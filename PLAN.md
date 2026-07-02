@@ -7,7 +7,6 @@
 # Miscellaneous
 
 * Lisp paren checker
-* Change version to 1.18.0
 * Add a --version and --help command line options
 * Add a `make test-packages` that creates packages in a cspackage-test
   and then creates several packages from several standard assemblies
@@ -20,3 +19,7 @@
   * Tell the agent never to assume that the files have not changed.
 * Set up RELEASES.md
 
+
+# DONE
+
+* Change version to 1.18.0
