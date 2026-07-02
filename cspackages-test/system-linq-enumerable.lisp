@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
 ;;; Generator Version: 18
-;;; Creation Date: 2026-07-02T22:37:37Z
+;;; Creation Date: 2026-07-02T22:49:51Z
 
 (cl:in-package :cl-user)
 
@@ -219,7 +219,7 @@
 
 (cl:defconstant <type> (monoutils:get-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-02T22:37:37Z")
+(cl:defconstant <creation> "2026-07-02T22:49:51Z")
 (cl:defconstant <version> 18)
 
 ;; Register C# Type with CLOS

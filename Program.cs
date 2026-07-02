@@ -6,9 +6,9 @@
 
 using DotCL;
 using PackageGenerator;
-using System.Text.RegularExpressions;
 
 const string AsdFileName = "dotcl-packagegen.asd";
+const string SystemName = "dotcl-packagegen";
 
 if (args.Contains("--help")) {
     PrintHelp();
@@ -92,6 +92,8 @@ MonoUtilsRegistrar.Initialize();
 if (hasAssemblyMetadata && !string.IsNullOrEmpty(assemblyMetadataFile)) {
     Console.WriteLine("[Program.cs] Running assembly package generator...");
     try {
+	// FIXME: This seems awfully fragile. Is there some way we can make these come in
+	// from the build process?
         var generatorManifestPath = Path.Combine(AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
         DotclHost.LoadFromManifest(generatorManifestPath);
         DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR", assemblyMetadataFile, classFilter ?? "", outputDir ?? "", constantProperties ?? "");
@@ -104,6 +106,7 @@ if (hasAssemblyMetadata && !string.IsNullOrEmpty(assemblyMetadataFile)) {
     return;
 }
 
+// FIXME: Same thing
 var manifestPath = Path.Combine(
     AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
 Console.WriteLine($"[Program.cs] manifest: {manifestPath}");
@@ -130,41 +133,20 @@ Environment.Exit(1);
 //////////////////////////////////////////////////////////////////////////////
 // --version / --help
 
-// Reads the :description/:version/:author/:license fields and the leading
-// ";;; Copyright ..." comment straight out of dotcl-packagegen.asd, so
-// `--version` never drifts from the system definition (the canonical
-// version source per BUILD.md). This is a plain textual scan rather than a
-// full Lisp reader; it is only expected to handle the simple, unescaped
-// string literals this project's own .asd actually uses.
-static (string? Copyright, string? Description, string? Version, string? Author, string? License) ReadAsdMetadata() {
-    string asdPath = Path.Combine(AppContext.BaseDirectory, AsdFileName);
-    if (!File.Exists(asdPath)) {
-        return (null, null, null, null, null);
-    }
-
-    string text = File.ReadAllText(asdPath);
-
-    string? Field(string key) {
-        var m = Regex.Match(text, $@":{key}\s+""([^""]*)""");
-        return m.Success ? m.Groups[1].Value : null;
-    }
-
-    string? copyright = null;
-    var copyrightMatch = Regex.Match(text, @"^;;;\s*(Copyright.*)$", RegexOptions.Multiline);
-    if (copyrightMatch.Success) {
-        copyright = copyrightMatch.Groups[1].Value.Trim();
-    }
-
-    return (copyright, Field("description"), Field("version"), Field("author"), Field("license"));
-}
-
+// Boots DotCL and calls into Lisp (utils:print-system-version) to load
+// dotcl-packagegen.asd via ASDF's own asdf:load-asd and report its version,
+// description, author, and license through ASDF's system introspection API
+// (asdf:component-version, asdf:system-author, asdf:system-license, etc.)
+// rather than parsing the .asd file by hand. This is the canonical version
+// source per BUILD.md, so it can never drift from the system definition.
 void PrintVersion() {
-    var (copyright, description, version, author, license) = ReadAsdMetadata();
-    Console.WriteLine($"dotcl-packagegen {version ?? "(version unknown: dotcl-packagegen.asd not found)"}");
-    if (description != null) Console.WriteLine(description);
-    if (author != null) Console.WriteLine($"Author: {author}");
-    if (license != null) Console.WriteLine($"License: {license}");
-    if (copyright != null) Console.WriteLine(copyright);
+    DotclHost.Initialize();
+    MonoUtilsRegistrar.Initialize();
+    // FIXME: Same thing
+    var manifestPath = Path.Combine(AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
+    DotclHost.LoadFromManifest(manifestPath);
+    string asdPath = Path.Combine(AppContext.BaseDirectory, AsdFileName);
+    DotclHost.Call("PRINT-SYSTEM-VERSION", asdPath, SystemName);
 }
 
 void PrintHelp() {

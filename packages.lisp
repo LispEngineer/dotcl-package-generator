@@ -36,6 +36,7 @@
             #:path-combine
             #:file-exists-and-readable-p
             #:qualify-path
+            #:print-system-version
             #:csharp-overload-not-found
             #:csharp-overload-package-name
             #:csharp-overload-class-name

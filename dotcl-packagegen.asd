@@ -2,7 +2,7 @@
 
 (defsystem "dotcl-packagegen"
   :description "DotCL C#-assembly-to-Lisp package generator"
-  :version "1.18.1"
+  :version "1.18.2"
   :author "Douglas P. Fields, Jr. <symbolics@lisp.engineer>"
   :license "Apache 2.0; Copyright 2026 Douglas P. Fields, Jr."
   :depends-on ("dotnet-class")

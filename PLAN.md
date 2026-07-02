@@ -11,11 +11,9 @@
   ones recently removed for TimeStamp) with all those generated packages,
   testing every possible method with every possible set of parameters.
   * This can be run with make test-packages and should be run after make-test passes.
-* Add a --version and --help command line options
 * Add a `make test-packages` that creates packages in a cspackage-test
   and then creates several packages from several standard assemblies
 * Copy documentation from dotcl-dungeonslime
-* Add Apache 2.0 License
 * Make a utilities template and copy it to the generated directory
 * Do multiple assemblies and classes at the same time
 * Generate a packages.lisp as well
@@ -26,5 +24,7 @@
 
 # DONE
 
-* Change version to 1.18.0
+* Add a --version and --help command line options
 * Lisp paren checker
+* Add Apache 2.0 License
+* Change version to 1.18.0

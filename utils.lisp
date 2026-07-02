@@ -131,6 +131,23 @@
         (when m-doc
           (format *error-output* "    Doc: ~S~%" m-doc))))))
 
+(defun print-system-version (asd-path system-name)
+  "Loads SYSTEM-NAME's definition from ASD-PATH (via ASDF's own asd-loading
+   and system introspection, rather than any ad hoc parsing of the file) and
+   prints its version, description, author, and license."
+  (asdf:load-asd asd-path)
+  (let ((sys (asdf:find-system system-name nil)))
+    (if (not sys)
+        (format t "~A (version unknown: system not found after loading ~A)~%" system-name asd-path)
+        (progn
+          (format t "~A ~A~%" system-name (asdf:component-version sys))
+          (let ((desc (asdf:system-description sys)))
+            (when desc (format t "~A~%" desc)))
+          (let ((author (asdf:system-author sys)))
+            (when author (format t "Author: ~A~%" author)))
+          (let ((license (asdf:system-license sys)))
+            (when license (format t "License: ~A~%" license)))))))
+
 ;;; Condition signaled when a generated C# wrapper function's dispatcher
 ;;; fails to find a matching method overload at runtime.
 (cl:define-condition csharp-overload-not-found (cl:error)
