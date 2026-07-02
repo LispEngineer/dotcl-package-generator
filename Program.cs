@@ -6,6 +6,19 @@
 
 using DotCL;
 using PackageGenerator;
+using System.Text.RegularExpressions;
+
+const string AsdFileName = "dotcl-packagegen.asd";
+
+if (args.Contains("--help")) {
+    PrintHelp();
+    return;
+}
+
+if (args.Contains("--version")) {
+    PrintVersion();
+    return;
+}
 
 string? assemblyFile = null;
 string? outputFile = null;
@@ -113,3 +126,91 @@ if (isTestMode) {
 
 Console.Error.WriteLine("[Program.cs] No action specified. Use --assembly, --assembly-metadata, or --test.");
 Environment.Exit(1);
+
+//////////////////////////////////////////////////////////////////////////////
+// --version / --help
+
+// Reads the :description/:version/:author/:license fields and the leading
+// ";;; Copyright ..." comment straight out of dotcl-packagegen.asd, so
+// `--version` never drifts from the system definition (the canonical
+// version source per BUILD.md). This is a plain textual scan rather than a
+// full Lisp reader; it is only expected to handle the simple, unescaped
+// string literals this project's own .asd actually uses.
+static (string? Copyright, string? Description, string? Version, string? Author, string? License) ReadAsdMetadata() {
+    string asdPath = Path.Combine(AppContext.BaseDirectory, AsdFileName);
+    if (!File.Exists(asdPath)) {
+        return (null, null, null, null, null);
+    }
+
+    string text = File.ReadAllText(asdPath);
+
+    string? Field(string key) {
+        var m = Regex.Match(text, $@":{key}\s+""([^""]*)""");
+        return m.Success ? m.Groups[1].Value : null;
+    }
+
+    string? copyright = null;
+    var copyrightMatch = Regex.Match(text, @"^;;;\s*(Copyright.*)$", RegexOptions.Multiline);
+    if (copyrightMatch.Success) {
+        copyright = copyrightMatch.Groups[1].Value.Trim();
+    }
+
+    return (copyright, Field("description"), Field("version"), Field("author"), Field("license"));
+}
+
+void PrintVersion() {
+    var (copyright, description, version, author, license) = ReadAsdMetadata();
+    Console.WriteLine($"dotcl-packagegen {version ?? "(version unknown: dotcl-packagegen.asd not found)"}");
+    if (description != null) Console.WriteLine(description);
+    if (author != null) Console.WriteLine($"Author: {author}");
+    if (license != null) Console.WriteLine($"License: {license}");
+    if (copyright != null) Console.WriteLine(copyright);
+}
+
+void PrintHelp() {
+    // Column where option descriptions start; computed rather than
+    // hand-aligned so it stays correct regardless of flag name length.
+    const int descColumn = 33;
+
+    void Opt(string flag, params string[] descLines) {
+        string pad = new string(' ', Math.Max(1, descColumn - 2 - flag.Length));
+        Console.WriteLine($"  {flag}{pad}{descLines[0]}");
+        for (int i = 1; i < descLines.Length; i++) {
+            Console.WriteLine(new string(' ', descColumn) + descLines[i]);
+        }
+    }
+
+    Console.WriteLine("Usage: dotcl-packagegen [options]");
+    Console.WriteLine();
+    Console.WriteLine("Stage 1 - extract assembly metadata:");
+    Opt("--assembly <path>", "Reflect over the given .NET assembly and emit Lisp",
+        "S-expression metadata describing its public types.");
+    Opt("--output <path|->", "Destination for the metadata (default '-', meaning",
+        "stdout; diagnostics always go to stderr so the payload",
+        "stays clean).");
+    Console.WriteLine();
+    Console.WriteLine("Stage 2 - generate Lisp package(s) from metadata:");
+    Opt("--assembly-metadata <path>", "Metadata file produced by Stage 1.");
+    Opt("--class <name>", "Fully-qualified C# class name to generate a Lisp",
+        "package for.");
+    Opt("--output <dir>", "Destination directory for the generated .lisp",
+        "package file(s).");
+    Opt("--constant-properties <spec>", "Comma/semicolon-separated static property names",
+        "(or \"*\" for all) to emit as Lisp constants instead",
+        "of re-evaluated accessors.");
+    Console.WriteLine();
+    Console.WriteLine("Other:");
+    Opt("--test", "Run the generator's own Lisp unit tests plus the",
+        "AssemblyToLispy metadata test suite.");
+    Opt("--version", "Show version, author, license, and copyright",
+        "information (read from dotcl-packagegen.asd).");
+    Opt("--help", "Show this help message.");
+    Console.WriteLine();
+    Console.WriteLine("Examples:");
+    Console.WriteLine("  dotcl-packagegen --assembly MonoGame.Framework.dll \\");
+    Console.WriteLine("      --output /tmp/mg.lispy.metadata");
+    Console.WriteLine();
+    Console.WriteLine("  dotcl-packagegen --assembly-metadata /tmp/mg.lispy.metadata \\");
+    Console.WriteLine("      --class Microsoft.Xna.Framework.Vector2 \\");
+    Console.WriteLine("      --output ./cspackages --constant-properties \"*\"");
+}

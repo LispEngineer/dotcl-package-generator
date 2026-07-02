@@ -109,4 +109,18 @@
     </Content>
   </ItemGroup>
 
+  <!-- ========================================================================= -->
+  <!-- .asd Copy for Runtime "version" Introspection                             -->
+  <!-- ========================================================================= -->
+  <!-- The raw dotcl-packagegen.asd is excluded from the DotCL Lisp-compile      -->
+  <!-- item group above, but the "version" flag reads its :version/:author/     -->
+  <!-- :license fields (and its leading copyright comment) directly from this   -->
+  <!-- file at runtime, so a copy is placed next to the executable separately.  -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <Content Include="dotcl-packagegen.asd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
