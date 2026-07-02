@@ -10,16 +10,6 @@ using PackageGenerator;
 const string AsdFileName = "dotcl-packagegen.asd";
 const string SystemName = "dotcl-packagegen";
 
-if (args.Contains("--help")) {
-    PrintHelp();
-    return;
-}
-
-if (args.Contains("--version")) {
-    PrintVersion();
-    return;
-}
-
 string? assemblyFile = null;
 string? outputFile = null;
 bool hasAssembly = false;
@@ -31,7 +21,19 @@ string? outputDir = null;
 bool hasAssemblyMetadata = false;
 string? constantProperties = null;
 var isTestMode = false;
+var printHelp = false;
+var printVersion = false;
 
+////////////////////////////////////////////////////////////////////////////
+// Parse arguments
+
+if (args.Contains("--help")) {
+    printHelp = true;
+}
+
+if (args.Contains("--version")) {
+    printVersion = true;
+}
 
 for (int i = 0; i < args.Length; i++) {
     if (args[i] == "--assembly" && i + 1 < args.Length) {
@@ -61,6 +63,16 @@ for (int i = 0; i < args.Length; i++) {
     }
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Handle all the run modes
+
+// FIRST: Run modes that do not need DotCL
+
+if (printHelp) {
+    PrintHelp();
+    return;
+}
+
 if (hasAssembly && !string.IsNullOrEmpty(assemblyFile)) {
     Console.Error.WriteLine($"[Program.cs] Generating assembly metadata...");
     if (!hasOutput || string.IsNullOrEmpty(outputFile)) {
@@ -83,19 +95,31 @@ if (hasAssembly && !string.IsNullOrEmpty(assemblyFile)) {
     return;
 }
 
+// NEXT: Program invocations that require DotCL to be running
+
 DotclHost.Initialize();
 
 // Register the custom C#-implemented Lisp package with DotCL's
 // package registry.
 MonoUtilsRegistrar.Initialize();
 
+// FIXME: This seems awfully fragile. Is there some way we can make these come in
+// from the build process?
+var manifestPath = Path.Combine(
+    AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
+Console.WriteLine($"[Program.cs] manifest: {manifestPath}");
+var loaded = DotclHost.LoadFromManifest(manifestPath);
+Console.WriteLine($"[Program.cs] LoadFromManifest loaded {loaded} fasls");
+
+
+if (printVersion) {
+    PrintVersion();
+    return;
+}
+
 if (hasAssemblyMetadata && !string.IsNullOrEmpty(assemblyMetadataFile)) {
     Console.WriteLine("[Program.cs] Running assembly package generator...");
     try {
-	// FIXME: This seems awfully fragile. Is there some way we can make these come in
-	// from the build process?
-        var generatorManifestPath = Path.Combine(AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
-        DotclHost.LoadFromManifest(generatorManifestPath);
         DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR", assemblyMetadataFile, classFilter ?? "", outputDir ?? "", constantProperties ?? "");
     } catch (Exception ex) {
         Console.Error.WriteLine($"[Program.cs] Error in assembly package generator: {ex.Message}");
@@ -105,13 +129,6 @@ if (hasAssemblyMetadata && !string.IsNullOrEmpty(assemblyMetadataFile)) {
     Console.WriteLine("[Program.cs] ...assembly package generator complete.");
     return;
 }
-
-// FIXME: Same thing
-var manifestPath = Path.Combine(
-    AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
-Console.WriteLine($"[Program.cs] manifest: {manifestPath}");
-var loaded = DotclHost.LoadFromManifest(manifestPath);
-Console.WriteLine($"[Program.cs] LoadFromManifest loaded {loaded} fasls");
 
 //////////////////////////////////////////////////////////////////////////////
 // Tests
@@ -127,7 +144,7 @@ if (isTestMode) {
     return;
 }
 
-Console.Error.WriteLine("[Program.cs] No action specified. Use --assembly, --assembly-metadata, or --test.");
+Console.Error.WriteLine("[Program.cs] No action specified. Run with --help to see options.");
 Environment.Exit(1);
 
 //////////////////////////////////////////////////////////////////////////////
@@ -140,11 +157,6 @@ Environment.Exit(1);
 // rather than parsing the .asd file by hand. This is the canonical version
 // source per BUILD.md, so it can never drift from the system definition.
 void PrintVersion() {
-    DotclHost.Initialize();
-    MonoUtilsRegistrar.Initialize();
-    // FIXME: Same thing
-    var manifestPath = Path.Combine(AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
-    DotclHost.LoadFromManifest(manifestPath);
     string asdPath = Path.Combine(AppContext.BaseDirectory, AsdFileName);
     DotclHost.Call("PRINT-SYSTEM-VERSION", asdPath, SystemName);
 }

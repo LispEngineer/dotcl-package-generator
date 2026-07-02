@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Xml.XmlReader
 ;;; Generator Version: 18
-;;; Creation Date: 2026-07-02T22:49:53Z
+;;; Creation Date: 2026-07-02T23:00:58Z
 
 (cl:in-package :cl-user)
 
@@ -161,7 +161,7 @@
 
 (cl:defconstant <type> (monoutils:get-type "System.Xml.XmlReader"))
 (cl:defconstant <type-str> "System.Xml.XmlReader")
-(cl:defconstant <creation> "2026-07-02T22:49:53Z")
+(cl:defconstant <creation> "2026-07-02T23:00:58Z")
 (cl:defconstant <version> 18)
 
 ;; Register C# Type with CLOS
