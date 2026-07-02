@@ -1,0 +1,112 @@
+<!-- Copyright 2026 Douglas P. Fields, Jr. -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ========================================================================= -->
+  <!-- General Project Configuration Property Group                              -->
+  <!-- ========================================================================= -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>PackageGenerator</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RollForward>Major</RollForward>
+    <TargetFramework>net10.0</TargetFramework>
+    <DefaultItemExcludes>$(DefaultItemExcludes);AssemblyToLispyTestTarget\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <!-- ========================================================================= -->
+  <!-- dotnet-tool Packaging (mirrors ../dotcl/runtime/runtime.csproj)           -->
+  <!-- ========================================================================= -->
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dotcl-packagegen</ToolCommandName>
+    <PackageId>dotcl-packagegen</PackageId>
+    <Description>Standalone DotCL C#-assembly-to-Lisp package generator, extracted from dotcl-dungeonslime.</Description>
+    <RuntimeIdentifiers>linux-x64;linux-arm64;win-x64;osx-x64;osx-arm64;any</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <!-- ========================================================================= -->
+  <!-- DotCL Build Properties                                                    -->
+  <!-- ========================================================================= -->
+  <!-- DotclProjectAsd: Specifies the entry ASDF system definition file path.    -->
+  <!-- The compiler task resolves dependencies and compiles Lisp sources         -->
+  <!-- relative to this file. No <DotclBuildInit> is needed because this        -->
+  <!-- system does not depend on any Quicklisp-resolved libraries.               -->
+  <!-- ========================================================================= -->
+  <PropertyGroup>
+    <DotclProjectAsd>$(MSBuildProjectDirectory)/dotcl-packagegen.asd</DotclProjectAsd>
+  </PropertyGroup>
+
+  <!-- ========================================================================= -->
+  <!-- Raw Lisp Source File Exclusions                                           -->
+  <!-- ========================================================================= -->
+  <!-- Under .NET SDK-style projects, all files in the project folder matching   -->
+  <!-- default patterns (including .lisp and .asd) are automatically included    -->
+  <!-- in the standard <None> item group. This section removes them to prevent   -->
+  <!-- default MSBuild copy tasks from copying uncompiled Lisp source files      -->
+  <!-- directly to the root of the output directory during a build.              -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <None Remove="dotcl-packagegen.asd" />
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- DotCL Runtime and Test Fixture References                                 -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <PackageReference Include="DotCL.Runtime" Version="0.1.15" />
+    <ProjectReference Include="AssemblyToLispyTestTarget\AssemblyToLispyTestTarget.csproj" />
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- Contrib Lisp Library Copy Task                                            -->
+  <!-- ========================================================================= -->
+  <!-- Copies the Lisp standard library ('contrib' directory) from the restored  -->
+  <!-- NuGet package assets folder to the build output directory, so the host    -->
+  <!-- can dynamically resolve ASDF/UIOP packages via (require "asdf") at        -->
+  <!-- runtime. Mirrors DungeonSlime.csproj.                                     -->
+  <!-- ========================================================================= -->
+  <ItemGroup Condition="'$(DotclProjectAsd)' != '' and '$(_DotCLContribDir)' != ''">
+    <None Include="$(_DotCLContribDir)\**\*">
+      <Link>contrib\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- NuGet Reference Assembly Copy Target                                      -->
+  <!-- ========================================================================= -->
+  <!-- Copies all local NuGet reference assemblies to the output bin/ directory  -->
+  <!-- before Lisp dependency resolution runs, preventing compile-time Lisp      -->
+  <!-- loading errors on clean builds. Mirrors DungeonSlime.csproj.              -->
+  <!-- ========================================================================= -->
+  <Target Name="CopyReferencesBeforeLisp" BeforeTargets="_DotCLResolveDeps" DependsOnTargets="ResolveReferences" Condition="'$(DotclProjectAsd)' != ''">
+    <MakeDir Directories="$(OutDir)" />
+    <Copy SourceFiles="@(ReferenceCopyLocalPaths)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- ========================================================================= -->
+  <!-- Output Directory Manifest Target                                          -->
+  <!-- ========================================================================= -->
+  <!-- Writes the build target output folder path out to a text file before     -->
+  <!-- Lisp root compilation executes, for compile-time Lisp macros that need   -->
+  <!-- to locate reference assembly paths dynamically. Mirrors DungeonSlime.csproj. -->
+  <!-- ========================================================================= -->
+  <Target Name="WriteOutDirForLisp" BeforeTargets="_DotCLCompileRoot" Condition="'$(DotclProjectAsd)' != ''">
+    <WriteLinesToFile File="obj/dotcl-outdir.txt" Lines="$(OutDir)" Overwrite="true" />
+  </Target>
+
+  <!-- ========================================================================= -->
+  <!-- Vendored Test Fixtures & Metadata Test Suite Copy                        -->
+  <!-- ========================================================================= -->
+  <!-- The Stage-1 metadata tests under tests/*.test.lisp are discovered and     -->
+  <!-- loaded at runtime (via glob) relative to the working directory, so they   -->
+  <!-- must be copied next to the executable, same as DungeonSlime does.         -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <Content Include="tests\*.lisp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
