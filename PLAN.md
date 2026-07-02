@@ -6,6 +6,7 @@
 
 # Miscellaneous
 
+* Make `Makefile` introspect the `.asd` for the version number.
 * Make a new DotCL application with its own .csproj and .asd
   that uses generated packages and runs LOTS of tests (such as the
   ones recently removed for TimeStamp) with all those generated packages,
