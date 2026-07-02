@@ -6,7 +6,11 @@
 
 # Miscellaneous
 
-* Lisp paren checker
+* Make a new DotCL application with its own .csproj and .asd
+  that uses generated packages and runs LOTS of tests (such as the
+  ones recently removed for TimeStamp) with all those generated packages,
+  testing every possible method with every possible set of parameters.
+  * This can be run with make test-packages and should be run after make-test passes.
 * Add a --version and --help command line options
 * Add a `make test-packages` that creates packages in a cspackage-test
   and then creates several packages from several standard assemblies
@@ -23,3 +27,4 @@
 # DONE
 
 * Change version to 1.18.0
+* Lisp paren checker

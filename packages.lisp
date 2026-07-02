@@ -14,13 +14,10 @@
 (format *error-output* "[packages.lisp] Defining packages in package ~S~%" *package*)
 
 ;; Pre-declare empty C# packages so local-nicknames doesn't crash.
-;; :system-time-span is also the target of a vendored cspackages/ fixture
-;; used by the generator's own operator-overload tests.
 (defpackage :system-io-path)
 (defpackage :system-app-domain)
 (defpackage :system-object)
 (defpackage :system-type)
-(defpackage :system-time-span)
 
 ;; Some special packages
 (defpackage :system-object
@@ -65,8 +62,6 @@
 
 (defpackage :package-generator-tests
   (:use :cl :assembly-package-generator :utils :monoutils)
-  (:local-nicknames
-    (:ts :system-time-span))
   (:export
     #:run-generator-tests
     #:run-package-generator-tests))

@@ -149,64 +149,9 @@
                 "new-single-single"
                 "constructor-overload-name for parameterized constructor matches types"))
 
-  ;; 4. Test Operator Overloads on Generated TimeSpan package
-  ;; (The Vector2/MonoGame operator block from the DungeonSlime original of this
-  ;; file is intentionally omitted here: this project only vendors System.* cspackages.)
-  (format *error-output* "--- Running Generated Package Operator Overload Tests ---~%")
-
-  ;; TimeSpan Operator Tests
-  (let ((t1 (ts:from-ticks 100))
-        (t2 (ts:from-ticks 200))
-        (t3 (ts:from-ticks 100)))
-
-    (assert-test (ts:= t1 t3)
-                t
-                "TimeSpan = operator (true case)")
-
-    (assert-test (ts:= t1 t2)
-                nil
-                "TimeSpan = operator (false case)")
-
-    (assert-test (ts:not= t1 t2)
-                t
-                "TimeSpan not= operator (true case)")
-
-    (assert-test (ts:not= t1 t3)
-                nil
-                "TimeSpan not= operator (false case)")
-
-    (assert-test (ts:< t1 t2)
-                t
-                "TimeSpan < operator (true case)")
-
-    (assert-test (ts:< t2 t1)
-                nil
-                "TimeSpan < operator (false case)")
-
-    (assert-test (ts:<= t1 t2)
-                t
-                "TimeSpan <= operator (less than case)")
-
-    (assert-test (ts:<= t1 t3)
-                t
-                "TimeSpan <= operator (equal case)")
-
-    (assert-test (ts:> t2 t1)
-                t
-                "TimeSpan > operator (true case)")
-
-    (assert-test (ts:> t1 t2)
-                nil
-                "TimeSpan > operator (false case)")
-
-    (assert-test (ts:>= t2 t1)
-                t
-                "TimeSpan >= operator (greater than case)")
-
-    (assert-test (ts:>= t1 t3)
-                t
-                "TimeSpan >= operator (equal case)"))
-
-  (format *error-output* "--- Generated Package Operator Overload Tests Completed ---~%")
+  ;; Functional/operator-overload testing of generated packages (e.g. the old
+  ;; TimeSpan operator checks that used to live here) is now handled by the
+  ;; `make test` target, which generates a range of standard-.NET classes into
+  ;; cspackages-test/ and validates them with check_parens.py.
 
   (format *error-output* "--- Package Generator Tests Completed ---~%"))
