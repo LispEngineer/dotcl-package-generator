@@ -14,6 +14,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     "No response after 60s - continued without an answer" and then ask me the question
     at the end of a text prompt.
 
+* Never modify `git` history, make commits, etc. I will handle that offline separately
+  from anything you do.
+
+* Don't assume that you are the only thing editing files. I often make concurrent changes
+  and use other tools to make changes as well. So, don't assume files are the same
+  between sessions or between user prompts.
+
 # Repository Description
 
 
