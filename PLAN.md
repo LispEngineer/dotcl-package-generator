@@ -83,6 +83,40 @@
     proxy on the fly, and has a reference to the proxy for reuse.
 
 
+# Make ASDF System
+
+To make it easier to load all the generated packages, the package system
+will create an ASDF system defintion file, an `.asd` file. The system will
+reference each generated file as a component, and have general metadata.
+
+The metadata to set are:
+* `:author`: Set this to "DotCL C# Assembly Package Generator"
+* `:version`: Set this to the assembly version (e.g., 21), as a string
+* `:homepage`: This should be the GitHub repository for the package generator,
+  which currently is https://github.com/LispEngineer/dotcl-package-generator .
+* `:description`: Set this to the fixed, one-line text
+  "Lisp packages enabling ease-of-interoperation with selected C# classes
+   and objects."
+* `:long-description`: Set this to a multi-line, indented detailed explanation of
+  the generator version and the packages included.
+  * Generator information: Exact version of the generator used (e.g., 2.21.3),
+    and the generation date and time.
+  * Details of packages included:
+    * Top level of indentation: The assembly (without pathname) from which it drew
+      the classes.
+    * First indent: The fully-qualified C# style class name & it's assigned package name
+    * Second indent: (if not blank) the Constant Properties defined for the class
+
+The components (`:components`) to include are:
+* `:file` for each generated `.lisp` package file
+  * There are no cross-dependencies so order does not matter.
+    Just use the same order as the command line arguments for simplicity.
+
+The name of the generated `.asd` file should be `csharp-assembly-packages.asd`.
+
+
+---
+
 # **DONE** Single Pass Generator
 
 Modify the program such that it generates all the files in a single execution.
@@ -152,8 +186,6 @@ can be extended to do more interesting things mentioned above,
 such as creating a unified ASDF system `.asd` file, creating a
 unified `packages.lisp` file, adding shared utilities. So this
 is a really foundational change that will help a lot in the future.
-
-
 
 
 # DONE
