@@ -20,6 +20,10 @@ comments indicating:
 * The C# class (in C# format) this package corresponds to
 * The Constant Properties defined for this package.
 
+Leave a line of whitespace between each package definition.
+
+Do not generate the `defpackage` in the package's `.lisp` file anymore.
+
 
 # Make `csharp-assembly-utils.lisp` and Package
 
