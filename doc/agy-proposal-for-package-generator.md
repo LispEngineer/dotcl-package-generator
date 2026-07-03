@@ -1,5 +1,7 @@
 # Handling C# Method Overloads in Lisp: Taxonomy & Phased Plan
 
+* Copyright 2026 Douglas P. Fields, Jr.
+
 Handling overloaded methods and operators from C# in Common Lisp is a complex mapping problem because C# relies on static type dispatch (resolved at compile time by the C# compiler based on argument types) while Lisp primarily relies on dynamic typing. 
 
 Below is a taxonomy of how methods can be overloaded in C#, how we can map them to Lisp, and a phased plan to implement these mappings in the generator.

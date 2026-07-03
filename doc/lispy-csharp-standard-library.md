@@ -1,6 +1,7 @@
 # Creating a Lispy C# Standard Library
 
 * Author: Douglas P. Fields, Jr. - symbolics@lisp.engineer
+* Copyright 2026 Douglas P. Fields, Jr.
 * Last updated: 2026-06-06
 
 DotCL projects will likely do a lot of things using C# Standard Library classes,

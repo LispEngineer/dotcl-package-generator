@@ -14,7 +14,6 @@
   * This can be run with make test-packages and should be run after make-test passes.
 * Add a `make test-packages` that creates packages in a cspackage-test
   and then creates several packages from several standard assemblies
-* Copy documentation from dotcl-dungeonslime
 * Make a utilities template and copy it to the generated directory
 * Do multiple assemblies and classes at the same time
 * Generate a packages.lisp as well
@@ -25,6 +24,7 @@
 
 # DONE
 
+* Copy documentation from dotcl-dungeonslime
 * Add a --version and --help command line options
 * Lisp paren checker
 * Add Apache 2.0 License

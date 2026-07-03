@@ -1,5 +1,7 @@
 # Package Documentation for `dotnet`
 
+* Copyright 2026 Douglas P. Fields, Jr.
+
 This document provides detailed documentation for the symbols exported by the `DOTNET` package in the DotCL Common Lisp environment. These functions provide the core interop capabilities between Common Lisp and the .NET Common Language Runtime (CLR), as well as low-level native Foreign Function Interface (FFI) memory and function calling capabilities.
 
 All symbols in the `DOTNET` package are registered at runtime by the C# engine (specifically in `Startup.cs`) and backed by static methods in the `DotCL.Runtime`, `DotCL.DotNetEvents`, `DotCL.DotNetNuGet`, and `DotCL.DotNetWinForms` classes.
