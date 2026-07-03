@@ -474,3 +474,54 @@ To support overloaded methods like binary/unary operators (e.g. `TimeSpan.+` and
 - **Maximum Mandatory Length**: The generator computes `max-mandatory-parameter-len` across all overloads.
 - **Optional Parameter Collection**: Positional parameters between `min-len` and `max-mandatory-len` are generated in the master wrapper lambda list using `cl:&optional` (with `supplied-p` variables) instead of keyword arguments.
 - **Strict Dispatching**: Master wrapper `cond` clauses evaluate both argument type checks and `supplied-p` presence flags to accurately dispatch to the correct C# overload signature.
+
+## Nested Type Package Naming (Version 19)
+
+C#'s CIL representation separates a nested type from its enclosing type with
+a `+` (e.g. `Type.FullName` for `Glyph` nested inside `SpriteFont` is
+`Microsoft.Xna.Framework.Graphics.SpriteFont+Glyph`). `AssemblyToLispy.cs`
+uses this value verbatim for `:fully-qualified-name`, and it must stay
+verbatim there: `monoutils:get-type`, `dotnet:resolve-type`, and `dotnet:the`
+type hints all require the literal `+`-form to resolve the live CLR type.
+
+Before Version 19, `camel-to-kebab` — which derives the generated Lisp
+package name and output filename from `:fully-qualified-name` — only
+special-cased `.` (mapping it to `-`); every other character, including
+`+`, was copied through unchanged. This leaked a literal `+` into the
+package/file name, plus a spurious extra hyphen from the uppercase-letter
+hyphen-insertion logic misreading the `+` as "not already a separator"
+(e.g. `microsoft-xna-framework-graphics-sprite-font+-glyph.lisp`).
+
+**First attempt (reverted)**: making `camel-to-kebab` itself treat `+` like
+`.` seemed like the obvious fix, but `camel-to-kebab` is *also* applied to
+already-mapped member/operator names, not just type names — and
+`AssemblyToLispy.cs` maps the C# `+` operator (`op_Addition`) to the
+literal one-character Lisp name `"+"` upstream (see its operator-name
+mangling table). Passing that already-correct `"+"` through a `+`-aware
+`camel-to-kebab` silently turned `System.TimeSpan`'s `(cl:defun + ...)`
+master wrapper into `(cl:defun - ...)` — a working operator turned into a
+different, wrong one, with no error anywhere. Caught by `make test`'s
+`cspackages-test/` diff showing an unrelated-looking change in
+`system-time-span.lisp`.
+
+**Actual fix**: a new, narrowly-scoped `type-fq-name-to-pkg-name` helper
+wraps `camel-to-kebab`, substituting `+` → `-` in the input *before*
+camel-casing — but only at the two call sites that convert a *type's*
+`fully-qualified-name` to a display name (`generate-class-file`'s
+`pkg-name`/`output-file`, and the `csharp-overload-not-found` condition's
+`:package-name` slot). `camel-to-kebab` itself is completely unchanged, so
+every other caller (member names, parameter names, and already-mapped
+operator symbols like `+`, `-`, `=`) is unaffected:
+
+```
+Microsoft.Xna.Framework.Graphics.SpriteFont+Glyph
+  -> microsoft-xna-framework-graphics-sprite-font-glyph
+AssemblyToLispyTestTarget.NestingContainer+NestedLevel2+NestedLevel3
+  -> assembly-to-lispy-test-target-nesting-container-nested-level2-nested-level3
+```
+
+Every reflection-facing use of `fq-name` (`<type>`, `<type-str>`,
+`dotnet:resolve-type`, `dotnet:the` hints) reads it raw, never through
+`type-fq-name-to-pkg-name` or `camel-to-kebab` — a nested type's generated
+package still resolves the correct live CLR type via its `+`-separated
+`<type-str>`.

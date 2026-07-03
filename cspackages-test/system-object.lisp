@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Object
-;;; Generator Version: 18
-;;; Creation Date: 2026-07-02T23:00:52Z
+;;; Generator Version: 19
+;;; Creation Date: 2026-07-03T05:03:00Z
 
 (cl:in-package :cl-user)
 
@@ -29,8 +29,8 @@
 
 (cl:defconstant <type> (monoutils:get-type "System.Object"))
 (cl:defconstant <type-str> "System.Object")
-(cl:defconstant <creation> "2026-07-02T23:00:52Z")
-(cl:defconstant <version> 18)
+(cl:defconstant <creation> "2026-07-03T05:03:00Z")
+(cl:defconstant <version> 19)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

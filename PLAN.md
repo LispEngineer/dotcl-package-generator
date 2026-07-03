@@ -6,6 +6,9 @@
 
 # Miscellaneous
 
+* Copy the `revert-cspackages-timestamps.sh` from DungeonSlime to here,
+  and use it in the `cspackages-test` directory.
+
 * Make a `FILES.md`
 * Make `Makefile` introspect the `.asd` for the version number.
 * Make a new DotCL application with its own .csproj and .asd
@@ -73,7 +76,7 @@
     proxy on the fly, and has a reference to the proxy for reuse.
 
 
-# Single Pass Generator
+# **DONE** Single Pass Generator
 
 Modify the program such that it generates all the files in a single execution.
 The execution could look like this, but all on a single command line:

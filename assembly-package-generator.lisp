@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 18
+(defparameter *generator-version* 19
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -32,7 +32,8 @@
    15 - Protected critical Lisp syntax symbols (quote, function, t, nil) from being shadowed by mapping conflicting C# member names to quote!, function!, t!, nil!; qualified other standard Common Lisp symbols in generated templates with cl: prefix.
    16 - Tracked is-static-overload-p per clean method overload inside Case 3 (instead of using group-wide static-p) to ensure overloaded static methods are correctly generated as static wrappers.
    17 - Mapped C# field/property 'NaN' to Lisp 'nan' in camel-to-kebab; mapped 'IsSomething' methods/properties to 'something?' in map-member-name.
-   18 - Added Master Wrapper with Precise Dispatch using Lisp's &key (var init supplied-p) syntax, split static vs instance mixed-mode overloads using '*' suffix, and added csharp-overload-not-found condition.")
+   18 - Added Master Wrapper with Precise Dispatch using Lisp's &key (var init supplied-p) syntax, split static vs instance mixed-mode overloads using '*' suffix, and added csharp-overload-not-found condition.
+   19 - Nested C# type names (CIL '+' separator, e.g. Outer+Inner) are now flattened to the same hyphen convention as namespace dots when deriving a type's Lisp package/file name (new type-fq-name-to-pkg-name helper), instead of leaking a literal '+' into it; camel-to-kebab itself is untouched (it is also applied to already-mapped operator names like the literal '+' produced for C#'s op_Addition, which must not be altered), and :fully-qualified-name plus all reflection-facing uses remain unaffected.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -57,6 +58,19 @@
                       (write-char (char-downcase c) sb))
                      (t
                       (write-char c sb))))))))
+
+(defun type-fq-name-to-pkg-name (fq-name)
+  "Converts a type's fully-qualified-name to a Lisp package/file name.
+   fq-name uses CIL's native '+' separator for nested types (e.g.
+   Outer+Inner), which must NOT be touched by camel-to-kebab itself: that
+   function is also applied to already-mapped member/operator names, and
+   the C# '+' operator (op_Addition) is legitimately mapped to the literal
+   one-character Lisp name \"+\" upstream in AssemblyToLispy.cs, so a
+   blanket '+' handling inside camel-to-kebab would corrupt operator
+   overload wrappers. Instead, '+' is flattened to '-' (matching the
+   existing '.' convention) only here, on a type's own fully-qualified
+   name, before camel-casing the rest."
+  (camel-to-kebab (substitute #\- #\+ fq-name)))
 
 (defun split-string (string &optional (separator #\;))
   "Split a string into a list of substrings at occurrences of the separator character."
@@ -539,7 +553,7 @@
     
     (cl:let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
       (cl:format stream "    (cl:t (cl:error 'utils:csharp-overload-not-found~%")
-      (cl:format stream "                    :package-name \"~A\"~%" (cl:string-upcase (camel-to-kebab fq-name)))
+      (cl:format stream "                    :package-name \"~A\"~%" (cl:string-upcase (type-fq-name-to-pkg-name fq-name)))
       (cl:format stream "                    :class-name <type-str>~%")
       (cl:format stream "                    :method-name \"~A\"~%" name)
       (cl:format stream "                    :supplied-args ~A))))~%~%" supplied-args-expr))))
@@ -605,7 +619,7 @@
    stamp (so a batch of files generated in one run can share a single
    timestamp); otherwise a fresh timestamp is computed."
   (let* ((fq-name (getf class-plist :fully-qualified-name))
-         (pkg-name (camel-to-kebab fq-name))
+         (pkg-name (type-fq-name-to-pkg-name fq-name))
          (output-file (merge-pathnames (make-pathname :name pkg-name :type "lisp")
                                        (pathname (concatenate 'string output-dir "/"))))
          (fields (getf class-plist :fields))

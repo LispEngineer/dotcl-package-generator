@@ -61,6 +61,7 @@
             #:resolve-batch-entry
             #:generate-class-file
             #:camel-to-kebab
+            #:type-fq-name-to-pkg-name
             #:split-string))
 
 (defpackage :package-generator-tests

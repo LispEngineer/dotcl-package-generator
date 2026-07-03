@@ -93,4 +93,26 @@
         (when create-method
           (assert-true (getf create-method :is-generic) "Create method should be generic")
           (assert-equal 1 (getf create-method :generic-arity) "Create generic-arity should be 1")
-          (assert-true (getf create-method :is-static) "Create method should be static"))))))
+          (assert-true (getf create-method :is-static) "Create method should be static")))))
+
+  ;; Test nested types (NestingContainer+NestedLevel2 and
+  ;; NestingContainer+NestedLevel2+NestedLevel3): the CIL '+' separator
+  ;; must survive verbatim in :fully-qualified-name (needed for live type
+  ;; resolution via monoutils:get-type), and the type must be tagged :nested.
+  (let ((lvl2 (find-if (lambda (cls)
+                          (string= (getf cls :fully-qualified-name)
+                                   "AssemblyToLispyTestTarget.NestingContainer+NestedLevel2"))
+                        *metadata*)))
+    (assert-not-null lvl2 "Should find NestingContainer+NestedLevel2 by its CIL-separated fully-qualified-name")
+    (when lvl2
+      (assert-equal "NestedLevel2" (getf lvl2 :name) "NestedLevel2's :name is its simple name, without '+'")
+      (assert-true (member :nested (getf lvl2 :flags)) "NestedLevel2 should have the :nested flag")))
+
+  (let ((lvl3 (find-if (lambda (cls)
+                          (string= (getf cls :fully-qualified-name)
+                                   "AssemblyToLispyTestTarget.NestingContainer+NestedLevel2+NestedLevel3"))
+                        *metadata*)))
+    (assert-not-null lvl3 "Should find NestingContainer+NestedLevel2+NestedLevel3 (two levels of '+' nesting)")
+    (when lvl3
+      (assert-equal "NestedLevel3" (getf lvl3 :name) "NestedLevel3's :name is its simple name, without '+'")
+      (assert-true (member :nested (getf lvl3 :flags)) "NestedLevel3 should have the :nested flag"))))

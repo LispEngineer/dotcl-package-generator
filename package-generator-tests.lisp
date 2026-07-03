@@ -41,6 +41,29 @@
               "some-mhtml-method"
               "Convert SomeMHTMLMethod to kebab-case")
 
+  ;; 1a. Confirm camel-to-kebab itself leaves '+' untouched: it is also
+  ;; applied to already-mapped operator/member names, and AssemblyToLispy.cs
+  ;; maps the C# '+' operator (op_Addition) to the literal one-character
+  ;; Lisp name "+" upstream, so camel-to-kebab must not corrupt it.
+  (assert-test (assembly-package-generator:camel-to-kebab "+")
+              "+"
+              "camel-to-kebab leaves a bare '+' operator name untouched")
+
+  ;; 1b. Test type-fq-name-to-pkg-name on nested-type CIL names (CIL uses
+  ;; '+' as the nested-type separator; it must flatten to '-' the same as
+  ;; '.', with no doubled hyphen at the boundary), one/two/three levels deep.
+  (assert-test (assembly-package-generator:type-fq-name-to-pkg-name "Microsoft.Xna.Framework.Graphics.SpriteFont+Glyph")
+              "microsoft-xna-framework-graphics-sprite-font-glyph"
+              "Convert one-level-nested SpriteFont+Glyph to a package name")
+
+  (assert-test (assembly-package-generator:type-fq-name-to-pkg-name "A+B+C")
+              "a-b-c"
+              "Convert two-level-nested A+B+C to a package name")
+
+  (assert-test (assembly-package-generator:type-fq-name-to-pkg-name "Outer+Middle+Inner+Deepest")
+              "outer-middle-inner-deepest"
+              "Convert three-level-nested Outer+Middle+Inner+Deepest to a package name")
+
 
   ;; 2. Test split-string
   (assert-test (assembly-package-generator:split-string "System.Console;System.Math")

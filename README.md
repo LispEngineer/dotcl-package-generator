@@ -60,6 +60,13 @@ read-only properties to be emitted as `defconstant` instead of `define-symbol-ma
 only when the property genuinely never changes at runtime (e.g. `Vector2.Zero`), since
 reflection alone can't tell constants from properties that vary.
 
+Nested C# types (a class/struct/enum declared inside another type) are addressed by their
+CIL name, which separates nesting levels with `+` rather than `.` — e.g.
+`--class Microsoft.Xna.Framework.Graphics.SpriteFont+Glyph` for the `Glyph` type nested
+inside `SpriteFont`. The generated Lisp package/file name flattens the `+` the same way it
+flattens namespace dots, so that example generates
+`microsoft-xna-framework-graphics-sprite-font-glyph`, not a name containing a literal `+`.
+
 Assembly files are validated to exist, and requested classes are validated to exist in their
 assembly's metadata, before any output file is written; any error is reported in red to
 standard error. `--version`/`--help` and `--test` boot the DotCL host

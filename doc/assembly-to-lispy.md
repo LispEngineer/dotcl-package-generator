@@ -74,8 +74,19 @@ Each entry is a Common Lisp plist with keys that are keywords. All keys are Comm
 Each type entry plist contains the following entries, by key:
 
 * `:name` (String): The simple name of the type (e.g., `ArrayList` or ``Action`4``).
+  For a nested type this is just its own simple name (e.g. `Glyph`), never including
+  any enclosing type.
 * `:fully-qualified-name` (String): The fully qualified name of the type, including
-  the namespace (e.g., `System.Collections.ArrayList` or ``System.Action`4``).
+  the namespace (e.g., `System.Collections.ArrayList` or ``System.Action`4``). For a
+  nested type, this is CIL's native `Type.FullName`, which separates the type from
+  its enclosing type(s) with `+` rather than `.` (e.g.
+  `Microsoft.Xna.Framework.Graphics.SpriteFont+Glyph`) — this value is used verbatim,
+  unmodified, since it is what live .NET reflection APIs (`monoutils:get-type`,
+  `dotnet:resolve-type`, `dotnet:the` type hints) require to resolve the type. See
+  `doc/generator-design-notes.md`'s "Nested Type Package Naming (Version 19)" section
+  for how the *generator* derives a human-friendly Lisp package/file name from this
+  value (it flattens `+` the same way it flattens namespace `.`, rather than leaking
+  the literal `+` into the generated name).
 * `:namespace` (String): The namespace in which the type is defined 
   (e.g., `System.Collections` or `System`).
 * `:kind` (Keyword): The classification of the C# entity. Must be one of the following:

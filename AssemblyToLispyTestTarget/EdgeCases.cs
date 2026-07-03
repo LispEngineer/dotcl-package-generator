@@ -144,4 +144,25 @@ namespace AssemblyToLispyTestTarget
             return default(T)!;
         }
     }
+
+    /// <summary>
+    /// A class with public types nested three levels deep, to test that the CIL
+    /// nested-type separator '+' (e.g. NestingContainer+NestedLevel2) is handled
+    /// correctly in :fully-qualified-name and in the derived Lisp package name.
+    /// </summary>
+    public class NestingContainer
+    {
+        /// <summary>
+        /// A public type nested one level inside NestingContainer.
+        /// </summary>
+        public class NestedLevel2
+        {
+            /// <summary>
+            /// A public type nested two levels inside NestingContainer.
+            /// </summary>
+            public class NestedLevel3
+            {
+            }
+        }
+    }
 }
