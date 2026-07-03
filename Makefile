@@ -59,6 +59,8 @@ test: build
 	      --class 'System.Collections.Generic.Dictionary`2+KeyCollection' \
 	      --class 'System.Collections.Generic.Dictionary`2+ValueCollection'
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo; System.Convert
+	# Undo any changes that only changed typestamp
+	./revert-cspackages-timestamps.sh
 	python3 check_parens.py $(GEN_TEST_DIR)/*.lisp $(GEN_TEST_DIR)/*.asd
 
 check-parens:
