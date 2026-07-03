@@ -6,11 +6,55 @@
 
 ## Overview
 
-TODO
+`dotcl-packagegen` is a standalone CLI tool (packaged as a `dotnet tool`) that generates
+[DotCL](https://github.com/dotcl/dotcl) Common Lisp packages/bindings for arbitrary .NET
+assemblies. It is a hybrid C#/Common Lisp codebase: C# does .NET reflection and hosts the
+DotCL Lisp runtime; Lisp does the actual code generation via string templating.
 
-# Usage
+The tool operates in two independent stages:
 
-TODO
+* **Stage 1** (`--assembly <dll> --output <metadata-file>`, pure C#, no DotCL needed):
+  `AssemblyToLispy.cs` reflects over a .NET assembly (plus its sidecar `.xml` doc file, if
+  present) and emits a single Lisp-reader-compatible s-expression list — one plist per public
+  type — to a "lispy metadata" file. See `doc/assembly-to-lispy.md` for the complete, canonical
+  schema of this format (keys, flags, parameter plists, documentation plists, default-value
+  literal formatting, etc.)
+
+* **Stage 2** (`--assembly-metadata <file> --class <FQN> --output <dir>`, boots DotCL): loads a
+  Stage-1 metadata file and calls into `assembly-package-generator.lisp`
+  (`run-assembly-package-generator` → `generate-assembly-packages` → `generate-class-file`),
+  which reads the plist for the requested class(es) and emits a `.lisp` file defining a package
+  with idiomatic Lisp wrapper functions for that C# type's constructors, methods, properties,
+  and fields.
+
+Splitting these stages means metadata can be captured once and reused, and Stage 2 (the part
+that needs to boot the full Lisp host) can be iterated on without re-running reflection.
+
+The metadata is a single Lisp s-expression.
+
+## Origin
+
+This package was split out of my
+[DotCL Dungeon Slime](https://github.com/LispEngineer/dotcl-dungeonslime)
+MonoGame proof of concept.
+
+
+# CLI Usage (Stage 1 / Stage 2 directly)
+
+```sh
+dotcl-packagegen --assembly path/to/Some.dll --output some.lispy.metadata
+dotcl-packagegen --assembly-metadata some.lispy.metadata --class Some.Namespace.Type \
+    --output ./cspackages --constant-properties "*"
+```
+
+`--constant-properties` (comma/semicolon-separated names, or `"*"` for all) forces static
+read-only properties to be emitted as `defconstant` instead of `define-symbol-macro` — safe
+only when the property genuinely never changes at runtime (e.g. `Vector2.Zero`), since
+reflection alone can't tell constants from properties that vary.
+
+`--version`/`--help` and `--test` boot the DotCL host (`DotclHost.Initialize()`); `--assembly`
+(Stage 1 alone) intentionally does not, since it's pure reflection.
+
 
 # Building & Testing
 
