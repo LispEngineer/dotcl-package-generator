@@ -216,8 +216,6 @@ is a really foundational change that will help a lot in the future.
   * Only if it is then possible for the main `.asd` file to reference
     that `.asd` file easily.
 
-
-
 * Add a `make test-packages` that creates packages in a cspackage-test
   and then creates several packages from several standard assemblies
 
@@ -225,13 +223,11 @@ is a really foundational change that will help a lot in the future.
   * Tell the agent never to assume that the files have not changed.
 * Set up `RELEASES.md`
 
-
 * Copy documentation from dotcl-dungeonslime
 * Add a --version and --help command line options
 * Lisp paren checker
 * Add Apache 2.0 License
 * Change version to 1.18.0
-
 
 ## Older DONE
 
