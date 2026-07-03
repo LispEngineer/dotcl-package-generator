@@ -24,9 +24,6 @@ TODO
     typically aware of the generic arity of the classes they use and might
     not easily guess the package name.
 
-* Copy the `revert-cspackages-timestamps.sh` from DungeonSlime to here,
-  and use it in the `cspackages-test` directory for the `make test` target.
-
 * Make a `FILES.md`
 * Make `Makefile` introspect the `.asd` for the version number.
 * Make a new DotCL application with its own .csproj and .asd
@@ -284,6 +281,10 @@ is a really foundational change that will help a lot in the future.
 
 
 # DONE
+
+* Copy the `revert-cspackages-timestamps.sh` from DungeonSlime to here,
+  and use it in the `cspackages-test` directory for the `make test` target.
+  * Extended it to the other date in `.asd` file too.
 
 * `generate-single-overload`/`generate-master-wrapper` hardcode the receiver parameter 
   name as literal `obj`, which collides when a C# method's own parameter is also named obj, e.g. 
