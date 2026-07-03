@@ -3,28 +3,6 @@
 * Author: Douglas P. Fields, Jr. - symbolics@lisp.engineer
 * Copyright 2026 Douglas P. Fields, Jr.
 
-
-# Make `packages.lisp`
-
-Currently, each generated `.lisp` file has a `cl:defpackage` at the top.
-A common convention is to define all packages in a single location,
-the `packages.lisp` file. Let's make the generator work that way as well.
-
-At the top of the generated `packages.lisp` the same comments should be
-included as in the other generated `.lisp` files.
-
-As each class is generated, append to the `packages.lisp` file the
-appropriate `cl:defpackage` section. Preceed the `defpackage` with
-comments indicating:
-* The source file this package corresponds to
-* The C# class (in C# format) this package corresponds to
-* The Constant Properties defined for this package.
-
-Leave a line of whitespace between each package definition.
-
-Do not generate the `defpackage` in the package's `.lisp` file anymore.
-
-
 # Make `csharp-assembly-utils.lisp` and Package
 
 The generated packages have a number of dependencies on other code.
@@ -71,8 +49,10 @@ How do we include the template files (if chosen) in the deployed application?
 
 TODO
 * Add Constant Properties as structured `<constant-properties>`
-  * A Lisp list of all the selected properties, could also include `"*"` as a single entry.
+  * A Lisp list of all the selected properties (strings); 
+    could also just be `"*"` as a single entry.
 * Add the Assembly as `<assembly>`
+* Add the Assembly to the per-package comment in `packages.lisp`
 
 
 # Miscellaneous
@@ -151,6 +131,27 @@ TODO
 
 
 ---
+
+# **DONE** Make `packages.lisp`
+
+Currently, each generated `.lisp` file has a `cl:defpackage` at the top.
+A common convention is to define all packages in a single location,
+the `packages.lisp` file. Let's make the generator work that way as well.
+
+At the top of the generated `packages.lisp` the same comments should be
+included as in the other generated `.lisp` files.
+
+As each class is generated, append to the `packages.lisp` file the
+appropriate `cl:defpackage` section. Preceed the `defpackage` with
+comments indicating:
+* The source file this package corresponds to
+* The C# class (in C# format) this package corresponds to
+* The Constant Properties defined for this package.
+
+Leave a line of whitespace between each package definition.
+
+Do not generate the `defpackage` in the package's `.lisp` file anymore.
+
 
 # **DONE** Make ASDF System
 
