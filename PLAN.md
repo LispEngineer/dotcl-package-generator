@@ -73,6 +73,77 @@
     proxy on the fly, and has a reference to the proxy for reuse.
 
 
+# Single Pass Generator
+
+Modify the program such that it generates all the files in a single execution.
+The execution could look like this, but all on a single command line:
+(separated here for ease of understanding)
+
+```
+dotcl-packagegen
+--out-dir some/directory
+--assembly path/to/Some.Assembly.dll
+--class Some.Class1 --constant-properties "*"
+--class Some.Class2
+--class Some.Class3
+--assembly path/to/Some.Other.Assembly.dll
+--class Some.Other.Class4 --constant-properties ""
+--class Some.Other.Class5 --constant-properties "*"
+```
+
+This will then generate the metadata for the assemblies,
+named as `Some.Assembly.metadata`, and then immediately
+generate the class packages `some-class1.lisp` and so forth,
+all in the `some/directory` as specified.
+
+All `--classes` are referencing the most recent `--assembly`.
+The `--constant-properties` references the most recent `--class`.
+
+## Thoughts on Implementation
+
+In C#:
+
+* Record the invocation timestamp for use in the
+  output files.
+
+* Create a list of everything to do, a 3-tuple:
+  * Assembly
+  * Class
+  * Constant Properties
+
+* Find all the assemblies, give an error if any can't be found.
+
+* Load all the assemblies, and give an error if any class mentioned
+  cannot be found in the loaded assemblies.
+  * (What about the `.xml` files adjacent to the assemblies?)
+
+* Generate all the assembly metadata files.
+
+In Lisp:
+
+* Pass the list of 3-tuples, enhanced with the location of the
+  generated metadata files, to Lisp from C#.
+
+* Load all the metadata files. Stop if there are any errors
+  upon attempting to load them.
+
+* Generate each package. Use the same timestamp for all generated
+  files, as recorded above.
+
+Throughout:
+
+* Output messages indicating to the user what is going on.
+  * Any error messages should be output in red color.
+
+## Next Steps
+
+Once there is a single-pass generator in place, the generator
+can be extended to do more interesting things mentioned above,
+such as creating a unified ASDF system `.asd` file, creating a
+unified `packages.lisp` file, adding shared utilities. So this
+is a really foundational change that will help a lot in the future.
+
+
 
 
 # DONE
