@@ -628,3 +628,56 @@ Because class files now depend on `packages.lisp` having been loaded first, `gen
 (Version 21) was updated to reflect that dependency explicitly rather than relying on component-list
 order alone: `csharp-assembly-packages.asd`'s `:components` now lists `(:file "packages")` first,
 and every class `:file` entry gains `:depends-on ("packages")`.
+
+## Self-Contained Runtime Support (Version 23)
+
+Generated output previously referenced this tool's own `monoutils`/`utils` packages at three
+runtime call sites — but a batch handed to a downstream project never shipped those packages, so
+generated code was never actually self-contained, contrary to this repo's stated goal.
+Investigation found `monoutils:dotnet-p`/`boxed-dotnet-p` are not portable Lisp at all: they are
+native primitives registered into DotCL by this tool's own `MonoUtilsRegistrar.Initialize()`
+(`MonoUtils.cs`), unreachable from any host that doesn't happen to load this exact assembly.
+
+Two of the three call sites had a stock-DotCL equivalent already available (DotCL 0.1.15,
+`Runtime.DotNet.cs`), so no custom code needs to ship for them at all:
+
+* The per-class `<type>` constant (`(cl:defconstant <type> ...)`) now calls `dotnet:resolve-type`
+  directly instead of `monoutils:get-type` — the latter only ever wrapped that same call for a
+  string argument, the only way generated code ever invoked it, and `dotnet:resolve-type` is
+  already used a few lines later in the same file for CLOS type registration.
+* `format-param-type-check`'s fallback for non-primitive C# parameter types now emits
+  `(dotnet:object-type arg)` (returns the wrapped `Type`, truthy, if `arg` is a
+  `LispDotNetObject`/`LispDotNetBoxed`; `NIL` otherwise) instead of `(monoutils:dotnet-p arg)` —
+  an exact drop-in replacement with identical semantics, no native registration required.
+
+The third — the `csharp-overload-not-found` condition raised by master-overload dispatch
+fallback clauses — is genuine custom Lisp logic (a `cl:define-condition`) with no stock
+equivalent, so it now ships with every batch: a single-pass invocation writes
+`csharp-assembly-utils.lisp` into `--out-dir` (`generate-batch-utils-file`, mirroring
+`generate-batch-asd-file`'s accumulate-then-write-once shape), and emitted `cl:error` forms
+reference `csharp-assembly-utils:csharp-overload-not-found` instead of
+`utils:csharp-overload-not-found`.
+
+Following the Version 22 convention that every `defpackage` form lives in `packages.lisp`, the
+`csharp-assembly-utils` package's `defpackage` is *not* in `csharp-assembly-utils.lisp` — it's
+written into `packages.lisp` (via `generate-batch-packages-file`) ahead of the per-class
+`defpackage` loop, and `csharp-assembly-utils.lisp` itself only has `(cl:in-package
+:csharp-assembly-utils)` plus the condition definition, exactly the shape every class file
+already has relative to `packages.lisp`.
+
+Both pieces of static content — the `defpackage` form and the condition definition — are copied
+verbatim from two new, real, hand-written, independently loadable and `check_parens.py`-able
+source files: `csharp-assembly-utils-package.template.lisp` and
+`csharp-assembly-utils.template.lisp`. `generate-batch-packages-file`/`generate-batch-utils-file`
+read them with `uiop:read-file-string` rather than reconstructing their content via `format`
+calls, so the actual known-good, testable source is what ships, not a generator-code
+approximation of it. Both templates are named with a `.template.lisp` double extension (not bare
+`.lisp`) and copied next to the built executable via `dotcl-packagegen.csproj`'s `<Content>`
+pattern — the same one already used for `dotcl-packagegen.asd`'s own version introspection —
+and `Program.cs` resolves and passes both paths down as two new scalar arguments on the
+`RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH` call.
+
+`csharp-assembly-packages.asd`'s `:components` gained `(:file "csharp-assembly-utils"
+:depends-on ("packages"))` (its `in-package` form needs that package to already exist), and
+every per-class `:file`'s `:depends-on` became `("packages" "csharp-assembly-utils")`, since
+class bodies now reference `csharp-assembly-utils:csharp-overload-not-found`.

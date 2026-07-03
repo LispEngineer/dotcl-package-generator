@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Xml.XmlReader
-;;; Generator Version: 22
-;;; Creation Date: 2026-07-03T12:54:32Z
+;;; Generator Version: 23
+;;; Creation Date: 2026-07-03T13:49:28Z
 
 (cl:in-package :system-xml-xml-reader)
 
-(cl:defconstant <type> (monoutils:get-type "System.Xml.XmlReader"))
+(cl:defconstant <type> (dotnet:resolve-type "System.Xml.XmlReader"))
 (cl:defconstant <type-str> "System.Xml.XmlReader")
-(cl:defconstant <creation> "2026-07-03T12:54:32Z")
-(cl:defconstant <version> 22)
+(cl:defconstant <creation> "2026-07-03T13:49:28Z")
+(cl:defconstant <version> 23)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -137,31 +137,31 @@
 (cl:defun create (input-uri cl:&optional (settings cl:nil supplied-settings) (input-context cl:nil supplied-input-context))
   "Master wrapper for System.Xml.XmlReader.Create overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:stringp input-uri) supplied-settings (cl:or (cl:null settings) (monoutils:dotnet-p settings)) supplied-input-context (cl:or (cl:null input-context) (monoutils:dotnet-p input-context)))
+    ((cl:and (cl:stringp input-uri) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:or (cl:null input-context) (dotnet:object-type input-context)))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:or (cl:null input-uri) (monoutils:dotnet-p input-uri)) supplied-settings (cl:or (cl:null settings) (monoutils:dotnet-p settings)) supplied-input-context (cl:stringp input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:stringp input-context))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:or (cl:null input-uri) (monoutils:dotnet-p input-uri)) supplied-settings (cl:or (cl:null settings) (monoutils:dotnet-p settings)) supplied-input-context (cl:or (cl:null input-context) (monoutils:dotnet-p input-context)))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:or (cl:null input-context) (dotnet:object-type input-context)))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:or (cl:null input-uri) (monoutils:dotnet-p input-uri)) supplied-settings (cl:or (cl:null settings) (monoutils:dotnet-p settings)) supplied-input-context (cl:stringp input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:stringp input-context))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:or (cl:null input-uri) (monoutils:dotnet-p input-uri)) supplied-settings (cl:or (cl:null settings) (monoutils:dotnet-p settings)) supplied-input-context (cl:or (cl:null input-context) (monoutils:dotnet-p input-context)))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:or (cl:null input-context) (dotnet:object-type input-context)))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:stringp input-uri) supplied-settings (cl:or (cl:null settings) (monoutils:dotnet-p settings)) (cl:not supplied-input-context))
+    ((cl:and (cl:stringp input-uri) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri settings))
-    ((cl:and (cl:or (cl:null input-uri) (monoutils:dotnet-p input-uri)) supplied-settings (cl:or (cl:null settings) (monoutils:dotnet-p settings)) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri settings))
-    ((cl:and (cl:or (cl:null input-uri) (monoutils:dotnet-p input-uri)) supplied-settings (cl:or (cl:null settings) (monoutils:dotnet-p settings)) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri settings))
-    ((cl:and (cl:or (cl:null input-uri) (monoutils:dotnet-p input-uri)) supplied-settings (cl:or (cl:null settings) (monoutils:dotnet-p settings)) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri settings))
     ((cl:and (cl:stringp input-uri) (cl:not supplied-settings) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri))
-    ((cl:and (cl:or (cl:null input-uri) (monoutils:dotnet-p input-uri)) (cl:not supplied-settings) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) (cl:not supplied-settings) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri))
-    ((cl:and (cl:or (cl:null input-uri) (monoutils:dotnet-p input-uri)) (cl:not supplied-settings) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) (cl:not supplied-settings) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "Create"
@@ -284,7 +284,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "Dispose" disposing))
     ((cl:and (cl:not supplied-disposing))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "Dispose"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "Dispose"
@@ -311,7 +311,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "GetAttribute" name))
     ((cl:and (cl:stringp name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "GetAttribute" name))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "GetAttribute"
@@ -373,7 +373,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "IsStartElement" name))
     ((cl:and (cl:not supplied-name) (cl:not supplied-ns))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "IsStartElement"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "IsStartElement"
@@ -419,7 +419,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "MoveToAttribute" name))
     ((cl:and (cl:stringp name) (cl:not supplied-ns))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "MoveToAttribute" name))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "MoveToAttribute"
@@ -630,11 +630,11 @@ Returns: The text content as a System.String object.
 (cl:defun read-element-content-as (obj return-type namespace-resolver cl:&optional (local-name cl:nil supplied-local-name) (namespace-uri cl:nil supplied-namespace-uri))
   "Master wrapper for System.Xml.XmlReader.ReadElementContentAs overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null return-type) (monoutils:dotnet-p return-type)) (cl:or (cl:null namespace-resolver) (monoutils:dotnet-p namespace-resolver)) supplied-local-name (cl:stringp local-name) supplied-namespace-uri (cl:stringp namespace-uri))
+    ((cl:and (cl:or (cl:null return-type) (dotnet:object-type return-type)) (cl:or (cl:null namespace-resolver) (dotnet:object-type namespace-resolver)) supplied-local-name (cl:stringp local-name) supplied-namespace-uri (cl:stringp namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAs" return-type namespace-resolver local-name namespace-uri))
-    ((cl:and (cl:or (cl:null return-type) (monoutils:dotnet-p return-type)) (cl:or (cl:null namespace-resolver) (monoutils:dotnet-p namespace-resolver)) (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
+    ((cl:and (cl:or (cl:null return-type) (dotnet:object-type return-type)) (cl:or (cl:null namespace-resolver) (dotnet:object-type namespace-resolver)) (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAs" return-type namespace-resolver))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAs"
@@ -716,7 +716,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsBoolean" local-name namespace-uri))
     ((cl:and (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsBoolean"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAsBoolean"
@@ -744,7 +744,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsDateTime" local-name namespace-uri))
     ((cl:and (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsDateTime"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAsDateTime"
@@ -772,7 +772,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsDecimal" local-name namespace-uri))
     ((cl:and (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsDecimal"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAsDecimal"
@@ -800,7 +800,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsDouble" local-name namespace-uri))
     ((cl:and (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsDouble"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAsDouble"
@@ -828,7 +828,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsFloat" local-name namespace-uri))
     ((cl:and (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsFloat"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAsFloat"
@@ -856,7 +856,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsInt" local-name namespace-uri))
     ((cl:and (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsInt"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAsInt"
@@ -884,7 +884,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsLong" local-name namespace-uri))
     ((cl:and (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsLong"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAsLong"
@@ -912,7 +912,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsObject" local-name namespace-uri))
     ((cl:and (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsObject"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAsObject"
@@ -946,7 +946,7 @@ Returns: A boxed common language runtime (CLR) object of the most appropriate ty
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsString" local-name namespace-uri))
     ((cl:and (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementContentAsString"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementContentAsString"
@@ -982,7 +982,7 @@ Returns: The element content as a System.String object.
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementString" name))
     ((cl:and (cl:not supplied-name) (cl:not supplied-ns))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadElementString"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadElementString"
@@ -1049,7 +1049,7 @@ Returns: If the reader is positioned on an element or an attribute node, this me
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadStartElement" name))
     ((cl:and (cl:not supplied-name) (cl:not supplied-ns))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadStartElement"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadStartElement"
@@ -1094,7 +1094,7 @@ Returns: A new XML reader instance set to System.Xml.ReadState.Initial. Calling 
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadToDescendant" name namespace-uri))
     ((cl:and (cl:stringp name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadToDescendant" name))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadToDescendant"
@@ -1124,7 +1124,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadToFollowing" name namespace-uri))
     ((cl:and (cl:stringp name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadToFollowing" name))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadToFollowing"
@@ -1154,7 +1154,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadToNextSibling" name namespace-uri))
     ((cl:and (cl:stringp name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj) "ReadToNextSibling" name))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
                     :class-name <type-str>
                     :method-name "ReadToNextSibling"

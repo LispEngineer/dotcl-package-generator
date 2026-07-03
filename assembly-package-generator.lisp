@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 22
+(defparameter *generator-version* 23
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -36,7 +36,8 @@
    19 - Nested C# type names (CIL '+' separator, e.g. Outer+Inner) are now flattened to the same hyphen convention as namespace dots when deriving a type's Lisp package/file name (new type-fq-name-to-pkg-name helper), instead of leaking a literal '+' into it; camel-to-kebab itself is untouched (it is also applied to already-mapped operator names like the literal '+' produced for C#'s op_Addition, which must not be altered), and :fully-qualified-name plus all reflection-facing uses remain unaffected.
    20 - Open-generic type names (.NET's backtick arity suffix, e.g. Dictionary`2 or ``Action`4``) are now also flattened to '-' in type-fq-name-to-pkg-name, alongside '+'; a raw backtick left in a generated package/symbol name was read by the Lisp reader as the backquote macro character, silently corrupting the surrounding defpackage form instead of signaling an error.
    21 - A single-pass invocation now also emits csharp-assembly-packages.asd (generate-batch-asd-file), tying every generated .lisp package file together as an ASDF system's :components, in command-line order, with this generator version and the dotcl-packagegen CLI version recorded in the system's :version/:long-description.
-   22 - Class .lisp files no longer emit their own cl:defpackage; a single-pass invocation now consolidates every class's defpackage form into one packages.lisp (generate-batch-packages-file), each preceded by a comment block naming its source file, C# class, and constant properties, with a blank line between packages. Class files retain only cl:in-package. csharp-assembly-packages.asd now lists packages as the first :file component, and every class :file declares :depends-on (\"packages\"), so ASDF's dependency graph (not just component-list order) enforces packages.lisp loading first.")
+   22 - Class .lisp files no longer emit their own cl:defpackage; a single-pass invocation now consolidates every class's defpackage form into one packages.lisp (generate-batch-packages-file), each preceded by a comment block naming its source file, C# class, and constant properties, with a blank line between packages. Class files retain only cl:in-package. csharp-assembly-packages.asd now lists packages as the first :file component, and every class :file declares :depends-on (\"packages\"), so ASDF's dependency graph (not just component-list order) enforces packages.lisp loading first.
+   23 - Generated output is now self-contained: it no longer references this tool's own monoutils/utils packages (monoutils:dotnet-p was backed by a native primitive registered by this tool's own MonoUtilsRegistrar, unavailable to any downstream host). The per-class <type> constant and the parameter type-check fallback now use stock dotnet:resolve-type / dotnet:object-type instead of monoutils:get-type / monoutils:dotnet-p, and the csharp-overload-not-found condition is emitted as csharp-assembly-utils:csharp-overload-not-found instead of utils:csharp-overload-not-found. A single-pass invocation now also emits csharp-assembly-utils.lisp (generate-batch-utils-file), holding that condition; its defpackage form is copied into packages.lisp ahead of the per-class defpackage forms (generate-batch-packages-file). Both are copied verbatim from real, standalone-loadable template files (csharp-assembly-utils-package.template.lisp, csharp-assembly-utils.template.lisp) rather than synthesized via format. csharp-assembly-packages.asd's :components gained a csharp-assembly-utils :file (:depends-on (\"packages\")), and every class :file's :depends-on became (\"packages\" \"csharp-assembly-utils\").")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -370,7 +371,7 @@
     ((string= param-type "System.String")
      (format nil "(cl:stringp ~A)" arg-str))
     (t
-     (format nil "(cl:or (cl:null ~A) (monoutils:dotnet-p ~A))" arg-str arg-str))))
+     (format nil "(cl:or (cl:null ~A) (dotnet:object-type ~A))" arg-str arg-str))))
 
 (cl:defun complex-group-p (clean-methods)
   "Returns t if the group of clean methods requires a master wrapper dispatch (either multiple overloads or presence of default arguments)."
@@ -564,7 +565,7 @@
           (cl:format stream "     ~A)~%" action-str))))
     
     (cl:let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
-      (cl:format stream "    (cl:t (cl:error 'utils:csharp-overload-not-found~%")
+      (cl:format stream "    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
       (cl:format stream "                    :package-name \"~A\"~%" (cl:string-upcase (type-fq-name-to-pkg-name fq-name)))
       (cl:format stream "                    :class-name <type-str>~%")
       (cl:format stream "                    :method-name \"~A\"~%" name)
@@ -810,7 +811,7 @@
         (format stream "(cl:in-package :~A)~%~%" pkg-name)
         
         ;; Type Constants
-        (format stream "(cl:defconstant <type> (monoutils:get-type \"~A\"))~%" fq-name)
+        (format stream "(cl:defconstant <type> (dotnet:resolve-type \"~A\"))~%" fq-name)
         (format stream "(cl:defconstant <type-str> \"~A\")~%" fq-name)
         (format stream "(cl:defconstant <creation> \"~A\")~%" creation-time)
         (format stream "(cl:defconstant <version> ~D)~%~%" *generator-version*)
@@ -1113,14 +1114,17 @@
               (push cname not-found))))
       (values (nreverse resolved) (nreverse not-found)))))
 
-(defun generate-batch-packages-file (entries-with-resolved output-dir creation-time)
-  "Writes packages.lisp into OUTPUT-DIR: one cl:defpackage per resolved
-   class (from ENTRIES-WITH-RESOLVED, in the same command-line order
-   GENERATE-BATCH-ASD-FILE consumes), each preceded by a comment block
-   naming its source .lisp file, its C# class, and its constant properties.
-   Individual class .lisp files no longer emit their own defpackage (see
-   COMPUTE-PACKAGE-EXPORTS-AND-SHADOWS / GENERATE-CLASS-FILE); this file
-   must be loaded before any of them."
+(defun generate-batch-packages-file (entries-with-resolved output-dir creation-time package-template-path)
+  "Writes packages.lisp into OUTPUT-DIR: first the CSHARP-ASSEMBLY-UTILS
+   defpackage form, copied verbatim from PACKAGE-TEMPLATE-PATH (a real,
+   standalone-loadable .lisp file -- see csharp-assembly-utils-package.template.lisp),
+   then one cl:defpackage per resolved class (from ENTRIES-WITH-RESOLVED, in
+   the same command-line order GENERATE-BATCH-ASD-FILE consumes), each
+   preceded by a comment block naming its source .lisp file, its C# class,
+   and its constant properties. Individual class .lisp files no longer emit
+   their own defpackage (see COMPUTE-PACKAGE-EXPORTS-AND-SHADOWS /
+   GENERATE-CLASS-FILE); this file must be loaded before any of them, as
+   well as before csharp-assembly-utils.lisp (GENERATE-BATCH-UTILS-FILE)."
   (let ((output-file (merge-pathnames (make-pathname :name "packages" :type "lisp")
                                        (pathname (concatenate 'string output-dir "/")))))
     (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
@@ -1128,6 +1132,9 @@
       (format stream ";;; Generator Version: ~D~%" *generator-version*)
       (format stream ";;; Creation Date: ~A~%~%" creation-time)
       (format stream "(cl:in-package :cl-user)~%~%")
+      (format stream ";;; Source File: csharp-assembly-utils.lisp~%")
+      (format stream ";;; Purpose: shared runtime support for generated packages~%")
+      (format stream "~A~%" (uiop:read-file-string package-template-path))
       (dolist (pair entries-with-resolved)
         (dolist (cls-pair (cdr pair))
           (let* ((cls (car cls-pair))
@@ -1149,6 +1156,22 @@
               (dolist (exp exports)
                 (format stream "   #:~A~%" exp))
               (format stream "  ))~%~%"))))))
+    output-file))
+
+(defun generate-batch-utils-file (output-dir creation-time utils-template-path)
+  "Writes csharp-assembly-utils.lisp into OUTPUT-DIR: the standard 3-line
+   header followed by UTILS-TEMPLATE-PATH's content, copied verbatim (a
+   real .lisp file -- see csharp-assembly-utils.template.lisp -- containing
+   cl:in-package plus the csharp-overload-not-found condition). Must run
+   after GENERATE-BATCH-PACKAGES-FILE, since this file's cl:in-package form
+   needs the CSHARP-ASSEMBLY-UTILS package already defined in packages.lisp."
+  (let ((output-file (merge-pathnames (make-pathname :name "csharp-assembly-utils" :type "lisp")
+                                       (pathname (concatenate 'string output-dir "/")))))
+    (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+      (format stream ";;; Generated automatically. Do not edit.~%")
+      (format stream ";;; Generator Version: ~D~%" *generator-version*)
+      (format stream ";;; Creation Date: ~A~%~%" creation-time)
+      (format stream "~A~%" (uiop:read-file-string utils-template-path)))
     output-file))
 
 (defun generate-batch-asd-file (entries-with-resolved output-dir creation-time cli-version)
@@ -1197,27 +1220,32 @@
                            (format desc "      Constant properties: ~{~A~^, ~}~%" cprops)))))))))
       (format stream "  :components (~%")
       (format stream "   (:file \"packages\")~%")
+      (format stream "   (:file \"csharp-assembly-utils\" :depends-on (\"packages\"))~%")
       (dolist (pair entries-with-resolved)
         (dolist (cls-pair (cdr pair))
           (let* ((fq-name (getf (car cls-pair) :fully-qualified-name))
                  (pkg-name (type-fq-name-to-pkg-name fq-name)))
-            (format stream "   (:file \"~A\" :depends-on (\"packages\"))~%" pkg-name))))
+            (format stream "   (:file \"~A\" :depends-on (\"packages\" \"csharp-assembly-utils\"))~%" pkg-name))))
       (format stream "  ))~%"))
     output-file))
 
-(defun generate-assembly-packages-batch (assembly-entries output-dir creation-time cli-version)
+(defun generate-assembly-packages-batch (assembly-entries output-dir creation-time cli-version
+                                          package-template-path utils-template-path)
   "Loads each entry's metadata file, resolves all requested classes across
    all entries, and only then generates the .lisp package files, so a
    class name that cannot be found aborts the whole run before anything is
    written. An entry with an empty :classes list is not an error -- it
    means only that entry's metadata file (already written by C#) was
    requested. Before any class file is written, emits packages.lisp
-   (GENERATE-BATCH-PACKAGES-FILE) holding every class's defpackage form, so
-   it exists ahead of (and independent of) the per-class files that assume
-   their package is already defined. Once every class file has been
-   written, also emits a csharp-assembly-packages.asd tying them all
-   together; CLI-VERSION (the dotcl-packagegen tool's own semver, e.g.
-   \"2.20.0\") is used in that file's long description."
+   (GENERATE-BATCH-PACKAGES-FILE, using PACKAGE-TEMPLATE-PATH for the
+   CSHARP-ASSEMBLY-UTILS defpackage form) holding every class's defpackage
+   form, so it exists ahead of (and independent of) the per-class files
+   that assume their package is already defined. Then emits
+   csharp-assembly-utils.lisp (GENERATE-BATCH-UTILS-FILE, using
+   UTILS-TEMPLATE-PATH). Once every class file has been written, also
+   emits a csharp-assembly-packages.asd tying them all together;
+   CLI-VERSION (the dotcl-packagegen tool's own semver, e.g. \"2.20.0\") is
+   used in that file's long description."
   (let ((all-resolved nil)
         (all-not-found nil)
         (entries-with-resolved nil))
@@ -1233,7 +1261,8 @@
         (utils:format-red *error-output* "Error: Class not found in assembly metadata: ~A~%" cname))
       (error "One or more requested classes were not found: ~{~A~^, ~}" all-not-found))
 
-    (generate-batch-packages-file entries-with-resolved output-dir creation-time)
+    (generate-batch-packages-file entries-with-resolved output-dir creation-time package-template-path)
+    (generate-batch-utils-file output-dir creation-time utils-template-path)
 
     (dolist (pair all-resolved)
       (let ((cls (car pair))
@@ -1245,12 +1274,16 @@
 
     t))
 
-(defun run-assembly-package-generator-batch (manifest-file output-dir creation-time cli-version)
+(defun run-assembly-package-generator-batch (manifest-file output-dir creation-time cli-version
+                                              package-template-path utils-template-path)
   "CLI entry point called by DotclHost.Call for the single-pass generator.
    MANIFEST-FILE is a Lisp-reader-compatible list of plists, one per
    assembly:
      ((:metadata-file \"...\" :assembly-name \"...\"
        :classes ((:name \"...\" :constant-properties \"...\") ...)) ...)
+   PACKAGE-TEMPLATE-PATH/UTILS-TEMPLATE-PATH point at
+   csharp-assembly-utils-package.template.lisp /
+   csharp-assembly-utils.template.lisp, copied next to the executable.
    Maps string parameters safely and reports errors in red."
   (handler-case
       (let ((mfile (and manifest-file (> (length manifest-file) 0) manifest-file))
@@ -1261,8 +1294,13 @@
           (error "Output directory path is required."))
         (unless (probe-file mfile)
           (error "Manifest file not found: ~A" mfile))
+        (unless (probe-file package-template-path)
+          (error "csharp-assembly-utils package template not found: ~A" package-template-path))
+        (unless (probe-file utils-template-path)
+          (error "csharp-assembly-utils template not found: ~A" utils-template-path))
         (let ((assembly-entries (utils:safe-read-form-from-file mfile)))
-          (generate-assembly-packages-batch assembly-entries odir creation-time cli-version)))
+          (generate-assembly-packages-batch assembly-entries odir creation-time cli-version
+                                             package-template-path utils-template-path)))
     (error (c)
       (utils:format-red *error-output* "Error in assembly-package-generator: ~A~%" c)
       (error c))))

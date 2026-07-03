@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 22
-;;; Creation Date: 2026-07-03T12:54:32Z
+;;; Generator Version: 23
+;;; Creation Date: 2026-07-03T13:49:28Z
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
-(cl:defconstant <type> (monoutils:get-type "System.Collections.Generic.Dictionary`2"))
+(cl:defconstant <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-03T12:54:32Z")
-(cl:defconstant <version> 22)
+(cl:defconstant <creation> "2026-07-03T13:49:28Z")
+(cl:defconstant <version> 23)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -189,7 +189,7 @@ Parameters:
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj) "TrimExcess" capacity))
     ((cl:and (cl:not supplied-capacity))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj) "TrimExcess"))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-COLLECTIONS-GENERIC-DICTIONARY-2"
                     :class-name <type-str>
                     :method-name "TrimExcess"

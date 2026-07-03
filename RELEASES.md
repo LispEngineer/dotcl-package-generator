@@ -10,6 +10,52 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.23.0 — 2026-07-03
+
+**Self-containment fix:** generated output no longer depends on this tool's own
+`monoutils`/`utils` packages at runtime — a downstream project loading a generated batch had no
+way to get those, so the "entirely self-contained" goal for generated packages wasn't actually
+met. `monoutils:dotnet-p`/`boxed-dotnet-p` turned out to be backed by a native primitive
+(`MonoUtilsRegistrar.Initialize()` in this tool's own `MonoUtils.cs`) unavailable to any host
+that doesn't happen to load this exact assembly — rather than ship that dependency, the two
+emitted call sites were swapped for stock DotCL 0.1.15 primitives that do the same job:
+
+* The per-class `<type>` constant now calls `dotnet:resolve-type` directly instead of
+  `monoutils:get-type` (which only ever wrapped that same call for a string argument, the only
+  way generated code invoked it) — consistent with the CLOS-registration block a few lines
+  later, which already called `dotnet:resolve-type` directly.
+* The parameter-type-check fallback for non-primitive C# types now checks
+  `(dotnet:object-type arg)` (truthy only for a wrapped `.NET` object, `NIL` otherwise) instead
+  of `monoutils:dotnet-p`.
+* The one genuinely custom piece of runtime logic generated code still needs — the
+  `csharp-overload-not-found` condition raised by master-overload dispatchers — is now emitted
+  as `csharp-assembly-utils:csharp-overload-not-found` instead of
+  `utils:csharp-overload-not-found`, and a single-pass invocation now also writes
+  `csharp-assembly-utils.lisp` into `--out-dir`, holding that condition. Its `defpackage` form is
+  written into `packages.lisp` instead (ahead of every class's own `defpackage`), following this
+  tool's own `packages.lisp` convention rather than making an exception for it.
+* Both new pieces of generated content — the `csharp-assembly-utils` `defpackage` form and the
+  condition definition itself — are copied verbatim from two new real, hand-written,
+  independently loadable/`check_parens.py`-able source files
+  (`csharp-assembly-utils-package.template.lisp`, `csharp-assembly-utils.template.lisp`),
+  read with `uiop:read-file-string` (`generate-batch-packages-file` /
+  new `generate-batch-utils-file`), rather than reconstructed via `format` calls — so the
+  known-good source is what actually ships. Both templates are copied next to the built
+  executable via `dotcl-packagegen.csproj`'s existing `<Content>`-copy pattern (the same one used
+  for `dotcl-packagegen.asd`'s own version introspection), and their paths are passed down from
+  `Program.cs` as two new scalar arguments on the `RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH` call.
+* `csharp-assembly-packages.asd`'s `:components` gained a `csharp-assembly-utils` `:file`
+  (`:depends-on ("packages")`, since its `in-package` form needs that package to already exist),
+  and every per-class `:file`'s `:depends-on` became `("packages" "csharp-assembly-utils")`.
+* `*generator-version*` bumped `22` → `23`, since this changes the emitted content of every
+  class file, not just adding a new one; see `doc/generator-design-notes.md`'s "Self-Contained
+  Runtime Support (Version 23)" section.
+* `doc/package-generator-dependencies.md` corrected: its stale `dotcl-dungeonslime` file links
+  now point at this repo's own `utils.lisp`/`monoutils.lisp`, and its "Dependencies of the
+  Generated Packages" section was rewritten to reflect that `monoutils`/`utils` are no longer
+  generated-output dependencies at all — only stock `dotnet:*` calls plus
+  `csharp-assembly-utils:csharp-overload-not-found`.
+
 ## 2.22.0 — 2026-07-03
 
 **New feature:** class `.lisp` files no longer each carry their own `(cl:defpackage ...)` form;

@@ -267,11 +267,32 @@
                                       (list :name "Fixture.ClassA" :constant-properties "*"))))
            (namestring out-dir)
            "2026-07-03T00:00:00Z"
-           "9.9.9")
+           "9.9.9"
+           (utils:qualify-path "csharp-assembly-utils-package.template.lisp")
+           (utils:qualify-path "csharp-assembly-utils.template.lisp"))
 
-          (let ((asd-file (merge-pathnames "csharp-assembly-packages.asd" out-dir)))
+          (let ((asd-file (merge-pathnames "csharp-assembly-packages.asd" out-dir))
+                (utils-file (merge-pathnames "csharp-assembly-utils.lisp" out-dir))
+                (packages-file (merge-pathnames "packages.lisp" out-dir)))
             (assert-test (not (null (probe-file asd-file))) t
                         "generate-assembly-packages-batch emits csharp-assembly-packages.asd")
+            (assert-test (not (null (probe-file utils-file))) t
+                        "generate-assembly-packages-batch emits csharp-assembly-utils.lisp")
+
+            (assert-test (not (null (search "csharp-overload-not-found"
+                                             (uiop:read-file-string utils-file))))
+                        t
+                        "csharp-assembly-utils.lisp defines the csharp-overload-not-found condition")
+
+            (assert-test (not (null (search "(cl:defpackage :csharp-assembly-utils"
+                                             (uiop:read-file-string packages-file))))
+                        t
+                        "packages.lisp includes the csharp-assembly-utils defpackage ahead of the class packages")
+
+            (dolist (class-file (list (merge-pathnames "fixture-class-a.lisp" out-dir)
+                                       (merge-pathnames "fixture-class-b.lisp" out-dir)))
+              (assert-test (search "monoutils:" (uiop:read-file-string class-file)) nil
+                          "generated class file no longer references monoutils:"))
 
             (asdf:load-asd asd-file)
             (let ((sys (asdf:find-system "csharp-assembly-packages" nil)))
@@ -283,8 +304,8 @@
               (assert-test (asdf:system-depends-on sys) nil
                           "csharp-assembly-packages.asd has no :depends-on yet")
               (assert-test (mapcar #'asdf:component-name (asdf:component-children sys))
-                          '("packages" "fixture-class-b" "fixture-class-a")
-                          "csharp-assembly-packages.asd lists packages first, then classes as :file components in request order"))))
+                          '("packages" "csharp-assembly-utils" "fixture-class-b" "fixture-class-a")
+                          "csharp-assembly-packages.asd lists packages, then csharp-assembly-utils, then classes as :file components in request order"))))
       (when (probe-file fixture-file)
         (delete-file fixture-file))
       (when (probe-file out-dir)

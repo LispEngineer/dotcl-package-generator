@@ -11,6 +11,8 @@ using PackageGenerator;
 
 const string AsdFileName = "dotcl-packagegen.asd";
 const string SystemName = "dotcl-packagegen";
+const string UtilsPackageTemplateFileName = "csharp-assembly-utils-package.template.lisp";
+const string UtilsTemplateFileName = "csharp-assembly-utils.template.lisp";
 
 var isTestMode = false;
 var printHelp = false;
@@ -147,10 +149,13 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
         string asdPath = Path.Combine(AppContext.BaseDirectory, AsdFileName);
         string cliVersion = DotclHost.ToClr<string>(
             DotclHost.Call("GET-SYSTEM-VERSION", asdPath, SystemName));
+        string utilsPackageTemplatePath = Path.Combine(AppContext.BaseDirectory, UtilsPackageTemplateFileName);
+        string utilsTemplatePath = Path.Combine(AppContext.BaseDirectory, UtilsTemplateFileName);
 
         Console.WriteLine("[Program.cs] Running assembly package generator...");
         try {
-            DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH", manifestFile, outDir, creationTime, cliVersion);
+            DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH", manifestFile, outDir, creationTime, cliVersion,
+                            utilsPackageTemplatePath, utilsTemplatePath);
         } catch (Exception ex) {
             Console.Error.WriteLine($"[Program.cs] Error in assembly package generator: {ex.Message}");
             Console.Error.WriteLine(ex.StackTrace);

@@ -48,6 +48,8 @@
   <!-- ========================================================================= -->
   <ItemGroup>
     <None Remove="dotcl-packagegen.asd" />
+    <None Remove="csharp-assembly-utils-package.template.lisp" />
+    <None Remove="csharp-assembly-utils.template.lisp" />
   </ItemGroup>
 
   <!-- ========================================================================= -->
@@ -119,6 +121,26 @@
   <!-- ========================================================================= -->
   <ItemGroup>
     <Content Include="dotcl-packagegen.asd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- csharp-assembly-utils Template Copy for Batch Generation                  -->
+  <!-- ========================================================================= -->
+  <!-- These two files are real, hand-written, standalone-loadable Lisp source   -->
+  <!-- (not part of dotcl-packagegen.asd, so never cross-compiled into this       -->
+  <!-- tool itself) whose content is copied verbatim into every generated batch's -->
+  <!-- packages.lisp / csharp-assembly-utils.lisp                                -->
+  <!-- (see GENERATE-BATCH-PACKAGES-FILE / GENERATE-BATCH-UTILS-FILE in           -->
+  <!-- assembly-package-generator.lisp), so a copy is placed next to the          -->
+  <!-- executable, mirroring the dotcl-packagegen.asd Content copy above.        -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <Content Include="csharp-assembly-utils-package.template.lisp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="csharp-assembly-utils.template.lisp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

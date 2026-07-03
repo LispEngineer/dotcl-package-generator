@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
-;;; Generator Version: 22
-;;; Creation Date: 2026-07-03T12:54:32Z
+;;; Generator Version: 23
+;;; Creation Date: 2026-07-03T13:49:28Z
 
 (cl:in-package :system-linq-enumerable)
 
-(cl:defconstant <type> (monoutils:get-type "System.Linq.Enumerable"))
+(cl:defconstant <type> (dotnet:resolve-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-03T12:54:32Z")
-(cl:defconstant <version> 22)
+(cl:defconstant <creation> "2026-07-03T13:49:28Z")
+(cl:defconstant <version> 23)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -41,11 +41,11 @@ Parameters:
 (cl:defun any (type source cl:&optional (predicate cl:nil supplied-predicate))
   "Master wrapper for System.Linq.Enumerable.Any overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-predicate (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "Any" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "Any" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Any"
@@ -88,47 +88,47 @@ Parameters:
 (cl:defun average (source cl:&optional (selector cl:nil supplied-selector))
   "Master wrapper for System.Linq.Enumerable.Average overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Average" source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Average"
@@ -333,11 +333,11 @@ Parameters:
 (cl:defun contains (type source value cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.Contains overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null value) (monoutils:dotnet-p value)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static-generic <type-str> "Contains" (cl:list type) source value comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null value) (monoutils:dotnet-p value)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Contains" (cl:list type) source value))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Contains"
@@ -365,11 +365,11 @@ Parameters:
 (cl:defun count (type source cl:&optional (predicate cl:nil supplied-predicate))
   "Master wrapper for System.Linq.Enumerable.Count overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-predicate (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "Count" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "Count" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Count"
@@ -399,11 +399,11 @@ Parameters:
 (cl:defun default-if-empty (type source cl:&optional (default-value cl:nil supplied-default-value))
   "Master wrapper for System.Linq.Enumerable.DefaultIfEmpty overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)))
      (dotnet:static-generic <type-str> "DefaultIfEmpty" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "DefaultIfEmpty" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "DefaultIfEmpty"
@@ -429,11 +429,11 @@ Parameters:
 (cl:defun distinct (type source cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.Distinct overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static-generic <type-str> "Distinct" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Distinct" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Distinct"
@@ -462,11 +462,11 @@ Parameters:
 (cl:defun element-at (type source index)
   "Master wrapper for System.Linq.Enumerable.ElementAt overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:numberp index))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:numberp index))
      (dotnet:static-generic <type-str> "ElementAt" (cl:list type) source index))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null index) (monoutils:dotnet-p index)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null index) (dotnet:object-type index)))
      (dotnet:static-generic <type-str> "ElementAt" (cl:list type) source index))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "ElementAt"
@@ -493,11 +493,11 @@ Parameters:
 (cl:defun element-at-or-default (type source index)
   "Master wrapper for System.Linq.Enumerable.ElementAtOrDefault overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:numberp index))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:numberp index))
      (dotnet:static-generic <type-str> "ElementAtOrDefault" (cl:list type) source index))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null index) (monoutils:dotnet-p index)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null index) (dotnet:object-type index)))
      (dotnet:static-generic <type-str> "ElementAtOrDefault" (cl:list type) source index))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "ElementAtOrDefault"
@@ -530,11 +530,11 @@ Returns: An empty System.Collections.Generic.IEnumerable`1 whose type argument i
 (cl:defun except (type first second cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.Except overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (monoutils:dotnet-p first)) (cl:or (cl:null second) (monoutils:dotnet-p second)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static-generic <type-str> "Except" (cl:list type) first second comparer))
-    ((cl:and (cl:or (cl:null first) (monoutils:dotnet-p first)) (cl:or (cl:null second) (monoutils:dotnet-p second)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Except" (cl:list type) first second))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Except"
@@ -565,11 +565,11 @@ Parameters:
 (cl:defun first (type source cl:&optional (predicate cl:nil supplied-predicate))
   "Master wrapper for System.Linq.Enumerable.First overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-predicate (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "First" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "First" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "First"
@@ -595,15 +595,15 @@ Parameters:
 (cl:defun first-or-default (type source cl:&optional (default-value cl:nil supplied-default-value) (default-value cl:nil supplied-default-value))
   "Master wrapper for System.Linq.Enumerable.FirstOrDefault overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)))
      (dotnet:static-generic <type-str> "FirstOrDefault" (cl:list type) source default-value default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "FirstOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "FirstOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-default-value) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-default-value) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "FirstOrDefault" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "FirstOrDefault"
@@ -671,11 +671,11 @@ Parameters:
 (cl:defun intersect (type first second cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.Intersect overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (monoutils:dotnet-p first)) (cl:or (cl:null second) (monoutils:dotnet-p second)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static-generic <type-str> "Intersect" (cl:list type) first second comparer))
-    ((cl:and (cl:or (cl:null first) (monoutils:dotnet-p first)) (cl:or (cl:null second) (monoutils:dotnet-p second)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Intersect" (cl:list type) first second))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Intersect"
@@ -709,11 +709,11 @@ Parameters:
 (cl:defun last (type source cl:&optional (predicate cl:nil supplied-predicate))
   "Master wrapper for System.Linq.Enumerable.Last overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-predicate (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "Last" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "Last" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Last"
@@ -739,15 +739,15 @@ Parameters:
 (cl:defun last-or-default (type source cl:&optional (default-value cl:nil supplied-default-value) (default-value cl:nil supplied-default-value))
   "Master wrapper for System.Linq.Enumerable.LastOrDefault overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)))
      (dotnet:static-generic <type-str> "LastOrDefault" (cl:list type) source default-value default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "LastOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "LastOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-default-value) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-default-value) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "LastOrDefault" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "LastOrDefault"
@@ -795,11 +795,11 @@ Parameters:
 (cl:defun long-count (type source cl:&optional (predicate cl:nil supplied-predicate))
   "Master wrapper for System.Linq.Enumerable.LongCount overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-predicate (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "LongCount" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "LongCount" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "LongCount"
@@ -825,51 +825,51 @@ Parameters:
 (cl:defun max (source cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.Max overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Max" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Max" source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Max"
@@ -1068,51 +1068,51 @@ Parameters:
 (cl:defun min (source cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.Min overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static <type-str> "Min" source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Min" source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Min"
@@ -1319,11 +1319,11 @@ Parameters:
 (cl:defun order (type source cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.Order overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static-generic <type-str> "Order" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Order" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Order"
@@ -1355,11 +1355,11 @@ Parameters:
 (cl:defun order-descending (type source cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.OrderDescending overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static-generic <type-str> "OrderDescending" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "OrderDescending" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "OrderDescending"
@@ -1412,11 +1412,11 @@ Parameters:
 (cl:defun reverse (type source)
   "Master wrapper for System.Linq.Enumerable.Reverse overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
      (dotnet:static-generic <type-str> "Reverse" (cl:list type) source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
      (dotnet:static-generic <type-str> "Reverse" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Reverse"
@@ -1458,11 +1458,11 @@ Parameters:
 (cl:defun sequence-equal (type first second cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.SequenceEqual overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (monoutils:dotnet-p first)) (cl:or (cl:null second) (monoutils:dotnet-p second)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static-generic <type-str> "SequenceEqual" (cl:list type) first second comparer))
-    ((cl:and (cl:or (cl:null first) (monoutils:dotnet-p first)) (cl:or (cl:null second) (monoutils:dotnet-p second)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "SequenceEqual" (cl:list type) first second))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "SequenceEqual"
@@ -1498,11 +1498,11 @@ Parameters:
 (cl:defun single (type source cl:&optional (predicate cl:nil supplied-predicate))
   "Master wrapper for System.Linq.Enumerable.Single overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-predicate (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "Single" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "Single" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Single"
@@ -1528,15 +1528,15 @@ Parameters:
 (cl:defun single-or-default (type source cl:&optional (default-value cl:nil supplied-default-value) (default-value cl:nil supplied-default-value))
   "Master wrapper for System.Linq.Enumerable.SingleOrDefault overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)))
      (dotnet:static-generic <type-str> "SingleOrDefault" (cl:list type) source default-value default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "SingleOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-default-value (cl:or (cl:null default-value) (monoutils:dotnet-p default-value)) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "SingleOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-default-value) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-default-value) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "SingleOrDefault" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "SingleOrDefault"
@@ -1599,11 +1599,11 @@ Parameters:
 (cl:defun skip-while (type source predicate)
   "Master wrapper for System.Linq.Enumerable.SkipWhile overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "SkipWhile" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "SkipWhile" (cl:list type) source predicate))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "SkipWhile"
@@ -1630,47 +1630,47 @@ Parameters:
 (cl:defun sum (source cl:&optional (selector cl:nil supplied-selector))
   "Master wrapper for System.Linq.Enumerable.Sum overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-selector (cl:or (cl:null selector) (monoutils:dotnet-p selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
      (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
      (dotnet:static <type-str> "Sum" source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Sum"
@@ -1849,11 +1849,11 @@ Parameters:
 (cl:defun take (type source count)
   "Master wrapper for System.Linq.Enumerable.Take overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:numberp count))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:numberp count))
      (dotnet:static-generic <type-str> "Take" (cl:list type) source count))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null count) (monoutils:dotnet-p count)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null count) (dotnet:object-type count)))
      (dotnet:static-generic <type-str> "Take" (cl:list type) source count))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Take"
@@ -1889,11 +1889,11 @@ Parameters:
 (cl:defun take-while (type source predicate)
   "Master wrapper for System.Linq.Enumerable.TakeWhile overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "TakeWhile" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "TakeWhile" (cl:list type) source predicate))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "TakeWhile"
@@ -1937,11 +1937,11 @@ Parameters:
 (cl:defun to-hash-set (type source cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.ToHashSet overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static-generic <type-str> "ToHashSet" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "ToHashSet" (cl:list type) source))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "ToHashSet"
@@ -1982,11 +1982,11 @@ Parameters:
 (cl:defun union (type first second cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.Union overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (monoutils:dotnet-p first)) (cl:or (cl:null second) (monoutils:dotnet-p second)) supplied-comparer (cl:or (cl:null comparer) (monoutils:dotnet-p comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
      (dotnet:static-generic <type-str> "Union" (cl:list type) first second comparer))
-    ((cl:and (cl:or (cl:null first) (monoutils:dotnet-p first)) (cl:or (cl:null second) (monoutils:dotnet-p second)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Union" (cl:list type) first second))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Union"
@@ -2017,11 +2017,11 @@ Parameters:
 (cl:defun where (type source predicate)
   "Master wrapper for System.Linq.Enumerable.Where overloads. Dispatches at runtime."
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "Where" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (monoutils:dotnet-p source)) (cl:or (cl:null predicate) (monoutils:dotnet-p predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
      (dotnet:static-generic <type-str> "Where" (cl:list type) source predicate))
-    (cl:t (cl:error 'utils:csharp-overload-not-found
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Where"
