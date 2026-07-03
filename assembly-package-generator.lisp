@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 19
+(defparameter *generator-version* 20
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -33,7 +33,8 @@
    16 - Tracked is-static-overload-p per clean method overload inside Case 3 (instead of using group-wide static-p) to ensure overloaded static methods are correctly generated as static wrappers.
    17 - Mapped C# field/property 'NaN' to Lisp 'nan' in camel-to-kebab; mapped 'IsSomething' methods/properties to 'something?' in map-member-name.
    18 - Added Master Wrapper with Precise Dispatch using Lisp's &key (var init supplied-p) syntax, split static vs instance mixed-mode overloads using '*' suffix, and added csharp-overload-not-found condition.
-   19 - Nested C# type names (CIL '+' separator, e.g. Outer+Inner) are now flattened to the same hyphen convention as namespace dots when deriving a type's Lisp package/file name (new type-fq-name-to-pkg-name helper), instead of leaking a literal '+' into it; camel-to-kebab itself is untouched (it is also applied to already-mapped operator names like the literal '+' produced for C#'s op_Addition, which must not be altered), and :fully-qualified-name plus all reflection-facing uses remain unaffected.")
+   19 - Nested C# type names (CIL '+' separator, e.g. Outer+Inner) are now flattened to the same hyphen convention as namespace dots when deriving a type's Lisp package/file name (new type-fq-name-to-pkg-name helper), instead of leaking a literal '+' into it; camel-to-kebab itself is untouched (it is also applied to already-mapped operator names like the literal '+' produced for C#'s op_Addition, which must not be altered), and :fully-qualified-name plus all reflection-facing uses remain unaffected.
+   20 - Open-generic type names (.NET's backtick arity suffix, e.g. Dictionary`2 or ``Action`4``) are now also flattened to '-' in type-fq-name-to-pkg-name, alongside '+'; a raw backtick left in a generated package/symbol name was read by the Lisp reader as the backquote macro character, silently corrupting the surrounding defpackage form instead of signaling an error.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -61,16 +62,25 @@
 
 (defun type-fq-name-to-pkg-name (fq-name)
   "Converts a type's fully-qualified-name to a Lisp package/file name.
-   fq-name uses CIL's native '+' separator for nested types (e.g.
-   Outer+Inner), which must NOT be touched by camel-to-kebab itself: that
-   function is also applied to already-mapped member/operator names, and
-   the C# '+' operator (op_Addition) is legitimately mapped to the literal
-   one-character Lisp name \"+\" upstream in AssemblyToLispy.cs, so a
-   blanket '+' handling inside camel-to-kebab would corrupt operator
-   overload wrappers. Instead, '+' is flattened to '-' (matching the
-   existing '.' convention) only here, on a type's own fully-qualified
-   name, before camel-casing the rest."
-  (camel-to-kebab (substitute #\- #\+ fq-name)))
+   fq-name may contain two CLR-native characters that must NOT be touched
+   by camel-to-kebab itself (that function is also applied to
+   already-mapped member/operator names, which legitimately reuse some of
+   these characters):
+   - '+', CIL's nested-type separator (e.g. Outer+Inner). The C# '+'
+     operator (op_Addition) is mapped to the literal one-character Lisp
+     name \"+\" upstream in AssemblyToLispy.cs, so a blanket '+' handling
+     inside camel-to-kebab would corrupt operator overload wrappers.
+   - '`', .NET's open-generic-type arity suffix (e.g. Dictionary`2,
+     ``Action`4``). A raw backtick in a generated symbol/package name is
+     read by the Lisp reader as the backquote macro character rather than
+     a literal character, corrupting the surrounding form (unlike '+',
+     backtick has no legitimate use in any member/operator name, but the
+     substitution still belongs here rather than in camel-to-kebab to keep
+     all type-name sanitization in one place).
+   Both are flattened to '-' (matching the existing '.' convention) only
+   here, on a type's own fully-qualified name, before camel-casing the
+   rest."
+  (camel-to-kebab (substitute #\- #\` (substitute #\- #\+ fq-name))))
 
 (defun split-string (string &optional (separator #\;))
   "Split a string into a list of substrings at occurrences of the separator character."

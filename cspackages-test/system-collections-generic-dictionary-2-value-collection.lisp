@@ -1,0 +1,60 @@
+;;; Generated automatically. Do not edit.
+;;; Class: System.Collections.Generic.Dictionary`2+ValueCollection
+;;; Generator Version: 20
+;;; Creation Date: 2026-07-03T05:16:06Z
+
+(cl:in-package :cl-user)
+
+(cl:defpackage :system-collections-generic-dictionary-2-value-collection
+  (:use :cl)
+  (:shadow
+   #:count
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:count
+   #:copy-to
+   #:get-enumerator
+  ))
+
+(cl:in-package :system-collections-generic-dictionary-2-value-collection)
+
+(cl:defconstant <type> (monoutils:get-type "System.Collections.Generic.Dictionary`2+ValueCollection"))
+(cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2+ValueCollection")
+(cl:defconstant <creation> "2026-07-03T05:16:06Z")
+(cl:defconstant <version> 20)
+
+;; Register C# Type with CLOS
+(cl:eval-when (:compile-toplevel :load-toplevel :execute)
+  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                 (dotnet:resolve-type "System.Collections.Generic.Dictionary`2+ValueCollection")))
+
+(cl:defun new (dictionary)
+  "Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2.ValueCollection class that reflects the values in the specified System.Collections.Generic.Dictionary`2.
+Parameters:
+  - dictionary (System.Collections.Generic.Dictionary`2[TKey, TValue]): The System.Collections.Generic.Dictionary`2 whose values are reflected in the new System.Collections.Generic.Dictionary`2.ValueCollection.
+"
+  (dotnet:new <type-str> dictionary))
+
+(cl:defun count (obj)
+  "Gets the number of elements contained in the System.Collections.Generic.Dictionary`2.ValueCollection."
+  (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2+ValueCollection") obj) "get_Count"))
+
+(cl:defun copy-to (obj array index)
+  "Summary: Copies the System.Collections.Generic.Dictionary`2.ValueCollection elements to an existing one-dimensional System.Array, starting at the specified array index.
+Parameters:
+  - array (TValue[]): The one-dimensional System.Array that is the destination of the elements copied from System.Collections.Generic.Dictionary`2.ValueCollection. The System.Array must have zero-based indexing.
+  - index (System.Int32): The zero-based index in array at which copying begins.
+"
+  (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2+ValueCollection") obj) "CopyTo" array index))
+
+(cl:defun get-enumerator (obj)
+  "Summary: Returns an enumerator that iterates through the System.Collections.Generic.Dictionary`2.ValueCollection.
+Returns: A System.Collections.Generic.Dictionary`2.ValueCollection.Enumerator for the System.Collections.Generic.Dictionary`2.ValueCollection.
+"
+  (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2+ValueCollection") obj) "GetEnumerator"))
+

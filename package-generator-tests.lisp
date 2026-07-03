@@ -64,6 +64,22 @@
               "outer-middle-inner-deepest"
               "Convert three-level-nested Outer+Middle+Inner+Deepest to a package name")
 
+  ;; 1c. Test type-fq-name-to-pkg-name on open-generic-type backtick arity
+  ;; suffixes (a raw backtick in a generated symbol/package name is
+  ;; misread by the Lisp reader as the backquote macro character), alone
+  ;; and combined with nested-type '+'.
+  (assert-test (assembly-package-generator:type-fq-name-to-pkg-name "System.Action`4")
+              "system-action-4"
+              "Convert generic-arity System.Action`4 to a package name")
+
+  (assert-test (assembly-package-generator:type-fq-name-to-pkg-name "System.Collections.Generic.Dictionary`2")
+              "system-collections-generic-dictionary-2"
+              "Convert generic-arity Dictionary`2 to a package name")
+
+  (assert-test (assembly-package-generator:type-fq-name-to-pkg-name "System.Collections.Generic.Dictionary`2+KeyCollection")
+              "system-collections-generic-dictionary-2-key-collection"
+              "Convert a nested type inside a generic type (backtick and '+' together) to a package name")
+
 
   ;; 2. Test split-string
   (assert-test (assembly-package-generator:split-string "System.Console;System.Math")

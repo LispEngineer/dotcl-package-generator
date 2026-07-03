@@ -8,8 +8,8 @@ EXECUTABLE := $(BIN_DIR)dotcl-packagegen
 NUPKG_DIR = nupkg
 
 # Tool package version. The minor version tracks assembly-package-generator.lisp's
-# internal *generator-version* (currently 19), so they stay visibly in sync.
-VERSION = 2.19.0
+# internal *generator-version* (currently 20), so they stay visibly in sync.
+VERSION = 2.20.0
 
 # Reference assembly directory for the standard .NET metadata used by `test`
 # to exercise Stage 1/Stage 2 generation end-to-end. This is the Arch Linux
@@ -48,10 +48,16 @@ test: build
 	      --class System.Object \
 	      --class System.Type \
 	      --class System.String \
+	      --class System.TimeZoneInfo \
+	      --class 'System.TimeZoneInfo+AdjustmentRule' \
 	    --assembly $(REF_DIR)System.Linq.dll \
 	      --class System.Linq.Enumerable \
 	    --assembly $(REF_DIR)System.Xml.ReaderWriter.dll \
-	      --class System.Xml.XmlReader
+	      --class System.Xml.XmlReader \
+	    --assembly $(REF_DIR)System.Collections.dll \
+	      --class 'System.Collections.Generic.Dictionary`2' \
+	      --class 'System.Collections.Generic.Dictionary`2+KeyCollection' \
+	      --class 'System.Collections.Generic.Dictionary`2+ValueCollection'
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo; System.Convert
 	python3 check_parens.py $(GEN_TEST_DIR)/*.lisp
 

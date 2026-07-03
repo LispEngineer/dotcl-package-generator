@@ -86,7 +86,10 @@ Each type entry plist contains the following entries, by key:
   `doc/generator-design-notes.md`'s "Nested Type Package Naming (Version 19)" section
   for how the *generator* derives a human-friendly Lisp package/file name from this
   value (it flattens `+` the same way it flattens namespace `.`, rather than leaking
-  the literal `+` into the generated name).
+  the literal `+` into the generated name). The same applies to the backtick-arity
+  suffix an open generic type's name carries (e.g. `` Dictionary`2 ``, `` System.Action`4 ``)
+  — see that doc's "Generic Type Backtick Sanitization (Version 20)" section for why a
+  raw backtick is unsafe to leave in a generated Lisp symbol/package name.
 * `:namespace` (String): The namespace in which the type is defined 
   (e.g., `System.Collections` or `System`).
 * `:kind` (Keyword): The classification of the C# entity. Must be one of the following:

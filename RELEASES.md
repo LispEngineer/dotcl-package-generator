@@ -10,6 +10,32 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.20.0 — 2026-07-03
+
+**Bug fix:** open-generic C# type names (.NET's backtick arity suffix, e.g.
+`System.Collections.Generic.Dictionary\`2` or `` System.Action`4 ``) previously leaked a raw
+backtick into the generated Lisp package name and filename — and unlike the `+` case fixed in
+`2.19.0`, this wasn't just cosmetic: a bare backtick is the Lisp reader's backquote macro
+character, so `(cl:defpackage :system-collections-generic-dictionary\`2 ...)` didn't read back
+as intended at all. The reader stopped the symbol token at the backtick and started a new
+backquote form there, silently corrupting the whole `defpackage` form (wrong package name, plus
+a spurious `(quote 2)` in place of `(:use :cl)`) rather than raising any error. This was
+discovered while adding `Dictionary\`2` and its nested `KeyCollection`/`ValueCollection` to
+`Makefile`'s test packages — no prior test had fed an open-generic type all the way through
+`generate-class-file`.
+
+* `type-fq-name-to-pkg-name` (`assembly-package-generator.lisp`, added in `2.19.0`) now also
+  flattens `` ` `` to `-`, the same as `+`. Unlike `+`, a backtick has no legitimate use in any
+  member/operator name in this codebase (only a type's own `Name`/`FullName` ever carries one),
+  so this needed no special-casing to avoid corrupting an intentional operator symbol.
+* `*generator-version*` bumped `19` → `20`; see `doc/generator-design-notes.md`'s "Generic Type
+  Backtick Sanitization (Version 20)" section for details.
+* `Makefile`'s `test` target now also generates
+  `System.Collections.Generic.Dictionary\`2`/`KeyCollection`/`ValueCollection` (from
+  `System.Collections.dll`) and `System.TimeZoneInfo`/`System.TimeZoneInfo+AdjustmentRule`
+  (from `System.Runtime.dll`), giving this bug — and the `2.19.0` nested-type fix — real,
+  checked-in regression coverage via `cspackages-test/`.
+
 ## 2.19.0 — 2026-07-03
 
 **Bug fix:** nested C# type names (CIL's `+` separator, e.g.

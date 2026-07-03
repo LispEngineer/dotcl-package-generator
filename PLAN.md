@@ -6,6 +6,13 @@
 
 # Miscellaneous
 
+* Handle generic classes name mangling using backticks more elegantly.
+  * Backticks have special meaning in Lisp so we cannot include them in the
+    package names, for example.
+  * The ugly workaround in v20 would make it hard for users, who are not
+    typically aware of the generic arity of the classes they use and might
+    not easily guess the package name.
+
 * Copy the `revert-cspackages-timestamps.sh` from DungeonSlime to here,
   and use it in the `cspackages-test` directory.
 

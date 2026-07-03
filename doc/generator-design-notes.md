@@ -525,3 +525,45 @@ Every reflection-facing use of `fq-name` (`<type>`, `<type-str>`,
 `type-fq-name-to-pkg-name` or `camel-to-kebab` — a nested type's generated
 package still resolves the correct live CLR type via its `+`-separated
 `<type-str>`.
+
+## Generic Type Backtick Sanitization (Version 20)
+
+Discovered immediately after Version 19, while adding an open-generic type
+(`System.Collections.Generic.Dictionary\`2`) to the checked-in test
+packages for the first time: .NET's open-generic-type names carry a
+backtick-and-arity suffix (`` `N ``, e.g. `` Dictionary`2 `` or
+`` System.Action`4 ``, per `AssemblyToLispy.cs`'s
+`GetSimplifiedTypeName`/backtick-formatting helpers — see
+`doc/assembly-to-lispy.md`). Like `+`, this backtick was previously copied
+through `type-fq-name-to-pkg-name`/`camel-to-kebab` unchanged into the
+generated package name and filename.
+
+Unlike `+`, a raw backtick isn't merely an unwanted-but-inert character —
+it is a Lisp reader macro character (the backquote/quasiquote prefix).
+`(cl:defpackage :system-collections-generic-dictionary\`2 ...)` does
+*not* read back as one symbol token followed by `defpackage`'s options
+list; the reader stops the symbol token at the backtick and starts a new
+backquote form there, so it actually parses as
+`(CL:DEFPACKAGE :SYSTEM-COLLECTIONS-GENERIC-DICTIONARY (QUOTE 2) ...)` —
+silently corrupting the form (wrong package name, and `(quote 2)` where
+`(:use :cl)` was supposed to be) rather than raising an error anywhere. No
+existing test caught this because nothing had previously fed a
+backtick-bearing type all the way through `generate-class-file`; earlier
+uses of backtick names in this codebase were metadata-only string
+comparisons (e.g. matching `:name` in `tests/synthetic-target.test.lisp`),
+never round-tripped through the Lisp reader.
+
+**Fix**: `type-fq-name-to-pkg-name` now also flattens `` ` `` to `-`,
+alongside `+`, before camel-casing. Unlike `+`, backtick is never
+legitimately part of a member/operator name anywhere in this codebase
+(only `Type.Name`/`Type.FullName` ever carry it, per
+`AssemblyToLispy.cs`), so there is no analogous risk of corrupting an
+intentional single-character Lisp symbol — the substitution still lives in
+`type-fq-name-to-pkg-name` rather than `camel-to-kebab`, to keep all
+type-name sanitization in one place:
+
+```
+System.Action`4                                        -> system-action-4
+System.Collections.Generic.Dictionary`2                 -> system-collections-generic-dictionary-2
+System.Collections.Generic.Dictionary`2+KeyCollection    -> system-collections-generic-dictionary-2-key-collection
+```
