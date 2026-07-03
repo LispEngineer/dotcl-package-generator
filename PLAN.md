@@ -3,46 +3,23 @@
 * Author: Douglas P. Fields, Jr. - symbolics@lisp.engineer
 * Copyright 2026 Douglas P. Fields, Jr.
 
-# Make `csharp-assembly-utils.lisp` and Package
+# Overload Consolidation
 
-The generated packages have a number of dependencies on other code.
-Currently this is not handled by the package generator.
-However, this needs to change, such that the generated packages are
-entirely self contained and can be used in any project.
-Toward that end, I want to extract all the utility functions into their
-own Lisp package and file that is included in the generated directory,
-and have the generated packages/files use that utility package
-(in a fully qualified, non-nicknamed manner so as to avoid shadowing issues).
+Consolidate all method overloads into at most two functions:
+* One for a class instance method
+* One for a static method
+* If there are no overloads that are both instance and static, just
+  emit one function. If there are both, emit a second function with
+  a `*` suffix for the static version.
+* This would reduce the potentially long list of functions like these:
+  ```
+  #:get-ambiguous-time-offsets
+  #:get-ambiguous-time-offsets-date-time-offset
+  #:get-ambiguous-time-offsets-date-time
+  ```
+  whose naming is actually pretty ugly too.
 
-See [`doc/package-generator-dependencies.md`](docs/package-generator-dependencies.md)
-for previously identified dependencies. Do not assume this file is up to date and
-confirm said dependencies are full and complete.
-
-Key Design Decisions:
-* Utility package name: `csharp-assembly-utils`
-* Utility package filename: `csharp-assembly-utils.lisp`
-
-Considerations:
-* Add the `:depends-on` for this package utility to the other `:file`s in the generated `.asd`.
-* Should we `(require "asdf")` in the utility package `.lisp` file? If so, should it be
-  included in an `eval-when` block? This is because some UIOP functions may be used.
-
-## Open Questions
-
-Since these utility functions are static, how should we handle them?
-* Option 1: Template files `template-csharp-assembly-utils.lisp` and `template-csau-packages.lisp`
-  plus system-generated headers (the standard 3 line comment we've been generated)?
-* Option 2: Have the code directly generate the files? Seems sort of ugly and harder
-  to test/verify, since the utility code is static.
-
-If we also use these functions in the package generator's code, then we could
-include the templates in our `.asd` and use them directly. This would mean the
-code is also known-good.
-
-How do we include the template files (if chosen) in the deployed application?
-* Consider the `.asd` `:static-file` option to include the templates in the build
-  so the deployed package generator can access them. Not sure how that would work
-  in DotCL though.
+Obviously, this requires updating the version number.
 
 
 # Add More to Generated `.lisp` Files
@@ -56,20 +33,6 @@ TODO
 
 
 # Miscellaneous
-
-* Consolidate all method overloads into at most two functions:
-  * One for a class instance method
-  * One for a static method
-  * If there are no overloads that are both instance and static, just
-    emit one function. If there are both, emit a second function with
-    a `*` suffix for the static version.
-  * This would reduce the potentially long list of functions like these:
-    ```
-    #:get-ambiguous-time-offsets
-    #:get-ambiguous-time-offsets-date-time-offset
-    #:get-ambiguous-time-offsets-date-time
-    ```
-    whose naming is actually pretty ugly too.
 
 * Handle generic classes name mangling using backticks more elegantly.
   * Backticks have special meaning in Lisp so we cannot include them in the
@@ -131,6 +94,48 @@ TODO
 
 
 ---
+
+# **DONE** Make `csharp-assembly-utils.lisp` and Package
+
+The generated packages have a number of dependencies on other code.
+Currently this is not handled by the package generator.
+However, this needs to change, such that the generated packages are
+entirely self contained and can be used in any project.
+Toward that end, I want to extract all the utility functions into their
+own Lisp package and file that is included in the generated directory,
+and have the generated packages/files use that utility package
+(in a fully qualified, non-nicknamed manner so as to avoid shadowing issues).
+
+See [`doc/package-generator-dependencies.md`](docs/package-generator-dependencies.md)
+for previously identified dependencies. Do not assume this file is up to date and
+confirm said dependencies are full and complete.
+
+Key Design Decisions:
+* Utility package name: `csharp-assembly-utils`
+* Utility package filename: `csharp-assembly-utils.lisp`
+
+Considerations:
+* Add the `:depends-on` for this package utility to the other `:file`s in the generated `.asd`.
+* Should we `(require "asdf")` in the utility package `.lisp` file? If so, should it be
+  included in an `eval-when` block? This is because some UIOP functions may be used.
+
+## Open Questions
+
+Since these utility functions are static, how should we handle them?
+* Option 1: Template files `template-csharp-assembly-utils.lisp` and `template-csau-packages.lisp`
+  plus system-generated headers (the standard 3 line comment we've been generated)?
+* Option 2: Have the code directly generate the files? Seems sort of ugly and harder
+  to test/verify, since the utility code is static.
+
+If we also use these functions in the package generator's code, then we could
+include the templates in our `.asd` and use them directly. This would mean the
+code is also known-good.
+
+How do we include the template files (if chosen) in the deployed application?
+* Consider the `.asd` `:static-file` option to include the templates in the build
+  so the deployed package generator can access them. Not sure how that would work
+  in DotCL though.
+
 
 # **DONE** Make `packages.lisp`
 
