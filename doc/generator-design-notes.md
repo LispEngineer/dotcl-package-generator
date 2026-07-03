@@ -1,0 +1,473 @@
+# Package Generator Design Notes
+
+* Author: Douglas P. Fields, Jr. - symbolics@lisp.engineer
+* Copyright 2026 Douglas P. Fields, Jr.
+
+**Provenance:** The sections below are excerpts extracted from
+`dotcl-dungeonslime/doc/implementation-notes.md` and
+`dotcl-dungeonslime/doc/opencode-implementation-notes.md`. Those source files
+are mixed-content documents covering both the DungeonSlime *game* and the
+package generator *tool*; only the generator-relevant sections were pulled
+out here (game-specific chapters, general DotCL/build/ASDF topics, and
+DungeonSlime's own migration/refactor logs were intentionally omitted). See
+those two source files for full context and the parts not reproduced here.
+
+---
+
+## Generating Constants for Static Properties
+
+*(from implementation-notes.md, "Lisp Packages for C# Classes")*
+
+The `assembly-package-generator.lisp` tool generates Lisp bindings for .NET assemblies.
+By default, it generates static properties (like `Vector2.Zero` or `Color.White`) as dynamic
+symbol macros via `(define-symbol-macro ...)` since they are technically properties, not
+constant fields, and reflection cannot distinguish whether a static read-only property's
+value could change.
+
+However, many types like `Microsoft.Xna.Framework.Vector2` and `Microsoft.Xna.Framework.Color`
+have properties that act identically to constants. To optimize these, the `--constant-properties`
+command-line flag was added to the generator. It accepts a comma-separated list of properties
+to treat as compile-time constants (evaluated at macro-expansion load-time in Lisp using
+`defconstant`). Passing `*` (e.g., `--constant-properties "*"`) marks all read-only
+static properties of the class as constants.
+
+Example Usage:
+```bash
+dotcl-packagegen --assembly-metadata obj/MonoGame.Framework.lispy.metadata --class Microsoft.Xna.Framework.Color --output cspackages --constant-properties "*"
+```
+This forces properties like `Color.White` to be emitted as `(defconstant +white+ ...)`
+instead of `(define-symbol-macro white ...)` improving performance and avoiding repeated
+reflection evaluations.
+
+## Direct Method Calls via Type Declarations
+
+*(from implementation-notes.md)*
+
+Starting in DotCL 0.1.11, method calls on C# instances can be optimized to direct
+calls (avoiding runtime reflection and boxing/unboxing overhead, resulting in an
+approximate 3.5x performance increase) by wrapping the receiver object in a
+type declaration using the `the` operator.
+
+The syntax for declaring a .NET type for a receiver is:
+```lisp
+(the (dotnet "Fully.Qualified.TypeName") receiver-form)
+```
+
+For instance, in `assembly-package-generator.lisp`, instance method stubs are
+automatically optimized for reference types (classes/interfaces, excluding
+structs and enums which are value types and not yet supported by `the` casting)
+like so:
+```lisp
+(defun dispose (obj)
+  (dotnet:invoke (the (dotnet "Microsoft.Xna.Framework.Graphics.SamplerState") obj) "Dispose"))
+```
+
+If the actual object passed at runtime does not match the declared type, DotCL
+will raise a `DotCL.LispErrorException` indicating the invalid cast.
+
+## .NET CLOS Integration in DotCL 0.1.9
+
+*(from implementation-notes.md)*
+
+DotCL 0.1.9 introduces the ability for CLOS generic functions (`defgeneric`)
+to dispatch natively on instances of C# classes created via `dotnet:define-class`
+as well as raw C# framework types (e.g., `Microsoft.Xna.Framework.Vector2`).
+
+### Class Registration and Naming
+
+When DotCL encounters a native C# object for the first time, or when `(class-of obj)`
+is explicitly called on it, DotCL lazily creates a CLOS wrapper class for the .NET type.
+This wrapper is placed in the `dotcl-internal` package and named after the short name
+of the C# class.
+For example, `Microsoft.Xna.Framework.Vector2` becomes `dotcl-internal::|Vector2|`.
+
+Internally, this registration happens in the DotCL compiler/runtime source code within
+`Runtime.CLOS.cs`, specifically in the `EnsureDotNetTypeClass(Type type)` function.
+This function creates a new `LispClass` and inserts it into the global `_classRegistry`
+dictionary, mapping the simple C# name (and its uppercase variant) to the CLOS class wrapper.
+Because `EnsureDotNetTypeClass` recursively calls itself on the type's `BaseType`, invoking
+`class-of` on a C# object recursively creates a Lisp class hierarchy that accurately mirrors
+the .NET inheritance tree (e.g. `System.ValueType`, `System.Object`).
+
+**This is directly relevant to the generator**: every generated package registers its
+class via `(dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass" (dotnet:resolve-type "..."))`,
+so the caveats below apply to anyone writing `defmethod`s against generated packages' types.
+
+To specialize a `defmethod` on a raw C# type, use an internal symbol as the class specializer:
+```lisp
+(defmethod get-x ((obj dotcl-internal::|Vector2|))
+  (dotnet:invoke obj "X"))
+```
+
+### Warning: Namespace Collision (Bug?)
+
+Because `EnsureDotNetTypeClass` explicitly uses the *short name* of the C# type
+(`type.Name` instead of `type.FullName`), it is impossible to distinguish between
+classes with the same name in different namespaces (e.g., `System.Object`
+and `Dougs.Special.Object`).
+
+When DotCL encounters the first of these classes, it registers `dotcl-internal::|Object|`
+and maps the C# type to it. When it encounters the second class, it queries `_classRegistry`
+with the same short name, finds the existing CLOS wrapper, and binds the second C# type to
+the exact same CLOS class.
+
+Consequences:
+1. **Broken Method Dispatch**: A `defmethod` targeting `dotcl-internal::|Object|` will
+   fire indiscriminately for instances of both `System.Object` and `Dougs.Special.Object`.
+   It is not possible to specialize methods for one but not the other.
+2. **Broken Inheritance**: The `ClassPrecedenceList` in Lisp is evaluated only for the first
+   type registered. The second type completely loses its own inheritance tree in the Lisp
+   layer and silently adopts the CPL of the first class.
+
+### The Compile-Time Constraint
+
+In Common Lisp, `defmethod` is a macro that expands at compile time. During this
+expansion, it calls `find-class` to verify the existence of the class being specialized.
+
+If a top-level `(defmethod ... ((obj dotcl-internal::|Vector2|)) ...)` is included statically
+in code compiled by the standalone DotCL compiler (which only loads standard .NET runtime
+libraries, not application-specific assemblies like a generated package's target assembly),
+the compiler will attempt to resolve `Vector2`, fail to find the assembly, and hard-crash
+compilation with `FIND-CLASS: no class named Vector2` or
+`DOTNET: type not found: Microsoft.Xna.Framework.Vector2`.
+
+### Workarounds
+
+**Option 1: The `eval` Workaround** — defer the macro-expansion of `defmethod` until
+*runtime*, when the target assembly is fully loaded, by quoting the method definition
+and passing it to `eval` inside a function:
+```lisp
+(defun register-clr-methods ()
+  ;; 1. Force the registration of the CLOS wrapper class.
+  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                 (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2"))
+  ;; 2. Dynamically evaluate the defmethod at runtime.
+  (eval '(defmethod get-x ((obj dotcl-internal::|Vector2|))
+           (dotnet:invoke obj "X"))))
+```
+
+**Option 2: Loading Assemblies at Compile Time** — use `eval-when` to explicitly load the
+required assembly `.dll` and register types during both `:compile-toplevel` and
+`:load-toplevel` phases, so standard top-level `defmethod` forms work natively:
+```lisp
+(eval-when (:compile-toplevel)
+  (dotnet:load-assembly "/path/to/Assembly.dll")
+  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+    (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2")))
+
+(eval-when (:load-toplevel :execute)
+  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass" (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2")))
+
+(defmethod get-x ((obj dotcl-internal::|Vector2|))
+  (dotnet:invoke obj "X"))
+```
+
+### Defining C# Types from Lisp
+
+When defining new C# proxy classes from Lisp using `dotnet:define-class` (or its
+underlying components), always pass parameter and field types as fully-qualified strings
+(e.g., `"System.Double"`) instead of unquoted symbols (e.g., `System.Double`).
+Symbols without string qualification might fail to resolve during macro expansion if the
+namespace environment isn't strictly controlled, whereas explicit string declarations
+correctly guide DotCL's internal reflection (`dotnet:resolve-type`).
+
+## Parentheses Balance Checking
+
+*(from implementation-notes.md, "Mismatched Parentheses in Common Lisp")*
+
+Mismatched parentheses in Common Lisp can lead to extremely confusing compilation
+errors, such as package lookup failures or symbols being reported as not external.
+This occurs because an extra or missing parenthesis can cause the Lisp reader
+to exit a macro definition or top-level form prematurely, causing subsequent forms
+to be parsed in the wrong context or skipped entirely.
+
+As soon as any compilation problems or other errors are encountered, the parentheses
+balance of all modified files must be checked individually. See `check_parens.py`
+and the `make check-parens` / `make test` targets in this project's own `BUILD.md`
+for the tooling that implements this check (ported from `dotcl-dungeonslime`).
+
+## Instance Properties and Struct "Boxing Mutation"
+
+*(from implementation-notes.md)*
+
+The generator (`assembly-package-generator.lisp`) emits accessor (`property-name`)
+and mutator (`(setf property-name)`) functions for C# instance properties.
+
+When invoking a setter on an instance property of a **value type (struct)** via `dotnet:invoke`,
+DotCL boxes the struct. Modifying a property through the generated Lisp `setf` mutator
+(e.g., `(setf (property-name my-struct) new-val)`) might only mutate the boxed copy inside
+the CLR boundary, leaving the original `my-struct` variable in Lisp unmodified.
+
+Therefore, users should exercise caution when mutating properties on C# structs from Lisp.
+A comment
+```lisp
+;; Note: Modifying a property of a value type (struct) via setf may only mutate
+;; a boxed copy, leaving the original unchanged. Use caution with structs.
+```
+is automatically inserted above property mutators generated for structs to alert users
+of this behavior.
+
+Reference types (classes) do not suffer from this issue.
+
+In addition, Lisp properties with only a setter (write-only properties) are generated
+with the name `set-propertyname` and accept the receiver as the first argument:
+`(set-propertyname obj new-value)`.
+
+### Example Transcript
+
+```lisp
+DUNGEON-SLIME> (defparameter x color:+white+)
+X
+DUNGEON-SLIME> x
+#<DOTNET Microsoft.Xna.Framework.Color {R:37 G:255 B:255 A:255}>
+DUNGEON-SLIME> (setf (color:r x) (dotnet:box 37 "System.Byte"))
+#<DOTNET-BOXED Byte 37>
+DUNGEON-SLIME> x
+#<DOTNET Microsoft.Xna.Framework.Color {R:37 G:255 B:255 A:255}>
+DUNGEON-SLIME> (setf (color:r x) (#!!System.Convert.ToByte 40))
+#<DOTNET System.Byte 40>
+DUNGEON-SLIME> x
+#<DOTNET Microsoft.Xna.Framework.Color {R:40 G:255 B:255 A:255}>
+DUNGEON-SLIME> (setf (color:r x) (the (dotnet "System.Byte") 55))
+Error: Method 'Microsoft.Xna.Framework.Color.set_R' not found.
+```
+
+## TimeSpan Standard Operator Dispatchers
+
+*(from implementation-notes.md, "Local Nickname Migration and TimeSpan Operator Dispatchers")*
+
+Standard operators like `+`, `-`, `*`, and `/` are overloaded in C#'s
+`System.TimeSpan`. The package generator emitted generic runtime dispatchers for
+these, passing the operator strings directly to `dotnet:static` (e.g., `(apply
+#'dotnet:static <type-str> "+" args)`).
+
+However, .NET static operators compiled in IL have special names (such as
+`op_Addition`, `op_UnaryPlus`, `op_Subtraction`, `op_UnaryNegation`,
+`op_Multiply`, `op_Division`), so calling `"+"` or `"-"` directly via
+`dotnet:static` results in `System.MissingMethodException`.
+
+To fix this, the operators inside a generated `system-time-span.lisp` were
+refactored to perform type and argument count dispatching purely in Lisp,
+calling the correct typed static method wrapper functions:
+* **`-`**: Calls `--time-span-time-span` (`op_Subtraction`) for 2 arguments, or
+  `--time-span` (`op_UnaryNegation`) for 1 argument.
+* **`+`**: Calls `+-time-span-time-span` (`op_Addition`) for 2 arguments, or
+  `+-time-span` (`op_UnaryPlus`) for 1 argument.
+* **`*`**: Inspects if the first argument is a C# object (via
+  `monoutils:dotnet-p`) to dispatch to `*-time-span-double` (`op_Multiply`) or
+  `*-double-time-span` (`op_Multiply`).
+* **`/`**: Inspects if the second argument is a C# object (via
+  `monoutils:dotnet-p`) to dispatch to `/-time-span-time-span` (`op_Division`)
+  or `/-time-span-double` (`op_Division`).
+
+---
+
+# Generator Version History (Detailed Design Notes)
+
+The generator's own `*generator-version*` docstring in `assembly-package-generator.lisp`
+has the authoritative one-line-per-version changelog. The sections below are the fuller
+design rationale for several versions, extracted from `implementation-notes.md` and
+`opencode-implementation-notes.md`.
+
+## C# Assembly Package Generator v10: Method Overload Support
+
+*(from opencode-implementation-notes.md)*
+
+### Overview
+
+This documents the implementation of version 10 of the
+`assembly-package-generator.lisp`, which adds automatic generation of
+method wrappers for overloaded C# methods. Previously (v9), only
+non-overloaded "simple" methods were generated. Methods with multiple
+overloads like `Vector2.DistanceSquared`, `Rectangle.Intersects`, and
+`Rectangle.Contains` were skipped entirely, requiring hand-written wrappers.
+
+Version 10 introduces a method classification system that categorizes
+overloads as "clean" (no ref/out/params/defaults) or "dirty" (has
+special parameter modifiers), and generates appropriate wrappers for
+each case.
+
+### Method Classification
+
+Four helper functions were added:
+
+- **`clean-method-p`** — Like `simple-method-p` but without the unique-name
+  check; returns t if a method has no ref/out/params/defaults/generics.
+- **`dirty-method-p`** — Returns t if a method has ref/out/params/defaults.
+  Complement to `clean-method-p`.
+- **`method-overload-name`** — Generates a disambiguated Lisp function name
+  by appending kebab-cased simple parameter type names. E.g.,
+  `Contains(Vector2)` → `contains-vector-2`.
+- **`method-signature-str`** — Returns a human-readable signature string for
+  doc-comments, e.g., `Contains(ref Rectangle, out bool) → void`.
+
+### Overload Handling Categories
+
+Methods are grouped by name. Each group falls into one of four cases:
+
+1. **No clean overloads** (all dirty): Emit a doc-comment listing the
+   skipped overloads. No functions generated.
+2. **Single clean overload**: Generate a single typed function with
+   the base name. Includes `(the (dotnet "Type") obj)` typed-call
+   optimization for value type receivers. Emits doc-comment for any
+   accompanying dirty overloads.
+3. **Multiple clean overloads** (2+): Generate a passthrough &rest
+   function that dispatches at runtime via DotCL's overload resolver,
+   plus per-overload typed functions with type-suffixed names for
+   direct invocation. Emits doc-comment for any dirty overloads.
+4. **Operators and accessors**: Unchanged from v9 — handled separately
+   by existing `op_`/`get_`/`set_` prefix filtering.
+
+### Value-Type Typed-Call Optimization
+
+In v9, the `(the (dotnet "Type") obj)` wrapper was only emitted for
+reference-type (class) receivers. Value types (structs) used bare
+`(dotnet:invoke obj ...)`. In v10, the wrapper is emitted for ALL
+receivers, including value types. DotCL 0.1.11 supports the
+`constrained.` + `callvirt` IL pattern needed for value type virtual
+dispatch via typed declarations.
+
+### Static Method Argument Type Hints
+
+For single-clean-overload static methods, the generated code now wraps
+each argument in `(the (dotnet "<type>") arg)` to improve DotCL's
+caching efficiency.
+
+## C# Generic Method Wrappers (Generator Version 12)
+
+*(from implementation-notes.md, "C# Generic Function Type Checking Refactoring")*
+
+To support invoking generic methods of exactly one type argument from Lisp, the C# Lisp Package Generator has been enhanced:
+
+* **Metadata Extraction**: `AssemblyToLispy.cs` formats generic methods by exporting `:is-generic t` and `:generic-arity [count]` (retrieved via `method.IsGenericMethod` and `method.GetGenericArguments().Length`).
+* **Schema Validation**: Updated the testing schema (`tests/framework.lisp` and the metadata test suite) to allow `:is-generic` and `:generic-arity` keywords inside method property lists, preventing validation failures.
+* **Method Classification**: Modified `simple-method-p` and `clean-method-p` in `assembly-package-generator.lisp` to support generic methods if their generic arity is exactly 1.
+* **Wrapper Generation**: Generated Lisp functions take the `type` parameter (supporting type name string, alias, or System.Type object) as the first argument (or second argument after `obj` for instance methods). The wrapper delegates invocation to DotCL's `dotnet:invoke-generic` or `dotnet:static-generic` interop targets by passing `(list type)` as the type arguments list.
+
+## C# Package Object Constructors (Version 11)
+
+*(from implementation-notes.md, "Chapter 16: SpriteFont Text Rendering")*
+
+### Struct Parameterless Constructor Injection
+In .NET Reflection, value types (structs) do not return their implicit parameterless constructor
+via `GetConstructors()`. To generate the correct parameterless `new` constructors for value types,
+the generator (`assembly-package-generator.lisp`) checks if the type is a struct (`:kind :struct`).
+If it is a struct and no zero-parameter constructor is found in the metadata, the generator
+injects a default parameterless constructor `(:parameters nil :public t)` into its internal
+constructors list.
+
+### Overload Collision Prevention
+For types with multiple clean constructors, the generator outputs a runtime dispatch `new`
+function using `&rest` arguments. Additionally, type-suffixed constructors (e.g.,
+`new-single-single`) are generated for performance or explicit dispatch. However, if a
+constructor has zero parameters, its type-suffixed name would be `new`, colliding with and
+overwriting the runtime dispatch `new` function.
+To resolve this collision, the generator skips creating the type-suffixed function for any
+zero-parameter constructor when a type has multiple clean constructors. The runtime dispatch
+`new` function handles the parameterless case correctly when called without arguments: `(new)`.
+
+## C# Operator Overload Dispatch in Package Generator (Generator Version 13 & 14)
+
+*(from implementation-notes.md)*
+
+### 1. Type-Based Operator Dispatching (Version 13)
+The C# Lisp Package Generator has been enhanced in Version 13 to automatically generate type- and argument-count-aware dispatch wrappers for C# operator overloads (methods whose name starts with `"op_"` in C#, such as `op_Addition` and `op_Subtraction`, which are mapped to Lisp symbols like `+` and `-`):
+* **Runtime Dispatch**: For overloaded operators, instead of outputting generic `(apply #'dotnet:static ...)` calls with raw operator symbols (e.g. `"+"` or `"-"`) which fail with `System.MissingMethodException`, the generator now emits a Lisp `cond` block.
+* **Overload Selection**: The `cond` block inspects the runtime argument count and types (numbers, booleans, strings, or `.NET` objects) and dispatches the call to the corresponding type-suffixed generated overload functions (e.g. `+-time-span-time-span` or `*-time-span-double`).
+* **Safe Fallback**: If no overload matches the argument patterns, a descriptive runtime error is thrown.
+
+### 2. Standard Lisp Package Qualification (Version 14)
+When standard Lisp operators (like `=`) are shadowed in a generated package (like `:system-time-span` shadowing `=`), any un-qualified calls to `=` in that package will resolve to the shadowed operator rather than the standard Common Lisp comparison function `cl:=`.
+* **The Bug**: In Version 13, the generated test conditions (e.g. `(= (length args) 2)`) inside `:system-time-span` resolved to `system-time-span:=`. This caused recursive dispatch attempts with integer arguments (e.g. calling `op_Equality(int, int)`), leading to `MissingMethodException`.
+* **The Fix**: In Version 14, the generator qualified all standard Lisp comparison operations in generated tests using the `cl:` package prefix (e.g., `(cl:= (length args) 2)`), ensuring they are evaluated as built-in Lisp functions rather than shadowed operator wrappers.
+
+## Namespace Safety & Standard Lisp Symbol Protection (Version 15)
+
+*(from implementation-notes.md)*
+
+The Lisp Package Generator has been enhanced in Version 15 to establish complete namespace safety, preventing generated wrappers from shadowing critical Lisp syntax symbols and resolving symbol name collisions.
+
+### 1. Mapping Special Forms & Reserved Words
+In Common Lisp, symbols like `quote` and `function` are special operators used by reader macros `'` and `#'`. If a package shadows them, reader macros expand to package-local symbols (e.g. `microsoft-xna-framework-vector2:quote`), which crashes Lisp evaluation.
+* **The Bug**: When generating wrappers for types containing members named `Quote`, `Function`, `T`, or `Nil`, the generator would output Lisp symbols like `quote` and `function` and place them in the package's `:shadow` list, causing syntax/compilation failures.
+* **The Fix**: Version 15 maps C# member names named `Quote`, `Function`, `T`, or `Nil` to safe names `quote!`, `function!`, `t!`, and `nil!` respectively. This keeps them out of the package's `:shadow` list and preserves standard Common Lisp reader behavior.
+
+### 2. Standard Lisp Symbol Qualification
+To prevent other shadowed symbols in generated packages (such as `length`, `nth`, `cond`, `and`, `or`, `error`, `setf`, `defun`, `apply`, `function`, `the`, `list`, `numberp`, `typep`, `stringp`, `boolean`, `t`, etc.) from colliding with standard Lisp operators inside generated templates, the generator now qualifies all standard Lisp operators in generated templates with the `cl:` package prefix.
+* **Examples**:
+  - `(cond ...)` -> `(cl:cond ...)`
+  - `(length args)` -> `(cl:length args)`
+  - `(and ...)` -> `(cl:and ...)`
+  - `(nth idx args)` -> `(cl:nth idx args)`
+  - `(defun ...)` -> `(cl:defun ...)`
+  - `(apply ...)` -> `(cl:apply ...)`
+  - `(the ...)` -> `(cl:the ...)`
+  - `(setf ...)` -> `(cl:setf ...)`
+  - `(error ...)` -> `(cl:error ...)`
+This prevents type-cast exceptions like `Unable to cast object of type 'DotCL.Cons' to type 'DotCL.LispDotNetObject'` when calling generated operator functions.
+
+## Struct Mutation, Boxing, and Overload Resolution (Version 16)
+
+*(from implementation-notes.md — excerpt; the source file's "Workaround" subsection is
+DungeonSlime-specific game code and is not reproduced here)*
+
+### 1. Static vs. Instance Method Name Collisions
+
+In C#, a class can define an instance method and a static method with the exact same name. For example, `Microsoft.Xna.Framework.Vector2` defines:
+- `public void Normalize()` — an instance method that normalizes the vector in-place (returns `void`).
+- `public static Vector2 Normalize(Vector2 value)` — a static method that returns a new normalized vector.
+
+In the Lisp wrapper package generator, methods are grouped by name to generate overload dispatchers. Because both methods are named `Normalize`, they were grouped together. However:
+- The generator previously determined if a method group was static based on the first method in that group. Since the instance method `Normalize()` appeared first, the entire group was classified as non-static (`static-p` is `nil`).
+- Consequently, the static overload was generated as an instance method `normalize-vector2` (incorrectly expecting an `obj` receiver and using `dotnet:invoke` on it), and the passthrough dispatcher `normalize` was overwritten by a 1-argument instance wrapper `(cl:defun normalize (obj))`.
+
+In Version 16, this was resolved by tracking `is-static-overload-p` per individual clean method overload (via `(getf cm :is-static)`) rather than using the group-wide `static-p`. This ensures that static overloads grouped with instance methods (such as `Vector2.Normalize(Vector2)`) are correctly generated as static wrappers utilizing `dotnet:static` without requiring an implicit `obj` receiver.
+
+### 2. Struct Boxing & In-Place Mutation Failures
+
+C# structures (like `Vector2` or `Color`) are value types (structs). In the Common Lisp / DotNet CLR interop layer, invoking any instance method on a value type receiver (such as calling the instance method `Normalize()` on a `Vector2` instance) requires boxing the structure into a heap-allocated `.NET` object wrapper.
+
+Any mutations performed by that instance method are applied only to the boxed copy on the heap. Once the method invocation returns, the boxed copy is discarded, and the original Lisp reference or local variable remains completely unmodified.
+
+Furthermore, because the instance method `Normalize()` returns `void`, the Lisp wrapper function evaluates to `nil`. Consequently:
+1. Calling something like `(v2:normalize (v2:new normal-x normal-y))` returns `nil`.
+2. The original vector is not normalized (since the mutation was performed on a boxed copy that was immediately discarded).
+3. The resulting `nil` normal vector can cause subsequent operations relying on the "mutated" value to fail silently or behave incorrectly.
+
+**Workaround**: callers should prefer static methods returning a new struct instance (or a
+hand-written Lisp-native helper) over relying on in-place instance-method mutation of structs.
+
+## Idiomatic Lisp Naming Conventions (Version 17)
+
+*(from implementation-notes.md)*
+
+To make C# package wrappers feel more idiomatic to Common Lisp developers, Version 17 of the C# Lisp Package Generator updates the naming conventions for specific types of methods and fields:
+
+### 1. NaN and IsNaN Mapping
+- **`NaN` Constant**: Mapped directly to `"nan"` in `camel-to-kebab` so that constant wrappers for `NaN` (such as `System.Double.NaN`) generate as `+nan+` instead of the literal kebab-case `+na-n+`.
+- **`IsNaN` Methods**: Mapped to `"nan?"` instead of the literal `is-na-n`.
+
+### 2. IsSomething Boolean Predicates Suffix
+- Any method or property whose C# name starts with `"Is"` followed by an uppercase letter (e.g. `IsEmpty`, `IsActive`, `IsFinite`) is translated to a Lisp predicate ending with a question mark `?` (e.g. `empty?`, `active?`, `finite?`), replacing the `is-` prefix.
+- If the name is exactly `"Is"` or does not start with an uppercase letter following "Is" (e.g. `"Issue"`), the name is translated normally without the question mark conversion.
+
+## C# Package Overload Resolution Enhancements (Version 18)
+
+*(from implementation-notes.md)*
+
+To support seamless interop for overloaded C# methods, the Lisp Package Generator implements Version 18 overload resolution rules:
+
+### 1. Index-Based Positional Prefix Determination
+Previously, the generator determined the common positional parameter prefix across overloads based on both name matching and lack of default values. However, C# overloads can use different parameter names for the same positional slots (e.g. `FromMilliseconds(double value)` vs `FromMilliseconds(long milliseconds)`).
+- **Rule**: The positional prefix is now determined solely by the lack of default values up to `min-len` of the overloads, ignoring parameter names.
+- **Variable Mapping**: Positional parameters are mapped in the generated master wrapper lambda list using parameter names from the first overload. During invocation code generation (`format-master-overload-action`), parameters are mapped back by positional index rather than name, ensuring variables are correctly bound and passed to the C# interop.
+
+### 2. Literal Package Names in Fallback Conditions
+When an overloaded method call fails to match any valid C# signature at runtime, the generator signals a `csharp-overload-not-found` error.
+- **Fix**: The package name parameter is now generated as a literal string constant computed at generation time (e.g. `"MICROSOFT-XNA-FRAMEWORK-VECTOR2"`) rather than querying `(cl:package-name *package*)` at runtime. This guarantees accurate, package-independent diagnostics.
+
+### 3. Optional Positional Overload Dispatch
+To support overloaded methods like binary/unary operators (e.g. `TimeSpan.+` and `Vector2.+`) and multi-arity positional methods (e.g., `Rectangle.Contains`), the generator determines optional positional parameters beyond the minimum overload parameter length:
+- **Maximum Mandatory Length**: The generator computes `max-mandatory-parameter-len` across all overloads.
+- **Optional Parameter Collection**: Positional parameters between `min-len` and `max-mandatory-len` are generated in the master wrapper lambda list using `cl:&optional` (with `supplied-p` variables) instead of keyword arguments.
+- **Strict Dispatching**: Master wrapper `cond` clauses evaluate both argument type checks and `supplied-p` presence flags to accurately dispatch to the correct C# overload signature.
