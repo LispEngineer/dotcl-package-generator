@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 24
-;;; Creation Date: 2026-07-03T15:23:10Z
+;;; Generator Version: 25
+;;; Creation Date: 2026-07-03T21:58:34Z
 
 (cl:in-package :system-string)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-03T15:23:10Z")
-(cl:defconstant <version> 24)
+(cl:defconstant <creation> "2026-07-03T21:58:34Z")
+(cl:defconstant <version> 25)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -101,12 +101,12 @@ new(SByte*, Int32, Int32, Encoding)
 (cl:define-symbol-macro empty (dotnet:static <type-str> "Empty"))
 (cl:setf (cl:documentation (cl:quote empty) (cl:quote cl:variable)) "Represents the empty string. This field is read-only.")
 
-(cl:defun chars (obj)
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "get_Chars"))
+(cl:defun chars (obj!)
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "get_Chars"))
 
-(cl:defun length (obj)
+(cl:defun length (obj!)
   "Gets the number of characters in the current System.String object."
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "get_Length"))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "get_Length"))
 
 (cl:defun = (a b)
   "Summary: Determines whether two specified strings have the same value.
@@ -117,11 +117,11 @@ Parameters:
 "
   (dotnet:static <type-str> "op_Equality" (cl:the (dotnet "System.String") a) (cl:the (dotnet "System.String") b)))
 
-(cl:defun clone (obj)
+(cl:defun clone (obj!)
   "Summary: Returns a reference to this instance of System.String.
 Returns: This instance of System.String.
 "
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "Clone"))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Clone"))
 
 (cl:defun compare (str-a str-b cl:&optional (ignore-case cl:nil supplied-ignore-case) (options cl:nil supplied-options) (length cl:nil supplied-length) (ignore-case2 cl:nil supplied-ignore-case2) (culture cl:nil supplied-culture))
   "Master wrapper for System.String.Compare overloads. Dispatches at runtime.
@@ -281,7 +281,7 @@ CompareOrdinal(String, Int32, String, Int32, Int32) -> Int32
                     :method-name "CompareOrdinal"
                     :supplied-args (cl:append (cl:list :str-a str-a) (cl:list :str-b str-b) (cl:when supplied-str-b2 (cl:list :str-b2 str-b2)) (cl:when supplied-index-b (cl:list :index-b index-b)) (cl:when supplied-length (cl:list :length length)))))))
 
-(cl:defun compare-to (obj value)
+(cl:defun compare-to (obj! value)
   "Master wrapper for System.String.CompareTo overloads. Dispatches at runtime.
 
 CompareTo(Object) -> Int32
@@ -298,9 +298,9 @@ CompareTo(String) -> Int32
 "
   (cl:cond
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "CompareTo" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CompareTo" value))
     ((cl:and (cl:stringp value))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "CompareTo" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CompareTo" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -442,7 +442,7 @@ Concat(Char], Char], Char], Char]) -> String
 ;;   Concat(params Object[]) -> String
 ;;   Concat(params String[]) -> String
 
-(cl:defun contains (obj value cl:&optional (comparison-type cl:nil supplied-comparison-type))
+(cl:defun contains (obj! value cl:&optional (comparison-type cl:nil supplied-comparison-type))
   "Master wrapper for System.String.Contains overloads. Dispatches at runtime.
 
 Contains(String) -> Boolean
@@ -473,13 +473,13 @@ Contains(Char, StringComparison) -> Boolean
 "
   (cl:cond
     ((cl:and (cl:stringp value) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Contains" value comparison-type))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Contains" value comparison-type))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Contains" value comparison-type))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Contains" value comparison-type))
     ((cl:and (cl:stringp value) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Contains" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Contains" value))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Contains" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Contains" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -494,7 +494,7 @@ Parameters:
 "
   (dotnet:static <type-str> "Copy" (cl:the (dotnet "System.String") str)))
 
-(cl:defun copy-to (obj destination cl:&optional (destination2 cl:nil supplied-destination2) (destination-index cl:nil supplied-destination-index) (count cl:nil supplied-count))
+(cl:defun copy-to (obj! destination cl:&optional (destination2 cl:nil supplied-destination2) (destination-index cl:nil supplied-destination-index) (count cl:nil supplied-count))
   "Master wrapper for System.String.CopyTo overloads. Dispatches at runtime.
 
 CopyTo(Char]) -> Void
@@ -512,9 +512,9 @@ CopyTo(Int32, Char[], Int32, Int32) -> Void
 "
   (cl:cond
     ((cl:and (cl:numberp destination) supplied-destination2 (cl:or (cl:null destination2) (dotnet:object-type destination2)) supplied-destination-index (cl:numberp destination-index) supplied-count (cl:numberp count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "CopyTo" destination destination2 destination-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CopyTo" destination destination2 destination-index count))
     ((cl:and (cl:or (cl:null destination) (dotnet:object-type destination)) (cl:not supplied-destination2) (cl:not supplied-destination-index) (cl:not supplied-count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "CopyTo" destination))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CopyTo" destination))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -537,7 +537,7 @@ Parameters:
 ;;   Create(IFormatProvider, ref DefaultInterpolatedStringHandler&) -> String
 ;;   Create(IFormatProvider, Char], ref DefaultInterpolatedStringHandler&) -> String
 
-(cl:defun ends-with (obj value cl:&optional (comparison-type cl:nil supplied-comparison-type) (culture cl:nil supplied-culture))
+(cl:defun ends-with (obj! value cl:&optional (comparison-type cl:nil supplied-comparison-type) (culture cl:nil supplied-culture))
   "Master wrapper for System.String.EndsWith overloads. Dispatches at runtime.
 
 EndsWith(String) -> Boolean
@@ -569,26 +569,26 @@ EndsWith(String, Boolean, CultureInfo) -> Boolean
 "
   (cl:cond
     ((cl:and (cl:stringp value) supplied-comparison-type (cl:typep comparison-type 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "EndsWith" value comparison-type culture))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "EndsWith" value comparison-type culture))
     ((cl:and (cl:stringp value) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)) (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "EndsWith" value comparison-type))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "EndsWith" value comparison-type))
     ((cl:and (cl:stringp value) (cl:not supplied-comparison-type) (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "EndsWith" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "EndsWith" value))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparison-type) (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "EndsWith" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "EndsWith" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "EndsWith"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-comparison-type (cl:list :comparison-type comparison-type)) (cl:when supplied-culture (cl:list :culture culture)))))))
 
-(cl:defun enumerate-runes (obj)
+(cl:defun enumerate-runes (obj!)
   "Summary: Returns an enumeration of System.Text.Rune from this string.
 Returns: A string rune enumerator.
 "
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "EnumerateRunes"))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "EnumerateRunes"))
 
-(cl:defun equals (obj obj cl:&optional (comparison-type cl:nil supplied-comparison-type))
+(cl:defun equals (obj! obj cl:&optional (comparison-type cl:nil supplied-comparison-type))
   "Master wrapper for System.String.Equals overloads. Dispatches at runtime.
 
 Equals(Object) -> Boolean
@@ -612,11 +612,11 @@ Equals(String, StringComparison) -> Boolean
 "
   (cl:cond
     ((cl:and (cl:stringp obj) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Equals" obj comparison-type))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Equals" obj comparison-type))
     ((cl:and (cl:stringp obj) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Equals" obj))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Equals" obj))
     ((cl:and (cl:or (cl:null obj) (dotnet:object-type obj)) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Equals" obj))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Equals" obj))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -771,13 +771,13 @@ Format(IFormatProvider, String, Object, Object, Object) -> String
 ;;   Format(IFormatProvider, String, params Object[]) -> String
 ;;   Format(IFormatProvider, CompositeFormat, params Object[]) -> String
 
-(cl:defun get-enumerator (obj)
+(cl:defun get-enumerator (obj!)
   "Summary: Retrieves an object that can iterate through the individual characters in this string.
 Returns: An enumerator object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "GetEnumerator"))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "GetEnumerator"))
 
-(cl:defun get-hash-code (obj cl:&optional (comparison-type cl:nil supplied-comparison-type))
+(cl:defun get-hash-code (obj! cl:&optional (comparison-type cl:nil supplied-comparison-type))
   "Master wrapper for System.String.GetHashCode overloads. Dispatches at runtime.
 
 GetHashCode() -> Int32
@@ -792,9 +792,9 @@ GetHashCode(StringComparison) -> Int32
 "
   (cl:cond
     ((cl:and supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "GetHashCode" comparison-type))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "GetHashCode" comparison-type))
     ((cl:and (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "GetHashCode"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "GetHashCode"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -828,22 +828,22 @@ GetHashCode(Char], StringComparison) -> Int32
                     :method-name "GetHashCode"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-comparison-type (cl:list :comparison-type comparison-type)))))))
 
-(cl:defun get-pinnable-reference (obj)
+(cl:defun get-pinnable-reference (obj!)
   "Summary: Returns a reference to the element of the string at index zero. This method is intended to support .NET compilers and is not intended to be called by user code.
 Returns: A reference to the first character in the string, or a reference to the string's null terminator if the string is empty.
 "
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "GetPinnableReference"))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "GetPinnableReference"))
 
-(cl:defun get-type-code (obj)
+(cl:defun get-type-code (obj!)
   "Summary: Returns the System.TypeCode for the System.String class.
 Returns: The enumerated constant, System.TypeCode.String.
 "
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "GetTypeCode"))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "GetTypeCode"))
 
 (cl:defun implicit-cast (value)
   (dotnet:static <type-str> "op_Implicit" (cl:the (dotnet "System.String") value)))
 
-(cl:defun index-of (obj value cl:&optional (start-index cl:nil supplied-start-index) (count cl:nil supplied-count) (comparison-type cl:nil supplied-comparison-type))
+(cl:defun index-of (obj! value cl:&optional (start-index cl:nil supplied-start-index) (count cl:nil supplied-count) (comparison-type cl:nil supplied-comparison-type))
   "Master wrapper for System.String.IndexOf overloads. Dispatches at runtime.
 
 IndexOf(Char) -> Int32
@@ -921,32 +921,32 @@ IndexOf(String, Int32, Int32, StringComparison) -> Int32
 "
   (cl:cond
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value start-index count comparison-type))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index count comparison-type))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value start-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index count))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value start-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index count))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:or (cl:null count) (dotnet:object-type count)) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value start-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index count))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:or (cl:null start-index) (dotnet:object-type start-index)) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index))
     ((cl:and (cl:stringp value) supplied-start-index (cl:or (cl:null start-index) (dotnet:object-type start-index)) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value))
     ((cl:and (cl:stringp value) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOf" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "IndexOf"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-start-index (cl:list :start-index start-index)) (cl:when supplied-count (cl:list :count count)) (cl:when supplied-comparison-type (cl:list :comparison-type comparison-type)))))))
 
-(cl:defun index-of-any (obj any-of cl:&optional (start-index cl:nil supplied-start-index) (count cl:nil supplied-count))
+(cl:defun index-of-any (obj! any-of cl:&optional (start-index cl:nil supplied-start-index) (count cl:nil supplied-count))
   "Master wrapper for System.String.IndexOfAny overloads. Dispatches at runtime.
 
 IndexOfAny(Char[]) -> Int32
@@ -972,25 +972,25 @@ IndexOfAny(Char[], Int32, Int32) -> Int32
 "
   (cl:cond
     ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOfAny" any-of start-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOfAny" any-of start-index count))
     ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOfAny" any-of start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOfAny" any-of start-index))
     ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) (cl:not supplied-start-index) (cl:not supplied-count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IndexOfAny" any-of))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOfAny" any-of))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "IndexOfAny"
                     :supplied-args (cl:append (cl:list :any-of any-of) (cl:when supplied-start-index (cl:list :start-index start-index)) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun insert (obj start-index value)
+(cl:defun insert (obj! start-index value)
   "Summary: Returns a new string in which a specified string is inserted at a specified index position in this instance.
 Returns: A new string that is equivalent to this instance, but with value inserted at position startIndex.
 Parameters:
   - start-index (System.Int32): The zero-based index position of the insertion.
   - value (System.String): The string to insert.
 "
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "Insert" start-index value))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Insert" start-index value))
 
 (cl:defun intern (str)
   "Summary: Retrieves the system's reference to the specified System.String.
@@ -1008,7 +1008,7 @@ Parameters:
 "
   (dotnet:static <type-str> "IsInterned" (cl:the (dotnet "System.String") str)))
 
-(cl:defun normalized? (obj cl:&optional (normalization-form cl:nil supplied-normalization-form))
+(cl:defun normalized? (obj! cl:&optional (normalization-form cl:nil supplied-normalization-form))
   "Master wrapper for System.String.IsNormalized overloads. Dispatches at runtime.
 
 IsNormalized() -> Boolean
@@ -1023,9 +1023,9 @@ IsNormalized(NormalizationForm) -> Boolean
 "
   (cl:cond
     ((cl:and supplied-normalization-form (cl:or (cl:null normalization-form) (dotnet:object-type normalization-form)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IsNormalized" normalization-form))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IsNormalized" normalization-form))
     ((cl:and (cl:not supplied-normalization-form))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "IsNormalized"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IsNormalized"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -1151,7 +1151,7 @@ Join(String, String[], Int32, Int32) -> String
 ;;   Join(Char, params Object[]) -> String
 ;;   Join(String, params Object[]) -> String
 
-(cl:defun last-index-of (obj value cl:&optional (start-index cl:nil supplied-start-index) (count cl:nil supplied-count) (comparison-type cl:nil supplied-comparison-type))
+(cl:defun last-index-of (obj! value cl:&optional (start-index cl:nil supplied-start-index) (count cl:nil supplied-count) (comparison-type cl:nil supplied-comparison-type))
   "Master wrapper for System.String.LastIndexOf overloads. Dispatches at runtime.
 
 LastIndexOf(Char) -> Int32
@@ -1222,30 +1222,30 @@ LastIndexOf(String, Int32, Int32, StringComparison) -> Int32
 "
   (cl:cond
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOf" value start-index count comparison-type))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index count comparison-type))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOf" value start-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index count))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOf" value start-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index count))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:or (cl:null count) (dotnet:object-type count)) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOf" value start-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index count))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOf" value start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOf" value start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index))
     ((cl:and (cl:stringp value) supplied-start-index (cl:or (cl:null start-index) (dotnet:object-type start-index)) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOf" value start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOf" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value))
     ((cl:and (cl:stringp value) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOf" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "LastIndexOf"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-start-index (cl:list :start-index start-index)) (cl:when supplied-count (cl:list :count count)) (cl:when supplied-comparison-type (cl:list :comparison-type comparison-type)))))))
 
-(cl:defun last-index-of-any (obj any-of cl:&optional (start-index cl:nil supplied-start-index) (count cl:nil supplied-count))
+(cl:defun last-index-of-any (obj! any-of cl:&optional (start-index cl:nil supplied-start-index) (count cl:nil supplied-count))
   "Master wrapper for System.String.LastIndexOfAny overloads. Dispatches at runtime.
 
 LastIndexOfAny(Char[]) -> Int32
@@ -1271,18 +1271,18 @@ LastIndexOfAny(Char[], Int32, Int32) -> Int32
 "
   (cl:cond
     ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOfAny" any-of start-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOfAny" any-of start-index count))
     ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOfAny" any-of start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOfAny" any-of start-index))
     ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) (cl:not supplied-start-index) (cl:not supplied-count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "LastIndexOfAny" any-of))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOfAny" any-of))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "LastIndexOfAny"
                     :supplied-args (cl:append (cl:list :any-of any-of) (cl:when supplied-start-index (cl:list :start-index start-index)) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun normalize (obj cl:&optional (normalization-form cl:nil supplied-normalization-form))
+(cl:defun normalize (obj! cl:&optional (normalization-form cl:nil supplied-normalization-form))
   "Master wrapper for System.String.Normalize overloads. Dispatches at runtime.
 
 Normalize() -> String
@@ -1297,9 +1297,9 @@ Normalize(NormalizationForm) -> String
 "
   (cl:cond
     ((cl:and supplied-normalization-form (cl:or (cl:null normalization-form) (dotnet:object-type normalization-form)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Normalize" normalization-form))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Normalize" normalization-form))
     ((cl:and (cl:not supplied-normalization-form))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Normalize"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Normalize"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -1315,7 +1315,7 @@ Parameters:
 "
   (dotnet:static <type-str> "op_Inequality" (cl:the (dotnet "System.String") a) (cl:the (dotnet "System.String") b)))
 
-(cl:defun pad-left (obj total-width cl:&optional (padding-char cl:nil supplied-padding-char))
+(cl:defun pad-left (obj! total-width cl:&optional (padding-char cl:nil supplied-padding-char))
   "Master wrapper for System.String.PadLeft overloads. Dispatches at runtime.
 
 PadLeft(Int32) -> String
@@ -1333,16 +1333,16 @@ PadLeft(Int32, Char) -> String
 "
   (cl:cond
     ((cl:and (cl:numberp total-width) supplied-padding-char (cl:or (cl:null padding-char) (dotnet:object-type padding-char)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "PadLeft" total-width padding-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "PadLeft" total-width padding-char))
     ((cl:and (cl:numberp total-width) (cl:not supplied-padding-char))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "PadLeft" total-width))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "PadLeft" total-width))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "PadLeft"
                     :supplied-args (cl:append (cl:list :total-width total-width) (cl:when supplied-padding-char (cl:list :padding-char padding-char)))))))
 
-(cl:defun pad-right (obj total-width cl:&optional (padding-char cl:nil supplied-padding-char))
+(cl:defun pad-right (obj! total-width cl:&optional (padding-char cl:nil supplied-padding-char))
   "Master wrapper for System.String.PadRight overloads. Dispatches at runtime.
 
 PadRight(Int32) -> String
@@ -1360,16 +1360,16 @@ PadRight(Int32, Char) -> String
 "
   (cl:cond
     ((cl:and (cl:numberp total-width) supplied-padding-char (cl:or (cl:null padding-char) (dotnet:object-type padding-char)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "PadRight" total-width padding-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "PadRight" total-width padding-char))
     ((cl:and (cl:numberp total-width) (cl:not supplied-padding-char))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "PadRight" total-width))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "PadRight" total-width))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "PadRight"
                     :supplied-args (cl:append (cl:list :total-width total-width) (cl:when supplied-padding-char (cl:list :padding-char padding-char)))))))
 
-(cl:defun remove (obj start-index cl:&optional (count cl:nil supplied-count))
+(cl:defun remove (obj! start-index cl:&optional (count cl:nil supplied-count))
   "Master wrapper for System.String.Remove overloads. Dispatches at runtime.
 
 Remove(Int32) -> String
@@ -1387,16 +1387,16 @@ Remove(Int32, Int32) -> String
 "
   (cl:cond
     ((cl:and (cl:numberp start-index) supplied-count (cl:numberp count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Remove" start-index count))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Remove" start-index count))
     ((cl:and (cl:numberp start-index) (cl:not supplied-count))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Remove" start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Remove" start-index))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "Remove"
                     :supplied-args (cl:append (cl:list :start-index start-index) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun replace (obj old-char new-char cl:&optional (comparison-type cl:nil supplied-comparison-type) (culture cl:nil supplied-culture))
+(cl:defun replace (obj! old-char new-char cl:&optional (comparison-type cl:nil supplied-comparison-type) (culture cl:nil supplied-culture))
   "Master wrapper for System.String.Replace overloads. Dispatches at runtime.
 
 Replace(Char, Char) -> String
@@ -1432,20 +1432,20 @@ Replace(String, String, Boolean, CultureInfo) -> String
 "
   (cl:cond
     ((cl:and (cl:stringp old-char) (cl:stringp new-char) supplied-comparison-type (cl:typep comparison-type 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Replace" old-char new-char comparison-type culture))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Replace" old-char new-char comparison-type culture))
     ((cl:and (cl:stringp old-char) (cl:stringp new-char) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)) (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Replace" old-char new-char comparison-type))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Replace" old-char new-char comparison-type))
     ((cl:and (cl:or (cl:null old-char) (dotnet:object-type old-char)) (cl:or (cl:null new-char) (dotnet:object-type new-char)) (cl:not supplied-comparison-type) (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Replace" old-char new-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Replace" old-char new-char))
     ((cl:and (cl:stringp old-char) (cl:stringp new-char) (cl:not supplied-comparison-type) (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Replace" old-char new-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Replace" old-char new-char))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "Replace"
                     :supplied-args (cl:append (cl:list :old-char old-char) (cl:list :new-char new-char) (cl:when supplied-comparison-type (cl:list :comparison-type comparison-type)) (cl:when supplied-culture (cl:list :culture culture)))))))
 
-(cl:defun replace-line-endings (obj cl:&optional (replacement-text cl:nil supplied-replacement-text))
+(cl:defun replace-line-endings (obj! cl:&optional (replacement-text cl:nil supplied-replacement-text))
   "Master wrapper for System.String.ReplaceLineEndings overloads. Dispatches at runtime.
 
 ReplaceLineEndings() -> String
@@ -1460,16 +1460,16 @@ ReplaceLineEndings(String) -> String
 "
   (cl:cond
     ((cl:and supplied-replacement-text (cl:stringp replacement-text))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ReplaceLineEndings" replacement-text))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ReplaceLineEndings" replacement-text))
     ((cl:and (cl:not supplied-replacement-text))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ReplaceLineEndings"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ReplaceLineEndings"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "ReplaceLineEndings"
                     :supplied-args (cl:append (cl:when supplied-replacement-text (cl:list :replacement-text replacement-text)))))))
 
-(cl:defun split (obj separator cl:&optional (options cl:nil supplied-options) (options2 cl:nil supplied-options2))
+(cl:defun split (obj! separator cl:&optional (options cl:nil supplied-options) (options2 cl:nil supplied-options2))
   "Master wrapper for System.String.Split overloads. Dispatches at runtime.
 
 Split(Char]) -> String[]
@@ -1547,25 +1547,25 @@ Split(String[], Int32, StringSplitOptions) -> String[]
 "
   (cl:cond
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator options options2))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator options options2))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
     ((cl:and (cl:stringp separator) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator options options2))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator options options2))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator options))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator options))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator options))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
     ((cl:and (cl:stringp separator) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator options))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator options))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:not supplied-options) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Split" separator))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -1581,7 +1581,7 @@ Split(String[], Int32, StringSplitOptions) -> String[]
 ;;   Split(Char, Int32, StringSplitOptions) -> String[]
 ;;   Split(String, Int32, StringSplitOptions) -> String[]
 
-(cl:defun starts-with (obj value cl:&optional (comparison-type cl:nil supplied-comparison-type) (culture cl:nil supplied-culture))
+(cl:defun starts-with (obj! value cl:&optional (comparison-type cl:nil supplied-comparison-type) (culture cl:nil supplied-culture))
   "Master wrapper for System.String.StartsWith overloads. Dispatches at runtime.
 
 StartsWith(String) -> Boolean
@@ -1613,20 +1613,20 @@ StartsWith(String, Boolean, CultureInfo) -> Boolean
 "
   (cl:cond
     ((cl:and (cl:stringp value) supplied-comparison-type (cl:typep comparison-type 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "StartsWith" value comparison-type culture))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "StartsWith" value comparison-type culture))
     ((cl:and (cl:stringp value) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)) (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "StartsWith" value comparison-type))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "StartsWith" value comparison-type))
     ((cl:and (cl:stringp value) (cl:not supplied-comparison-type) (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "StartsWith" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "StartsWith" value))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparison-type) (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "StartsWith" value))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "StartsWith" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "StartsWith"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-comparison-type (cl:list :comparison-type comparison-type)) (cl:when supplied-culture (cl:list :culture culture)))))))
 
-(cl:defun substring (obj start-index cl:&optional (length cl:nil supplied-length))
+(cl:defun substring (obj! start-index cl:&optional (length cl:nil supplied-length))
   "Master wrapper for System.String.Substring overloads. Dispatches at runtime.
 
 Substring(Int32) -> String
@@ -1644,16 +1644,16 @@ Substring(Int32, Int32) -> String
 "
   (cl:cond
     ((cl:and (cl:numberp start-index) supplied-length (cl:numberp length))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Substring" start-index length))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Substring" start-index length))
     ((cl:and (cl:numberp start-index) (cl:not supplied-length))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Substring" start-index))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Substring" start-index))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "Substring"
                     :supplied-args (cl:append (cl:list :start-index start-index) (cl:when supplied-length (cl:list :length length)))))))
 
-(cl:defun to-char-array (obj cl:&optional (start-index cl:nil supplied-start-index) (length cl:nil supplied-length))
+(cl:defun to-char-array (obj! cl:&optional (start-index cl:nil supplied-start-index) (length cl:nil supplied-length))
   "Master wrapper for System.String.ToCharArray overloads. Dispatches at runtime.
 
 ToCharArray() -> Char[]
@@ -1669,16 +1669,16 @@ ToCharArray(Int32, Int32) -> Char[]
 "
   (cl:cond
     ((cl:and supplied-start-index (cl:numberp start-index) supplied-length (cl:numberp length))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToCharArray" start-index length))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToCharArray" start-index length))
     ((cl:and (cl:not supplied-start-index) (cl:not supplied-length))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToCharArray"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToCharArray"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "ToCharArray"
                     :supplied-args (cl:append (cl:when supplied-start-index (cl:list :start-index start-index)) (cl:when supplied-length (cl:list :length length)))))))
 
-(cl:defun to-lower (obj cl:&optional (culture cl:nil supplied-culture))
+(cl:defun to-lower (obj! cl:&optional (culture cl:nil supplied-culture))
   "Master wrapper for System.String.ToLower overloads. Dispatches at runtime.
 
 ToLower() -> String
@@ -1693,22 +1693,22 @@ ToLower(CultureInfo) -> String
 "
   (cl:cond
     ((cl:and supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToLower" culture))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToLower" culture))
     ((cl:and (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToLower"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToLower"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "ToLower"
                     :supplied-args (cl:append (cl:when supplied-culture (cl:list :culture culture)))))))
 
-(cl:defun to-lower-invariant (obj)
+(cl:defun to-lower-invariant (obj!)
   "Summary: Returns a copy of this System.String object converted to lowercase using the casing rules of the invariant culture.
 Returns: The lowercase equivalent of the current string.
 "
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToLowerInvariant"))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToLowerInvariant"))
 
-(cl:defun to-string (obj cl:&optional (provider cl:nil supplied-provider))
+(cl:defun to-string (obj! cl:&optional (provider cl:nil supplied-provider))
   "Master wrapper for System.String.ToString overloads. Dispatches at runtime.
 
 ToString() -> String
@@ -1723,16 +1723,16 @@ ToString(IFormatProvider) -> String
 "
   (cl:cond
     ((cl:and supplied-provider (cl:or (cl:null provider) (dotnet:object-type provider)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToString" provider))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToString" provider))
     ((cl:and (cl:not supplied-provider))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToString"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToString"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "ToString"
                     :supplied-args (cl:append (cl:when supplied-provider (cl:list :provider provider)))))))
 
-(cl:defun to-upper (obj cl:&optional (culture cl:nil supplied-culture))
+(cl:defun to-upper (obj! cl:&optional (culture cl:nil supplied-culture))
   "Master wrapper for System.String.ToUpper overloads. Dispatches at runtime.
 
 ToUpper() -> String
@@ -1747,22 +1747,22 @@ ToUpper(CultureInfo) -> String
 "
   (cl:cond
     ((cl:and supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToUpper" culture))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToUpper" culture))
     ((cl:and (cl:not supplied-culture))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToUpper"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToUpper"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "ToUpper"
                     :supplied-args (cl:append (cl:when supplied-culture (cl:list :culture culture)))))))
 
-(cl:defun to-upper-invariant (obj)
+(cl:defun to-upper-invariant (obj!)
   "Summary: Returns a copy of this System.String object converted to uppercase using the casing rules of the invariant culture.
 Returns: The uppercase equivalent of the current string.
 "
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "ToUpperInvariant"))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToUpperInvariant"))
 
-(cl:defun trim (obj cl:&optional (trim-char cl:nil supplied-trim-char))
+(cl:defun trim (obj! cl:&optional (trim-char cl:nil supplied-trim-char))
   "Master wrapper for System.String.Trim overloads. Dispatches at runtime.
 
 Trim() -> String
@@ -1779,11 +1779,11 @@ Trim(Char]) -> String
 "
   (cl:cond
     ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Trim" trim-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Trim" trim-char))
     ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Trim" trim-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Trim" trim-char))
     ((cl:and (cl:not supplied-trim-char))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "Trim"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Trim"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -1795,7 +1795,7 @@ Trim(Char]) -> String
 ;; yet supported:
 ;;   Trim(params Char[]) -> String
 
-(cl:defun trim-end (obj cl:&optional (trim-char cl:nil supplied-trim-char))
+(cl:defun trim-end (obj! cl:&optional (trim-char cl:nil supplied-trim-char))
   "Master wrapper for System.String.TrimEnd overloads. Dispatches at runtime.
 
 TrimEnd() -> String
@@ -1812,11 +1812,11 @@ TrimEnd(Char]) -> String
 "
   (cl:cond
     ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "TrimEnd" trim-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimEnd" trim-char))
     ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "TrimEnd" trim-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimEnd" trim-char))
     ((cl:and (cl:not supplied-trim-char))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "TrimEnd"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimEnd"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -1828,7 +1828,7 @@ TrimEnd(Char]) -> String
 ;; yet supported:
 ;;   TrimEnd(params Char[]) -> String
 
-(cl:defun trim-start (obj cl:&optional (trim-char cl:nil supplied-trim-char))
+(cl:defun trim-start (obj! cl:&optional (trim-char cl:nil supplied-trim-char))
   "Master wrapper for System.String.TrimStart overloads. Dispatches at runtime.
 
 TrimStart() -> String
@@ -1845,11 +1845,11 @@ TrimStart(Char]) -> String
 "
   (cl:cond
     ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "TrimStart" trim-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimStart" trim-char))
     ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "TrimStart" trim-char))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimStart" trim-char))
     ((cl:and (cl:not supplied-trim-char))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj) "TrimStart"))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimStart"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -1861,11 +1861,11 @@ TrimStart(Char]) -> String
 ;; yet supported:
 ;;   TrimStart(params Char[]) -> String
 
-(cl:defun try-copy-to (obj destination)
+(cl:defun try-copy-to (obj! destination)
   "Summary: Copies the contents of this string into the destination span.
 Returns: if the data was copied; if the destination was too short to fit the contents of the string.
 Parameters:
   - destination (System.Span`1[System.Char]): The span into which to copy this string's contents.
 "
-  (dotnet:invoke (cl:the (dotnet "System.String") obj) "TryCopyTo" destination))
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TryCopyTo" destination))
 

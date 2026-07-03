@@ -10,6 +10,15 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.25.0 — 2026-07-03
+
+**Receiver-parameter collision fix:** the hardcoded receiver parameter for instance methods and
+properties was named `obj` in generated code, which collided with a C# method's own parameter of
+the same name (e.g. `System.Object.Equals(object obj)`), producing an invalid Lisp lambda list
+with a duplicate `obj` binding. The receiver is now named `obj!`, which `map-param-name` (the only
+function that maps a C# parameter name into generated Lisp code) can never produce for an actual
+parameter, guaranteeing no future collision regardless of the C# parameter's name.
+
 ## 2.24.0 — 2026-07-03
 
 **Overload consolidation:** overloaded methods and constructors now generate at most one or two

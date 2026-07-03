@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Object
-;;; Generator Version: 24
-;;; Creation Date: 2026-07-03T15:23:10Z
+;;; Generator Version: 25
+;;; Creation Date: 2026-07-03T21:58:34Z
 
 (cl:in-package :system-object)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Object"))
 (cl:defconstant <type-str> "System.Object")
-(cl:defconstant <creation> "2026-07-03T15:23:10Z")
-(cl:defconstant <version> 24)
+(cl:defconstant <creation> "2026-07-03T21:58:34Z")
+(cl:defconstant <version> 25)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -20,13 +20,13 @@
 "
   (dotnet:new <type-str>))
 
-(cl:defun equals (obj obj)
+(cl:defun equals (obj! obj)
   "Summary: Determines whether the specified object is equal to the current object.
 Returns: if the specified object is equal to the current object; otherwise, .
 Parameters:
   - obj (System.Object): The object to compare with the current object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.Object") obj) "Equals" obj))
+  (dotnet:invoke (cl:the (dotnet "System.Object") obj!) "Equals" obj))
 
 (cl:defun equals* (obj-a obj-b)
   "Summary: Determines whether the specified object instances are considered equal.
@@ -37,28 +37,28 @@ Parameters:
 "
   (dotnet:static <type-str> "Equals" (cl:the (dotnet "System.Object") obj-a) (cl:the (dotnet "System.Object") obj-b)))
 
-(cl:defun finalize (obj)
+(cl:defun finalize (obj!)
   "Summary: Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
 "
-  (dotnet:invoke (cl:the (dotnet "System.Object") obj) "Finalize"))
+  (dotnet:invoke (cl:the (dotnet "System.Object") obj!) "Finalize"))
 
-(cl:defun get-hash-code (obj)
+(cl:defun get-hash-code (obj!)
   "Summary: Serves as the default hash function.
 Returns: A hash code for the current object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.Object") obj) "GetHashCode"))
+  (dotnet:invoke (cl:the (dotnet "System.Object") obj!) "GetHashCode"))
 
-(cl:defun get-type (obj)
+(cl:defun get-type (obj!)
   "Summary: Gets the System.Type of the current instance.
 Returns: The exact runtime type of the current instance.
 "
-  (dotnet:invoke (cl:the (dotnet "System.Object") obj) "GetType"))
+  (dotnet:invoke (cl:the (dotnet "System.Object") obj!) "GetType"))
 
-(cl:defun memberwise-clone (obj)
+(cl:defun memberwise-clone (obj!)
   "Summary: Creates a shallow copy of the current System.Object.
 Returns: A shallow copy of the current System.Object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.Object") obj) "MemberwiseClone"))
+  (dotnet:invoke (cl:the (dotnet "System.Object") obj!) "MemberwiseClone"))
 
 (cl:defun reference-equals (obj-a obj-b)
   "Summary: Determines whether the specified System.Object instances are the same instance.
@@ -69,9 +69,9 @@ Parameters:
 "
   (dotnet:static <type-str> "ReferenceEquals" (cl:the (dotnet "System.Object") obj-a) (cl:the (dotnet "System.Object") obj-b)))
 
-(cl:defun to-string (obj)
+(cl:defun to-string (obj!)
   "Summary: Returns a string that represents the current object.
 Returns: A string that represents the current object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.Object") obj) "ToString"))
+  (dotnet:invoke (cl:the (dotnet "System.Object") obj!) "ToString"))
 

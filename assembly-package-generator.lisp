@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 24
+(defparameter *generator-version* 25
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -38,7 +38,8 @@
    21 - A single-pass invocation now also emits csharp-assembly-packages.asd (generate-batch-asd-file), tying every generated .lisp package file together as an ASDF system's :components, in command-line order, with this generator version and the dotcl-packagegen CLI version recorded in the system's :version/:long-description.
    22 - Class .lisp files no longer emit their own cl:defpackage; a single-pass invocation now consolidates every class's defpackage form into one packages.lisp (generate-batch-packages-file), each preceded by a comment block naming its source file, C# class, and constant properties, with a blank line between packages. Class files retain only cl:in-package. csharp-assembly-packages.asd now lists packages as the first :file component, and every class :file declares :depends-on (\"packages\"), so ASDF's dependency graph (not just component-list order) enforces packages.lisp loading first.
    23 - Generated output is now self-contained: it no longer references this tool's own monoutils/utils packages (monoutils:dotnet-p was backed by a native primitive registered by this tool's own MonoUtilsRegistrar, unavailable to any downstream host). The per-class <type> constant and the parameter type-check fallback now use stock dotnet:resolve-type / dotnet:object-type instead of monoutils:get-type / monoutils:dotnet-p, and the csharp-overload-not-found condition is emitted as csharp-assembly-utils:csharp-overload-not-found instead of utils:csharp-overload-not-found. A single-pass invocation now also emits csharp-assembly-utils.lisp (generate-batch-utils-file), holding that condition; its defpackage form is copied into packages.lisp ahead of the per-class defpackage forms (generate-batch-packages-file). Both are copied verbatim from real, standalone-loadable template files (csharp-assembly-utils-package.template.lisp, csharp-assembly-utils.template.lisp) rather than synthesized via format. csharp-assembly-packages.asd's :components gained a csharp-assembly-utils :file (:depends-on (\"packages\")), and every class :file's :depends-on became (\"packages\" \"csharp-assembly-utils\").
-   24 - Overload consolidation: the type-suffixed per-overload direct-call functions previously emitted (and exported) alongside every multi-overload method's Master Wrapper and every multi-constructor type's passthrough new (e.g. contains-vector-2, new-single-single) are no longer generated or exported at all; the existing Master Wrapper cond dispatch already selects the correct overload precisely, so those functions were pure redundancy. Constructors gained their own Master Wrapper (generate-constructor-master-wrapper), replacing the old (apply #'dotnet:new <type-str> args) &rest passthrough with the same supplied-p-based precise dispatch methods already had; every class now emits at most one new regardless of constructor overload count (methods still emit a second, *-suffixed wrapper only when a name is overloaded as both instance and static). To compensate for the lost per-overload functions' individual docstrings, every Master Wrapper's docstring (method or constructor) now enumerates all of its covered overloads' signatures plus each overload's own XML-doc-sourced Summary/Returns/Parameters text (format-combined-overloads-docstring/format-overload-doc-block), so the full set of available overloads stays documented on the one remaining function. Giving constructors a Master Wrapper exposed a latent bug in collect-optional-positional-params: each positional dispatch slot's representative parameter name is picked arbitrarily from whichever overload happens to have one there, so two overloads with unrelated arities can coincidentally reuse the same parameter name at two different slots (e.g. System.TimeSpan's 3-arg and 4-arg constructors each have an unrelated 'seconds' parameter, at index 2 and index 3 respectively), which previously produced an invalid lambda-list with a duplicate variable name. uniquify-positional-params now numeric-suffixes any such collision before the lambda-list/cond-block/docstring are generated.")
+   24 - Overload consolidation: the type-suffixed per-overload direct-call functions previously emitted (and exported) alongside every multi-overload method's Master Wrapper and every multi-constructor type's passthrough new (e.g. contains-vector-2, new-single-single) are no longer generated or exported at all; the existing Master Wrapper cond dispatch already selects the correct overload precisely, so those functions were pure redundancy. Constructors gained their own Master Wrapper (generate-constructor-master-wrapper), replacing the old (apply #'dotnet:new <type-str> args) &rest passthrough with the same supplied-p-based precise dispatch methods already had; every class now emits at most one new regardless of constructor overload count (methods still emit a second, *-suffixed wrapper only when a name is overloaded as both instance and static). To compensate for the lost per-overload functions' individual docstrings, every Master Wrapper's docstring (method or constructor) now enumerates all of its covered overloads' signatures plus each overload's own XML-doc-sourced Summary/Returns/Parameters text (format-combined-overloads-docstring/format-overload-doc-block), so the full set of available overloads stays documented on the one remaining function. Giving constructors a Master Wrapper exposed a latent bug in collect-optional-positional-params: each positional dispatch slot's representative parameter name is picked arbitrarily from whichever overload happens to have one there, so two overloads with unrelated arities can coincidentally reuse the same parameter name at two different slots (e.g. System.TimeSpan's 3-arg and 4-arg constructors each have an unrelated 'seconds' parameter, at index 2 and index 3 respectively), which previously produced an invalid lambda-list with a duplicate variable name. uniquify-positional-params now numeric-suffixes any such collision before the lambda-list/cond-block/docstring are generated.
+   25 - The hardcoded instance-method/property receiver parameter is now named obj! instead of obj, since map-param-name (the only function that maps a C# parameter name to a generated Lisp parameter name) never appends a trailing '!' to anything, guaranteeing obj! can never collide with a mapped C# parameter name. Previously, a C# instance method with its own parameter literally named obj (e.g. System.Object.Equals(object obj)) generated an invalid lambda list with a duplicate obj binding.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -565,9 +566,9 @@
       (static-p
        (cl:format nil "(dotnet:static <type-str> \"~A\"~@[ ~{~A~^ ~}~])" dotnet-method-name param-names))
       (is-generic-p
-       (cl:format nil "(dotnet:invoke-generic (cl:the (dotnet \"~A\") obj) \"~A\" (cl:list type)~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name param-names))
+       (cl:format nil "(dotnet:invoke-generic (cl:the (dotnet \"~A\") obj!) \"~A\" (cl:list type)~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name param-names))
       (cl:t
-       (cl:format nil "(dotnet:invoke (cl:the (dotnet \"~A\") obj) \"~A\"~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name param-names)))))
+       (cl:format nil "(dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name param-names)))))
 
 (cl:defun format-supplied-args-expr (prefix opt-params key-params)
   "Generates Lisp expression constructing a plist of supplied arguments at runtime."
@@ -600,7 +601,7 @@
     (cl:when is-generic-p
       (cl:setf args-list (cl:append args-list (cl:list "type"))))
     (cl:unless static-p
-      (cl:setf args-list (cl:append args-list (cl:list "obj"))))
+      (cl:setf args-list (cl:append args-list (cl:list "obj!"))))
     (cl:setf args-list (cl:append args-list prefix-names))
     (cl:when opt-params
       (cl:setf args-list (cl:append args-list (cl:list "cl:&optional")))
@@ -709,9 +710,9 @@
                         (static-p
                          (cl:format nil "~{~A~^ ~}" param-names))
                         (is-generic-p
-                         (cl:format nil "type obj~@[ ~{~A~^ ~}~]" param-names))
+                         (cl:format nil "type obj!~@[ ~{~A~^ ~}~]" param-names))
                         (cl:t
-                         (cl:format nil "obj~@[ ~{~A~^ ~}~]" param-names))))
+                         (cl:format nil "obj!~@[ ~{~A~^ ~}~]" param-names))))
             (docstring (build-docstring summary returns params m-doc))
             (escaped-docstring (escape-lisp-string docstring))
             (dotnet-method-name (cl:or (cl:getf m :mangled-name) (cl:getf m :name)))
@@ -735,9 +736,9 @@
               (cl:format stream "  (dotnet:static <type-str> \"~A\"~@[~{ ~A~}~]))~%~%" dotnet-method-name static-typed-args)
               (cl:format stream "  (dotnet:static <type-str> \"~A\"~@[ ~{~A~^ ~}~]))~%~%" dotnet-method-name param-names)))
          (is-generic-p
-          (cl:format stream "  (dotnet:invoke-generic (cl:the (dotnet \"~A\") obj) \"~A\" (cl:list type)~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name param-names))
+          (cl:format stream "  (dotnet:invoke-generic (cl:the (dotnet \"~A\") obj!) \"~A\" (cl:list type)~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name param-names))
          (cl:t
-          (cl:format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj) \"~A\"~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name param-names)))))
+          (cl:format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name param-names)))))
 
 (defun format-overload-test (cm)
   "Generates a Lisp conditional test expression string for checking if the runtime arguments match the method's parameters."
@@ -1046,28 +1047,28 @@
                  (p-doc (getf (getf p :documentation) :summary))
                  (doc-str (if p-doc (escape-lisp-string p-doc) "")))
             (when readable
-              (format stream "(cl:defun ~A (obj)~%" pname)
+              (format stream "(cl:defun ~A (obj!)~%" pname)
               (when (> (length doc-str) 0)
                 (format stream "  \"~A\"~%" doc-str))
-              (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj) \"~A\"))~%~%" fq-name get-method))
+              (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"))~%~%" fq-name get-method))
             (when writeable
               (if readable
                   (progn
                     (when is-value-type-p
                       (format stream ";; Note: Modifying a property of a value type (struct) via setf may only mutate~%")
                       (format stream ";; a boxed copy, leaving the original unchanged. Use caution with structs.~%"))
-                    (format stream "(cl:defun (cl:setf ~A) (new-value obj)~%" pname)
+                    (format stream "(cl:defun (cl:setf ~A) (new-value obj!)~%" pname)
                     (when (> (length doc-str) 0)
                       (format stream "  \"~A\"~%" doc-str))
-                    (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj) \"~A\" new-value))~%~%" fq-name set-method))
+                    (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\" new-value))~%~%" fq-name set-method))
                   (progn
                     (when is-value-type-p
                       (format stream ";; Note: Modifying a property of a value type (struct) via setf may only mutate~%")
                       (format stream ";; a boxed copy, leaving the original unchanged. Use caution with structs.~%"))
-                    (format stream "(cl:defun set-~A (obj new-value)~%" pname)
+                    (format stream "(cl:defun set-~A (obj! new-value)~%" pname)
                     (when (> (length doc-str) 0)
                       (format stream "  \"~A\"~%" doc-str))
-                    (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj) \"~A\" new-value))~%~%" fq-name set-method))))))
+                    (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\" new-value))~%~%" fq-name set-method))))))
         
         ;; Methods - Generated from method groups with overload handling
         (dolist (group method-groups)

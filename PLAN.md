@@ -4,6 +4,70 @@
 * Copyright 2026 Douglas P. Fields, Jr.
 
 
+
+# Add More to Generated `.lisp` Files
+
+TODO
+* Add Constant Properties as structured `<constant-properties>`
+  * A Lisp list of all the selected properties (strings); 
+    could also just be `"*"` as a single entry.
+* Add the Assembly as `<assembly>`
+* Add the Assembly to the per-package comment in `packages.lisp`
+
+
+# Miscellaneous
+
+* Handle generic classes name mangling using backticks more elegantly.
+  * Backticks have special meaning in Lisp so we cannot include them in the
+    package names, for example.
+  * The ugly workaround in v20 would make it hard for users, who are not
+    typically aware of the generic arity of the classes they use and might
+    not easily guess the package name.
+
+* Copy the `revert-cspackages-timestamps.sh` from DungeonSlime to here,
+  and use it in the `cspackages-test` directory for the `make test` target.
+
+* Make a `FILES.md`
+* Make `Makefile` introspect the `.asd` for the version number.
+* Make a new DotCL application with its own .csproj and .asd
+  that uses generated packages and runs LOTS of tests (such as the
+  ones recently removed for TimeStamp) with all those generated packages,
+  testing every possible method with every possible set of parameters.
+  * This can be run with make test-packages and should be run after make-test passes.
+* Make a utilities template and copy it to the generated directory
+* Do multiple assemblies and classes at the same time
+* Generate a packages.lisp as well
+
+* Improve C# class package generator:
+  * Handle dirty overloads (ref/out) with -ref suffix naming and
+    out→multiple-values mapping in a future version.
+  * Consider casting mutator parameters to the correct type, e.g.,
+    `(#!!System.Convert.ToByte 37)`, or `(dotnet:box 37 "System.Byte")`
+    in the mutator function implementation
+  * Add documentation comments that indicate the return type and
+    expected input type(s) of any parameters.
+  * Change IsSomething methods to `something?` methods
+  * Change `ToSomething` methods to `->something`
+  * Handle multiple classes at a time for a single assembly
+  * Add the assembly version (and other versions?) from which the class package was made
+  * Change `GetSomething` methods to ???
+  * Make operator overloads take N parameters - assuming they are all the same type
+    * This needs more consideration
+
+* Make the `AssemblyToLispy` tests less fragile
+  * I upgraded from DotNet 10.0.8 to 10.0.9 and the tests broke.
+  * Remove hardcoded paths and find the assemblies in some automated fashion?
+
+* Implement a system to convert a CLOS class to a CLR/C# class somehow,
+  or really, create a C# proxy for the CLOS class.
+  (I'm still noodling ways to do that.)
+  * Make it as generic as possible.
+  * Maybe a base CLOS class that implements functionality to create that
+    proxy on the fly, and has a reference to the proxy for reuse.
+
+
+---
+
 # **DONE** Overload Consolidation
 
 Consolidate all method overloads into at most two functions:
@@ -36,86 +100,6 @@ section below for the follow-up item) in how positional dispatch-slot parameter 
 picked when overloads have unrelated arities; `uniquify-positional-params` was added to fix it
 for the specific case of two different slots coincidentally choosing the same parameter name.
 
-
-# Add More to Generated `.lisp` Files
-
-TODO
-* Add Constant Properties as structured `<constant-properties>`
-  * A Lisp list of all the selected properties (strings); 
-    could also just be `"*"` as a single entry.
-* Add the Assembly as `<assembly>`
-* Add the Assembly to the per-package comment in `packages.lisp`
-
-
-# Miscellaneous
-
-* `generate-single-overload`/`generate-master-wrapper` hardcode the receiver parameter 
-  name as literal `obj`, which collides when a C# method's own parameter is also named obj, e.g. 
-  `System.Object.Equals(object obj)` generates `(cl:defun equals (obj obj) ...)`, 
-  an invalid lambda list.
-  * Suggestion: change the name of `obj` to something that C# cannot generate, such as
-    `obj*` `obj!` `<obj>`, etc.
-
-* Handle generic classes name mangling using backticks more elegantly.
-  * Backticks have special meaning in Lisp so we cannot include them in the
-    package names, for example.
-  * The ugly workaround in v20 would make it hard for users, who are not
-    typically aware of the generic arity of the classes they use and might
-    not easily guess the package name.
-
-* Copy the `revert-cspackages-timestamps.sh` from DungeonSlime to here,
-  and use it in the `cspackages-test` directory.
-
-* Make a `FILES.md`
-* Make `Makefile` introspect the `.asd` for the version number.
-* Make a new DotCL application with its own .csproj and .asd
-  that uses generated packages and runs LOTS of tests (such as the
-  ones recently removed for TimeStamp) with all those generated packages,
-  testing every possible method with every possible set of parameters.
-  * This can be run with make test-packages and should be run after make-test passes.
-* Make a utilities template and copy it to the generated directory
-* Do multiple assemblies and classes at the same time
-* Generate a packages.lisp as well
-
-* Have the package generator do two more things:
-  * Generate a packages.lisp file with all the package information separate from the
-    generated packages.
-  * Generate a `utils.lisp` in its own namespace which can be used by all the
-    other packages (in the target directory).
-    * This could contain any helper methods that would have been elsewhere.
-    * This could be stored in a `cspackages-utils.lisp-template` (so it doesn't
-      get compiled by accident).
-    * This should have its own version number.
-
-* Improve C# class package generator:
-  * Handle dirty overloads (ref/out) with -ref suffix naming and
-    out→multiple-values mapping in a future version.
-  * Consider casting mutator parameters to the correct type, e.g.,
-    `(#!!System.Convert.ToByte 37)`, or `(dotnet:box 37 "System.Byte")`
-    in the mutator function implementation
-  * Add documentation comments that indicate the return type and
-    expected input type(s) of any parameters.
-  * Change IsSomething methods to `something?` methods
-  * Change `ToSomething` methods to `->something`
-  * Handle multiple classes at a time for a single assembly
-  * Add the assembly version (and other versions?) from which the class package was made
-  * Change `GetSomething` methods to ???
-  * Make operator overloads take N parameters - assuming they are all the same type
-    * This needs more consideration
-
-* Make the `AssemblyToLispy` tests less fragile
-  * I upgraded from DotNet 10.0.8 to 10.0.9 and the tests broke.
-  * Remove hardcoded paths and find the assemblies in some automated fashion?
-
-* Implement a system to convert a CLOS class to a CLR/C# class somehow,
-  or really, create a C# proxy for the CLOS class.
-  (I'm still noodling ways to do that.)
-  * Make it as generic as possible.
-  * Maybe a base CLOS class that implements functionality to create that
-    proxy on the fly, and has a reference to the proxy for reuse.
-
-
----
 
 # **DONE** Make `csharp-assembly-utils.lisp` and Package
 
@@ -157,6 +141,18 @@ How do we include the template files (if chosen) in the deployed application?
 * Consider the `.asd` `:static-file` option to include the templates in the build
   so the deployed package generator can access them. Not sure how that would work
   in DotCL though.
+
+## Old Misc
+
+* **DONE** Have the package generator do two more things:
+  * Generate a packages.lisp file with all the package information separate from the
+    generated packages.
+  * Generate a `utils.lisp` in its own namespace which can be used by all the
+    other packages (in the target directory).
+    * This could contain any helper methods that would have been elsewhere.
+    * This could be stored in a `cspackages-utils.lisp-template` (so it doesn't
+      get compiled by accident).
+    * This should have its own version number.
 
 
 # **DONE** Make `packages.lisp`
@@ -288,6 +284,18 @@ is a really foundational change that will help a lot in the future.
 
 
 # DONE
+
+* `generate-single-overload`/`generate-master-wrapper` hardcode the receiver parameter 
+  name as literal `obj`, which collides when a C# method's own parameter is also named obj, e.g. 
+  `System.Object.Equals(object obj)` generates `(cl:defun equals (obj obj) ...)`, 
+  an invalid lambda list.
+  * Suggestion: change the name of `obj` to something that C# cannot generate, such as
+    `obj*` `obj!` `<obj>`, etc.
+  * DONE (Generator Version 25): renamed the hardcoded receiver to `obj!` everywhere it's
+    emitted (methods, master wrappers, instance property getters/setters). `map-param-name`
+    never appends a trailing `!` to a mapped C# parameter name, so `obj!` can never collide.
+    See `doc/generator-design-notes.md`'s "Receiver Parameter Renamed to `obj!` (Version 25)"
+    section and `RELEASES.md`'s 2.25.0 entry.
 
 * Have it generate a whole ASDF system, with its own `.asd` file,
   its own `packages.lisp`, its shared code (e.g., `csharp-assembly-utils.lisp`)

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo
-;;; Generator Version: 24
-;;; Creation Date: 2026-07-03T15:23:10Z
+;;; Generator Version: 25
+;;; Creation Date: 2026-07-03T21:58:34Z
 
 (cl:in-package :system-time-zone-info)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.TimeZoneInfo"))
 (cl:defconstant <type-str> "System.TimeZoneInfo")
-(cl:defconstant <creation> "2026-07-03T15:23:10Z")
-(cl:defconstant <version> 24)
+(cl:defconstant <creation> "2026-07-03T21:58:34Z")
+(cl:defconstant <version> 25)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -21,33 +21,33 @@
 (cl:define-symbol-macro utc (dotnet:static <type-str> "Utc"))
 (cl:setf (cl:documentation (cl:quote utc) (cl:quote cl:variable)) "Gets a System.TimeZoneInfo object that represents the Coordinated Universal Time (UTC) zone.")
 
-(cl:defun base-utc-offset (obj)
+(cl:defun base-utc-offset (obj!)
   "Gets the time difference between the current time zone's standard time and Coordinated Universal Time (UTC)."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "get_BaseUtcOffset"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "get_BaseUtcOffset"))
 
-(cl:defun daylight-name (obj)
+(cl:defun daylight-name (obj!)
   "Gets the display name for the current time zone's daylight saving time."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "get_DaylightName"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "get_DaylightName"))
 
-(cl:defun display-name (obj)
+(cl:defun display-name (obj!)
   "Gets the general display name that represents the time zone."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "get_DisplayName"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "get_DisplayName"))
 
-(cl:defun has-iana-id (obj)
+(cl:defun has-iana-id (obj!)
   "Returns if this TimeZoneInfo object has an IANA ID."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "get_HasIanaId"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "get_HasIanaId"))
 
-(cl:defun id (obj)
+(cl:defun id (obj!)
   "Gets the time zone identifier."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "get_Id"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "get_Id"))
 
-(cl:defun standard-name (obj)
+(cl:defun standard-name (obj!)
   "Gets the display name for the time zone's standard time."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "get_StandardName"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "get_StandardName"))
 
-(cl:defun supports-daylight-saving-time (obj)
+(cl:defun supports-daylight-saving-time (obj!)
   "Gets a value indicating whether the time zone has any daylight saving time rules."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "get_SupportsDaylightSavingTime"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "get_SupportsDaylightSavingTime"))
 
 (cl:defun clear-cached-data ()
   "Summary: Clears cached time zone data.
@@ -214,7 +214,7 @@ CreateCustomTimeZone(String, TimeSpan, String, String, String, TimeZoneInfo+Adju
                     :method-name "CreateCustomTimeZone"
                     :supplied-args (cl:append (cl:list :id id) (cl:list :base-utc-offset base-utc-offset) (cl:list :display-name display-name) (cl:list :standard-display-name standard-display-name) (cl:when supplied-daylight-display-name (cl:list :daylight-display-name daylight-display-name)) (cl:when supplied-adjustment-rules (cl:list :adjustment-rules adjustment-rules)) (cl:when supplied-disable-daylight-saving-time (cl:list :disable-daylight-saving-time disable-daylight-saving-time)))))))
 
-(cl:defun equals (obj other)
+(cl:defun equals (obj! other)
   "Master wrapper for System.TimeZoneInfo.Equals overloads. Dispatches at runtime.
 
 Equals(TimeZoneInfo) -> Boolean
@@ -231,9 +231,9 @@ Equals(Object) -> Boolean
 "
   (cl:cond
     ((cl:and (cl:or (cl:null other) (dotnet:object-type other)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "Equals" other))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "Equals" other))
     ((cl:and (cl:or (cl:null other) (dotnet:object-type other)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "Equals" other))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "Equals" other))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
                     :class-name <type-str>
@@ -256,13 +256,13 @@ Parameters:
 "
   (dotnet:static <type-str> "FromSerializedString" (cl:the (dotnet "System.String") source)))
 
-(cl:defun get-adjustment-rules (obj)
+(cl:defun get-adjustment-rules (obj!)
   "Summary: Retrieves an array of System.TimeZoneInfo.AdjustmentRule objects that apply to the current System.TimeZoneInfo object.
 Returns: An array of objects for this time zone.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "GetAdjustmentRules"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetAdjustmentRules"))
 
-(cl:defun get-ambiguous-time-offsets (obj date-time-offset)
+(cl:defun get-ambiguous-time-offsets (obj! date-time-offset)
   "Master wrapper for System.TimeZoneInfo.GetAmbiguousTimeOffsets overloads. Dispatches at runtime.
 
 GetAmbiguousTimeOffsets(DateTimeOffset) -> TimeSpan[]
@@ -279,20 +279,20 @@ GetAmbiguousTimeOffsets(DateTime) -> TimeSpan[]
 "
   (cl:cond
     ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "GetAmbiguousTimeOffsets" date-time-offset))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetAmbiguousTimeOffsets" date-time-offset))
     ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "GetAmbiguousTimeOffsets" date-time-offset))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetAmbiguousTimeOffsets" date-time-offset))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
                     :class-name <type-str>
                     :method-name "GetAmbiguousTimeOffsets"
                     :supplied-args (cl:append (cl:list :date-time-offset date-time-offset))))))
 
-(cl:defun get-hash-code (obj)
+(cl:defun get-hash-code (obj!)
   "Summary: Serves as a hash function for hashing algorithms and data structures such as hash tables.
 Returns: A 32-bit signed integer that serves as the hash code for this System.TimeZoneInfo object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "GetHashCode"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetHashCode"))
 
 (cl:defun get-system-time-zones (cl:&optional (skip-sorting cl:nil supplied-skip-sorting))
   "Master wrapper for System.TimeZoneInfo.GetSystemTimeZones overloads. Dispatches at runtime.
@@ -317,7 +317,7 @@ GetSystemTimeZones(Boolean) -> TimeZoneInfo]
                     :method-name "GetSystemTimeZones"
                     :supplied-args (cl:append (cl:when supplied-skip-sorting (cl:list :skip-sorting skip-sorting)))))))
 
-(cl:defun get-utc-offset (obj date-time-offset)
+(cl:defun get-utc-offset (obj! date-time-offset)
   "Master wrapper for System.TimeZoneInfo.GetUtcOffset overloads. Dispatches at runtime.
 
 GetUtcOffset(DateTimeOffset) -> TimeSpan
@@ -334,24 +334,24 @@ GetUtcOffset(DateTime) -> TimeSpan
 "
   (cl:cond
     ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "GetUtcOffset" date-time-offset))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetUtcOffset" date-time-offset))
     ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "GetUtcOffset" date-time-offset))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetUtcOffset" date-time-offset))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
                     :class-name <type-str>
                     :method-name "GetUtcOffset"
                     :supplied-args (cl:append (cl:list :date-time-offset date-time-offset))))))
 
-(cl:defun has-same-rules (obj other)
+(cl:defun has-same-rules (obj! other)
   "Summary: Indicates whether the current object and another System.TimeZoneInfo object have the same adjustment rules.
 Returns: if the two time zones have identical adjustment rules and an identical base offset; otherwise, .
 Parameters:
   - other (System.TimeZoneInfo): A second object to compare with the current System.TimeZoneInfo object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "HasSameRules" other))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "HasSameRules" other))
 
-(cl:defun ambiguous-time? (obj date-time-offset)
+(cl:defun ambiguous-time? (obj! date-time-offset)
   "Master wrapper for System.TimeZoneInfo.IsAmbiguousTime overloads. Dispatches at runtime.
 
 IsAmbiguousTime(DateTimeOffset) -> Boolean
@@ -368,16 +368,16 @@ IsAmbiguousTime(DateTime) -> Boolean
 "
   (cl:cond
     ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "IsAmbiguousTime" date-time-offset))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "IsAmbiguousTime" date-time-offset))
     ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "IsAmbiguousTime" date-time-offset))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "IsAmbiguousTime" date-time-offset))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
                     :class-name <type-str>
                     :method-name "IsAmbiguousTime"
                     :supplied-args (cl:append (cl:list :date-time-offset date-time-offset))))))
 
-(cl:defun daylight-saving-time? (obj date-time-offset)
+(cl:defun daylight-saving-time? (obj! date-time-offset)
   "Master wrapper for System.TimeZoneInfo.IsDaylightSavingTime overloads. Dispatches at runtime.
 
 IsDaylightSavingTime(DateTimeOffset) -> Boolean
@@ -394,34 +394,34 @@ IsDaylightSavingTime(DateTime) -> Boolean
 "
   (cl:cond
     ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "IsDaylightSavingTime" date-time-offset))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "IsDaylightSavingTime" date-time-offset))
     ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "IsDaylightSavingTime" date-time-offset))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "IsDaylightSavingTime" date-time-offset))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
                     :class-name <type-str>
                     :method-name "IsDaylightSavingTime"
                     :supplied-args (cl:append (cl:list :date-time-offset date-time-offset))))))
 
-(cl:defun invalid-time? (obj date-time)
+(cl:defun invalid-time? (obj! date-time)
   "Summary: Indicates whether a particular date and time is invalid.
 Returns: if dateTime is invalid; otherwise, .
 Parameters:
   - date-time (System.DateTime): A date and time value.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "IsInvalidTime" date-time))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "IsInvalidTime" date-time))
 
-(cl:defun to-serialized-string (obj)
+(cl:defun to-serialized-string (obj!)
   "Summary: Converts the current System.TimeZoneInfo object to a serialized string.
 Returns: A string that represents the current System.TimeZoneInfo object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "ToSerializedString"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "ToSerializedString"))
 
-(cl:defun to-string (obj)
+(cl:defun to-string (obj!)
   "Summary: Returns the current System.TimeZoneInfo object's display name.
 Returns: The value of the System.TimeZoneInfo.DisplayName property of the current System.TimeZoneInfo object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj) "ToString"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "ToString"))
 
 ;; The following C# System.TimeZoneInfo.TryConvertIanaIdToWindowsId overloads have special parameter types
 ;; (ref, out, params, or defaults) and are not yet supported:

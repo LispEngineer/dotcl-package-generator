@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 24
-;;; Creation Date: 2026-07-03T15:23:10Z
+;;; Generator Version: 25
+;;; Creation Date: 2026-07-03T21:58:34Z
 
 (cl:in-package :system-time-span)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-03T15:23:10Z")
-(cl:defconstant <version> 24)
+(cl:defconstant <creation> "2026-07-03T21:58:34Z")
+(cl:defconstant <version> 25)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -153,65 +153,65 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
 (cl:defconstant +zero+ (dotnet:static <type-str> "Zero"))
 (cl:setf (cl:documentation (cl:quote +zero+) (cl:quote cl:variable)) "Represents the zero System.TimeSpan value. This field is read-only.")
 
-(cl:defun days (obj)
+(cl:defun days (obj!)
   "Gets the days component of the time interval represented by the current System.TimeSpan structure."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_Days"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_Days"))
 
-(cl:defun hours (obj)
+(cl:defun hours (obj!)
   "Gets the hours component of the time interval represented by the current System.TimeSpan structure."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_Hours"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_Hours"))
 
-(cl:defun microseconds (obj)
+(cl:defun microseconds (obj!)
   "Gets the microseconds component of the time interval represented by the current System.TimeSpan structure."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_Microseconds"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_Microseconds"))
 
-(cl:defun milliseconds (obj)
+(cl:defun milliseconds (obj!)
   "Gets the milliseconds component of the time interval represented by the current System.TimeSpan structure."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_Milliseconds"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_Milliseconds"))
 
-(cl:defun minutes (obj)
+(cl:defun minutes (obj!)
   "Gets the minutes component of the time interval represented by the current System.TimeSpan structure."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_Minutes"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_Minutes"))
 
-(cl:defun nanoseconds (obj)
+(cl:defun nanoseconds (obj!)
   "Gets the nanoseconds component of the time interval represented by the current System.TimeSpan structure."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_Nanoseconds"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_Nanoseconds"))
 
-(cl:defun seconds (obj)
+(cl:defun seconds (obj!)
   "Gets the seconds component of the time interval represented by the current System.TimeSpan structure."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_Seconds"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_Seconds"))
 
-(cl:defun ticks (obj)
+(cl:defun ticks (obj!)
   "Gets the number of ticks that represent the value of the current System.TimeSpan structure."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_Ticks"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_Ticks"))
 
-(cl:defun total-days (obj)
+(cl:defun total-days (obj!)
   "Gets the value of the current System.TimeSpan structure expressed in whole and fractional days."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_TotalDays"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_TotalDays"))
 
-(cl:defun total-hours (obj)
+(cl:defun total-hours (obj!)
   "Gets the value of the current System.TimeSpan structure expressed in whole and fractional hours."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_TotalHours"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_TotalHours"))
 
-(cl:defun total-microseconds (obj)
+(cl:defun total-microseconds (obj!)
   "Gets the value of the current System.TimeSpan structure expressed in whole and fractional microseconds."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_TotalMicroseconds"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_TotalMicroseconds"))
 
-(cl:defun total-milliseconds (obj)
+(cl:defun total-milliseconds (obj!)
   "Gets the value of the current System.TimeSpan structure expressed in whole and fractional milliseconds."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_TotalMilliseconds"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_TotalMilliseconds"))
 
-(cl:defun total-minutes (obj)
+(cl:defun total-minutes (obj!)
   "Gets the value of the current System.TimeSpan structure expressed in whole and fractional minutes."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_TotalMinutes"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_TotalMinutes"))
 
-(cl:defun total-nanoseconds (obj)
+(cl:defun total-nanoseconds (obj!)
   "Gets the value of the current System.TimeSpan structure expressed in whole and fractional nanoseconds."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_TotalNanoseconds"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_TotalNanoseconds"))
 
-(cl:defun total-seconds (obj)
+(cl:defun total-seconds (obj!)
   "Gets the value of the current System.TimeSpan structure expressed in whole and fractional seconds."
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "get_TotalSeconds"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "get_TotalSeconds"))
 
 (cl:defun - (t-val cl:&optional (t2 cl:nil supplied-t2))
   "Master wrapper for System.TimeSpan.- overloads. Dispatches at runtime.
@@ -368,13 +368,13 @@ Parameters:
 "
   (dotnet:static <type-str> "op_GreaterThanOrEqual" (cl:the (dotnet "System.TimeSpan") t1) (cl:the (dotnet "System.TimeSpan") t2)))
 
-(cl:defun add (obj ts)
+(cl:defun add (obj! ts)
   "Summary: Returns a new System.TimeSpan object whose value is the sum of the specified System.TimeSpan object and this instance.
 Returns: A new object that represents the value of this instance plus the value of ts.
 Parameters:
   - ts (System.TimeSpan): The time interval to add.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "Add" ts))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Add" ts))
 
 (cl:defun compare (t1 t2)
   "Summary: Compares two System.TimeSpan values and returns an integer that indicates whether the first value is shorter than, equal to, or longer than the second value.
@@ -385,7 +385,7 @@ Parameters:
 "
   (dotnet:static <type-str> "Compare" (cl:the (dotnet "System.TimeSpan") t1) (cl:the (dotnet "System.TimeSpan") t2)))
 
-(cl:defun compare-to (obj value)
+(cl:defun compare-to (obj! value)
   "Master wrapper for System.TimeSpan.CompareTo overloads. Dispatches at runtime.
 
 CompareTo(Object) -> Int32
@@ -402,16 +402,16 @@ CompareTo(TimeSpan) -> Int32
 "
   (cl:cond
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "CompareTo" value))
+     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "CompareTo" value))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "CompareTo" value))
+     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "CompareTo" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
                     :method-name "CompareTo"
                     :supplied-args (cl:append (cl:list :value value))))))
 
-(cl:defun divide (obj divisor)
+(cl:defun divide (obj! divisor)
   "Master wrapper for System.TimeSpan.Divide overloads. Dispatches at runtime.
 
 Divide(Double) -> TimeSpan
@@ -428,22 +428,22 @@ Divide(TimeSpan) -> Double
 "
   (cl:cond
     ((cl:and (cl:numberp divisor))
-     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "Divide" divisor))
+     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Divide" divisor))
     ((cl:and (cl:or (cl:null divisor) (dotnet:object-type divisor)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "Divide" divisor))
+     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Divide" divisor))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
                     :method-name "Divide"
                     :supplied-args (cl:append (cl:list :divisor divisor))))))
 
-(cl:defun duration (obj)
+(cl:defun duration (obj!)
   "Summary: Returns a new System.TimeSpan object whose value is the absolute value of the current System.TimeSpan object.
 Returns: A new object whose value is the absolute value of the current System.TimeSpan object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "Duration"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Duration"))
 
-(cl:defun equals (obj value)
+(cl:defun equals (obj! value)
   "Master wrapper for System.TimeSpan.Equals overloads. Dispatches at runtime.
 
 Equals(Object) -> Boolean
@@ -460,9 +460,9 @@ Equals(TimeSpan) -> Boolean
 "
   (cl:cond
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "Equals" value))
+     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Equals" value))
     ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "Equals" value))
+     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Equals" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
@@ -717,25 +717,25 @@ Parameters:
 "
   (dotnet:static <type-str> "FromTicks" (cl:the (dotnet "System.Int64") value)))
 
-(cl:defun get-hash-code (obj)
+(cl:defun get-hash-code (obj!)
   "Summary: Returns a hash code for this instance.
 Returns: A 32-bit signed integer hash code.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "GetHashCode"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "GetHashCode"))
 
-(cl:defun multiply (obj factor)
+(cl:defun multiply (obj! factor)
   "Summary: Returns a new System.TimeSpan object which value is the result of multiplication of this instance and the specified factor.
 Returns: A new object that represents the value of this instance multiplied by the value of factor.
 Parameters:
   - factor (System.Double): The value to be multiplied by.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "Multiply" factor))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Multiply" factor))
 
-(cl:defun negate (obj)
+(cl:defun negate (obj!)
   "Summary: Returns a new System.TimeSpan object whose value is the negated value of this instance.
 Returns: A new object with the same numeric value as this instance, but with the opposite sign.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "Negate"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Negate"))
 
 (cl:defun not= (t1 t2)
   "Summary: Indicates whether two System.TimeSpan instances are not equal.
@@ -867,15 +867,15 @@ ParseExact(Char], String[], IFormatProvider, TimeSpanStyles) -> TimeSpan
 ;;   ParseExact(Char], Char], IFormatProvider, TimeSpanStyles) -> TimeSpan
 ;;   ParseExact(Char], String[], IFormatProvider, TimeSpanStyles) -> TimeSpan
 
-(cl:defun subtract (obj ts)
+(cl:defun subtract (obj! ts)
   "Summary: Returns a new System.TimeSpan object whose value is the difference between the specified System.TimeSpan object and this instance.
 Returns: A new time interval whose value is the result of the value of this instance minus the value of ts.
 Parameters:
   - ts (System.TimeSpan): The time interval to be subtracted.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "Subtract" ts))
+  (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Subtract" ts))
 
-(cl:defun to-string (obj cl:&optional (format cl:nil supplied-format) (format-provider cl:nil supplied-format-provider))
+(cl:defun to-string (obj! cl:&optional (format cl:nil supplied-format) (format-provider cl:nil supplied-format-provider))
   "Master wrapper for System.TimeSpan.ToString overloads. Dispatches at runtime.
 
 ToString() -> String
@@ -897,11 +897,11 @@ ToString(String, IFormatProvider) -> String
 "
   (cl:cond
     ((cl:and supplied-format (cl:stringp format) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:object-type format-provider)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "ToString" format format-provider))
+     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "ToString" format format-provider))
     ((cl:and supplied-format (cl:stringp format) (cl:not supplied-format-provider))
-     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "ToString" format))
+     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "ToString" format))
     ((cl:and (cl:not supplied-format) (cl:not supplied-format-provider))
-     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj) "ToString"))
+     (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "ToString"))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>

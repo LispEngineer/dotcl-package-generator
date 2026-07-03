@@ -61,8 +61,8 @@ automatically optimized for reference types (classes/interfaces, excluding
 structs and enums which are value types and not yet supported by `the` casting)
 like so:
 ```lisp
-(defun dispose (obj)
-  (dotnet:invoke (the (dotnet "Microsoft.Xna.Framework.Graphics.SamplerState") obj) "Dispose"))
+(defun dispose (obj!)
+  (dotnet:invoke (the (dotnet "Microsoft.Xna.Framework.Graphics.SamplerState") obj!) "Dispose"))
 ```
 
 If the actual object passed at runtime does not match the declared type, DotCL
@@ -214,7 +214,7 @@ Reference types (classes) do not suffer from this issue.
 
 In addition, Lisp properties with only a setter (write-only properties) are generated
 with the name `set-propertyname` and accept the receiver as the first argument:
-`(set-propertyname obj new-value)`.
+`(set-propertyname obj! new-value)`.
 
 ### Example Transcript
 
@@ -746,3 +746,22 @@ before building the lambda list, so every downstream consumer (`format-master-ov
 `master-overload-param-names`, `format-supplied-args-expr`) sees already-unique names without
 needing its own collision logic — this exact latent bug applies equally to methods, not just
 constructors, though no case in the checked-in test packages happened to trigger it there.
+
+## Receiver Parameter Renamed to `obj!` (Version 25)
+
+Every instance method/property wrapper's hardcoded receiver parameter was literally named
+`obj` (`generate-single-overload`, `generate-master-wrapper`, `format-master-overload-action`,
+and the instance-property getter/setter generation in `generate-class-file`). This collides
+when the underlying C# method has its own parameter also named `obj` — e.g.
+`System.Object.Equals(object obj)` mapped its one C# parameter to the Lisp name `obj` (via
+`map-param-name`, which is a near-identity mapping for a name that's already lowercase and has
+no reserved-word conflict), producing the invalid lambda list `(cl:defun equals (obj obj) ...)`.
+
+The fix renames the hardcoded receiver to `obj!` everywhere it's emitted. This name is
+collision-proof by construction: `map-param-name` (the *only* function that turns a C# parameter
+name into a generated Lisp parameter name) only ever kebab-cases the name and, for the two
+reserved words it special-cases, appends `-val` (`t` → `t-val`, `nil` → `nil-val`) — it never
+appends a trailing `!`. That suffix is only ever produced by `map-member-name`, for *method/property
+names*, not parameter names. So no C# parameter, regardless of its name, can ever map to `obj!`.
+This mirrors the existing "protect a name the generator itself needs" pattern established in
+Version 15 for `quote!`/`function!`/`t!`/`nil!`.

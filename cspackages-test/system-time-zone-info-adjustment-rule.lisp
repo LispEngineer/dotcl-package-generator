@@ -1,43 +1,43 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo+AdjustmentRule
-;;; Generator Version: 24
-;;; Creation Date: 2026-07-03T15:23:10Z
+;;; Generator Version: 25
+;;; Creation Date: 2026-07-03T21:58:34Z
 
 (cl:in-package :system-time-zone-info-adjustment-rule)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.TimeZoneInfo+AdjustmentRule"))
 (cl:defconstant <type-str> "System.TimeZoneInfo+AdjustmentRule")
-(cl:defconstant <creation> "2026-07-03T15:23:10Z")
-(cl:defconstant <version> 24)
+(cl:defconstant <creation> "2026-07-03T21:58:34Z")
+(cl:defconstant <version> 25)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
   (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
                  (dotnet:resolve-type "System.TimeZoneInfo+AdjustmentRule")))
 
-(cl:defun base-utc-offset-delta (obj)
+(cl:defun base-utc-offset-delta (obj!)
   "Gets the time difference with the base UTC offset for the time zone during the adjustment-rule period."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj) "get_BaseUtcOffsetDelta"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "get_BaseUtcOffsetDelta"))
 
-(cl:defun date-end (obj)
+(cl:defun date-end (obj!)
   "Gets the date when the adjustment rule ceases to be in effect."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj) "get_DateEnd"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "get_DateEnd"))
 
-(cl:defun date-start (obj)
+(cl:defun date-start (obj!)
   "Gets the date when the adjustment rule takes effect."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj) "get_DateStart"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "get_DateStart"))
 
-(cl:defun daylight-delta (obj)
+(cl:defun daylight-delta (obj!)
   "Gets the amount of time that is required to form the time zone's daylight saving time. This amount of time is added to the time zone's offset from Coordinated Universal Time (UTC)."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj) "get_DaylightDelta"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "get_DaylightDelta"))
 
-(cl:defun daylight-transition-end (obj)
+(cl:defun daylight-transition-end (obj!)
   "Gets information about the annual transition from daylight saving time back to standard time."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj) "get_DaylightTransitionEnd"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "get_DaylightTransitionEnd"))
 
-(cl:defun daylight-transition-start (obj)
+(cl:defun daylight-transition-start (obj!)
   "Gets information about the annual transition from standard time to daylight saving time."
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj) "get_DaylightTransitionStart"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "get_DaylightTransitionStart"))
 
 (cl:defun create-adjustment-rule (date-start date-end daylight-delta daylight-transition-start daylight-transition-end cl:&optional (base-utc-offset-delta cl:nil supplied-base-utc-offset-delta))
   "Master wrapper for System.TimeZoneInfo+AdjustmentRule.CreateAdjustmentRule overloads. Dispatches at runtime.
@@ -74,7 +74,7 @@ CreateAdjustmentRule(DateTime, DateTime, TimeSpan, TimeZoneInfo+TransitionTime, 
                     :method-name "CreateAdjustmentRule"
                     :supplied-args (cl:append (cl:list :date-start date-start) (cl:list :date-end date-end) (cl:list :daylight-delta daylight-delta) (cl:list :daylight-transition-start daylight-transition-start) (cl:list :daylight-transition-end daylight-transition-end) (cl:when supplied-base-utc-offset-delta (cl:list :base-utc-offset-delta base-utc-offset-delta)))))))
 
-(cl:defun equals (obj other)
+(cl:defun equals (obj! other)
   "Master wrapper for System.TimeZoneInfo+AdjustmentRule.Equals overloads. Dispatches at runtime.
 
 Equals(TimeZoneInfo+AdjustmentRule) -> Boolean
@@ -91,18 +91,18 @@ Equals(Object) -> Boolean
 "
   (cl:cond
     ((cl:and (cl:or (cl:null other) (dotnet:object-type other)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj) "Equals" other))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "Equals" other))
     ((cl:and (cl:or (cl:null other) (dotnet:object-type other)))
-     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj) "Equals" other))
+     (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "Equals" other))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO-ADJUSTMENT-RULE"
                     :class-name <type-str>
                     :method-name "Equals"
                     :supplied-args (cl:append (cl:list :other other))))))
 
-(cl:defun get-hash-code (obj)
+(cl:defun get-hash-code (obj!)
   "Summary: Serves as a hash function for hashing algorithms and data structures such as hash tables.
 Returns: A 32-bit signed integer that serves as the hash code for the current System.TimeZoneInfo.AdjustmentRule object.
 "
-  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj) "GetHashCode"))
+  (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "GetHashCode"))
 
