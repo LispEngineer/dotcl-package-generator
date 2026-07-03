@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 23
-;;; Creation Date: 2026-07-03T13:49:28Z
+;;; Generator Version: 24
+;;; Creation Date: 2026-07-03T15:23:10Z
 
 (cl:in-package :cl-user)
 
@@ -45,11 +45,6 @@
    #:<creation>
    #:<version>
    #:new
-   #:new-int64
-   #:new-int32-int32-int32
-   #:new-int32-int32-int32-int32
-   #:new-int32-int32-int32-int32-int32
-   #:new-int32-int32-int32-int32-int32-int32
    #:+hours-per-day+
    #:+microseconds-per-day+
    #:+microseconds-per-hour+
@@ -91,17 +86,9 @@
    #:total-nanoseconds
    #:total-seconds
    #:-
-   #:--time-span
-   #:--time-span-time-span
    #:*
-   #:*-time-span-double
-   #:*-double-time-span
    #:/
-   #:/-time-span-double
-   #:/-time-span-time-span
    #:+
-   #:+-time-span
-   #:+-time-span-time-span
    #:<
    #:<=
    #:=
@@ -110,60 +97,25 @@
    #:add
    #:compare
    #:compare-to
-   #:compare-to-object
-   #:compare-to-time-span
    #:divide
-   #:divide-double
-   #:divide-time-span
    #:duration
    #:equals
    #:equals*
-   #:equals-object
-   #:equals-time-span
-   #:equals-time-span-time-span
    #:from-days
-   #:from-days-double
-   #:from-days-int32
-   #:from-days-int32-int32-int64-int64-int64-int64
    #:from-hours
-   #:from-hours-int32
-   #:from-hours-double
-   #:from-hours-int32-int64-int64-int64-int64
    #:from-microseconds
-   #:from-microseconds-int64
-   #:from-microseconds-double
    #:from-milliseconds
-   #:from-milliseconds-int64
-   #:from-milliseconds-double
-   #:from-milliseconds-int64-int64
    #:from-minutes
-   #:from-minutes-int64
-   #:from-minutes-double
-   #:from-minutes-int64-int64-int64-int64
    #:from-seconds
-   #:from-seconds-int64
-   #:from-seconds-double
-   #:from-seconds-int64-int64-int64
    #:from-ticks
    #:get-hash-code
    #:multiply
    #:negate
    #:not=
    #:parse
-   #:parse-string
-   #:parse-string-i-format-provider
-   #:parse-char]-i-format-provider
    #:parse-exact
-   #:parse-exact-string-string-i-format-provider
-   #:parse-exact-string-string[]-i-format-provider
-   #:parse-exact-string-string-i-format-provider-time-span-styles
-   #:parse-exact-char]-char]-i-format-provider-time-span-styles
-   #:parse-exact-string-string[]-i-format-provider-time-span-styles
-   #:parse-exact-char]-string[]-i-format-provider-time-span-styles
    #:subtract
    #:to-string
-   #:to-string-string
-   #:to-string-string-i-format-provider
   ))
 
 ;;; Source File: system-object.lisp
@@ -179,8 +131,6 @@
    #:new
    #:equals
    #:equals*
-   #:equals-object
-   #:equals-object-object
    #:finalize
    #:get-hash-code
    #:get-type
@@ -282,20 +232,13 @@
    #:underlying-system-type
    #:=
    #:equals
-   #:equals-object
-   #:equals-type
    #:find-interfaces
    #:find-members
    #:get-array-rank
    #:get-attribute-flags-impl
    #:get-constructor
-   #:get-constructor-type[]
-   #:get-constructor-binding-flags-type[]
-   #:get-constructor-binding-flags-binder-type[]-parameter-modifier[]
-   #:get-constructor-binding-flags-binder-calling-conventions-type[]-parameter-modifier[]
    #:get-constructor-impl
    #:get-constructors
-   #:get-constructors-binding-flags
    #:get-default-members
    #:get-element-type
    #:get-enum-name
@@ -304,15 +247,9 @@
    #:get-enum-values
    #:get-enum-values-as-underlying-type
    #:get-event
-   #:get-event-string
-   #:get-event-string-binding-flags
    #:get-events
-   #:get-events-binding-flags
    #:get-field
-   #:get-field-string
-   #:get-field-string-binding-flags
    #:get-fields
-   #:get-fields-binding-flags
    #:get-function-pointer-calling-conventions
    #:get-function-pointer-parameter-types
    #:get-function-pointer-return-type
@@ -321,81 +258,32 @@
    #:get-generic-type-definition
    #:get-hash-code
    #:get-interface
-   #:get-interface-string
-   #:get-interface-string-boolean
    #:get-interface-map
    #:get-interfaces
    #:get-member
-   #:get-member-string
-   #:get-member-string-binding-flags
-   #:get-member-string-member-types-binding-flags
    #:get-members
-   #:get-members-binding-flags
    #:get-member-with-same-metadata-definition-as
    #:get-method
-   #:get-method-string
-   #:get-method-string-binding-flags
-   #:get-method-string-type[]
-   #:get-method-string-binding-flags-type[]
-   #:get-method-string-type[]-parameter-modifier[]
-   #:get-method-string-int32-type[]
-   #:get-method-string-int32-type[]-parameter-modifier[]
-   #:get-method-string-int32-binding-flags-type[]
-   #:get-method-string-binding-flags-binder-type[]-parameter-modifier[]
-   #:get-method-string-binding-flags-binder-calling-conventions-type[]-parameter-modifier[]
-   #:get-method-string-int32-binding-flags-binder-type[]-parameter-modifier[]
-   #:get-method-string-int32-binding-flags-binder-calling-conventions-type[]-parameter-modifier[]
    #:get-method-impl
-   #:get-method-impl-string-binding-flags-binder-calling-conventions-type[]-parameter-modifier[]
-   #:get-method-impl-string-int32-binding-flags-binder-calling-conventions-type[]-parameter-modifier[]
    #:get-methods
-   #:get-methods-binding-flags
    #:get-nested-type
-   #:get-nested-type-string
-   #:get-nested-type-string-binding-flags
    #:get-nested-types
-   #:get-nested-types-binding-flags
    #:get-optional-custom-modifiers
    #:get-properties
-   #:get-properties-binding-flags
    #:get-property
-   #:get-property-string
-   #:get-property-string-binding-flags
-   #:get-property-string-type
-   #:get-property-string-type[]
-   #:get-property-string-type-type[]
-   #:get-property-string-type-type[]-parameter-modifier[]
-   #:get-property-string-binding-flags-binder-type-type[]-parameter-modifier[]
    #:get-property-impl
    #:get-required-custom-modifiers
    #:get-type
    #:get-type*
-   #:get-type-string
-   #:get-type-string-boolean
-   #:get-type-string-boolean-boolean
-   #:get-type-string-assembly]-type]
-   #:get-type-string-assembly]-type]-boolean
-   #:get-type-string-assembly]-type]-boolean-boolean
    #:get-type-array
    #:get-type-code
    #:get-type-code-impl
    #:get-type-from-clsid
-   #:get-type-from-clsid-guid
-   #:get-type-from-clsid-guid-boolean
-   #:get-type-from-clsid-guid-string
-   #:get-type-from-clsid-guid-string-boolean
    #:get-type-from-handle
    #:get-type-from-prog-id
-   #:get-type-from-prog-id-string
-   #:get-type-from-prog-id-string-boolean
-   #:get-type-from-prog-id-string-string
-   #:get-type-from-prog-id-string-string-boolean
    #:get-type-handle
    #:has-element-type-impl
    #:invoke-member
-   #:invoke-member-string-binding-flags-binder-object-object[]
-   #:invoke-member-string-binding-flags-binder-object-object[]-culture-info
-   #:invoke-member-string-binding-flags-binder-object-object[]-parameter-modifier[]-culture-info-string[]
    #:array-impl?
    #:assignable-from?
    #:assignable-to?
@@ -411,7 +299,6 @@
    #:subclass-of?
    #:value-type-impl?
    #:make-array-type
-   #:make-array-type-int32
    #:make-by-ref-type
    #:make-generic-method-parameter
    #:make-pointer-type
@@ -439,195 +326,60 @@
    #:<creation>
    #:<version>
    #:new
-   #:new-char[]
-   #:new-char*
-   #:new-s-byte*
-   #:new-char]
-   #:new-char-int32
-   #:new-char[]-int32-int32
-   #:new-char*-int32-int32
-   #:new-s-byte*-int32-int32
-   #:new-s-byte*-int32-int32-encoding
    #:empty
    #:chars
    #:length
    #:=
    #:clone
    #:compare
-   #:compare-string-string
-   #:compare-string-string-boolean
-   #:compare-string-string-string-comparison
-   #:compare-string-string-culture-info-compare-options
-   #:compare-string-string-boolean-culture-info
-   #:compare-string-int32-string-int32-int32
-   #:compare-string-int32-string-int32-int32-boolean
-   #:compare-string-int32-string-int32-int32-string-comparison
-   #:compare-string-int32-string-int32-int32-boolean-culture-info
-   #:compare-string-int32-string-int32-int32-culture-info-compare-options
    #:compare-ordinal
-   #:compare-ordinal-string-string
-   #:compare-ordinal-string-int32-string-int32-int32
    #:compare-to
-   #:compare-to-object
-   #:compare-to-string
    #:concat
-   #:concat-object
-   #:concat-object]
-   #:concat-i-enumerable
-   #:concat-string]
-   #:concat-object-object
-   #:concat-string-string
-   #:concat-char]-char]
-   #:concat-object-object-object
-   #:concat-string-string-string
-   #:concat-char]-char]-char]
-   #:concat-string-string-string-string
-   #:concat-char]-char]-char]-char]
    #:contains
-   #:contains-string
-   #:contains-char
-   #:contains-string-string-comparison
-   #:contains-char-string-comparison
    #:copy
    #:copy-to
-   #:copy-to-char]
-   #:copy-to-int32-char[]-int32-int32
    #:create
    #:ends-with
-   #:ends-with-string
-   #:ends-with-char
-   #:ends-with-string-string-comparison
-   #:ends-with-string-boolean-culture-info
    #:enumerate-runes
    #:equals
    #:equals*
-   #:equals-object
-   #:equals-string
-   #:equals-string-string-comparison
-   #:equals-string-string
-   #:equals-string-string-string-comparison
    #:format
-   #:format-string-object
-   #:format-string-object]
-   #:format-string-object-object
-   #:format-i-format-provider-string-object
-   #:format-i-format-provider-string-object]
-   #:format-i-format-provider-composite-format-t-arg0
-   #:format-i-format-provider-composite-format-object]
-   #:format-string-object-object-object
-   #:format-i-format-provider-string-object-object
-   #:format-i-format-provider-string-object-object-object
    #:get-enumerator
    #:get-hash-code
    #:get-hash-code*
-   #:get-hash-code-string-comparison
-   #:get-hash-code-char]
-   #:get-hash-code-char]-string-comparison
    #:get-pinnable-reference
    #:get-type-code
    #:implicit-cast
    #:index-of
-   #:index-of-char
-   #:index-of-string
-   #:index-of-char-int32
-   #:index-of-char-string-comparison
-   #:index-of-string-int32
-   #:index-of-string-string-comparison
-   #:index-of-char-int32-int32
-   #:index-of-string-int32-int32
-   #:index-of-string-int32-string-comparison
-   #:index-of-string-int32-int32-string-comparison
    #:index-of-any
-   #:index-of-any-char[]
-   #:index-of-any-char[]-int32
-   #:index-of-any-char[]-int32-int32
    #:insert
    #:intern
    #:interned?
    #:normalized?
-   #:normalized?-normalization-form
    #:null-or-empty?
    #:null-or-white-space?
    #:join
-   #:join-char-string]
-   #:join-string-string]
-   #:join-char-object]
-   #:join-string-object]
-   #:join-char-i-enumerable
-   #:join-string-i-enumerable
-   #:join-char-string[]-int32-int32
-   #:join-string-string[]-int32-int32
    #:last-index-of
-   #:last-index-of-char
-   #:last-index-of-string
-   #:last-index-of-char-int32
-   #:last-index-of-string-int32
-   #:last-index-of-string-string-comparison
-   #:last-index-of-char-int32-int32
-   #:last-index-of-string-int32-int32
-   #:last-index-of-string-int32-string-comparison
-   #:last-index-of-string-int32-int32-string-comparison
    #:last-index-of-any
-   #:last-index-of-any-char[]
-   #:last-index-of-any-char[]-int32
-   #:last-index-of-any-char[]-int32-int32
    #:normalize
-   #:normalize-normalization-form
    #:not=
    #:pad-left
-   #:pad-left-int32
-   #:pad-left-int32-char
    #:pad-right
-   #:pad-right-int32
-   #:pad-right-int32-char
    #:remove
-   #:remove-int32
-   #:remove-int32-int32
    #:replace
-   #:replace-char-char
-   #:replace-string-string
-   #:replace-string-string-string-comparison
-   #:replace-string-string-boolean-culture-info
    #:replace-line-endings
-   #:replace-line-endings-string
    #:split
-   #:split-char]
-   #:split-char-string-split-options
-   #:split-char[]-int32
-   #:split-char[]-string-split-options
-   #:split-string-string-split-options
-   #:split-string[]-string-split-options
-   #:split-char-int32-string-split-options
-   #:split-char[]-int32-string-split-options
-   #:split-string-int32-string-split-options
-   #:split-string[]-int32-string-split-options
    #:starts-with
-   #:starts-with-string
-   #:starts-with-char
-   #:starts-with-string-string-comparison
-   #:starts-with-string-boolean-culture-info
    #:substring
-   #:substring-int32
-   #:substring-int32-int32
    #:to-char-array
-   #:to-char-array-int32-int32
    #:to-lower
-   #:to-lower-culture-info
    #:to-lower-invariant
    #:to-string
-   #:to-string-i-format-provider
    #:to-upper
-   #:to-upper-culture-info
    #:to-upper-invariant
    #:trim
-   #:trim-char
-   #:trim-char]
    #:trim-end
-   #:trim-end-char
-   #:trim-end-char]
    #:trim-start
-   #:trim-start-char
-   #:trim-start-char]
    #:try-copy-to
   ))
 
@@ -652,43 +404,21 @@
    #:supports-daylight-saving-time
    #:clear-cached-data
    #:convert-time
-   #:convert-time-date-time-offset-time-zone-info
-   #:convert-time-date-time-time-zone-info
-   #:convert-time-date-time-time-zone-info-time-zone-info
    #:convert-time-by-system-time-zone-id
-   #:convert-time-by-system-time-zone-id-date-time-offset-string
-   #:convert-time-by-system-time-zone-id-date-time-string
-   #:convert-time-by-system-time-zone-id-date-time-string-string
    #:convert-time-from-utc
    #:convert-time-to-utc
-   #:convert-time-to-utc-date-time
-   #:convert-time-to-utc-date-time-time-zone-info
    #:create-custom-time-zone
-   #:create-custom-time-zone-string-time-span-string-string
-   #:create-custom-time-zone-string-time-span-string-string-string-time-zone-info+-adjustment-rule[]
-   #:create-custom-time-zone-string-time-span-string-string-string-time-zone-info+-adjustment-rule[]-boolean
    #:equals
-   #:equals-time-zone-info
-   #:equals-object
    #:find-system-time-zone-by-id
    #:from-serialized-string
    #:get-adjustment-rules
    #:get-ambiguous-time-offsets
-   #:get-ambiguous-time-offsets-date-time-offset
-   #:get-ambiguous-time-offsets-date-time
    #:get-hash-code
    #:get-system-time-zones
-   #:get-system-time-zones-boolean
    #:get-utc-offset
-   #:get-utc-offset-date-time-offset
-   #:get-utc-offset-date-time
    #:has-same-rules
    #:ambiguous-time?
-   #:ambiguous-time?-date-time-offset
-   #:ambiguous-time?-date-time
    #:daylight-saving-time?
-   #:daylight-saving-time?-date-time-offset
-   #:daylight-saving-time?-date-time
    #:invalid-time?
    #:to-serialized-string
    #:to-string
@@ -711,11 +441,7 @@
    #:daylight-transition-end
    #:daylight-transition-start
    #:create-adjustment-rule
-   #:create-adjustment-rule-date-time-date-time-time-span-time-zone-info+-transition-time-time-zone-info+-transition-time
-   #:create-adjustment-rule-date-time-date-time-time-span-time-zone-info+-transition-time-time-zone-info+-transition-time-time-span
    #:equals
-   #:equals-time-zone-info+-adjustment-rule
-   #:equals-object
    #:get-hash-code
   ))
 
@@ -743,193 +469,54 @@
    #:aggregate
    #:all
    #:any
-   #:any-i-enumerable
-   #:any-i-enumerable-boolean]
    #:append
    #:as-enumerable
    #:average
-   #:average-int32]
-   #:average-int64]
-   #:average-single]
-   #:average-double]
-   #:average-decimal]
-   #:average-int32]]
-   #:average-int64]]
-   #:average-single]]
-   #:average-double]]
-   #:average-decimal]]
-   #:average-i-enumerable-int32]
-   #:average-i-enumerable-int64]
-   #:average-i-enumerable-single]
-   #:average-i-enumerable-double]
-   #:average-i-enumerable-decimal]
-   #:average-i-enumerable-int32]]
-   #:average-i-enumerable-int64]]
-   #:average-i-enumerable-single]]
-   #:average-i-enumerable-double]]
-   #:average-i-enumerable-decimal]]
    #:cast
    #:chunk
    #:concat
    #:contains
-   #:contains-i-enumerable-t-source
-   #:contains-i-enumerable-t-source-i-equality-comparer
    #:count
-   #:count-i-enumerable
-   #:count-i-enumerable-boolean]
    #:default-if-empty
-   #:default-if-empty-i-enumerable
-   #:default-if-empty-i-enumerable-t-source
    #:distinct
-   #:distinct-i-enumerable
-   #:distinct-i-enumerable-i-equality-comparer
    #:element-at
-   #:element-at-i-enumerable-int32
-   #:element-at-i-enumerable-index
    #:element-at-or-default
-   #:element-at-or-default-i-enumerable-int32
-   #:element-at-or-default-i-enumerable-index
    #:empty
    #:except
-   #:except-i-enumerable-i-enumerable
-   #:except-i-enumerable-i-enumerable-i-equality-comparer
    #:first
-   #:first-i-enumerable
-   #:first-i-enumerable-boolean]
    #:first-or-default
-   #:first-or-default-i-enumerable
-   #:first-or-default-i-enumerable-t-source
-   #:first-or-default-i-enumerable-boolean]
-   #:first-or-default-i-enumerable-boolean]-t-source
    #:index
    #:infinite-sequence
    #:intersect
-   #:intersect-i-enumerable-i-enumerable
-   #:intersect-i-enumerable-i-enumerable-i-equality-comparer
    #:last
-   #:last-i-enumerable
-   #:last-i-enumerable-boolean]
    #:last-or-default
-   #:last-or-default-i-enumerable
-   #:last-or-default-i-enumerable-t-source
-   #:last-or-default-i-enumerable-boolean]
-   #:last-or-default-i-enumerable-boolean]-t-source
    #:long-count
-   #:long-count-i-enumerable
-   #:long-count-i-enumerable-boolean]
    #:max
-   #:max-int32]
-   #:max-int64]
-   #:max-int32]]
-   #:max-int64]]
-   #:max-double]
-   #:max-double]]
-   #:max-single]
-   #:max-single]]
-   #:max-decimal]
-   #:max-decimal]]
-   #:max-i-enumerable
-   #:max-i-enumerable-i-comparer
-   #:max-i-enumerable-int32]
-   #:max-i-enumerable-int32]]
-   #:max-i-enumerable-int64]
-   #:max-i-enumerable-int64]]
-   #:max-i-enumerable-single]
-   #:max-i-enumerable-single]]
-   #:max-i-enumerable-double]
-   #:max-i-enumerable-double]]
-   #:max-i-enumerable-decimal]
-   #:max-i-enumerable-decimal]]
    #:min
-   #:min-int32]
-   #:min-int64]
-   #:min-int32]]
-   #:min-int64]]
-   #:min-single]
-   #:min-single]]
-   #:min-double]
-   #:min-double]]
-   #:min-decimal]
-   #:min-decimal]]
-   #:min-i-enumerable
-   #:min-i-enumerable-i-comparer
-   #:min-i-enumerable-int32]
-   #:min-i-enumerable-int32]]
-   #:min-i-enumerable-int64]
-   #:min-i-enumerable-int64]]
-   #:min-i-enumerable-single]
-   #:min-i-enumerable-single]]
-   #:min-i-enumerable-double]
-   #:min-i-enumerable-double]]
-   #:min-i-enumerable-decimal]
-   #:min-i-enumerable-decimal]]
    #:of-type
    #:order
-   #:order-i-enumerable
-   #:order-i-enumerable-i-comparer
    #:order-descending
-   #:order-descending-i-enumerable
-   #:order-descending-i-enumerable-i-comparer
    #:prepend
    #:range
    #:repeat
    #:reverse
-   #:reverse-i-enumerable
-   #:reverse-t-source[]
    #:sequence
    #:sequence-equal
-   #:sequence-equal-i-enumerable-i-enumerable
-   #:sequence-equal-i-enumerable-i-enumerable-i-equality-comparer
    #:shuffle
    #:single
-   #:single-i-enumerable
-   #:single-i-enumerable-boolean]
    #:single-or-default
-   #:single-or-default-i-enumerable
-   #:single-or-default-i-enumerable-t-source
-   #:single-or-default-i-enumerable-boolean]
-   #:single-or-default-i-enumerable-boolean]-t-source
    #:skip
    #:skip-last
    #:skip-while
-   #:skip-while-i-enumerable-boolean]
    #:sum
-   #:sum-int32]
-   #:sum-int64]
-   #:sum-single]
-   #:sum-double]
-   #:sum-decimal]
-   #:sum-int32]]
-   #:sum-int64]]
-   #:sum-single]]
-   #:sum-double]]
-   #:sum-decimal]]
-   #:sum-i-enumerable-int32]
-   #:sum-i-enumerable-int64]
-   #:sum-i-enumerable-single]
-   #:sum-i-enumerable-double]
-   #:sum-i-enumerable-decimal]
-   #:sum-i-enumerable-int32]]
-   #:sum-i-enumerable-int64]]
-   #:sum-i-enumerable-single]]
-   #:sum-i-enumerable-double]]
-   #:sum-i-enumerable-decimal]]
    #:take
-   #:take-i-enumerable-int32
-   #:take-i-enumerable-range
    #:take-last
    #:take-while
-   #:take-while-i-enumerable-boolean]
    #:to-array
    #:to-hash-set
-   #:to-hash-set-i-enumerable
-   #:to-hash-set-i-enumerable-i-equality-comparer
    #:to-list
    #:union
-   #:union-i-enumerable-i-enumerable
-   #:union-i-enumerable-i-enumerable-i-equality-comparer
    #:where
-   #:where-i-enumerable-boolean]
   ))
 
 ;;; Source File: system-xml-xml-reader.lisp
@@ -975,35 +562,14 @@
    #:xml-space
    #:close
    #:create
-   #:create-string
-   #:create-stream
-   #:create-text-reader
-   #:create-string-xml-reader-settings
-   #:create-stream-xml-reader-settings
-   #:create-text-reader-xml-reader-settings
-   #:create-xml-reader-xml-reader-settings
-   #:create-string-xml-reader-settings-xml-parser-context
-   #:create-stream-xml-reader-settings-string
-   #:create-stream-xml-reader-settings-xml-parser-context
-   #:create-text-reader-xml-reader-settings-string
-   #:create-text-reader-xml-reader-settings-xml-parser-context
    #:dispose
-   #:dispose-boolean
    #:get-attribute
-   #:get-attribute-string
-   #:get-attribute-int32
-   #:get-attribute-string-string
    #:get-value-async
    #:name?
    #:name-token?
    #:start-element?
-   #:start-element?-string
-   #:start-element?-string-string
    #:lookup-namespace
    #:move-to-attribute
-   #:move-to-attribute-string
-   #:move-to-attribute-int32
-   #:move-to-attribute-string-string
    #:move-to-content
    #:move-to-content-async
    #:move-to-element
@@ -1031,55 +597,34 @@
    #:read-content-as-string
    #:read-content-as-string-async
    #:read-element-content-as
-   #:read-element-content-as-type-i-xml-namespace-resolver
-   #:read-element-content-as-type-i-xml-namespace-resolver-string-string
    #:read-element-content-as-async
    #:read-element-content-as-base64
    #:read-element-content-as-base64-async
    #:read-element-content-as-bin-hex
    #:read-element-content-as-bin-hex-async
    #:read-element-content-as-boolean
-   #:read-element-content-as-boolean-string-string
    #:read-element-content-as-date-time
-   #:read-element-content-as-date-time-string-string
    #:read-element-content-as-decimal
-   #:read-element-content-as-decimal-string-string
    #:read-element-content-as-double
-   #:read-element-content-as-double-string-string
    #:read-element-content-as-float
-   #:read-element-content-as-float-string-string
    #:read-element-content-as-int
-   #:read-element-content-as-int-string-string
    #:read-element-content-as-long
-   #:read-element-content-as-long-string-string
    #:read-element-content-as-object
-   #:read-element-content-as-object-string-string
    #:read-element-content-as-object-async
    #:read-element-content-as-string
-   #:read-element-content-as-string-string-string
    #:read-element-content-as-string-async
    #:read-element-string
-   #:read-element-string-string
-   #:read-element-string-string-string
    #:read-end-element
    #:read-inner-xml
    #:read-inner-xml-async
    #:read-outer-xml
    #:read-outer-xml-async
    #:read-start-element
-   #:read-start-element-string
-   #:read-start-element-string-string
    #:read-string
    #:read-subtree
    #:read-to-descendant
-   #:read-to-descendant-string
-   #:read-to-descendant-string-string
    #:read-to-following
-   #:read-to-following-string
-   #:read-to-following-string-string
    #:read-to-next-sibling
-   #:read-to-next-sibling-string
-   #:read-to-next-sibling-string-string
    #:read-value-chunk
    #:read-value-chunk-async
    #:resolve-entity
@@ -1103,14 +648,6 @@
    #:<creation>
    #:<version>
    #:new
-   #:new-int32
-   #:new-i-equality-comparer
-   #:new-i-dictionary
-   #:new-key-value-pair
-   #:new-int32-i-equality-comparer
-   #:new-i-dictionary-i-equality-comparer
-   #:new-key-value-pair-i-equality-comparer
-   #:new-serialization-info-streaming-context
    #:capacity
    #:comparer
    #:count
@@ -1128,7 +665,6 @@
    #:on-deserialization
    #:remove
    #:trim-excess
-   #:trim-excess-int32
    #:try-add
   ))
 

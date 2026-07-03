@@ -10,6 +10,29 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.24.0 — 2026-07-03
+
+**Overload consolidation:** overloaded methods and constructors now generate at most one or two
+Lisp functions total, instead of one dispatcher plus one type-suffixed direct-call function per
+C# overload. The type-suffixed functions (e.g. `contains-vector-2`,
+`get-ambiguous-time-offsets-date-time`, `new-single-single`) were pure redundancy — the existing
+Master Wrapper `cond` dispatch already picks the exact right overload from argument types and
+`supplied-p` flags — so they're no longer generated or exported at all:
+
+* A method with 2+ clean overloads now emits just its Master Wrapper (`name`, plus `name*` only
+  when the same name is overloaded as both instance and static — unchanged from before).
+* Constructors gained a real Master Wrapper of their own (previously they only got a bare
+  `(apply #'dotnet:new ...)` passthrough relying on DotCL's own runtime resolution, plus the
+  type-suffixed functions). Every class now emits exactly one `new`, regardless of how many
+  constructor overloads it has.
+* To keep the per-overload documentation the deleted functions used to carry, every Master
+  Wrapper's docstring now lists every overload it dispatches to — its human-readable signature
+  plus that overload's own XML-doc Summary/Returns/Parameters text — so the full set of available
+  overloads and their documentation is still visible from the one remaining function.
+
+See `doc/generator-design-notes.md`'s "Overload Consolidation (Version 24)" section for the
+implementation details.
+
 ## 2.23.0 — 2026-07-03
 
 **Self-containment fix:** generated output no longer depends on this tool's own

@@ -188,6 +188,95 @@
                 "new-single-single"
                 "constructor-overload-name for parameterized constructor matches types"))
 
+  ;; 3.6 Regression test for the positional-parameter-name-collision bug found
+  ;; while implementing Overload Consolidation (generator v24, PLAN.md): two
+  ;; overloads of unrelated arity can coincidentally reuse the same parameter
+  ;; name at two different positional dispatch slots (e.g. System.TimeSpan's
+  ;; 3-arg and 4-arg constructors each have an unrelated "Seconds" parameter,
+  ;; at slot index 2 and 3 respectively), which previously produced an
+  ;; invalid duplicate-variable lambda list.
+  (let ((params (list '(:name "Ticks" :type "System.Int64")
+                       '(:name "Seconds" :type "System.Int32")
+                       '(:name "Seconds" :type "System.Int32")
+                       '(:name "Milliseconds" :type "System.Int32"))))
+    (assert-test (mapcar (lambda (p) (getf p :name))
+                          (assembly-package-generator::uniquify-positional-params params))
+                '("Ticks" "Seconds" "Seconds2" "Milliseconds")
+                "uniquify-positional-params disambiguates a repeated positional parameter name")
+
+    (assert-test (mapcar (lambda (p) (getf p :name))
+                          (assembly-package-generator::uniquify-positional-params
+                           (list '(:name "X" :type "System.Single")
+                                 '(:name "Y" :type "System.Single"))))
+                '("X" "Y")
+                "uniquify-positional-params leaves already-distinct names untouched"))
+
+  ;; 3.7 Regression test: generate-constructor-master-wrapper's emitted lambda
+  ;; list must never contain a duplicate variable name, even for a
+  ;; System.TimeSpan-shaped set of constructor overloads (0, 1, 3, and 4
+  ;; mandatory parameters, with an unrelated "seconds" parameter shared by
+  ;; the 3-arg and 4-arg overloads at different positions).
+  (let* ((ctors-list
+           '((:parameters nil :public t)
+             (:parameters ((:name "ticks" :type "System.Int64")) :public t)
+             (:parameters ((:name "hours" :type "System.Int32")
+                           (:name "minutes" :type "System.Int32")
+                           (:name "seconds" :type "System.Int32")) :public t)
+             (:parameters ((:name "days" :type "System.Int32")
+                           (:name "hours" :type "System.Int32")
+                           (:name "minutes" :type "System.Int32")
+                           (:name "seconds" :type "System.Int32")) :public t)))
+         (output (with-output-to-string (s)
+                   (assembly-package-generator::generate-constructor-master-wrapper
+                    s ctors-list "System.TimeSpan")))
+         (defun-line (first (assembly-package-generator::split-string output #\Newline))))
+
+    (assert-test (not (null (search "(seconds cl:nil supplied-seconds)" defun-line)))
+                t
+                "constructor master wrapper keeps the first colliding 'seconds' slot name as-is")
+
+    (assert-test (not (null (search "(seconds2 cl:nil supplied-seconds2)" defun-line)))
+                t
+                "constructor master wrapper disambiguates the second colliding 'seconds' slot")
+
+    (let* ((form (read-from-string (concatenate 'string defun-line ")")))
+           (arglist (third form))
+           (var-names (mapcar (lambda (a) (if (consp a) (first a) a)) arglist))
+           (var-names (remove-if (lambda (s) (member s '(cl:&optional cl:&key cl:&rest))) var-names)))
+      (assert-test (length var-names)
+                  (length (remove-duplicates var-names))
+                  "constructor master wrapper's lambda list has no duplicate parameter names (would be an invalid defun)")))
+
+  ;; 3.8 Regression test: compute-package-exports-and-shadows no longer
+  ;; exports type-suffixed overload names for multi-overload methods or
+  ;; multi-overload constructors (Overload Consolidation, generator v24) --
+  ;; only the Master Wrapper name(s) (plus a mixed-mode "*"-suffixed static
+  ;; name, for methods) should be exported.
+  (let ((class-plist
+          '(:fields nil
+            :properties nil
+            :kind :class
+            :constructors ((:parameters nil :public t)
+                           (:parameters ((:name "x" :type "System.Single")) :public t))
+            :methods ((:name "Foo" :is-static t :return-type "System.Void" :parameters nil)
+                      (:name "Foo" :is-static t :return-type "System.Void"
+                       :parameters ((:name "x" :type "System.Single")))))))
+    (multiple-value-bind (exports shadows)
+        (assembly-package-generator::compute-package-exports-and-shadows class-plist nil)
+      (declare (ignore shadows))
+      (assert-test (and (member "new" exports :test #'string=) t)
+                  t
+                  "compute-package-exports-and-shadows exports 'new' for a multi-overload constructor")
+      (assert-test (and (member "foo" exports :test #'string=) t)
+                  t
+                  "compute-package-exports-and-shadows exports the Master Wrapper name for a multi-overload method")
+      (assert-test (and (member "new-single" exports :test #'string=) t)
+                  nil
+                  "compute-package-exports-and-shadows no longer exports type-suffixed constructor names")
+      (assert-test (and (member "foo-single" exports :test #'string=) t)
+                  nil
+                  "compute-package-exports-and-shadows no longer exports type-suffixed method names")))
+
   ;; Functional/operator-overload testing of generated packages (e.g. the old
   ;; TimeSpan operator checks that used to live here) is now handled by the
   ;; `make test` target, which generates a range of standard-.NET classes into

@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 23
+(defparameter *generator-version* 24
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -37,7 +37,8 @@
    20 - Open-generic type names (.NET's backtick arity suffix, e.g. Dictionary`2 or ``Action`4``) are now also flattened to '-' in type-fq-name-to-pkg-name, alongside '+'; a raw backtick left in a generated package/symbol name was read by the Lisp reader as the backquote macro character, silently corrupting the surrounding defpackage form instead of signaling an error.
    21 - A single-pass invocation now also emits csharp-assembly-packages.asd (generate-batch-asd-file), tying every generated .lisp package file together as an ASDF system's :components, in command-line order, with this generator version and the dotcl-packagegen CLI version recorded in the system's :version/:long-description.
    22 - Class .lisp files no longer emit their own cl:defpackage; a single-pass invocation now consolidates every class's defpackage form into one packages.lisp (generate-batch-packages-file), each preceded by a comment block naming its source file, C# class, and constant properties, with a blank line between packages. Class files retain only cl:in-package. csharp-assembly-packages.asd now lists packages as the first :file component, and every class :file declares :depends-on (\"packages\"), so ASDF's dependency graph (not just component-list order) enforces packages.lisp loading first.
-   23 - Generated output is now self-contained: it no longer references this tool's own monoutils/utils packages (monoutils:dotnet-p was backed by a native primitive registered by this tool's own MonoUtilsRegistrar, unavailable to any downstream host). The per-class <type> constant and the parameter type-check fallback now use stock dotnet:resolve-type / dotnet:object-type instead of monoutils:get-type / monoutils:dotnet-p, and the csharp-overload-not-found condition is emitted as csharp-assembly-utils:csharp-overload-not-found instead of utils:csharp-overload-not-found. A single-pass invocation now also emits csharp-assembly-utils.lisp (generate-batch-utils-file), holding that condition; its defpackage form is copied into packages.lisp ahead of the per-class defpackage forms (generate-batch-packages-file). Both are copied verbatim from real, standalone-loadable template files (csharp-assembly-utils-package.template.lisp, csharp-assembly-utils.template.lisp) rather than synthesized via format. csharp-assembly-packages.asd's :components gained a csharp-assembly-utils :file (:depends-on (\"packages\")), and every class :file's :depends-on became (\"packages\" \"csharp-assembly-utils\").")
+   23 - Generated output is now self-contained: it no longer references this tool's own monoutils/utils packages (monoutils:dotnet-p was backed by a native primitive registered by this tool's own MonoUtilsRegistrar, unavailable to any downstream host). The per-class <type> constant and the parameter type-check fallback now use stock dotnet:resolve-type / dotnet:object-type instead of monoutils:get-type / monoutils:dotnet-p, and the csharp-overload-not-found condition is emitted as csharp-assembly-utils:csharp-overload-not-found instead of utils:csharp-overload-not-found. A single-pass invocation now also emits csharp-assembly-utils.lisp (generate-batch-utils-file), holding that condition; its defpackage form is copied into packages.lisp ahead of the per-class defpackage forms (generate-batch-packages-file). Both are copied verbatim from real, standalone-loadable template files (csharp-assembly-utils-package.template.lisp, csharp-assembly-utils.template.lisp) rather than synthesized via format. csharp-assembly-packages.asd's :components gained a csharp-assembly-utils :file (:depends-on (\"packages\")), and every class :file's :depends-on became (\"packages\" \"csharp-assembly-utils\").
+   24 - Overload consolidation: the type-suffixed per-overload direct-call functions previously emitted (and exported) alongside every multi-overload method's Master Wrapper and every multi-constructor type's passthrough new (e.g. contains-vector-2, new-single-single) are no longer generated or exported at all; the existing Master Wrapper cond dispatch already selects the correct overload precisely, so those functions were pure redundancy. Constructors gained their own Master Wrapper (generate-constructor-master-wrapper), replacing the old (apply #'dotnet:new <type-str> args) &rest passthrough with the same supplied-p-based precise dispatch methods already had; every class now emits at most one new regardless of constructor overload count (methods still emit a second, *-suffixed wrapper only when a name is overloaded as both instance and static). To compensate for the lost per-overload functions' individual docstrings, every Master Wrapper's docstring (method or constructor) now enumerates all of its covered overloads' signatures plus each overload's own XML-doc-sourced Summary/Returns/Parameters text (format-combined-overloads-docstring/format-overload-doc-block), so the full set of available overloads stays documented on the one remaining function. Giving constructors a Master Wrapper exposed a latent bug in collect-optional-positional-params: each positional dispatch slot's representative parameter name is picked arbitrarily from whichever overload happens to have one there, so two overloads with unrelated arities can coincidentally reuse the same parameter name at two different slots (e.g. System.TimeSpan's 3-arg and 4-arg constructors each have an unrelated 'seconds' parameter, at index 2 and index 3 respectively), which previously produced an invalid lambda-list with a duplicate variable name. uniquify-positional-params now numeric-suffixes any such collision before the lambda-list/cond-block/docstring are generated.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -361,6 +362,38 @@
                     ptype
                     pdesc)))))))
 
+(defun format-overload-doc-block (signature-str summary returns parameters doc-plist)
+  "Builds one documentation block for a single overload inside a combined
+   master-wrapper docstring: SIGNATURE-STR (from method-signature-str or
+   constructor-signature-str) followed by an indented build-docstring block
+   (Summary/Returns/Parameters, sourced from the assembly's XML doc comments)
+   when any of that was available; omits the indented block entirely when
+   there is nothing to show."
+  (let ((body (build-docstring summary returns parameters doc-plist)))
+    (with-output-to-string (out)
+      (format out "~A~%" signature-str)
+      (dolist (line (split-string body #\Newline))
+        (when (> (length line) 0)
+          (format out "  ~A~%" line))))))
+
+(defun format-combined-overloads-docstring (header signature-fn methods)
+  "Builds a combined docstring for a master wrapper dispatching across
+   METHODS (method or constructor plists): HEADER, then one
+   format-overload-doc-block per method (using SIGNATURE-FN, either
+   #'method-signature-str or #'constructor-signature-str, to produce that
+   overload's signature line), so the full set of available overloads and
+   their XML documentation stays visible even though only one dispatching
+   function is generated."
+  (with-output-to-string (out)
+    (format out "~A~%" header)
+    (dolist (m methods)
+      (let* ((m-doc (getf m :documentation))
+             (summary (getf m-doc :summary))
+             (returns (getf m-doc :returns))
+             (params (getf m :parameters))
+             (sig (funcall signature-fn m)))
+        (format out "~%~A" (format-overload-doc-block sig summary returns params m-doc))))))
+
 (defun format-param-type-check (param-type arg-str)
   "Returns a Lisp type checking expression string for the given C# parameter type."
   (cond
@@ -444,6 +477,28 @@
           (cl:push found-param opt-params))))
     (cl:nreverse opt-params)))
 
+(cl:defun uniquify-positional-params (params)
+  "Given the ordered list of positional dispatch-slot parameter plists
+   (PREFIX appended with OPT-PARAMS), returns a copy where any :name whose
+   mapped Lisp name collides with an earlier slot's gets a numeric suffix, so
+   every slot binds a distinct lambda-list variable. Each slot's
+   representative parameter is picked arbitrarily from whichever overload
+   happens to have one there (see collect-optional-positional-params), so two
+   unrelated overloads can coincidentally share a parameter name at different
+   positional slots (e.g. TimeSpan's 3-arg ctor's 'seconds' at index 2 vs. its
+   4-arg ctor's unrelated 'seconds' at index 3)."
+  (cl:let ((seen nil))
+    (cl:mapcar (cl:lambda (p)
+                 (cl:let* ((base-name (cl:getf p :name))
+                           (final-name base-name)
+                           (suffix 2))
+                   (cl:loop while (cl:member (map-param-name final-name) seen :test #'cl:string=) do
+                     (cl:setf final-name (cl:format nil "~A~D" base-name suffix))
+                     (cl:incf suffix))
+                   (cl:push (map-param-name final-name) seen)
+                   (cl:list* :name final-name p)))
+               params)))
+
 (cl:defun format-master-overload-condition (cm prefix opt-params key-params)
   "Generates Lisp conditional test expression checking supplied-p flags and parameter types for cm."
   (cl:let* ((cond-parts nil)
@@ -482,21 +537,27 @@
             (cl:push (cl:format nil "(cl:not ~A)" supplied-var) cond-parts))))
     (cl:format nil "(cl:and ~{~A~^ ~})" (cl:nreverse cond-parts))))
 
-(cl:defun format-master-overload-action (cm fq-name name static-p is-generic-p prefix opt-params)
-  "Generates C# invocation code for cm, mapping parameter names to the master wrapper's bound variables."
+(cl:defun master-overload-param-names (cm prefix opt-params)
+  "Maps CM's (a method or constructor plist) parameters to the master
+   wrapper's bound variable names by positional index: names from PREFIX for
+   positional args, from OPT-PARAMS for optional positional args beyond that,
+   and CM's own (mapped) parameter name for anything past that (keyword args)."
   (cl:let* ((cm-params (cl:getf cm :parameters))
             (prefix-len (cl:length prefix))
-            (max-mand-len (+ prefix-len (cl:length opt-params)))
-            (param-names
-              (cl:loop for p in cm-params
-                       for idx from 0
-                       collect (cl:cond
-                                 ((cl:< idx prefix-len)
-                                  (map-param-name (cl:getf (cl:nth idx prefix) :name)))
-                                 ((cl:< idx max-mand-len)
-                                  (map-param-name (cl:getf (cl:nth (- idx prefix-len) opt-params) :name)))
-                                 (cl:t
-                                  (map-param-name (cl:getf p :name))))))
+            (max-mand-len (+ prefix-len (cl:length opt-params))))
+    (cl:loop for p in cm-params
+             for idx from 0
+             collect (cl:cond
+                       ((cl:< idx prefix-len)
+                        (map-param-name (cl:getf (cl:nth idx prefix) :name)))
+                       ((cl:< idx max-mand-len)
+                        (map-param-name (cl:getf (cl:nth (- idx prefix-len) opt-params) :name)))
+                       (cl:t
+                        (map-param-name (cl:getf p :name)))))))
+
+(cl:defun format-master-overload-action (cm fq-name name static-p is-generic-p prefix opt-params)
+  "Generates C# invocation code for cm, mapping parameter names to the master wrapper's bound variables."
+  (cl:let* ((param-names (master-overload-param-names cm prefix opt-params))
             (dotnet-method-name (cl:or (cl:getf cm :mangled-name) name)))
     (cl:cond
       ((cl:and static-p is-generic-p)
@@ -526,11 +587,14 @@
 
 (cl:defun generate-master-wrapper (stream methods name mname fq-name static-p is-generic-p)
   "Generates Master Wrapper defun with precise dispatch cond block and fallback error signaling."
-  (cl:let* ((prefix (common-parameter-prefix methods))
-            (prefix-len (cl:length prefix))
-            (prefix-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) prefix))
+  (cl:let* ((raw-prefix (common-parameter-prefix methods))
+            (prefix-len (cl:length raw-prefix))
             (max-mand-len (max-mandatory-parameter-len methods))
-            (opt-params (collect-optional-positional-params methods prefix-len max-mand-len))
+            (raw-opt-params (collect-optional-positional-params methods prefix-len max-mand-len))
+            (uniquified (uniquify-positional-params (cl:append raw-prefix raw-opt-params)))
+            (prefix (cl:subseq uniquified 0 prefix-len))
+            (opt-params (cl:nthcdr prefix-len uniquified))
+            (prefix-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) prefix))
             (key-params (collect-key-params methods max-mand-len))
             (args-list nil))
     (cl:when is-generic-p
@@ -553,9 +617,12 @@
           (cl:setf args-list (cl:append args-list (cl:list (cl:format nil "(~A ~A ~A)" kp-name kp-default supplied-var)))))))
     
     (cl:format stream "(cl:defun ~A (~{~A~^ ~})~%" mname args-list)
-    (cl:format stream "  \"Master wrapper for ~A.~A overloads. Dispatches at runtime.\"~%" fq-name name)
+    (cl:let* ((header (cl:format nil "Master wrapper for ~A.~A overloads. Dispatches at runtime." fq-name name))
+              (docstring (format-combined-overloads-docstring header #'method-signature-str methods))
+              (escaped-docstring (escape-lisp-string docstring)))
+      (cl:format stream "  \"~A\"~%" escaped-docstring))
     (cl:format stream "  (cl:cond~%")
-    
+
     ;; Sort methods by parameter count descending for specificity
     (cl:let ((sorted-methods (cl:sort (cl:copy-list methods) #'> :key (cl:lambda (m) (cl:length (cl:getf m :parameters))))))
       (cl:dolist (cm sorted-methods)
@@ -563,12 +630,69 @@
               (action-str (format-master-overload-action cm fq-name name static-p is-generic-p prefix opt-params)))
           (cl:format stream "    (~A~%" cond-str)
           (cl:format stream "     ~A)~%" action-str))))
-    
+
     (cl:let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
       (cl:format stream "    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
       (cl:format stream "                    :package-name \"~A\"~%" (cl:string-upcase (type-fq-name-to-pkg-name fq-name)))
       (cl:format stream "                    :class-name <type-str>~%")
       (cl:format stream "                    :method-name \"~A\"~%" name)
+      (cl:format stream "                    :supplied-args ~A))))~%~%" supplied-args-expr))))
+
+(cl:defun format-constructor-master-overload-action (cm prefix opt-params)
+  "Generates C# constructor invocation code for cm (a constructor plist),
+   mapping parameter names to the master wrapper's bound variables."
+  (cl:let ((param-names (master-overload-param-names cm prefix opt-params)))
+    (cl:format nil "(dotnet:new <type-str>~@[ ~{~A~^ ~}~])" param-names)))
+
+(cl:defun generate-constructor-master-wrapper (stream ctors fq-name)
+  "Generates a Master Wrapper 'new' defun with precise dispatch cond block
+   and fallback error signaling, covering all clean constructor overloads.
+   Constructors have no static/instance split (unlike generate-master-wrapper),
+   so exactly one 'new' function is always emitted here."
+  (cl:let* ((raw-prefix (common-parameter-prefix ctors))
+            (prefix-len (cl:length raw-prefix))
+            (max-mand-len (max-mandatory-parameter-len ctors))
+            (raw-opt-params (collect-optional-positional-params ctors prefix-len max-mand-len))
+            (uniquified (uniquify-positional-params (cl:append raw-prefix raw-opt-params)))
+            (prefix (cl:subseq uniquified 0 prefix-len))
+            (opt-params (cl:nthcdr prefix-len uniquified))
+            (prefix-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) prefix))
+            (key-params (collect-key-params ctors max-mand-len))
+            (args-list prefix-names))
+    (cl:when opt-params
+      (cl:setf args-list (cl:append args-list (cl:list "cl:&optional")))
+      (cl:dolist (op opt-params)
+        (cl:let* ((op-name (map-param-name (cl:getf op :name)))
+                  (supplied-var (cl:format nil "supplied-~A" op-name)))
+          (cl:setf args-list (cl:append args-list (cl:list (cl:format nil "(~A cl:nil ~A)" op-name supplied-var)))))))
+    (cl:when key-params
+      (cl:setf args-list (cl:append args-list (cl:list "cl:&key")))
+      (cl:dolist (kp key-params)
+        (cl:let* ((kp-name (map-param-name (cl:getf kp :name)))
+               (kp-default (find-parameter-default-str (cl:getf kp :name) ctors))
+               (supplied-var (cl:format nil "supplied-~A" kp-name)))
+          (cl:setf args-list (cl:append args-list (cl:list (cl:format nil "(~A ~A ~A)" kp-name kp-default supplied-var)))))))
+
+    (cl:format stream "(cl:defun new (~{~A~^ ~})~%" args-list)
+    (cl:let* ((header (cl:format nil "Master wrapper for ~A constructor overloads. Dispatches at runtime." fq-name))
+              (docstring (format-combined-overloads-docstring header #'constructor-signature-str ctors))
+              (escaped-docstring (escape-lisp-string docstring)))
+      (cl:format stream "  \"~A\"~%" escaped-docstring))
+    (cl:format stream "  (cl:cond~%")
+
+    ;; Sort constructors by parameter count descending for specificity
+    (cl:let ((sorted-ctors (cl:sort (cl:copy-list ctors) #'> :key (cl:lambda (m) (cl:length (cl:getf m :parameters))))))
+      (cl:dolist (cm sorted-ctors)
+        (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
+                 (action-str (format-constructor-master-overload-action cm prefix opt-params)))
+          (cl:format stream "    (~A~%" cond-str)
+          (cl:format stream "     ~A)~%" action-str))))
+
+    (cl:let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
+      (cl:format stream "    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
+      (cl:format stream "                    :package-name \"~A\"~%" (cl:string-upcase (type-fq-name-to-pkg-name fq-name)))
+      (cl:format stream "                    :class-name <type-str>~%")
+      (cl:format stream "                    :method-name \"new\"~%")
       (cl:format stream "                    :supplied-args ~A))))~%~%" supplied-args-expr))))
 
 (cl:defun generate-single-overload (stream m mname fq-name static-p)
@@ -682,12 +806,7 @@
 
     ;; Collect constructor exports
     (when (> clean-ctor-count 0)
-      (push "new" exports)
-      (when (>= clean-ctor-count 2)
-        (dolist (c clean-ctors)
-          (let ((params (getf c :parameters)))
-            (when params
-              (push (constructor-overload-name c) exports))))))
+      (push "new" exports))
 
     (dolist (f literal-fields)
       (push (format nil "+~A+" (camel-to-kebab (getf f :name))) exports))
@@ -719,11 +838,7 @@
         (when (> clean-count 0)
           (push kebab-name exports)
           (when mixed-mode-p
-            (push (concatenate 'string kebab-name "*") exports)))
-        (when (>= clean-count 2)
-          ;; Export type-suffixed names for multi-overload methods
-          (dolist (cm clean-methods)
-            (push (method-overload-name cm) exports)))))
+            (push (concatenate 'string kebab-name "*") exports)))))
 
     ;; Remove duplicates from exports while preserving order
     (setf exports (remove-duplicates (nreverse exports) :test #'string= :from-end t))
@@ -858,30 +973,9 @@
           
           ;; Case 3: Multiple clean constructors
           ((>= clean-ctor-count 2)
-           ;; Generate passthrough &rest function for DotCL runtime dispatch
-           (format stream "(cl:defun new (cl:&rest args)~%")
-           (format stream "  \"Passthrough constructor for ~A. Dispatches at runtime.\"~%" fq-name)
-           (format stream "  (cl:apply (cl:function dotnet:new) <type-str> args))~%~%")
-           ;; Generate per-overload typed functions with type-suffixed names
-           (dolist (c clean-ctors)
-             (let ((params (getf c :parameters)))
-               (when params
-                 (let* ((cname (constructor-overload-name c))
-                        (c-doc (getf c :documentation))
-                        (summary (getf c-doc :summary))
-                        (returns (getf c-doc :returns))
-                        (param-names (mapcar (lambda (p) (map-param-name (getf p :name))) params))
-                        (overload-signature (constructor-signature-str c))
-                        (args-str (format nil "~{~A~^ ~}" param-names))
-                        (docstring (build-docstring summary returns params c-doc))
-                        (overload-note (format nil "Calls ~A constructor ~A" fq-name overload-signature))
-                        (full-docstring (if (> (length docstring) 0)
-                                            (concatenate 'string overload-note ". " docstring)
-                                            overload-note))
-                        (escaped-full-doc (escape-lisp-string full-docstring)))
-                   (format stream "(cl:defun ~A (~A)~%" cname args-str)
-                   (format stream "  \"~A\"~%" escaped-full-doc)
-                   (format stream "  (dotnet:new <type-str>~@[ ~{~A~^ ~}~]))~%~%" param-names)))))
+           ;; Generate a single Master Wrapper 'new' dispatching precisely
+           ;; across every clean constructor overload.
+           (generate-constructor-master-wrapper stream clean-ctors fq-name)
            ;; Emit dirty constructor doc-comments if any
            (when (> dirty-ctor-count 0)
              (format stream ";; Note: ~A also has the following constructors with special~%" fq-name)
@@ -1024,58 +1118,6 @@
                      (cl:if (cl:and (= instance-count 1) (cl:not (complex-group-p instance-clean)))
                             (generate-single-overload stream (first instance-clean) kebab-name fq-name nil)
                             (generate-master-wrapper stream instance-clean name kebab-name fq-name nil (getf (first instance-clean) :is-generic)))))))
-               
-               ;; Generate per-overload typed functions with type-suffixed names (for clean-count >= 2)
-               (when (>= clean-count 2)
-                 (dolist (cm clean-methods)
-                   (let* ((mname (method-overload-name cm))
-                          (m-doc (getf cm :documentation))
-                          (summary (getf m-doc :summary))
-                          (returns (getf m-doc :returns))
-                          (params (getf cm :parameters))
-                          (is-generic-overload-p (getf cm :is-generic))
-                          (is-static-overload-p (getf cm :is-static))
-                          (param-names (mapcar (lambda (p) (map-param-name (getf p :name))) params))
-                          (overload-signature (method-signature-str cm))
-                          (args-str (cl:cond
-                                      ((and is-static-overload-p is-generic-overload-p)
-                                       (format nil "type~@[ ~{~A~^ ~}~]" param-names))
-                                      (is-static-overload-p
-                                       (format nil "~{~A~^ ~}" param-names))
-                                      (is-generic-overload-p
-                                       (format nil "type obj~@[ ~{~A~^ ~}~]" param-names))
-                                      (cl:t
-                                       (format nil "obj~@[ ~{~A~^ ~}~]" param-names))))
-                          (docstring (build-docstring summary returns params m-doc))
-                          (escaped-docstring (escape-lisp-string docstring))
-                          ;; Construct a note about the specific overload signature
-                          (overload-note (format nil "Calls ~A.~A ~A" fq-name name overload-signature))
-                          (full-docstring (if (> (length docstring) 0)
-                                              (concatenate 'string overload-note ". " docstring)
-                                              overload-note))
-                          (escaped-full-doc (escape-lisp-string full-docstring))
-                          (dotnet-method-name (or (getf cm :mangled-name) name))
-                          ;; Static method type hints for typed overloads
-                          (static-typed-args
-                            (if is-static-overload-p
-                                (mapcar (lambda (pn pt)
-                                          (format nil "(cl:the (dotnet \"~A\") ~A)" pt pn))
-                                        param-names
-                                        (mapcar (lambda (p) (getf p :type)) params))
-                                nil)))
-                     (format stream "(cl:defun ~A (~A)~%" mname args-str)
-                     (format stream "  \"~A\"~%" escaped-full-doc)
-                     (cl:cond
-                       ((and is-static-overload-p is-generic-overload-p)
-                        (format stream "  (dotnet:static-generic <type-str> \"~A\" (cl:list type)~@[ ~{~A~^ ~}~]))~%~%" dotnet-method-name param-names))
-                       (is-static-overload-p
-                        (if static-typed-args
-                            (format stream "  (dotnet:static <type-str> \"~A\"~@[~{ ~A~}~]))~%~%" dotnet-method-name static-typed-args)
-                            (format stream "  (dotnet:static <type-str> \"~A\"~@[ ~{~A~^ ~}~]))~%~%" dotnet-method-name param-names)))
-                       (is-generic-overload-p
-                        (format stream "  (dotnet:invoke-generic (cl:the (dotnet \"~A\") obj) \"~A\" (cl:list type)~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name param-names))
-                       (cl:t
-                        (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj) \"~A\"~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name param-names))))))
                
                ;; Emit dirty overload doc-comment if any
                (when (> dirty-count 0)

@@ -1,83 +1,94 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 23
-;;; Creation Date: 2026-07-03T13:49:28Z
+;;; Generator Version: 24
+;;; Creation Date: 2026-07-03T15:23:10Z
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-03T13:49:28Z")
-(cl:defconstant <version> 23)
+(cl:defconstant <creation> "2026-07-03T15:23:10Z")
+(cl:defconstant <version> 24)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
   (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
                  (dotnet:resolve-type "System.Collections.Generic.Dictionary`2")))
 
-(cl:defun new (cl:&rest args)
-  "Passthrough constructor for System.Collections.Generic.Dictionary`2. Dispatches at runtime."
-  (cl:apply (cl:function dotnet:new) <type-str> args))
+(cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Collections.Generic.Dictionary`2 constructor overloads. Dispatches at runtime.
 
-(cl:defun new-int32 (capacity)
-  "Calls System.Collections.Generic.Dictionary`2 constructor new(Int32). Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that is empty, has the specified initial capacity, and uses the default equality comparer for the key type.
-Parameters:
-  - capacity (System.Int32): The initial number of elements that the System.Collections.Generic.Dictionary`2 can contain.
-"
-  (dotnet:new <type-str> capacity))
+new()
+  Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that is empty, has the default initial capacity, and uses the default equality comparer for the key type.
 
-(cl:defun new-i-equality-comparer (comparer)
-  "Calls System.Collections.Generic.Dictionary`2 constructor new(IEqualityComparer). Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that is empty, has the default initial capacity, and uses the specified System.Collections.Generic.IEqualityComparer`1.
-Parameters:
-  - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 implementation to use when comparing keys, or to use the default System.Collections.Generic.EqualityComparer`1 for the type of the key.
-"
-  (dotnet:new <type-str> comparer))
+new(Int32)
+  Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that is empty, has the specified initial capacity, and uses the default equality comparer for the key type.
+  Parameters:
+    - capacity (System.Int32): The initial number of elements that the System.Collections.Generic.Dictionary`2 can contain.
 
-(cl:defun new-i-dictionary (dictionary)
-  "Calls System.Collections.Generic.Dictionary`2 constructor new(IDictionary). Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that contains elements copied from the specified System.Collections.Generic.IDictionary`2 and uses the default equality comparer for the key type.
-Parameters:
-  - dictionary (System.Collections.Generic.IDictionary`2[TKey, TValue]): The System.Collections.Generic.IDictionary`2 whose elements are copied to the new System.Collections.Generic.Dictionary`2.
-"
-  (dotnet:new <type-str> dictionary))
+new(IEqualityComparer)
+  Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that is empty, has the default initial capacity, and uses the specified System.Collections.Generic.IEqualityComparer`1.
+  Parameters:
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 implementation to use when comparing keys, or to use the default System.Collections.Generic.EqualityComparer`1 for the type of the key.
 
-(cl:defun new-key-value-pair (collection)
-  "Calls System.Collections.Generic.Dictionary`2 constructor new(KeyValuePair). Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that contains elements copied from the specified System.Collections.Generic.IEnumerable`1.
-Parameters:
-  - collection (System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]): The System.Collections.Generic.IEnumerable`1 whose elements are copied to the new System.Collections.Generic.Dictionary`2.
-"
-  (dotnet:new <type-str> collection))
+new(IDictionary)
+  Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that contains elements copied from the specified System.Collections.Generic.IDictionary`2 and uses the default equality comparer for the key type.
+  Parameters:
+    - dictionary (System.Collections.Generic.IDictionary`2[TKey, TValue]): The System.Collections.Generic.IDictionary`2 whose elements are copied to the new System.Collections.Generic.Dictionary`2.
 
-(cl:defun new-int32-i-equality-comparer (capacity comparer)
-  "Calls System.Collections.Generic.Dictionary`2 constructor new(Int32, IEqualityComparer). Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that is empty, has the specified initial capacity, and uses the specified System.Collections.Generic.IEqualityComparer`1.
-Parameters:
-  - capacity (System.Int32): The initial number of elements that the System.Collections.Generic.Dictionary`2 can contain.
-  - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 implementation to use when comparing keys, or to use the default System.Collections.Generic.EqualityComparer`1 for the type of the key.
-"
-  (dotnet:new <type-str> capacity comparer))
+new(KeyValuePair)
+  Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that contains elements copied from the specified System.Collections.Generic.IEnumerable`1.
+  Parameters:
+    - collection (System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]): The System.Collections.Generic.IEnumerable`1 whose elements are copied to the new System.Collections.Generic.Dictionary`2.
 
-(cl:defun new-i-dictionary-i-equality-comparer (dictionary comparer)
-  "Calls System.Collections.Generic.Dictionary`2 constructor new(IDictionary, IEqualityComparer). Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that contains elements copied from the specified System.Collections.Generic.IDictionary`2 and uses the specified System.Collections.Generic.IEqualityComparer`1.
-Parameters:
-  - dictionary (System.Collections.Generic.IDictionary`2[TKey, TValue]): The System.Collections.Generic.IDictionary`2 whose elements are copied to the new System.Collections.Generic.Dictionary`2.
-  - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 implementation to use when comparing keys, or to use the default System.Collections.Generic.EqualityComparer`1 for the type of the key.
-"
-  (dotnet:new <type-str> dictionary comparer))
+new(Int32, IEqualityComparer)
+  Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that is empty, has the specified initial capacity, and uses the specified System.Collections.Generic.IEqualityComparer`1.
+  Parameters:
+    - capacity (System.Int32): The initial number of elements that the System.Collections.Generic.Dictionary`2 can contain.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 implementation to use when comparing keys, or to use the default System.Collections.Generic.EqualityComparer`1 for the type of the key.
 
-(cl:defun new-key-value-pair-i-equality-comparer (collection comparer)
-  "Calls System.Collections.Generic.Dictionary`2 constructor new(KeyValuePair, IEqualityComparer). Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that contains elements copied from the specified System.Collections.Generic.IEnumerable`1 and uses the specified System.Collections.Generic.IEqualityComparer`1.
-Parameters:
-  - collection (System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]): The System.Collections.Generic.IEnumerable`1 whose elements are copied to the new System.Collections.Generic.Dictionary`2.
-  - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 implementation to use when comparing keys, or to use the default System.Collections.Generic.EqualityComparer`1 for the type of the key.
-"
-  (dotnet:new <type-str> collection comparer))
+new(IDictionary, IEqualityComparer)
+  Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that contains elements copied from the specified System.Collections.Generic.IDictionary`2 and uses the specified System.Collections.Generic.IEqualityComparer`1.
+  Parameters:
+    - dictionary (System.Collections.Generic.IDictionary`2[TKey, TValue]): The System.Collections.Generic.IDictionary`2 whose elements are copied to the new System.Collections.Generic.Dictionary`2.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 implementation to use when comparing keys, or to use the default System.Collections.Generic.EqualityComparer`1 for the type of the key.
 
-(cl:defun new-serialization-info-streaming-context (info context)
-  "Calls System.Collections.Generic.Dictionary`2 constructor new(SerializationInfo, StreamingContext). Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class with serialized data.
-Parameters:
-  - info (System.Runtime.Serialization.SerializationInfo): A System.Runtime.Serialization.SerializationInfo object containing the information required to serialize the System.Collections.Generic.Dictionary`2.
-  - context (System.Runtime.Serialization.StreamingContext): A System.Runtime.Serialization.StreamingContext structure containing the source and destination of the serialized stream associated with the System.Collections.Generic.Dictionary`2.
+new(KeyValuePair, IEqualityComparer)
+  Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class that contains elements copied from the specified System.Collections.Generic.IEnumerable`1 and uses the specified System.Collections.Generic.IEqualityComparer`1.
+  Parameters:
+    - collection (System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]): The System.Collections.Generic.IEnumerable`1 whose elements are copied to the new System.Collections.Generic.Dictionary`2.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 implementation to use when comparing keys, or to use the default System.Collections.Generic.EqualityComparer`1 for the type of the key.
+
+new(SerializationInfo, StreamingContext)
+  Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class with serialized data.
+  Parameters:
+    - info (System.Runtime.Serialization.SerializationInfo): A System.Runtime.Serialization.SerializationInfo object containing the information required to serialize the System.Collections.Generic.Dictionary`2.
+    - context (System.Runtime.Serialization.StreamingContext): A System.Runtime.Serialization.StreamingContext structure containing the source and destination of the serialized stream associated with the System.Collections.Generic.Dictionary`2.
 "
-  (dotnet:new <type-str> info context))
+  (cl:cond
+    ((cl:and supplied-capacity (cl:numberp capacity) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:new <type-str> capacity comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:new <type-str> capacity comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:new <type-str> capacity comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:new <type-str> capacity comparer))
+    ((cl:and supplied-capacity (cl:numberp capacity) (cl:not supplied-comparer))
+     (dotnet:new <type-str> capacity))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-comparer))
+     (dotnet:new <type-str> capacity))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-comparer))
+     (dotnet:new <type-str> capacity))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-comparer))
+     (dotnet:new <type-str> capacity))
+    ((cl:and (cl:not supplied-capacity) (cl:not supplied-comparer))
+     (dotnet:new <type-str>))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-COLLECTIONS-GENERIC-DICTIONARY-2"
+                    :class-name <type-str>
+                    :method-name "new"
+                    :supplied-args (cl:append (cl:when supplied-capacity (cl:list :capacity capacity)) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun capacity (obj)
   "Gets the total numbers of elements the internal data structure can hold without resizing."
@@ -183,7 +194,16 @@ Parameters:
 ;;   Remove(TKey, out TValue&) -> Boolean
 
 (cl:defun trim-excess (obj cl:&optional (capacity cl:nil supplied-capacity))
-  "Master wrapper for System.Collections.Generic.Dictionary`2.TrimExcess overloads. Dispatches at runtime."
+  "Master wrapper for System.Collections.Generic.Dictionary`2.TrimExcess overloads. Dispatches at runtime.
+
+TrimExcess() -> Void
+  Summary: Sets the capacity of this dictionary to what it would be if it had been originally initialized with all its entries.
+
+TrimExcess(Int32) -> Void
+  Summary: Sets the capacity of this dictionary to hold up a specified number of entries without any further expansion of its backing storage.
+  Parameters:
+    - capacity (System.Int32): The new capacity.
+"
   (cl:cond
     ((cl:and supplied-capacity (cl:numberp capacity))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj) "TrimExcess" capacity))
@@ -194,18 +214,6 @@ Parameters:
                     :class-name <type-str>
                     :method-name "TrimExcess"
                     :supplied-args (cl:append (cl:when supplied-capacity (cl:list :capacity capacity)))))))
-
-(cl:defun trim-excess (obj)
-  "Calls System.Collections.Generic.Dictionary`2.TrimExcess TrimExcess() -> Void. Summary: Sets the capacity of this dictionary to what it would be if it had been originally initialized with all its entries.
-"
-  (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj) "TrimExcess"))
-
-(cl:defun trim-excess-int32 (obj capacity)
-  "Calls System.Collections.Generic.Dictionary`2.TrimExcess TrimExcess(Int32) -> Void. Summary: Sets the capacity of this dictionary to hold up a specified number of entries without any further expansion of its backing storage.
-Parameters:
-  - capacity (System.Int32): The new capacity.
-"
-  (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj) "TrimExcess" capacity))
 
 (cl:defun try-add (obj key value)
   "Summary: Attempts to add the specified key and value to the dictionary.

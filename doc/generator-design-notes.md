@@ -681,3 +681,68 @@ and `Program.cs` resolves and passes both paths down as two new scalar arguments
 :depends-on ("packages"))` (its `in-package` form needs that package to already exist), and
 every per-class `:file`'s `:depends-on` became `("packages" "csharp-assembly-utils")`, since
 class bodies now reference `csharp-assembly-utils:csharp-overload-not-found`.
+
+## Overload Consolidation (Version 24)
+
+Every overloaded method already got a single dispatching "Master Wrapper" (Version 18) — a
+`defun` with `&optional`/`&key (var init supplied-p)` parameters and a `cond` block that
+inspects argument types/`supplied-p` flags to invoke the exact right C# overload. But
+`generate-class-file` *also* kept emitting one type-suffixed direct-call function per clean
+overload alongside that wrapper (e.g. `contains-vector-2`, `get-ambiguous-time-offsets-date-time`),
+purely as an optional fast/explicit path — and exporting all of them. For methods with many
+overloads this produced exactly the long, ugly export lists `PLAN.md`'s "Overload Consolidation"
+section called out. Since the Master Wrapper's `cond` dispatch already selects the correct
+overload with full precision, these functions were redundant, not load-bearing, and Version 24
+removes their generation and export entirely (`generate-class-file`, `compute-package-exports-and-shadows`).
+`method-overload-name`/`constructor-overload-name` remain as internal helper functions (still
+exercised directly by `package-generator-tests.lisp`) but are no longer called from the
+generation path.
+
+Constructors never had a Master Wrapper — multiple clean constructors instead got a bare
+`(cl:defun new (cl:&rest args) (cl:apply #'dotnet:new <type-str> args))` passthrough (relying on
+DotCL's own runtime overload resolution) plus the same type-suffixed direct-call functions
+(`new-single-single`, etc.). Version 24 gives constructors a real Master Wrapper too
+(`generate-constructor-master-wrapper`), built from the same helpers the method wrapper uses
+(`common-parameter-prefix`, `max-mandatory-parameter-len`, `collect-optional-positional-params`,
+`collect-key-params`, `format-master-overload-condition` — none of which depend on
+static/instance-ness or a method name, so they're directly reusable) plus a new
+`format-constructor-master-overload-action` that emits `(dotnet:new <type-str> ...)` instead of
+`dotnet:invoke`/`dotnet:static`. `master-overload-param-names` was factored out of
+`format-master-overload-action` to share the prefix/optional/keyword→positional-index parameter
+name mapping between the method and constructor action formatters. This also makes the
+Version 11 zero-parameter-constructor-name-collision workaround moot: since there's no longer a
+type-suffixed `new` (which is what collided with the dispatcher's own `new` name), there's
+nothing left to special-case.
+
+To avoid losing the per-overload documentation that lived in the deleted functions' docstrings,
+every Master Wrapper's docstring (method or constructor) now enumerates every overload it covers:
+a header line, then one block per overload with that overload's human-readable signature
+(`method-signature-str`/`constructor-signature-str`) followed by its own XML-doc-sourced
+Summary/Returns/Parameters text (reusing `build-docstring`), indented underneath. Two new helpers
+implement this: `format-overload-doc-block` (one overload's block) and
+`format-combined-overloads-docstring` (the full docstring, called with `#'method-signature-str`
+or `#'constructor-signature-str` depending on which kind of overload group it's covering).
+
+### Positional Parameter Name Collisions (Constructor Master Wrapper)
+
+Giving constructors a Master Wrapper immediately surfaced a latent bug in
+`collect-optional-positional-params`, previously unreachable because nothing exercised the
+Master Wrapper machinery on an overload group whose arities aren't a single monotonically-growing
+family. For each positional dispatch slot beyond the common mandatory prefix, that function picks
+its representative parameter from whichever overload happens to be first (in metadata order) with
+a parameter present at that index — but nothing guarantees overloads at different indices don't
+reuse the same parameter name for unrelated purposes. `System.TimeSpan`'s constructors are a real
+example: `new(Int32 hours, Int32 minutes, Int32 seconds)` and
+`new(Int32 days, Int32 hours, Int32 minutes, Int32 seconds)` both have a `seconds` parameter, but
+at index 2 and index 3 respectively — two genuinely different slots that happened to share a
+name. Emitting both as `(cl:defun new (... seconds ... seconds ...))` is an invalid lambda list
+(duplicate variable).
+
+`uniquify-positional-params` fixes this generically: given the ordered `prefix` ++ `opt-params`
+list, it renames (via a numeric suffix, e.g. `seconds2`) any slot whose mapped Lisp name collides
+with an earlier slot's. Both `generate-master-wrapper` (methods) and
+`generate-constructor-master-wrapper` (constructors) run their raw `prefix`/`opt-params` through it
+before building the lambda list, so every downstream consumer (`format-master-overload-condition`,
+`master-overload-param-names`, `format-supplied-args-expr`) sees already-unique names without
+needing its own collision logic — this exact latent bug applies equally to methods, not just
+constructors, though no case in the checked-in test packages happened to trigger it there.

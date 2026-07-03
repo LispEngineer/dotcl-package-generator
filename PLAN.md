@@ -3,7 +3,8 @@
 * Author: Douglas P. Fields, Jr. - symbolics@lisp.engineer
 * Copyright 2026 Douglas P. Fields, Jr.
 
-# Overload Consolidation
+
+# **DONE** Overload Consolidation
 
 Consolidate all method overloads into at most two functions:
 * One for a class instance method
@@ -21,6 +22,20 @@ Consolidate all method overloads into at most two functions:
 
 Obviously, this requires updating the version number.
 
+## Implementation Notes
+
+**DONE** in generator version 24 (2.24.0). Type-suffixed per-overload direct-call functions
+(for both methods and constructors) are no longer generated or exported; each overloaded
+method/constructor now emits only its Master Wrapper (`name`, plus `name*` when a name is
+overloaded as both instance and static). Constructors, which previously had no Master Wrapper
+at all (just a bare `&rest` passthrough), gained one too. See `doc/generator-design-notes.md`'s
+"Overload Consolidation (Version 24)" section and `RELEASES.md`'s `2.24.0` entry.
+
+Extending the Master Wrapper to constructors surfaced a latent bug (see the Miscellaneous
+section below for the follow-up item) in how positional dispatch-slot parameter names are
+picked when overloads have unrelated arities; `uniquify-positional-params` was added to fix it
+for the specific case of two different slots coincidentally choosing the same parameter name.
+
 
 # Add More to Generated `.lisp` Files
 
@@ -33,6 +48,13 @@ TODO
 
 
 # Miscellaneous
+
+* `generate-single-overload`/`generate-master-wrapper` hardcode the receiver parameter 
+  name as literal `obj`, which collides when a C# method's own parameter is also named obj, e.g. 
+  `System.Object.Equals(object obj)` generates `(cl:defun equals (obj obj) ...)`, 
+  an invalid lambda list.
+  * Suggestion: change the name of `obj` to something that C# cannot generate, such as
+    `obj*` `obj!` `<obj>`, etc.
 
 * Handle generic classes name mangling using backticks more elegantly.
   * Backticks have special meaning in Lisp so we cannot include them in the

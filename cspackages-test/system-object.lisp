@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Object
-;;; Generator Version: 23
-;;; Creation Date: 2026-07-03T13:49:28Z
+;;; Generator Version: 24
+;;; Creation Date: 2026-07-03T15:23:10Z
 
 (cl:in-package :system-object)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Object"))
 (cl:defconstant <type-str> "System.Object")
-(cl:defconstant <creation> "2026-07-03T13:49:28Z")
-(cl:defconstant <version> 23)
+(cl:defconstant <creation> "2026-07-03T15:23:10Z")
+(cl:defconstant <version> 24)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -30,23 +30,6 @@ Parameters:
 
 (cl:defun equals* (obj-a obj-b)
   "Summary: Determines whether the specified object instances are considered equal.
-Returns: if the objects are considered equal; otherwise, . If both objA and objB are null, the method returns .
-Parameters:
-  - obj-a (System.Object): The first object to compare.
-  - obj-b (System.Object): The second object to compare.
-"
-  (dotnet:static <type-str> "Equals" (cl:the (dotnet "System.Object") obj-a) (cl:the (dotnet "System.Object") obj-b)))
-
-(cl:defun equals-object (obj obj)
-  "Calls System.Object.Equals Equals(Object) -> Boolean. Summary: Determines whether the specified object is equal to the current object.
-Returns: if the specified object is equal to the current object; otherwise, .
-Parameters:
-  - obj (System.Object): The object to compare with the current object.
-"
-  (dotnet:invoke (cl:the (dotnet "System.Object") obj) "Equals" obj))
-
-(cl:defun equals-object-object (obj-a obj-b)
-  "Calls System.Object.Equals Equals(Object, Object) -> Boolean. Summary: Determines whether the specified object instances are considered equal.
 Returns: if the objects are considered equal; otherwise, . If both objA and objB are null, the method returns .
 Parameters:
   - obj-a (System.Object): The first object to compare.
