@@ -12,7 +12,7 @@ these locations:
 * [`Makefile`](Makefile)
 * [`assembly-package-generator.lisp`](assembly-package-generator.lisp)
 * [`dotcl-packagegen.asd`](dotcl-packagegen.asd)
-* [`RELEASES.md`](RELEASES.md)
+* [`RELEASES.md`](RELEASES.md) — add an entry describing the change alongside the version bump.
 
 
 # Parentheses Balance Checker

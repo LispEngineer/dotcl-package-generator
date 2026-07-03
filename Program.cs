@@ -1,28 +1,26 @@
 // Copyright 2026 Douglas P. Fields, Jr.
 //
-// This is the standalone package-generator entry point
-// It exposes only two-stage assembly-to-Lisp
-// package generator plus its test mode.
+// This is the standalone package-generator entry point. It exposes a
+// single-pass assembly-metadata-plus-package generator (one or more
+// assemblies, each with zero or more classes, in one invocation) plus its
+// test mode.
 
+using System.Text;
 using DotCL;
 using PackageGenerator;
 
 const string AsdFileName = "dotcl-packagegen.asd";
 const string SystemName = "dotcl-packagegen";
 
-string? assemblyFile = null;
-string? outputFile = null;
-bool hasAssembly = false;
-bool hasOutput = false;
-
-string? assemblyMetadataFile = null;
-string? classFilter = null;
-string? outputDir = null;
-bool hasAssemblyMetadata = false;
-string? constantProperties = null;
 var isTestMode = false;
 var printHelp = false;
 var printVersion = false;
+
+string? outDir = null;
+var groups = new List<AssemblyGroup>();
+AssemblyGroup? currentGroup = null;
+ClassSpec? currentClass = null;
+var argErrors = new List<string>();
 
 ////////////////////////////////////////////////////////////////////////////
 // Parse arguments
@@ -36,27 +34,28 @@ if (args.Contains("--version")) {
 }
 
 for (int i = 0; i < args.Length; i++) {
-    if (args[i] == "--assembly" && i + 1 < args.Length) {
-        assemblyFile = args[i + 1];
-        hasAssembly = true;
+    if (args[i] == "--out-dir" && i + 1 < args.Length) {
+        outDir = args[i + 1];
         i++;
-    } else if (args[i] == "--assembly-metadata" && i + 1 < args.Length) {
-        assemblyMetadataFile = args[i + 1];
-        hasAssemblyMetadata = true;
+    } else if (args[i] == "--assembly" && i + 1 < args.Length) {
+        currentGroup = new AssemblyGroup { DllPath = args[i + 1] };
+        groups.Add(currentGroup);
+        currentClass = null;
         i++;
     } else if (args[i] == "--class" && i + 1 < args.Length) {
-        classFilter = args[i + 1];
+        if (currentGroup == null) {
+            argErrors.Add("--class specified before any --assembly.");
+        } else {
+            currentClass = new ClassSpec { Name = args[i + 1] };
+            currentGroup.Classes.Add(currentClass);
+        }
         i++;
-    } else if (args[i] == "--output" && i + 1 < args.Length) {
-        outputFile = args[i + 1];
-        outputDir = args[i + 1];
-        hasOutput = true;
-        i++;
-    } else if (args[i] == "--output") {
-        outputFile = "-";
-        hasOutput = true;
     } else if (args[i] == "--constant-properties" && i + 1 < args.Length) {
-        constantProperties = args[i + 1];
+        if (currentClass == null) {
+            argErrors.Add("--constant-properties specified before any --class.");
+        } else {
+            currentClass.ConstantProperties = args[i + 1];
+        }
         i++;
     } else if (args[i] == "--test") {
         isTestMode = true;
@@ -66,67 +65,108 @@ for (int i = 0; i < args.Length; i++) {
 //////////////////////////////////////////////////////////////////////////
 // Handle all the run modes
 
-// FIRST: Run modes that do not need DotCL
-
 if (printHelp) {
     PrintHelp();
     return;
 }
 
-if (hasAssembly && !string.IsNullOrEmpty(assemblyFile)) {
-    Console.Error.WriteLine($"[Program.cs] Generating assembly metadata...");
-    if (!hasOutput || string.IsNullOrEmpty(outputFile)) {
-        outputFile = "-";
+// FIRST: the single-pass generator. Stage 1 (metadata reflection) needs no
+// DotCL, so it all happens before DotclHost.Initialize() runs below.
+
+if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argErrors.Count > 0)) {
+    if (argErrors.Count > 0) {
+        foreach (var msg in argErrors) {
+            WriteRed(msg);
+        }
+        Environment.Exit(1);
     }
-    if (outputFile == "-") {
-        PackageGenerator.AssemblyToLispy.RedirectLogsToError = true;
+
+    if (string.IsNullOrEmpty(outDir)) {
+        WriteRed("Error: --out-dir is required.");
+        Environment.Exit(1);
     }
+
+    if (groups.Count == 0) {
+        WriteRed("Error: at least one --assembly is required.");
+        Environment.Exit(1);
+    }
+
+    var missing = groups
+        .Select(g => Path.GetFullPath(g.DllPath))
+        .Where(p => !File.Exists(p))
+        .ToList();
+    if (missing.Count > 0) {
+        foreach (var m in missing) {
+            WriteRed($"Error: Assembly file not found: {m}");
+        }
+        Environment.Exit(1);
+    }
+
+    Directory.CreateDirectory(outDir);
+
+    string creationTime = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+    var manifest = new StringBuilder();
+    manifest.Append('(');
+
     try {
-        string fullAssemblyPath = Path.GetFullPath(assemblyFile);
-        string inputDir = Path.GetDirectoryName(fullAssemblyPath) ?? Directory.GetCurrentDirectory();
-        string inputAssemblyFile = Path.GetFileName(fullAssemblyPath);
-        PackageGenerator.AssemblyToLispy.GenerateLispyMetadata(inputDir, inputAssemblyFile, outputFile);
+        foreach (var group in groups) {
+            string fullAssemblyPath = Path.GetFullPath(group.DllPath);
+            string inputDir = Path.GetDirectoryName(fullAssemblyPath) ?? Directory.GetCurrentDirectory();
+            string inputAssemblyFile = Path.GetFileName(fullAssemblyPath);
+            string assemblyBaseName = Path.GetFileNameWithoutExtension(inputAssemblyFile);
+            string metadataFilePath = Path.Combine(outDir, assemblyBaseName + ".lispy.metadata");
+
+            Console.Error.WriteLine($"[Program.cs] Generating assembly metadata for {inputAssemblyFile}...");
+            AssemblyToLispy.GenerateLispyMetadata(inputDir, inputAssemblyFile, metadataFilePath);
+
+            manifest.Append("(:metadata-file \"").Append(EscapeLispString(metadataFilePath)).Append("\"\n");
+            manifest.Append(" :classes (");
+            foreach (var cls in group.Classes) {
+                manifest.Append("(:name \"").Append(EscapeLispString(cls.Name)).Append('"');
+                manifest.Append(" :constant-properties \"").Append(EscapeLispString(cls.ConstantProperties)).Append("\")");
+            }
+            manifest.Append("))\n");
+        }
     } catch (Exception ex) {
-        Console.Error.WriteLine($"[Program.cs] Error generating metadata: {ex.Message}");
+        WriteRed($"Error generating metadata: {ex.Message}");
         Console.Error.WriteLine(ex.StackTrace);
         Environment.Exit(1);
     }
-    Console.Error.WriteLine($"[Program.cs] ...assembly metadata generation complete.");
+
+    manifest.Append(')');
+
+    string manifestFile = Path.GetTempFileName();
+    try {
+        File.WriteAllText(manifestFile, manifest.ToString());
+
+        DotclHost.Initialize();
+        MonoUtilsRegistrar.Initialize();
+        LoadDotclManifest();
+
+        Console.WriteLine("[Program.cs] Running assembly package generator...");
+        try {
+            DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH", manifestFile, outDir, creationTime);
+        } catch (Exception ex) {
+            Console.Error.WriteLine($"[Program.cs] Error in assembly package generator: {ex.Message}");
+            Console.Error.WriteLine(ex.StackTrace);
+            Environment.Exit(1);
+        }
+        Console.WriteLine("[Program.cs] ...assembly package generator complete.");
+    } finally {
+        File.Delete(manifestFile);
+    }
+
     return;
 }
 
 // NEXT: Program invocations that require DotCL to be running
 
 DotclHost.Initialize();
-
-// Register the custom C#-implemented Lisp package with DotCL's
-// package registry.
 MonoUtilsRegistrar.Initialize();
-
-// FIXME: This seems awfully fragile. Is there some way we can make these come in
-// from the build process?
-var manifestPath = Path.Combine(
-    AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
-Console.WriteLine($"[Program.cs] manifest: {manifestPath}");
-var loaded = DotclHost.LoadFromManifest(manifestPath);
-Console.WriteLine($"[Program.cs] LoadFromManifest loaded {loaded} fasls");
-
+LoadDotclManifest();
 
 if (printVersion) {
     PrintVersion();
-    return;
-}
-
-if (hasAssemblyMetadata && !string.IsNullOrEmpty(assemblyMetadataFile)) {
-    Console.WriteLine("[Program.cs] Running assembly package generator...");
-    try {
-        DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR", assemblyMetadataFile, classFilter ?? "", outputDir ?? "", constantProperties ?? "");
-    } catch (Exception ex) {
-        Console.Error.WriteLine($"[Program.cs] Error in assembly package generator: {ex.Message}");
-        Console.Error.WriteLine(ex.StackTrace);
-        Environment.Exit(1);
-    }
-    Console.WriteLine("[Program.cs] ...assembly package generator complete.");
     return;
 }
 
@@ -146,6 +186,34 @@ if (isTestMode) {
 
 Console.Error.WriteLine("[Program.cs] No action specified. Run with --help to see options.");
 Environment.Exit(1);
+
+//////////////////////////////////////////////////////////////////////////////
+// Helpers
+
+void LoadDotclManifest() {
+    // FIXME: This seems awfully fragile. Is there some way we can make these come in
+    // from the build process?
+    var manifestPath = Path.Combine(
+        AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
+    Console.WriteLine($"[Program.cs] manifest: {manifestPath}");
+    var loaded = DotclHost.LoadFromManifest(manifestPath);
+    Console.WriteLine($"[Program.cs] LoadFromManifest loaded {loaded} fasls");
+}
+
+void WriteRed(string message) {
+    Console.Error.WriteLine($"\x1b[31m{message}\x1b[0m");
+}
+
+string EscapeLispString(string str) {
+    var sb = new StringBuilder();
+    foreach (char c in str) {
+        if (c == '"' || c == '\\') {
+            sb.Append('\\');
+        }
+        sb.Append(c);
+    }
+    return sb.ToString();
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // --version / --help
@@ -174,24 +242,25 @@ void PrintHelp() {
         }
     }
 
-    Console.WriteLine("Usage: dotcl-packagegen [options]");
+    Console.WriteLine("Usage: dotcl-packagegen --out-dir <dir> --assembly <path> [--class <name>");
+    Console.WriteLine("           [--constant-properties <spec>]]... [--assembly <path> ...]...");
     Console.WriteLine();
-    Console.WriteLine("Stage 1 - extract assembly metadata:");
-    Opt("--assembly <path>", "Reflect over the given .NET assembly and emit Lisp",
-        "S-expression metadata describing its public types.");
-    Opt("--output <path|->", "Destination for the metadata (default '-', meaning",
-        "stdout; diagnostics always go to stderr so the payload",
-        "stays clean).");
+    Console.WriteLine("Single-pass generator: reflects one or more .NET assemblies and generates");
+    Console.WriteLine("Lisp package(s) for the requested classes, all in one invocation.");
     Console.WriteLine();
-    Console.WriteLine("Stage 2 - generate Lisp package(s) from metadata:");
-    Opt("--assembly-metadata <path>", "Metadata file produced by Stage 1.");
-    Opt("--class <name>", "Fully-qualified C# class name to generate a Lisp",
-        "package for.");
-    Opt("--output <dir>", "Destination directory for the generated .lisp",
+    Opt("--out-dir <dir>", "Destination directory for generated metadata and .lisp",
         "package file(s).");
+    Opt("--assembly <path>", "A .NET assembly to reflect. Repeatable; starts a new",
+        "group that subsequent --class options attach to. An",
+        "--assembly with no --class options still emits its",
+        "metadata file, generating no packages.");
+    Opt("--class <name>", "Fully-qualified C# class name to generate a Lisp",
+        "package for, in the most recently given --assembly.",
+        "Repeatable.");
     Opt("--constant-properties <spec>", "Comma/semicolon-separated static property names",
         "(or \"*\" for all) to emit as Lisp constants instead",
-        "of re-evaluated accessors.");
+        "of re-evaluated accessors, for the most recently given",
+        "--class.");
     Console.WriteLine();
     Console.WriteLine("Other:");
     Opt("--test", "Run the generator's own Lisp unit tests plus the",
@@ -200,11 +269,21 @@ void PrintHelp() {
         "information (read from dotcl-packagegen.asd).");
     Opt("--help", "Show this help message.");
     Console.WriteLine();
-    Console.WriteLine("Examples:");
-    Console.WriteLine("  dotcl-packagegen --assembly MonoGame.Framework.dll \\");
-    Console.WriteLine("      --output /tmp/mg.lispy.metadata");
-    Console.WriteLine();
-    Console.WriteLine("  dotcl-packagegen --assembly-metadata /tmp/mg.lispy.metadata \\");
-    Console.WriteLine("      --class Microsoft.Xna.Framework.Vector2 \\");
-    Console.WriteLine("      --output ./cspackages --constant-properties \"*\"");
+    Console.WriteLine("Example:");
+    Console.WriteLine("  dotcl-packagegen --out-dir ./cspackages \\");
+    Console.WriteLine("      --assembly Some.Assembly.dll \\");
+    Console.WriteLine("        --class Some.Class1 --constant-properties \"*\" \\");
+    Console.WriteLine("        --class Some.Class2 \\");
+    Console.WriteLine("      --assembly Some.Other.Assembly.dll \\");
+    Console.WriteLine("        --class Some.Other.Class3 --constant-properties \"*\"");
+}
+
+class AssemblyGroup {
+    public required string DllPath;
+    public List<ClassSpec> Classes = new();
+}
+
+class ClassSpec {
+    public required string Name;
+    public string ConstantProperties = "";
 }

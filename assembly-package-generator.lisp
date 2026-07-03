@@ -599,8 +599,11 @@
                             collect (format-param-type-check (getf p :type) (format nil "(cl:nth ~D args)" idx)))))
           (format nil "(cl:and (cl:= (cl:length args) ~D)~{ ~A~})" arg-count checks)))))
 
-(defun generate-class-file (class-plist output-dir &optional constant-properties-list)
-  "Generates the Lisp source file for a single class plist."
+(defun generate-class-file (class-plist output-dir &optional constant-properties-list creation-time)
+  "Generates the Lisp source file for a single class plist.
+   CREATION-TIME, if supplied, is used verbatim as the file's creation-date
+   stamp (so a batch of files generated in one run can share a single
+   timestamp); otherwise a fresh timestamp is computed."
   (let* ((fq-name (getf class-plist :fully-qualified-name))
          (pkg-name (camel-to-kebab fq-name))
          (output-file (merge-pathnames (make-pathname :name pkg-name :type "lisp")
@@ -617,7 +620,7 @@
                     (cons '(:parameters nil :public t) raw-ctors)
                     raw-ctors))
          (is-value-type-p (or (eq kind :struct) (eq kind :enum)))
-         (creation-time (get-iso-8601-time)))
+         (creation-time (or creation-time (get-iso-8601-time))))
     
     (ensure-directories-exist output-file :verbose t)
     
@@ -1022,41 +1025,74 @@
     ) ;; close outer let*
   ) ;; close defun generate-class-file
 
-(defun generate-assembly-packages (metadata-file class-filter output-dir &optional constant-properties-list)
-  "Loads the metadata-file, filters classes by class-filter, and generates output Lisp files."
-  (unless (probe-file metadata-file)
-    (error "Metadata file not found: ~A" metadata-file))
-  
-  (let* ((metadata (utils:safe-read-form-from-file metadata-file))
-         (filters (and class-filter (> (length class-filter) 0) (split-string class-filter #\;)))
-         (classes-to-gen (if filters
-                             (remove-if-not
-                              (lambda (c)
-                                (member (getf c :fully-qualified-name) filters :test #'string=))
-                              metadata)
-                             metadata)))
-    
-    (when (and filters (= 0 (length classes-to-gen)))
-      (utils:format-red *error-output* "Warning: No classes matched the filter ~S~%" class-filter))
-    
-    (dolist (cls classes-to-gen)
-      (format *error-output* "Generating package for C# Class: ~A~%" (getf cls :fully-qualified-name))
-      (generate-class-file cls output-dir constant-properties-list))
-    
+(defun resolve-batch-entry (entry)
+  "Loads ENTRY's :metadata-file and resolves each of its :classes by
+   :fully-qualified-name against the loaded metadata. Returns two values:
+   a list of (class-plist . constant-properties-list) pairs ready for
+   generate-class-file, and a list of class names from :classes that could
+   not be found in the metadata (empty if all resolved, or if :classes was
+   empty, which is a valid metadata-only request)."
+  (let* ((metadata-file (getf entry :metadata-file))
+         (classes (getf entry :classes)))
+    (unless (probe-file metadata-file)
+      (error "Metadata file not found: ~A" metadata-file))
+    (let ((metadata (utils:safe-read-form-from-file metadata-file))
+          (resolved nil)
+          (not-found nil))
+      (dolist (class-entry classes)
+        (let* ((cname (getf class-entry :name))
+               (cprops-str (getf class-entry :constant-properties))
+               (cprops (and cprops-str (> (length cprops-str) 0) (split-string cprops-str #\,)))
+               (cls (find cname metadata :key (lambda (c) (getf c :fully-qualified-name)) :test #'string=)))
+          (if cls
+              (push (cons cls cprops) resolved)
+              (push cname not-found))))
+      (values (nreverse resolved) (nreverse not-found)))))
+
+(defun generate-assembly-packages-batch (assembly-entries output-dir creation-time)
+  "Loads each entry's metadata file, resolves all requested classes across
+   all entries, and only then generates the .lisp package files, so a
+   class name that cannot be found aborts the whole run before anything is
+   written. An entry with an empty :classes list is not an error -- it
+   means only that entry's metadata file (already written by C#) was
+   requested."
+  (let ((all-resolved nil)
+        (all-not-found nil))
+    (dolist (entry assembly-entries)
+      (multiple-value-bind (resolved not-found) (resolve-batch-entry entry)
+        (setf all-resolved (append all-resolved resolved))
+        (setf all-not-found (append all-not-found not-found))))
+
+    (when all-not-found
+      (dolist (cname all-not-found)
+        (utils:format-red *error-output* "Error: Class not found in assembly metadata: ~A~%" cname))
+      (error "One or more requested classes were not found: ~{~A~^, ~}" all-not-found))
+
+    (dolist (pair all-resolved)
+      (let ((cls (car pair))
+            (cprops (cdr pair)))
+        (format *error-output* "Generating package for C# Class: ~A~%" (getf cls :fully-qualified-name))
+        (generate-class-file cls output-dir cprops creation-time)))
+
     t))
 
-(defun run-assembly-package-generator (metadata-file class-filter output-dir &optional constant-properties-str)
-  "CLI entry point called by DotclHost.Call. Maps string parameters safely."
+(defun run-assembly-package-generator-batch (manifest-file output-dir creation-time)
+  "CLI entry point called by DotclHost.Call for the single-pass generator.
+   MANIFEST-FILE is a Lisp-reader-compatible list of plists, one per
+   assembly:
+     ((:metadata-file \"...\" :classes ((:name \"...\" :constant-properties \"...\") ...)) ...)
+   Maps string parameters safely and reports errors in red."
   (handler-case
-      (let ((mfile (and metadata-file (> (length metadata-file) 0) metadata-file))
-            (cfilter (and class-filter (> (length class-filter) 0) class-filter))
-            (odir (and output-dir (> (length output-dir) 0) output-dir))
-            (cprops (and constant-properties-str (> (length constant-properties-str) 0) (split-string constant-properties-str #\,))))
+      (let ((mfile (and manifest-file (> (length manifest-file) 0) manifest-file))
+            (odir (and output-dir (> (length output-dir) 0) output-dir)))
         (unless mfile
-          (error "Metadata file path is required."))
+          (error "Manifest file path is required."))
         (unless odir
           (error "Output directory path is required."))
-        (generate-assembly-packages mfile cfilter odir cprops))
+        (unless (probe-file mfile)
+          (error "Manifest file not found: ~A" mfile))
+        (let ((assembly-entries (utils:safe-read-form-from-file mfile)))
+          (generate-assembly-packages-batch assembly-entries odir creation-time)))
     (error (c)
       (utils:format-red *error-output* "Error in assembly-package-generator: ~A~%" c)
       (error c))))

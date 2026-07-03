@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+* See also [`GEMINI.md`](GEMINI.md) for more useful details.
+
 ## What this is
 
 `dotcl-packagegen` is a standalone CLI tool (packaged as a `dotnet tool`) that generates
@@ -9,24 +11,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 assemblies. It is a hybrid C#/Common Lisp codebase: C# does .NET reflection and hosts the
 DotCL Lisp runtime; Lisp does the actual code generation via string templating.
 
-The tool operates in two independent stages:
+The tool is a **single-pass generator**: one invocation takes `--out-dir` plus one or more
+`--assembly` groups (each with zero or more `--class` names, each optionally with its own
+`--constant-properties`) and does everything in one process, internally in two phases:
 
-* **Stage 1** (`--assembly <dll> --output <metadata-file>`, pure C#, no DotCL needed):
-  `AssemblyToLispy.cs` reflects over a .NET assembly (plus its sidecar `.xml` doc file, if
+* **Metadata reflection** (pure C#, no DotCL needed): for each `--assembly`,
+  `AssemblyToLispy.cs` reflects over the .NET assembly (plus its sidecar `.xml` doc file, if
   present) and emits a single Lisp-reader-compatible s-expression list — one plist per public
-  type — to a "lispy metadata" file. See `doc/assembly-to-lispy.md` for the complete, canonical
-  schema of this format (keys, flags, parameter plists, documentation plists, default-value
-  literal formatting, etc.) — **that doc must be kept in sync with any change to
-  `AssemblyToLispy.cs`'s output shape.**
-* **Stage 2** (`--assembly-metadata <file> --class <FQN> --output <dir>`, boots DotCL): loads a
-  Stage-1 metadata file and calls into `assembly-package-generator.lisp`
-  (`run-assembly-package-generator` → `generate-assembly-packages` → `generate-class-file`),
-  which reads the plist for the requested class(es) and emits a `.lisp` file defining a package
-  with idiomatic Lisp wrapper functions for that C# type's constructors, methods, properties,
-  and fields.
+  type — to a `<AssemblyName>.lispy.metadata` file in `--out-dir`. See `doc/assembly-to-lispy.md`
+  for the complete, canonical schema of this format (keys, flags, parameter plists,
+  documentation plists, default-value literal formatting, etc.) — **that doc must be kept in
+  sync with any change to `AssemblyToLispy.cs`'s output shape.** An `--assembly` with no
+  `--class` options is valid — it emits only that assembly's metadata, generating no packages.
+* **Package generation** (boots DotCL): once every assembly's metadata has been reflected,
+  `Program.cs` builds a Lisp-reader-compatible manifest (one entry per assembly: its metadata
+  file path plus its requested class names/constant-properties) to a temp file and calls into
+  `assembly-package-generator.lisp` (`run-assembly-package-generator-batch` →
+  `generate-assembly-packages-batch` → `generate-class-file`), which resolves and validates every
+  requested class *before* generating anything, then emits a `.lisp` file per class defining a
+  package with idiomatic Lisp wrapper functions for that C# type's constructors, methods,
+  properties, and fields. All files from one invocation share a single creation timestamp.
 
-Splitting these stages means metadata can be captured once and reused, and Stage 2 (the part
-that needs to boot the full Lisp host) can be iterated on without re-running reflection.
+`DotclHost.Call`'s marshaling only handles scalars (strings, numbers, booleans), not nested
+lists — hence the manifest-file-on-disk approach for handing the assembly/class/
+constant-properties structure from C# to Lisp, reusing the same "Lisp-reader-compatible
+s-expression file" convention as the metadata files themselves.
 
 ## Build & test commands
 
@@ -41,7 +50,7 @@ post-build verification steps that matter (see below).
   `package-generator-tests.lisp`/`generator-tests.lisp`, plus the `AssemblyToLispyTest` C# suite
   against `System.Runtime.dll`, `System.Console.dll`, the synthetic
   `AssemblyToLispyTestTarget.dll`, and `DotCL.Runtime.dll`). It then does an **end-to-end
-  smoke test**: runs both stages against real reference assemblies
+  smoke test**: a single single-pass invocation against real reference assemblies
   (`System.Runtime`, `System.Linq`, `System.Xml.ReaderWriter`) to generate real `.lisp` packages
   into `cspackages-test/` (checked into git so output drift is visible in diffs), and finally
   runs `check_parens.py` on everything generated. This last step exists because generated code
@@ -68,44 +77,58 @@ There is no separate "run one test" entry point — `--test` runs the whole Lisp
 one process; Lisp tests are self-registering (see `tests/framework.lisp`'s `def-assembly-test`)
 rather than individually addressable from the CLI.
 
-### CLI usage (Stage 1 / Stage 2 directly)
+### CLI usage
 
 ```sh
-dotcl-packagegen --assembly path/to/Some.dll --output some.lispy.metadata
-dotcl-packagegen --assembly-metadata some.lispy.metadata --class Some.Namespace.Type \
-    --output ./cspackages --constant-properties "*"
+dotcl-packagegen --out-dir ./cspackages \
+    --assembly path/to/Some.Assembly.dll \
+      --class Some.Namespace.Type1 --constant-properties "*" \
+      --class Some.Namespace.Type2 \
+    --assembly path/to/Some.Other.Assembly.dll \
+      --class Some.Other.Namespace.Type3
 ```
+
+`--class` attaches to the most recently given `--assembly`; `--constant-properties` attaches to
+the most recently given `--class`. `--assembly` is repeatable and may have zero `--class`
+options (metadata-only).
 
 `--constant-properties` (comma/semicolon-separated names, or `"*"` for all) forces static
 read-only properties to be emitted as `defconstant` instead of `define-symbol-macro` — safe
 only when the property genuinely never changes at runtime (e.g. `Vector2.Zero`), since
 reflection alone can't tell constants from properties that vary.
 
-`--version`/`--help` and `--test` boot the DotCL host (`DotclHost.Initialize()`); `--assembly`
-(Stage 1 alone) intentionally does not, since it's pure reflection.
+`--version`/`--help` and `--test` boot the DotCL host (`DotclHost.Initialize()`); the
+metadata-reflection portion of a `--out-dir` invocation intentionally does not, since it's pure
+reflection and runs before DotCL boots.
 
 ## Architecture map
 
-* **`Program.cs`** — CLI entry point/arg parsing/dispatch only. Stage 1 (`--assembly`) is
-  handled *before* `DotclHost.Initialize()` runs, since it needs no Lisp; everything else
-  (Stage 2, `--test`, `--version`) boots DotCL first.
-* **`AssemblyToLispy.cs`** — Stage 1. All the reflection-to-plist logic: type/member
-  enumeration, XML-doc-comment parsing and signature matching, generic/backtick type-name
-  formatting, default-value-to-Lisp-literal conversion, operator-name mangling
-  (`op_Addition` → `+`), etc. `AssemblyToLispyTest` (bottom of the file) is the C# half of
-  `--test`.
+* **`Program.cs`** — CLI entry point/arg parsing/dispatch only. Parses `--out-dir`/repeated
+  `--assembly`/`--class`/`--constant-properties` into a list of assembly groups, validates
+  `--out-dir` and assembly-file existence, then runs metadata reflection for every assembly
+  *before* `DotclHost.Initialize()` runs (it needs no Lisp), builds the batch manifest, and only
+  then boots DotCL and calls `RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH`. `--test`/`--version` boot
+  DotCL directly without the reflection pass.
+* **`AssemblyToLispy.cs`** — all the reflection-to-plist logic: type/member enumeration,
+  XML-doc-comment parsing and signature matching, generic/backtick type-name formatting,
+  default-value-to-Lisp-literal conversion, operator-name mangling (`op_Addition` → `+`), etc.
+  `AssemblyToLispyTest` (bottom of the file) is the C# half of `--test`.
 * **`MonoUtils.cs`** — small set of C#-implemented Lisp primitives (registered into DotCL via
   `MonoUtilsRegistrar.Initialize()`), exposed to Lisp as the `MONOUTILS` package
   (`monoutils.lisp` re-exports them). Used both by the generator itself and by *generated*
   package code at runtime (e.g. `monoutils:dotnet-p`, `monoutils:get-type` — see
   `doc/package-generator-dependencies.md` for the full dependency list in both directions).
-* **`assembly-package-generator.lisp`** — Stage 2, the code generator proper. Entry points
-  `run-assembly-package-generator` → `generate-assembly-packages` → `generate-class-file`
-  (~1000 lines; the bulk of the file). Bump `*generator-version*` (top of file) whenever
-  generation *behavior* changes, and add a changelog line in its docstring — `doc/generator-design-notes.md`'s
-  "Generator Version History" section has the detailed rationale per version and should gain an
-  entry for significant changes. `VERSION` in `Makefile`, `dotcl-packagegen.asd`, and
-  `assembly-package-generator.lisp` must all be kept in lockstep (see `BUILD.md`).
+* **`assembly-package-generator.lisp`** — the code generator proper. Entry points
+  `run-assembly-package-generator-batch` → `generate-assembly-packages-batch` (which resolves
+  and validates every requested class against its assembly's metadata *before* generating
+  anything, via `resolve-batch-entry`) → `generate-class-file` (~1000 lines; the bulk of the
+  file). Bump `*generator-version*` (top of file) whenever generation *behavior* (the shape of
+  emitted `.lisp` files) changes, and add a changelog line in its docstring —
+  `doc/generator-design-notes.md`'s "Generator Version History" section has the detailed
+  rationale per version and should gain an entry for significant changes. `VERSION` in
+  `Makefile`, `dotcl-packagegen.asd`, and `assembly-package-generator.lisp` must all be kept in
+  lockstep (see `BUILD.md`); see `RELEASES.md` for the CLI-level (as opposed to generated-code)
+  version history.
 * **`utils.lisp`** / **`monoutils.lisp`** / **`packages.lisp`** — shared plumbing: safe
   s-expression file reading, path helpers, the `csharp-overload-not-found` condition type
   (signaled by generated overload-dispatch code at runtime when no C# overload matches), and
@@ -113,8 +136,8 @@ reflection alone can't tell constants from properties that vary.
 * **`AssemblyToLispyTestTarget/`** — a small, deliberately-crafted C# assembly
   (`EdgeCases.cs`) whose sole purpose is exercising every metadata edge case (generics,
   `scoped`/`ref readonly`/`params`, extension methods, abstract base + protected ctor,
-  enums with non-`int` base type, interfaces) so Stage 1 has 100% coverage without depending on
-  finding these cases in the real BCL.
+  enums with non-`int` base type, interfaces) so metadata reflection has 100% coverage without
+  depending on finding these cases in the real BCL.
 * **`tests/`** — Lisp test suite, dynamically discovered at runtime (globbed, not statically
   loaded via the `.asd`): `framework.lisp` provides the `deftest`/`assert-equal` DSL plus a
   recursive schema validator (`validate-type-schema` etc., enforcing the exact schema in
@@ -127,7 +150,7 @@ reflection alone can't tell constants from properties that vary.
   Not hand-edited; regenerated by `make test`. Useful for diffing generation output across
   changes.
 * **`doc/`** — design docs, not just notes:
-  * `assembly-to-lispy.md` is the **canonical schema spec** for the Stage 1 metadata format —
+  * `assembly-to-lispy.md` is the **canonical schema spec** for the reflected metadata format —
     treat it as authoritative and update it alongside any `AssemblyToLispy.cs` output change.
   * `generator-design-notes.md` is the versioned design/rationale log for
     `assembly-package-generator.lisp` (naming conventions, overload dispatch algorithm,

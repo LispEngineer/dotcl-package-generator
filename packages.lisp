@@ -56,8 +56,10 @@
 
 (defpackage :assembly-package-generator
   (:use :cl)
-  (:export #:run-assembly-package-generator
-            #:generate-assembly-packages
+  (:export #:run-assembly-package-generator-batch
+            #:generate-assembly-packages-batch
+            #:resolve-batch-entry
+            #:generate-class-file
             #:camel-to-kebab
             #:split-string))
 

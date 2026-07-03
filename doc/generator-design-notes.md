@@ -33,8 +33,11 @@ static properties of the class as constants.
 
 Example Usage:
 ```bash
-dotcl-packagegen --assembly-metadata obj/MonoGame.Framework.lispy.metadata --class Microsoft.Xna.Framework.Color --output cspackages --constant-properties "*"
+dotcl-packagegen --out-dir cspackages --assembly MonoGame.Framework.dll --class Microsoft.Xna.Framework.Color --constant-properties "*"
 ```
+
+(Current versions of the tool take an assembly `.dll` directly and reflect its metadata as
+part of the same invocation; see `README.md`/`CLAUDE.md` for the up-to-date CLI shape.)
 This forces properties like `Color.White` to be emitted as `(defconstant +white+ ...)`
 instead of `(define-symbol-macro white ...)` improving performance and avoiding repeated
 reflection evaluations.

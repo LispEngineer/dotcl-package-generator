@@ -154,4 +154,56 @@
   ;; `make test` target, which generates a range of standard-.NET classes into
   ;; cspackages-test/ and validates them with check_parens.py.
 
+  ;; 4. Single-pass batch generation: resolve-batch-entry / generate-assembly-packages-batch
+  (let* ((fixture-metadata
+           '((:fully-qualified-name "Fixture.ClassA" :kind :class :fields nil :properties nil :methods nil :constructors nil)
+             (:fully-qualified-name "Fixture.ClassB" :kind :class :fields nil :properties nil :methods nil :constructors nil)))
+         (fixture-file (merge-pathnames "package-generator-tests-fixture.lispy-metadata"
+                                        (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (with-open-file (s fixture-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+            (prin1 fixture-metadata s))
+
+          ;; 4.1 All requested classes resolve; per-class constant-properties stay isolated.
+          (multiple-value-bind (resolved not-found)
+              (assembly-package-generator:resolve-batch-entry
+               (list :metadata-file (namestring fixture-file)
+                     :classes (list (list :name "Fixture.ClassA" :constant-properties "*")
+                                    (list :name "Fixture.ClassB" :constant-properties ""))))
+            (assert-test (length not-found) 0
+                        "resolve-batch-entry finds no missing classes when all names are valid")
+            (assert-test (length resolved) 2
+                        "resolve-batch-entry resolves every requested class")
+            (assert-test (cdr (assoc "Fixture.ClassA" resolved
+                                     :key (lambda (cls) (getf cls :fully-qualified-name))
+                                     :test #'string=))
+                        '("*")
+                        "resolve-batch-entry keeps ClassA's own constant-properties")
+            (assert-test (cdr (assoc "Fixture.ClassB" resolved
+                                     :key (lambda (cls) (getf cls :fully-qualified-name))
+                                     :test #'string=))
+                        nil
+                        "resolve-batch-entry does not leak ClassA's constant-properties onto ClassB"))
+
+          ;; 4.2 An empty :classes list is valid (metadata-only request), not an error.
+          (multiple-value-bind (resolved not-found)
+              (assembly-package-generator:resolve-batch-entry
+               (list :metadata-file (namestring fixture-file) :classes nil))
+            (assert-test resolved nil
+                        "resolve-batch-entry returns no pairs for an empty :classes list")
+            (assert-test not-found nil
+                        "resolve-batch-entry treats an empty :classes list as valid, not missing"))
+
+          ;; 4.3 A class name absent from the metadata is reported as not-found.
+          (multiple-value-bind (resolved not-found)
+              (assembly-package-generator:resolve-batch-entry
+               (list :metadata-file (namestring fixture-file)
+                     :classes (list (list :name "Fixture.DoesNotExist" :constant-properties ""))))
+            (declare (ignore resolved))
+            (assert-test not-found '("Fixture.DoesNotExist")
+                        "resolve-batch-entry reports classes missing from the metadata")))
+      (when (probe-file fixture-file)
+        (delete-file fixture-file))))
+
   (format *error-output* "--- Package Generator Tests Completed ---~%"))

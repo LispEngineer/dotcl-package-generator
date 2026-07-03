@@ -9,7 +9,7 @@ NUPKG_DIR = nupkg
 
 # Tool package version. The minor version tracks assembly-package-generator.lisp's
 # internal *generator-version* (currently 18), so they stay visibly in sync.
-VERSION = 1.18.2
+VERSION = 2.18.0
 
 # Reference assembly directory for the standard .NET metadata used by `test`
 # to exercise Stage 1/Stage 2 generation end-to-end. This is the Arch Linux
@@ -34,25 +34,25 @@ test: build
 	# metadata test suite (System.Runtime, System.Console, the synthetic
 	# target, and DotCL.Runtime).
 	$(EXECUTABLE) --test
-	# Exercise Stage 1 + Stage 2 generation end-to-end on a couple of
-	# representative standard-.NET classes, then verify the emitted Lisp
-	# is syntactically well-formed (balanced parentheses) before trusting
-	# it. This catches code-emission regressions that unit tests miss,
-	# since the generator produces its output via textual templating.
+	# Exercise the single-pass generator end-to-end (metadata reflection +
+	# package generation for a couple of representative standard-.NET
+	# classes, all in one invocation), then verify the emitted Lisp is
+	# syntactically well-formed (balanced parentheses) before trusting it.
+	# This catches code-emission regressions that unit tests miss, since
+	# the generator produces its output via textual templating.
 	rm -rf $(GEN_TEST_DIR)
 	mkdir -p $(GEN_TEST_DIR)
-	$(EXECUTABLE) --assembly $(REF_DIR)System.Runtime.dll --output $(GEN_TEST_DIR)/System.Runtime.lispy.metadata
-	$(EXECUTABLE) --assembly-metadata $(GEN_TEST_DIR)/System.Runtime.lispy.metadata --class System.TimeSpan --output $(GEN_TEST_DIR) --constant-properties "*"
-	$(EXECUTABLE) --assembly-metadata $(GEN_TEST_DIR)/System.Runtime.lispy.metadata --class System.Object --output $(GEN_TEST_DIR)
-	$(EXECUTABLE) --assembly-metadata $(GEN_TEST_DIR)/System.Runtime.lispy.metadata --class System.Type --output $(GEN_TEST_DIR)
-	$(EXECUTABLE) --assembly-metadata $(GEN_TEST_DIR)/System.Runtime.lispy.metadata --class System.String --output $(GEN_TEST_DIR)
+	$(EXECUTABLE) --out-dir $(GEN_TEST_DIR) \
+	    --assembly $(REF_DIR)System.Runtime.dll \
+	      --class System.TimeSpan --constant-properties "*" \
+	      --class System.Object \
+	      --class System.Type \
+	      --class System.String \
+	    --assembly $(REF_DIR)System.Linq.dll \
+	      --class System.Linq.Enumerable \
+	    --assembly $(REF_DIR)System.Xml.ReaderWriter.dll \
+	      --class System.Xml.XmlReader
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo; System.Convert
-	#
-	$(EXECUTABLE) --assembly $(REF_DIR)System.Linq.dll --output $(GEN_TEST_DIR)/System.Linq.lispy.metadata
-	$(EXECUTABLE) --assembly-metadata $(GEN_TEST_DIR)/System.Linq.lispy.metadata --class System.Linq.Enumerable --output $(GEN_TEST_DIR)
-	#
-	$(EXECUTABLE) --assembly $(REF_DIR)System.Xml.ReaderWriter.dll --output $(GEN_TEST_DIR)/System.Xml.ReaderWriter.lispy.metadata
-	$(EXECUTABLE) --assembly-metadata $(GEN_TEST_DIR)/System.Xml.ReaderWriter.lispy.metadata --class System.Xml.XmlReader --output $(GEN_TEST_DIR)
 	python3 check_parens.py $(GEN_TEST_DIR)/*.lisp
 
 check-parens:
