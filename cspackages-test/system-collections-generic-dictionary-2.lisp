@@ -1,58 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 21
-;;; Creation Date: 2026-07-03T11:54:54Z
-
-(cl:in-package :cl-user)
-
-(cl:defpackage :system-collections-generic-dictionary-2
-  (:use :cl)
-  (:shadow
-   #:count
-   #:values
-   #:remove
-  )
-  (:export
-   #:<type>
-   #:<type-str>
-   #:<creation>
-   #:<version>
-   #:new
-   #:new-int32
-   #:new-i-equality-comparer
-   #:new-i-dictionary
-   #:new-key-value-pair
-   #:new-int32-i-equality-comparer
-   #:new-i-dictionary-i-equality-comparer
-   #:new-key-value-pair-i-equality-comparer
-   #:new-serialization-info-streaming-context
-   #:capacity
-   #:comparer
-   #:count
-   #:item
-   #:keys
-   #:values
-   #:add
-   #:clear
-   #:contains-key
-   #:contains-value
-   #:ensure-capacity
-   #:get-alternate-lookup
-   #:get-enumerator
-   #:get-object-data
-   #:on-deserialization
-   #:remove
-   #:trim-excess
-   #:trim-excess-int32
-   #:try-add
-  ))
+;;; Generator Version: 22
+;;; Creation Date: 2026-07-03T12:54:32Z
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
 (cl:defconstant <type> (monoutils:get-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-03T11:54:54Z")
-(cl:defconstant <version> 21)
+(cl:defconstant <creation> "2026-07-03T12:54:32Z")
+(cl:defconstant <version> 22)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

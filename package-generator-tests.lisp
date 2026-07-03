@@ -283,8 +283,8 @@
               (assert-test (asdf:system-depends-on sys) nil
                           "csharp-assembly-packages.asd has no :depends-on yet")
               (assert-test (mapcar #'asdf:component-name (asdf:component-children sys))
-                          '("fixture-class-b" "fixture-class-a")
-                          "csharp-assembly-packages.asd lists classes as :file components in request order"))))
+                          '("packages" "fixture-class-b" "fixture-class-a")
+                          "csharp-assembly-packages.asd lists packages first, then classes as :file components in request order"))))
       (when (probe-file fixture-file)
         (delete-file fixture-file))
       (when (probe-file out-dir)

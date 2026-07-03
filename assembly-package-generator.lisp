@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 21
+(defparameter *generator-version* 22
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -35,7 +35,8 @@
    18 - Added Master Wrapper with Precise Dispatch using Lisp's &key (var init supplied-p) syntax, split static vs instance mixed-mode overloads using '*' suffix, and added csharp-overload-not-found condition.
    19 - Nested C# type names (CIL '+' separator, e.g. Outer+Inner) are now flattened to the same hyphen convention as namespace dots when deriving a type's Lisp package/file name (new type-fq-name-to-pkg-name helper), instead of leaking a literal '+' into it; camel-to-kebab itself is untouched (it is also applied to already-mapped operator names like the literal '+' produced for C#'s op_Addition, which must not be altered), and :fully-qualified-name plus all reflection-facing uses remain unaffected.
    20 - Open-generic type names (.NET's backtick arity suffix, e.g. Dictionary`2 or ``Action`4``) are now also flattened to '-' in type-fq-name-to-pkg-name, alongside '+'; a raw backtick left in a generated package/symbol name was read by the Lisp reader as the backquote macro character, silently corrupting the surrounding defpackage form instead of signaling an error.
-   21 - A single-pass invocation now also emits csharp-assembly-packages.asd (generate-batch-asd-file), tying every generated .lisp package file together as an ASDF system's :components, in command-line order, with this generator version and the dotcl-packagegen CLI version recorded in the system's :version/:long-description.")
+   21 - A single-pass invocation now also emits csharp-assembly-packages.asd (generate-batch-asd-file), tying every generated .lisp package file together as an ASDF system's :components, in command-line order, with this generator version and the dotcl-packagegen CLI version recorded in the system's :version/:long-description.
+   22 - Class .lisp files no longer emit their own cl:defpackage; a single-pass invocation now consolidates every class's defpackage form into one packages.lisp (generate-batch-packages-file), each preceded by a comment block naming its source file, C# class, and constant properties, with a blank line between packages. Class files retain only cl:in-package. csharp-assembly-packages.asd now lists packages as the first :file component, and every class :file declares :depends-on (\"packages\"), so ASDF's dependency graph (not just component-list order) enforces packages.lisp loading first.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -624,6 +625,118 @@
                             collect (format-param-type-check (getf p :type) (format nil "(cl:nth ~D args)" idx)))))
           (format nil "(cl:and (cl:= (cl:length args) ~D)~{ ~A~})" arg-count checks)))))
 
+(defun compute-package-exports-and-shadows (class-plist constant-properties-list)
+  "Returns (values exports shadows) for CLASS-PLIST given
+   CONSTANT-PROPERTIES-LIST, deduped, with CL-symbol conflicts detected in
+   SHADOWS. This mirrors the field/property/method-group walk
+   generate-class-file performs for its own body generation, but exists
+   separately so packages.lisp (via generate-batch-packages-file) can build
+   each class's defpackage form without generate-class-file emitting one
+   itself."
+  (let* ((fields (getf class-plist :fields))
+         (properties (getf class-plist :properties))
+         (methods (getf class-plist :methods))
+         (kind (getf class-plist :kind))
+         (raw-ctors (getf class-plist :constructors))
+         (ctors (if (and (eq kind :struct)
+                         (not (some (lambda (ctor) (null (getf ctor :parameters))) raw-ctors)))
+                    (cons '(:parameters nil :public t) raw-ctors)
+                    raw-ctors))
+         (literal-fields (remove-if-not #'literal-field-p fields))
+         (runtime-fields-all (remove-if-not #'runtime-readonly-field-p fields))
+         (pure-const-fields (remove-if-not (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
+         (dynamic-const-fields (remove-if (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
+         (const-props (remove-if-not #'constant-property-p properties))
+         (pure-const-props (remove-if-not (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
+         (dynamic-const-props (remove-if (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
+         (instance-props (remove-if-not #'instance-property-p properties))
+         (non-operator-non-accessor-methods
+           (remove-if (lambda (m)
+                        (or (uiop:string-prefix-p "op_" (getf m :name))
+                            (uiop:string-prefix-p "get_" (getf m :name))
+                            (uiop:string-prefix-p "set_" (getf m :name))
+                            (generic-type-p (getf m :return-type))
+                            (some (lambda (p) (generic-type-p (getf p :type)))
+                                  (getf m :parameters))))
+                      methods))
+         (method-groups
+           (let ((table (make-hash-table :test #'equal)))
+             (dolist (m non-operator-non-accessor-methods)
+               (push m (gethash (getf m :name) table)))
+             (let ((groups nil))
+               (maphash (lambda (name methods)
+                          (push (cons name (nreverse methods)) groups))
+                         table)
+               (nreverse groups))))
+         (clean-ctors (remove-if-not #'clean-constructor-p ctors))
+         (clean-ctor-count (length clean-ctors))
+         (exports nil)
+         (shadows nil))
+
+    ;; Collect all exports
+    (push "<type>" exports)
+    (push "<type-str>" exports)
+    (push "<creation>" exports)
+    (push "<version>" exports)
+
+    ;; Collect constructor exports
+    (when (> clean-ctor-count 0)
+      (push "new" exports)
+      (when (>= clean-ctor-count 2)
+        (dolist (c clean-ctors)
+          (let ((params (getf c :parameters)))
+            (when params
+              (push (constructor-overload-name c) exports))))))
+
+    (dolist (f literal-fields)
+      (push (format nil "+~A+" (camel-to-kebab (getf f :name))) exports))
+    (dolist (f pure-const-fields)
+      (push (format nil "+~A+" (camel-to-kebab (getf f :name))) exports))
+    (dolist (f dynamic-const-fields)
+      (push (map-member-name (getf f :name)) exports))
+    (dolist (p pure-const-props)
+      (push (format nil "+~A+" (camel-to-kebab (getf p :name))) exports))
+    (dolist (p dynamic-const-props)
+      (push (map-member-name (getf p :name)) exports))
+    (dolist (p instance-props)
+      (let* ((pname (map-member-name (getf p :name)))
+             (readable (getf p :readable)))
+        (if readable
+            (push pname exports)
+            (push (format nil "set-~A" pname) exports))))
+    ;; Collect method exports from method groups
+    (dolist (group method-groups)
+      (let* ((name (car group))
+             (clean-methods (remove-if-not #'clean-method-p (cdr group)))
+             (clean-count (length clean-methods))
+             (kebab-name (map-member-name name))
+             (static-clean (remove-if-not (lambda (m) (getf m :is-static)) clean-methods))
+             (instance-clean (remove-if-not (lambda (m) (not (getf m :is-static))) clean-methods))
+             (static-count (length static-clean))
+             (instance-count (length instance-clean))
+             (mixed-mode-p (and (> static-count 0) (> instance-count 0))))
+        (when (> clean-count 0)
+          (push kebab-name exports)
+          (when mixed-mode-p
+            (push (concatenate 'string kebab-name "*") exports)))
+        (when (>= clean-count 2)
+          ;; Export type-suffixed names for multi-overload methods
+          (dolist (cm clean-methods)
+            (push (method-overload-name cm) exports)))))
+
+    ;; Remove duplicates from exports while preserving order
+    (setf exports (remove-duplicates (nreverse exports) :test #'string= :from-end t))
+
+    ;; Identify exported symbols that conflict with CL and must be shadowed
+    (dolist (exp exports)
+      (multiple-value-bind (sym status) (find-symbol (string-upcase exp) :common-lisp)
+        (when (and sym (eq status :external))
+          (push exp shadows))))
+    ;; Remove duplicates from shadows while preserving order
+    (setf shadows (remove-duplicates (nreverse shadows) :test #'string= :from-end t))
+
+    (values exports shadows)))
+
 (defun generate-class-file (class-plist output-dir &optional constant-properties-list creation-time)
   "Generates the Lisp source file for a single class plist.
    CREATION-TIME, if supplied, is used verbatim as the file's creation-date
@@ -680,72 +793,8 @@
            (clean-ctors (remove-if-not #'clean-constructor-p ctors))
            (dirty-ctors (remove-if-not #'dirty-constructor-p ctors))
            (clean-ctor-count (length clean-ctors))
-           (dirty-ctor-count (length dirty-ctors))
-           (exports nil)
-           (shadows nil))
-      
-      ;; Collect all exports
-      (push "<type>" exports)
-      (push "<type-str>" exports)
-      (push "<creation>" exports)
-      (push "<version>" exports)
-      
-      ;; Collect constructor exports
-      (when (> clean-ctor-count 0)
-        (push "new" exports)
-        (when (>= clean-ctor-count 2)
-          (dolist (c clean-ctors)
-            (let ((params (getf c :parameters)))
-              (when params
-                (push (constructor-overload-name c) exports))))))
-      
-      (dolist (f literal-fields)
-        (push (format nil "+~A+" (camel-to-kebab (getf f :name))) exports))
-      (dolist (f pure-const-fields)
-        (push (format nil "+~A+" (camel-to-kebab (getf f :name))) exports))
-      (dolist (f dynamic-const-fields)
-        (push (map-member-name (getf f :name)) exports))
-      (dolist (p pure-const-props)
-        (push (format nil "+~A+" (camel-to-kebab (getf p :name))) exports))
-      (dolist (p dynamic-const-props)
-        (push (map-member-name (getf p :name)) exports))
-      (dolist (p instance-props)
-        (let* ((pname (map-member-name (getf p :name)))
-               (readable (getf p :readable)))
-          (if readable
-              (push pname exports)
-              (push (format nil "set-~A" pname) exports))))
-      ;; Collect method exports from method groups
-      (dolist (group method-groups)
-        (let* ((name (car group))
-               (clean-methods (remove-if-not #'clean-method-p (cdr group)))
-               (clean-count (length clean-methods))
-               (kebab-name (map-member-name name))
-               (static-clean (remove-if-not (lambda (m) (getf m :is-static)) clean-methods))
-               (instance-clean (remove-if-not (lambda (m) (not (getf m :is-static))) clean-methods))
-               (static-count (length static-clean))
-               (instance-count (length instance-clean))
-               (mixed-mode-p (and (> static-count 0) (> instance-count 0))))
-          (when (> clean-count 0)
-            (push kebab-name exports)
-            (when mixed-mode-p
-              (push (concatenate 'string kebab-name "*") exports)))
-          (when (>= clean-count 2)
-            ;; Export type-suffixed names for multi-overload methods
-            (dolist (cm clean-methods)
-              (push (method-overload-name cm) exports)))))
-      
-      ;; Remove duplicates from exports while preserving order
-      (setf exports (remove-duplicates (nreverse exports) :test #'string= :from-end t))
-      
-      ;; Identify exported symbols that conflict with CL and must be shadowed
-      (dolist (exp exports)
-        (multiple-value-bind (sym status) (find-symbol (string-upcase exp) :common-lisp)
-          (when (and sym (eq status :external))
-            (push exp shadows))))
-      ;; Remove duplicates from shadows while preserving order
-      (setf shadows (remove-duplicates (nreverse shadows) :test #'string= :from-end t))
-      
+           (dirty-ctor-count (length dirty-ctors)))
+
       ;; 2. Write to the Lisp output file
       (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
         ;; Comments
@@ -753,21 +802,11 @@
         (format stream ";;; Class: ~A~%" fq-name)
         (format stream ";;; Generator Version: ~D~%" *generator-version*)
         (format stream ";;; Creation Date: ~A~%~%" creation-time)
-        
-        ;; Preamble
-        (format stream "(cl:in-package :cl-user)~%~%")
-        (format stream "(cl:defpackage :~A~%" pkg-name)
-        (format stream "  (:use :cl)~%")
-        (when shadows
-          (format stream "  (:shadow~%")
-          (dolist (shad shadows)
-            (format stream "   #:~A~%" shad))
-          (format stream "  )~%"))
-        (format stream "  (:export~%")
-        (dolist (exp exports)
-          (format stream "   #:~A~%" exp))
-        (format stream "  ))~%~%")
-        
+
+        ;; Preamble -- the defpackage for this class lives in packages.lisp
+        ;; (generate-batch-packages-file), which must be loaded before this
+        ;; file; here we just enter the already-defined package.
+
         (format stream "(cl:in-package :~A)~%~%" pkg-name)
         
         ;; Type Constants
@@ -1074,6 +1113,44 @@
               (push cname not-found))))
       (values (nreverse resolved) (nreverse not-found)))))
 
+(defun generate-batch-packages-file (entries-with-resolved output-dir creation-time)
+  "Writes packages.lisp into OUTPUT-DIR: one cl:defpackage per resolved
+   class (from ENTRIES-WITH-RESOLVED, in the same command-line order
+   GENERATE-BATCH-ASD-FILE consumes), each preceded by a comment block
+   naming its source .lisp file, its C# class, and its constant properties.
+   Individual class .lisp files no longer emit their own defpackage (see
+   COMPUTE-PACKAGE-EXPORTS-AND-SHADOWS / GENERATE-CLASS-FILE); this file
+   must be loaded before any of them."
+  (let ((output-file (merge-pathnames (make-pathname :name "packages" :type "lisp")
+                                       (pathname (concatenate 'string output-dir "/")))))
+    (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+      (format stream ";;; Generated automatically. Do not edit.~%")
+      (format stream ";;; Generator Version: ~D~%" *generator-version*)
+      (format stream ";;; Creation Date: ~A~%~%" creation-time)
+      (format stream "(cl:in-package :cl-user)~%~%")
+      (dolist (pair entries-with-resolved)
+        (dolist (cls-pair (cdr pair))
+          (let* ((cls (car cls-pair))
+                 (cprops (cdr cls-pair))
+                 (fq-name (getf cls :fully-qualified-name))
+                 (pkg-name (type-fq-name-to-pkg-name fq-name)))
+            (multiple-value-bind (exports shadows) (compute-package-exports-and-shadows cls cprops)
+              (format stream ";;; Source File: ~A.lisp~%" pkg-name)
+              (format stream ";;; C# Class: ~A~%" fq-name)
+              (format stream ";;; Constant Properties: ~:[(none)~;~:*~{~A~^, ~}~]~%" cprops)
+              (format stream "(cl:defpackage :~A~%" pkg-name)
+              (format stream "  (:use :cl)~%")
+              (when shadows
+                (format stream "  (:shadow~%")
+                (dolist (shad shadows)
+                  (format stream "   #:~A~%" shad))
+                (format stream "  )~%"))
+              (format stream "  (:export~%")
+              (dolist (exp exports)
+                (format stream "   #:~A~%" exp))
+              (format stream "  ))~%~%"))))))
+    output-file))
+
 (defun generate-batch-asd-file (entries-with-resolved output-dir creation-time cli-version)
   "Writes csharp-assembly-packages.asd into OUTPUT-DIR, listing every
    generated class package (from ENTRIES-WITH-RESOLVED, a list of
@@ -1081,7 +1158,10 @@
    GENERATE-ASSEMBLY-PACKAGES-BATCH, where ENTRY is a manifest entry with
    :assembly-name and RESOLVED is RESOLVE-BATCH-ENTRY's list of
    (class-plist . constant-properties-list) pairs) as a :file component, in
-   the same order the classes were requested on the command line.
+   the same order the classes were requested on the command line. The
+   packages.lisp file written by GENERATE-BATCH-PACKAGES-FILE is listed
+   first, with every class :file depending on it via :depends-on, since
+   defpackage forms live there rather than in the class files.
    CLI-VERSION is the dotcl-packagegen tool's own version string (e.g.
    \"2.20.0\"), used only in the long description; the system's own
    :version is the short generator format version (*GENERATOR-VERSION*)."
@@ -1116,11 +1196,12 @@
                          (when cprops
                            (format desc "      Constant properties: ~{~A~^, ~}~%" cprops)))))))))
       (format stream "  :components (~%")
+      (format stream "   (:file \"packages\")~%")
       (dolist (pair entries-with-resolved)
         (dolist (cls-pair (cdr pair))
           (let* ((fq-name (getf (car cls-pair) :fully-qualified-name))
                  (pkg-name (type-fq-name-to-pkg-name fq-name)))
-            (format stream "   (:file \"~A\")~%" pkg-name))))
+            (format stream "   (:file \"~A\" :depends-on (\"packages\"))~%" pkg-name))))
       (format stream "  ))~%"))
     output-file))
 
@@ -1130,10 +1211,13 @@
    class name that cannot be found aborts the whole run before anything is
    written. An entry with an empty :classes list is not an error -- it
    means only that entry's metadata file (already written by C#) was
-   requested. Once every class file has been written, also emits a
-   csharp-assembly-packages.asd tying them all together; CLI-VERSION (the
-   dotcl-packagegen tool's own semver, e.g. \"2.20.0\") is used in that
-   file's long description."
+   requested. Before any class file is written, emits packages.lisp
+   (GENERATE-BATCH-PACKAGES-FILE) holding every class's defpackage form, so
+   it exists ahead of (and independent of) the per-class files that assume
+   their package is already defined. Once every class file has been
+   written, also emits a csharp-assembly-packages.asd tying them all
+   together; CLI-VERSION (the dotcl-packagegen tool's own semver, e.g.
+   \"2.20.0\") is used in that file's long description."
   (let ((all-resolved nil)
         (all-not-found nil)
         (entries-with-resolved nil))
@@ -1148,6 +1232,8 @@
       (dolist (cname all-not-found)
         (utils:format-red *error-output* "Error: Class not found in assembly metadata: ~A~%" cname))
       (error "One or more requested classes were not found: ~{~A~^, ~}" all-not-found))
+
+    (generate-batch-packages-file entries-with-resolved output-dir creation-time)
 
     (dolist (pair all-resolved)
       (let ((cls (car pair))

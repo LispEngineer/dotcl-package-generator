@@ -1,76 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo
-;;; Generator Version: 21
-;;; Creation Date: 2026-07-03T11:54:54Z
-
-(cl:in-package :cl-user)
-
-(cl:defpackage :system-time-zone-info
-  (:use :cl)
-  (:export
-   #:<type>
-   #:<type-str>
-   #:<creation>
-   #:<version>
-   #:local
-   #:utc
-   #:base-utc-offset
-   #:daylight-name
-   #:display-name
-   #:has-iana-id
-   #:id
-   #:standard-name
-   #:supports-daylight-saving-time
-   #:clear-cached-data
-   #:convert-time
-   #:convert-time-date-time-offset-time-zone-info
-   #:convert-time-date-time-time-zone-info
-   #:convert-time-date-time-time-zone-info-time-zone-info
-   #:convert-time-by-system-time-zone-id
-   #:convert-time-by-system-time-zone-id-date-time-offset-string
-   #:convert-time-by-system-time-zone-id-date-time-string
-   #:convert-time-by-system-time-zone-id-date-time-string-string
-   #:convert-time-from-utc
-   #:convert-time-to-utc
-   #:convert-time-to-utc-date-time
-   #:convert-time-to-utc-date-time-time-zone-info
-   #:create-custom-time-zone
-   #:create-custom-time-zone-string-time-span-string-string
-   #:create-custom-time-zone-string-time-span-string-string-string-time-zone-info+-adjustment-rule[]
-   #:create-custom-time-zone-string-time-span-string-string-string-time-zone-info+-adjustment-rule[]-boolean
-   #:equals
-   #:equals-time-zone-info
-   #:equals-object
-   #:find-system-time-zone-by-id
-   #:from-serialized-string
-   #:get-adjustment-rules
-   #:get-ambiguous-time-offsets
-   #:get-ambiguous-time-offsets-date-time-offset
-   #:get-ambiguous-time-offsets-date-time
-   #:get-hash-code
-   #:get-system-time-zones
-   #:get-system-time-zones-boolean
-   #:get-utc-offset
-   #:get-utc-offset-date-time-offset
-   #:get-utc-offset-date-time
-   #:has-same-rules
-   #:ambiguous-time?
-   #:ambiguous-time?-date-time-offset
-   #:ambiguous-time?-date-time
-   #:daylight-saving-time?
-   #:daylight-saving-time?-date-time-offset
-   #:daylight-saving-time?-date-time
-   #:invalid-time?
-   #:to-serialized-string
-   #:to-string
-  ))
+;;; Generator Version: 22
+;;; Creation Date: 2026-07-03T12:54:32Z
 
 (cl:in-package :system-time-zone-info)
 
 (cl:defconstant <type> (monoutils:get-type "System.TimeZoneInfo"))
 (cl:defconstant <type-str> "System.TimeZoneInfo")
-(cl:defconstant <creation> "2026-07-03T11:54:54Z")
-(cl:defconstant <version> 21)
+(cl:defconstant <creation> "2026-07-03T12:54:32Z")
+(cl:defconstant <version> 22)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

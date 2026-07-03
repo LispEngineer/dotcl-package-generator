@@ -1,33 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2+KeyCollection
-;;; Generator Version: 21
-;;; Creation Date: 2026-07-03T11:54:54Z
-
-(cl:in-package :cl-user)
-
-(cl:defpackage :system-collections-generic-dictionary-2-key-collection
-  (:use :cl)
-  (:shadow
-   #:count
-  )
-  (:export
-   #:<type>
-   #:<type-str>
-   #:<creation>
-   #:<version>
-   #:new
-   #:count
-   #:contains
-   #:copy-to
-   #:get-enumerator
-  ))
+;;; Generator Version: 22
+;;; Creation Date: 2026-07-03T12:54:32Z
 
 (cl:in-package :system-collections-generic-dictionary-2-key-collection)
 
 (cl:defconstant <type> (monoutils:get-type "System.Collections.Generic.Dictionary`2+KeyCollection"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2+KeyCollection")
-(cl:defconstant <creation> "2026-07-03T11:54:54Z")
-(cl:defconstant <version> 21)
+(cl:defconstant <creation> "2026-07-03T12:54:32Z")
+(cl:defconstant <version> 22)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

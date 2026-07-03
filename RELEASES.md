@@ -10,6 +10,36 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.22.0 — 2026-07-03
+
+**New feature:** class `.lisp` files no longer each carry their own `(cl:defpackage ...)` form;
+a single-pass invocation now consolidates every requested class's `defpackage` into one
+`packages.lisp` file in `--out-dir`, following this codebase's own convention of a single
+project-wide `packages.lisp`. Class files now only `(cl:in-package :<pkg-name>)`, so
+`packages.lisp` must be loaded first — `csharp-assembly-packages.asd`'s component graph was
+updated to enforce that.
+
+* New Lisp function `generate-batch-packages-file` (`assembly-package-generator.lisp`), modeled
+  on the existing `generate-batch-asd-file` (accumulate across the whole batch, write once),
+  called from `generate-assembly-packages-batch` before the per-class `generate-class-file` loop
+  runs. Each class's `defpackage` is preceded by a 3-line comment block naming its source `.lisp`
+  file, its C# class, and its constant properties (`(none)` when empty), with a blank line
+  between each package definition.
+* The export/shadow-symbol computation `generate-class-file` used to build its (now-removed)
+  inline `defpackage` was extracted into a new shared function,
+  `compute-package-exports-and-shadows` — same logic, no behavior change, now the single source
+  of truth used by both `generate-class-file` (indirectly, still needed for its `in-package`
+  form) and `generate-batch-packages-file`.
+* `generate-batch-asd-file`'s `:components` now lists `(:file "packages")` first, and every
+  per-class `(:file "...")` entry gained `:depends-on ("packages")`, so ASDF's dependency graph
+  — not just component-list order — enforces that `packages.lisp` loads before any class file
+  that needs its package to already exist.
+* `*generator-version*` bumped `21` → `22`, since this changes the shape of every generated
+  `.lisp` package file (no more inline `defpackage`) as well as introducing a new generated file;
+  see `doc/generator-design-notes.md`'s "Consolidated packages.lisp (Version 22)" section.
+* `package-generator-tests.lisp`'s end-to-end `.asd`-generation test updated to expect `packages`
+  as the first `:file` component ahead of the requested classes.
+
 ## 2.21.0 — 2026-07-03
 
 **New feature:** a single-pass invocation now also emits `csharp-assembly-packages.asd` into

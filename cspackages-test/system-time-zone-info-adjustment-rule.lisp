@@ -1,38 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo+AdjustmentRule
-;;; Generator Version: 21
-;;; Creation Date: 2026-07-03T11:54:54Z
-
-(cl:in-package :cl-user)
-
-(cl:defpackage :system-time-zone-info-adjustment-rule
-  (:use :cl)
-  (:export
-   #:<type>
-   #:<type-str>
-   #:<creation>
-   #:<version>
-   #:base-utc-offset-delta
-   #:date-end
-   #:date-start
-   #:daylight-delta
-   #:daylight-transition-end
-   #:daylight-transition-start
-   #:create-adjustment-rule
-   #:create-adjustment-rule-date-time-date-time-time-span-time-zone-info+-transition-time-time-zone-info+-transition-time
-   #:create-adjustment-rule-date-time-date-time-time-span-time-zone-info+-transition-time-time-zone-info+-transition-time-time-span
-   #:equals
-   #:equals-time-zone-info+-adjustment-rule
-   #:equals-object
-   #:get-hash-code
-  ))
+;;; Generator Version: 22
+;;; Creation Date: 2026-07-03T12:54:32Z
 
 (cl:in-package :system-time-zone-info-adjustment-rule)
 
 (cl:defconstant <type> (monoutils:get-type "System.TimeZoneInfo+AdjustmentRule"))
 (cl:defconstant <type-str> "System.TimeZoneInfo+AdjustmentRule")
-(cl:defconstant <creation> "2026-07-03T11:54:54Z")
-(cl:defconstant <version> 21)
+(cl:defconstant <creation> "2026-07-03T12:54:32Z")
+(cl:defconstant <version> 22)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

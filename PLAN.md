@@ -67,14 +67,29 @@ How do we include the template files (if chosen) in the deployed application?
   in DotCL though.
 
 
-# Add Constant Properties to Generated `.lisp` Files
+# Add More to Generated `.lisp` Files
 
 TODO
-* Add as structured `<constant-properties>`
+* Add Constant Properties as structured `<constant-properties>`
   * A Lisp list of all the selected properties, could also include `"*"` as a single entry.
+* Add the Assembly as `<assembly>`
 
 
 # Miscellaneous
+
+* Consolidate all method overloads into at most two functions:
+  * One for a class instance method
+  * One for a static method
+  * If there are no overloads that are both instance and static, just
+    emit one function. If there are both, emit a second function with
+    a `*` suffix for the static version.
+  * This would reduce the potentially long list of functions like these:
+    ```
+    #:get-ambiguous-time-offsets
+    #:get-ambiguous-time-offsets-date-time-offset
+    #:get-ambiguous-time-offsets-date-time
+    ```
+    whose naming is actually pretty ugly too.
 
 * Handle generic classes name mangling using backticks more elegantly.
   * Backticks have special meaning in Lisp so we cannot include them in the

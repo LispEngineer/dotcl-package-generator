@@ -591,3 +591,40 @@ a real generated file, in the same order the classes were requested on the comma
 * No `:depends-on` is emitted yet, even though every generated package's runtime code needs
   `monoutils`/`utils` (provided by this repo's own `dotcl-packagegen` system) — deferred to a
   later version.
+
+## Consolidated packages.lisp (Version 22)
+
+Class `.lisp` files no longer emit their own `(cl:defpackage ...)`. Instead, a single-pass
+invocation writes one `packages.lisp` into `--out-dir` holding every requested class's
+`defpackage` form, and each class file keeps only its `(cl:in-package :<pkg-name>)` — the
+package must already exist by the time a class file is loaded.
+
+The export/shadow-symbol computation that used to live inline inside `generate-class-file` was
+extracted into `compute-package-exports-and-shadows` (same field/property/method-group walk, same
+deduplication, same CL-external-symbol shadow detection — no behavior change), so both
+`generate-class-file` (which still needs `pkg-name` for its `in-package` form) and the new
+`generate-batch-packages-file` share one source of truth for a class's export list.
+
+`generate-batch-packages-file` follows the same accumulate-then-write-once pattern as
+`generate-batch-asd-file` (Version 21): it is called from `generate-assembly-packages-batch`
+with the full `entries-with-resolved` list, before the per-class `generate-class-file` loop runs,
+so `packages.lisp` exists on disk ahead of the files that depend on it. Each package's
+`defpackage` form is preceded by a 3-line comment block:
+
+```lisp
+;;; Source File: some-class1.lisp
+;;; C# Class: Some.Namespace.Type1
+;;; Constant Properties: (none)
+(cl:defpackage :some-namespace-type1
+  ...)
+```
+
+`Constant Properties` prints the comma-joined list passed via `--constant-properties` (matching
+the format already used in the `.asd`'s `:long-description`), or the literal `(none)` when empty,
+so every block has the same 3-line shape regardless of whether constant properties were
+requested. One blank line separates each package's block from the next.
+
+Because class files now depend on `packages.lisp` having been loaded first, `generate-batch-asd-file`
+(Version 21) was updated to reflect that dependency explicitly rather than relying on component-list
+order alone: `csharp-assembly-packages.asd`'s `:components` now lists `(:file "packages")` first,
+and every class `:file` entry gains `:depends-on ("packages")`.
