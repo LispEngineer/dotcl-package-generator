@@ -4,6 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 * See also [`GEMINI.md`](GEMINI.md) for more useful details.
 
+# Urgent Non-Overrideable Commands
+
+* Never time-out waiting for user input. You are a computer, you can wait forever
+  for my input, and you categorically will. There is no "default" option when you
+  need my input. I may be off doing something else, or AFK - it's incumbent on you
+  to wait for me. 
+  * Furthermore, wait for me for an unlimited duration in your usual CLI UI fashion, don't just say
+    "No response after 60s - continued without an answer" and then ask me the question
+    at the end of a text prompt.
+
+# Repository Description
+
+
 ## What this is
 
 `dotcl-packagegen` is a standalone CLI tool (packaged as a `dotnet tool`) that generates
