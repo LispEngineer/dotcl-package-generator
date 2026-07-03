@@ -37,6 +37,7 @@
             #:file-exists-and-readable-p
             #:qualify-path
             #:print-system-version
+            #:get-system-version
             #:csharp-overload-not-found
             #:csharp-overload-package-name
             #:csharp-overload-class-name
@@ -60,6 +61,7 @@
             #:generate-assembly-packages-batch
             #:resolve-batch-entry
             #:generate-class-file
+            #:generate-batch-asd-file
             #:camel-to-kebab
             #:type-fq-name-to-pkg-name
             #:split-string))

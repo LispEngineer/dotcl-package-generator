@@ -10,6 +10,40 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.21.0 — 2026-07-03
+
+**New feature:** a single-pass invocation now also emits `csharp-assembly-packages.asd` into
+`--out-dir` alongside the generated `.lisp` package files, so the whole batch can be loaded in
+one shot with `(asdf:load-system "csharp-assembly-packages")` instead of hand-writing a system
+definition or a pile of `(load ...)` calls.
+
+* New Lisp function `generate-batch-asd-file` (`assembly-package-generator.lisp`), called from
+  `generate-assembly-packages-batch` once every requested class's `.lisp` file has been written.
+  `:components` lists one `(:file "<pkg-name>")` per generated class, in the same order the
+  classes were requested on the command line, using the same `type-fq-name-to-pkg-name` mapping
+  `generate-class-file` uses for the file's actual name — so the two are guaranteed to agree.
+* `:version` in the generated `.asd` is the short, 2-digit `*generator-version*` (e.g. `"21"`).
+  `:long-description` additionally records the full `dotcl-packagegen` CLI/application version
+  (e.g. `"2.21.0"`), the generation timestamp, and, per assembly, each requested class's
+  fully-qualified name, assigned package name, and any constant-properties.
+* Each manifest entry built by `Program.cs` now carries an explicit `:assembly-name` (the
+  original `.dll` filename) so the Lisp side doesn't need to recover it by string-parsing the
+  metadata file's path.
+* `utils.lisp` gained `get-system-version`, a non-printing counterpart to the existing
+  `print-system-version` (used by `--version`) that returns `dotcl-packagegen.asd`'s own
+  `:version` string via the same `asdf:load-asd` + `asdf:component-version` introspection, so
+  `Program.cs` can pass it through as the batch generator's `cli-version` argument.
+* No `:depends-on` is emitted yet, even though every generated package's runtime code needs
+  `monoutils`/`utils` (provided by this repo's own `dotcl-packagegen` system) — that's deferred
+  to a later change.
+* `*generator-version*` bumped `20` → `21`, since this release changes the single-pass
+  generator's overall output (a new `csharp-assembly-packages.asd` file), even though it doesn't
+  change the shape of any individual generated `.lisp` package file; see
+  `doc/generator-design-notes.md`'s "Batch ASDF System Generation (Version 21)" section.
+* `Makefile`'s `test` target's `check_parens.py` invocation now also globs `*.asd` in
+  `cspackages-test/`, so the newly-generated system definition gets the same syntax check as
+  every other generated file.
+
 ## 2.20.0 — 2026-07-03
 
 **Bug fix:** open-generic C# type names (.NET's backtick arity suffix, e.g.

@@ -120,6 +120,7 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
             AssemblyToLispy.GenerateLispyMetadata(inputDir, inputAssemblyFile, metadataFilePath);
 
             manifest.Append("(:metadata-file \"").Append(EscapeLispString(metadataFilePath)).Append("\"\n");
+            manifest.Append(" :assembly-name \"").Append(EscapeLispString(inputAssemblyFile)).Append("\"\n");
             manifest.Append(" :classes (");
             foreach (var cls in group.Classes) {
                 manifest.Append("(:name \"").Append(EscapeLispString(cls.Name)).Append('"');
@@ -143,9 +144,13 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
         MonoUtilsRegistrar.Initialize();
         LoadDotclManifest();
 
+        string asdPath = Path.Combine(AppContext.BaseDirectory, AsdFileName);
+        string cliVersion = DotclHost.ToClr<string>(
+            DotclHost.Call("GET-SYSTEM-VERSION", asdPath, SystemName));
+
         Console.WriteLine("[Program.cs] Running assembly package generator...");
         try {
-            DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH", manifestFile, outDir, creationTime);
+            DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH", manifestFile, outDir, creationTime, cliVersion);
         } catch (Exception ex) {
             Console.Error.WriteLine($"[Program.cs] Error in assembly package generator: {ex.Message}");
             Console.Error.WriteLine(ex.StackTrace);

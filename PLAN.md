@@ -82,8 +82,45 @@
   * Maybe a base CLOS class that implements functionality to create that
     proxy on the fly, and has a reference to the proxy for reuse.
 
+# Make `packages.lisp`
 
-# Make ASDF System
+Currently, each generated `.lisp` file has a `cl:defpackage` at the top.
+A common convention is to define all packages in a single location,
+the `packages.lisp` file. Let's make the generator work that way as well.
+
+At the top of the generated `packages.lisp` the same comments should be
+included as in the other generated `.lisp` files.
+
+As each class is generated, append to the `packages.lisp` file the
+appropriate `cl:defpackage` section. Preceed the `defpackage` with
+comments indicating:
+* The source file this package corresponds to
+* The C# class (in C# format) this package corresponds to
+* The Constant Properties defined for this package.
+
+
+# Make `csharp-assembly-utils.lisp` and Package
+
+TODO
+* Template files `template-csharp-assembly-utils.lisp` and `template-csau-packages.lisp`
+* Consider the `.asd` `:static-file` option to include the templates in the build
+  so the deployed package generator can access them. Not sure how that would work
+  in DotCL though.
+* Add the `:depends-on` for this package to the other `:file`s in the generated `.asd`.
+
+
+# Add Constant Properties to Generated `.lisp` Files
+
+TODO
+* Add as structured `<constant-properties>`
+  * A Lisp list of all the selected properties, could also include `"*"` as a single entry.
+
+
+# **DONE** Make ASDF System
+
+**DONE** in 2.21.0. `:depends-on` was intentionally left out of the generated system for
+now (further plans for it will come in a later change) — everything else below was
+implemented as specified.
 
 To make it easier to load all the generated packages, the package system
 will create an ASDF system defintion file, an `.asd` file. The system will

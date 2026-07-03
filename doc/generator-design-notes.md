@@ -567,3 +567,27 @@ System.Action`4                                        -> system-action-4
 System.Collections.Generic.Dictionary`2                 -> system-collections-generic-dictionary-2
 System.Collections.Generic.Dictionary`2+KeyCollection    -> system-collections-generic-dictionary-2-key-collection
 ```
+
+## Batch ASDF System Generation (Version 21)
+
+A single-pass invocation now also writes a `csharp-assembly-packages.asd` into `--out-dir`,
+alongside the generated `.lisp` package files, so the whole batch can be loaded with one
+`(asdf:load-system "csharp-assembly-packages")` instead of hand-writing a system definition or a
+pile of `(load ...)` calls.
+
+`generate-batch-asd-file` (`assembly-package-generator.lisp`) is called from
+`generate-assembly-packages-batch` once every requested class's `.lisp` file has been written.
+It reuses `type-fq-name-to-pkg-name` — the same function `generate-class-file` uses for the
+file's actual name — so each `:components` entry (`(:file "<pkg-name>")`) is guaranteed to match
+a real generated file, in the same order the classes were requested on the command line.
+
+* `:version` is the short, 2-digit `*generator-version*` (this generator-behavior-shape version,
+  e.g. `"21"`).
+* `:long-description` additionally records the full `dotcl-packagegen` CLI/application version
+  (obtained via a new `utils:get-system-version`, a non-printing counterpart to the existing
+  `utils:print-system-version` used by `--version`), the generation timestamp, and, per assembly,
+  each requested class's fully-qualified name, assigned package name, and any
+  constant-properties.
+* No `:depends-on` is emitted yet, even though every generated package's runtime code needs
+  `monoutils`/`utils` (provided by this repo's own `dotcl-packagegen` system) — deferred to a
+  later version.

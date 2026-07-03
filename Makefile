@@ -9,7 +9,7 @@ NUPKG_DIR = nupkg
 
 # Tool package version. The minor version tracks assembly-package-generator.lisp's
 # internal *generator-version* (currently 20), so they stay visibly in sync.
-VERSION = 2.20.0
+VERSION = 2.21.0
 
 # Reference assembly directory for the standard .NET metadata used by `test`
 # to exercise Stage 1/Stage 2 generation end-to-end. This is the Arch Linux
@@ -59,7 +59,7 @@ test: build
 	      --class 'System.Collections.Generic.Dictionary`2+KeyCollection' \
 	      --class 'System.Collections.Generic.Dictionary`2+ValueCollection'
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo; System.Convert
-	python3 check_parens.py $(GEN_TEST_DIR)/*.lisp
+	python3 check_parens.py $(GEN_TEST_DIR)/*.lisp $(GEN_TEST_DIR)/*.asd
 
 check-parens:
 	# Verifies balanced parentheses in every source .lisp/.asd file in the

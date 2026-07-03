@@ -131,6 +131,14 @@
         (when m-doc
           (format *error-output* "    Doc: ~S~%" m-doc))))))
 
+(defun get-system-version (asd-path system-name)
+  "Loads SYSTEM-NAME's definition from ASD-PATH (via ASDF's own asd-loading
+   and system introspection, same as PRINT-SYSTEM-VERSION) and returns its
+   version string, or NIL if the system cannot be found after loading."
+  (asdf:load-asd asd-path)
+  (let ((sys (asdf:find-system system-name nil)))
+    (and sys (asdf:component-version sys))))
+
 (defun print-system-version (asd-path system-name)
   "Loads SYSTEM-NAME's definition from ASD-PATH (via ASDF's own asd-loading
    and system introspection, rather than any ad hoc parsing of the file) and
