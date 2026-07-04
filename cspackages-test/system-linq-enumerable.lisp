@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
-;;; Generator Version: 29
-;;; Creation Date: 2026-07-04T14:21:19Z
+;;; Generator Version: 30
+;;; Creation Date: 2026-07-04T15:28:03Z
 
 (cl:in-package :system-linq-enumerable)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-04T14:21:19Z")
-(cl:defconstant <version> 29)
+(cl:defconstant <creation> "2026-07-04T15:28:03Z")
+(cl:defconstant <version> 30)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

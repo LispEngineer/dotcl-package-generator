@@ -142,6 +142,23 @@ namespace AssemblyToLispyTestTarget
         public void DefaultsMethod(string strVal = "hello", int intVal = 42, object? nullVal = null, char charVal = 'A')
         {
         }
+
+        /// <summary>
+        /// A binary operator exercising a newly-mapped operator symbol (op_Modulus -> %).
+        /// </summary>
+        public static EdgeCaseStruct operator %(EdgeCaseStruct a, EdgeCaseStruct b)
+        {
+            return new EdgeCaseStruct();
+        }
+
+        /// <summary>
+        /// A unary operator sharing this type's other operator's arity-1 call shape,
+        /// to exercise arity-based unary/binary disambiguation for a non-generic type.
+        /// </summary>
+        public static EdgeCaseStruct operator -(EdgeCaseStruct a)
+        {
+            return a;
+        }
     }
 
     /// <summary>

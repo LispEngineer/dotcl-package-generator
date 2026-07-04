@@ -15,36 +15,6 @@ TODO
 * Add the Assembly to the per-package comment in `packages.lisp`
 
 
-# **DONE** Multi-Type Arity Improvements
-
-* Reconsider the multi-arity overloads with suffix `arity-#` naming
-  convention. Maybe have a suffix like `<>` which indicates that it
-  takes a type parameter. Example: `aggregate<>` or `aggregate<2>`?
-
-* Take type arguments in two forms:
-  * A single type
-  * A list of types (or other sequence)
-  * This would allow the multi-arity overloads to use a single type specified
-    version, e.g., just `aggregate<>` for all possible arities.
-
-## Implementation Notes
-
-**DONE** in generator version 28 (2.28.0). Replaced the `-arity-N` suffix scheme with a two-tier
-dispatch mirroring the Version 24 Overload Consolidation's `*` static/instance convention, so a
-method-name group's public surface stays at most two names. `generic-arity-dispatch-mode`
-classifies a method name's generic-arity cells as `:single` (the common case -- generates bare
-`base-name`, unchanged), `:split-with-plain` (a non-generic overload coexists with generic ones --
-generates `base-name` plus a `base-name<>` dispatcher), or `:split-all-generic` (every overload is
-generic but at different arities, e.g. `Enumerable.Aggregate`'s arity-1/2/3 overloads -- `base-name`
-itself becomes the dispatcher, no `<>` needed). The dispatcher takes the type argument(s) as its
-first parameter -- a single type, or a `cl:list` of types (arity = its length), distinguished via
-`cl:listp` -- and applies the rest of its arguments through to an internal, unexported per-arity
-function (the old `-arity-N` bodies, reused verbatim). In the `:split-with-plain` case, an empty
-type list/`nil` falls through to the plain `base-name` function instead of erroring. See
-`doc/generator-design-notes.md`'s "Generic-Arity Two-Tier Dispatch (Version 28)" section and
-`RELEASES.md`'s `2.28.0` entry.
-
-
 # Miscellaneous
 
 * **HIGH PRIORITY**: Provide a safe way to **clone/copy a boxed struct instance** (e.g.
@@ -75,8 +45,6 @@ type list/`nil` falls through to the plain `base-name` function instead of error
        to `new`) — implementable entirely in this repo, though it needs to handle
        structs whose full state isn't reconstructible via a public constructor plus
        public settable members.
-
-* Add missing operator overload handling.
 
 * Implement read/write for static properties and fields per this:
   * any static property or field that is
@@ -156,6 +124,36 @@ type list/`nil` falls through to the plain `base-name` function instead of error
 
 
 ---
+
+# **DONE** Multi-Type Arity Improvements
+
+* Reconsider the multi-arity overloads with suffix `arity-#` naming
+  convention. Maybe have a suffix like `<>` which indicates that it
+  takes a type parameter. Example: `aggregate<>` or `aggregate<2>`?
+
+* Take type arguments in two forms:
+  * A single type
+  * A list of types (or other sequence)
+  * This would allow the multi-arity overloads to use a single type specified
+    version, e.g., just `aggregate<>` for all possible arities.
+
+## Implementation Notes
+
+**DONE** in generator version 28 (2.28.0). Replaced the `-arity-N` suffix scheme with a two-tier
+dispatch mirroring the Version 24 Overload Consolidation's `*` static/instance convention, so a
+method-name group's public surface stays at most two names. `generic-arity-dispatch-mode`
+classifies a method name's generic-arity cells as `:single` (the common case -- generates bare
+`base-name`, unchanged), `:split-with-plain` (a non-generic overload coexists with generic ones --
+generates `base-name` plus a `base-name<>` dispatcher), or `:split-all-generic` (every overload is
+generic but at different arities, e.g. `Enumerable.Aggregate`'s arity-1/2/3 overloads -- `base-name`
+itself becomes the dispatcher, no `<>` needed). The dispatcher takes the type argument(s) as its
+first parameter -- a single type, or a `cl:list` of types (arity = its length), distinguished via
+`cl:listp` -- and applies the rest of its arguments through to an internal, unexported per-arity
+function (the old `-arity-N` bodies, reused verbatim). In the `:split-with-plain` case, an empty
+type list/`nil` falls through to the plain `base-name` function instead of erroring. See
+`doc/generator-design-notes.md`'s "Generic-Arity Two-Tier Dispatch (Version 28)" section and
+`RELEASES.md`'s `2.28.0` entry.
+
 
 # **DONE** Overload Consolidation
 
@@ -373,6 +371,14 @@ is a really foundational change that will help a lot in the future.
 
 
 # DONE
+
+* Add missing operator overload handling.
+  * DONE (2026-07-04): `AssemblyToLispy.cs`'s `GetCleanMethodName` now maps the 8 remaining
+    standard operators (`%`,`&`,`|`,`^`,`<<`,`>>`,`>>>`,`~`) plus C# 11's checked-operator
+    variants (suffixed `!`). Existing operator codegen (Master Wrapper dispatch, unary/binary
+    arity disambiguation, `:mangled-name`-based invocation) already handled any mapped operator
+    correctly and needed no changes — see `doc/generator-design-notes.md`'s Version 30 section.
+    Generator version bumped 29 → 30; CLI `VERSION` bumped 2.29.1 → 2.30.0.
 
 * Public instance fields (e.g. a plain mutable field on a simple data-holder class or struct)
   generated nothing at all — no getter, no setter, no comment. `public-instance-field-p` existed

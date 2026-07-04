@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector2
-;;; Generator Version: 29
-;;; Creation Date: 2026-07-04T14:21:19Z
+;;; Generator Version: 30
+;;; Creation Date: 2026-07-04T15:28:03Z
 
 (cl:in-package :system-numerics-vector2)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Numerics.Vector2"))
 (cl:defconstant <type-str> "System.Numerics.Vector2")
-(cl:defconstant <creation> "2026-07-04T14:21:19Z")
-(cl:defconstant <version> 29)
+(cl:defconstant <creation> "2026-07-04T15:28:03Z")
+(cl:defconstant <version> 30)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -365,6 +365,20 @@ new(Single, Single)
                     :method-name "/"
                     :supplied-args (cl:append (cl:list :left left) (cl:list :right right))))))
 
+(cl:defun & (left right)
+  "Parameters:
+  - left (System.Numerics.Vector2): 
+  - right (System.Numerics.Vector2): 
+"
+  (dotnet:static <type-str> "op_BitwiseAnd" (cl:the (dotnet "System.Numerics.Vector2") left) (cl:the (dotnet "System.Numerics.Vector2") right)))
+
+(cl:defun ^ (left right)
+  "Parameters:
+  - left (System.Numerics.Vector2): 
+  - right (System.Numerics.Vector2): 
+"
+  (dotnet:static <type-str> "op_ExclusiveOr" (cl:the (dotnet "System.Numerics.Vector2") left) (cl:the (dotnet "System.Numerics.Vector2") right)))
+
 (cl:defun + (value cl:&optional (right cl:nil supplied-right))
   "Master wrapper for System.Numerics.Vector2.+ overloads. Dispatches at runtime.
 
@@ -390,6 +404,13 @@ new(Single, Single)
                     :method-name "+"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-right (cl:list :right right)))))))
 
+(cl:defun << (value shift-amount)
+  "Parameters:
+  - value (System.Numerics.Vector2): 
+  - shift-amount (System.Int32): 
+"
+  (dotnet:static <type-str> "op_LeftShift" (cl:the (dotnet "System.Numerics.Vector2") value) (cl:the (dotnet "System.Int32") shift-amount)))
+
 (cl:defun = (left right)
   "Summary: Returns a value that indicates whether each pair of elements in two specified vectors is equal.
 Returns: if left and right are equal; otherwise, .
@@ -398,6 +419,33 @@ Parameters:
   - right (System.Numerics.Vector2): The second vector to compare.
 "
   (dotnet:static <type-str> "op_Equality" (cl:the (dotnet "System.Numerics.Vector2") left) (cl:the (dotnet "System.Numerics.Vector2") right)))
+
+(cl:defun >> (value shift-amount)
+  "Parameters:
+  - value (System.Numerics.Vector2): 
+  - shift-amount (System.Int32): 
+"
+  (dotnet:static <type-str> "op_RightShift" (cl:the (dotnet "System.Numerics.Vector2") value) (cl:the (dotnet "System.Int32") shift-amount)))
+
+(cl:defun >>> (value shift-amount)
+  "Parameters:
+  - value (System.Numerics.Vector2): 
+  - shift-amount (System.Int32): 
+"
+  (dotnet:static <type-str> "op_UnsignedRightShift" (cl:the (dotnet "System.Numerics.Vector2") value) (cl:the (dotnet "System.Int32") shift-amount)))
+
+(cl:defun | (left right)
+  "Parameters:
+  - left (System.Numerics.Vector2): 
+  - right (System.Numerics.Vector2): 
+"
+  (dotnet:static <type-str> "op_BitwiseOr" (cl:the (dotnet "System.Numerics.Vector2") left) (cl:the (dotnet "System.Numerics.Vector2") right)))
+
+(cl:defun ~ (value)
+  "Parameters:
+  - value (System.Numerics.Vector2): 
+"
+  (dotnet:static <type-str> "op_OnesComplement" (cl:the (dotnet "System.Numerics.Vector2") value)))
 
 (cl:defun abs (value)
   "Summary: Returns a vector whose elements are the absolute values of each of the specified vector's elements.

@@ -10,6 +10,30 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.30.0 — 2026-07-04
+
+**Completed operator overload mapping coverage.**
+
+* `GetCleanMethodName` now maps the 8 remaining standard C# overloadable operators previously
+  left as raw `op_Xxx` names (`op_Modulus` → `%`, `op_BitwiseAnd` → `&`, `op_BitwiseOr` → `|`,
+  `op_ExclusiveOr` → `^`, `op_LeftShift` → `<<`, `op_RightShift` → `>>`,
+  `op_UnsignedRightShift` → `>>>`, `op_OnesComplement` → `~`), plus C# 11's checked-operator
+  variants, suffixed `!` to coexist alongside their unchecked counterparts on the same type
+  (`op_CheckedAddition` → `+!`, `op_CheckedSubtraction` → `-!`, `op_CheckedMultiply` → `*!`,
+  `op_CheckedDivision` → `/!`, `op_CheckedUnaryNegation` → `-!`, `op_CheckedExplicit` →
+  `explicit-cast!`).
+* No generation-logic changes were needed: a mapped operator's `:name` is already its clean Lisp
+  symbol by the time the generator's `"op_"`-prefix filters run, so any newly-mapped operator
+  flows through the existing clean-method/Master Wrapper pipeline exactly like previously-mapped
+  operators (`+`, `-`, `=`, `implicit-cast`, etc.) already did. See
+  `doc/generator-design-notes.md`'s Version 30 section for the full investigation.
+* Added operator-codegen test coverage (previously absent — only metadata `:mangled-name`
+  extraction was tested): `AssemblyToLispyTestTarget/EdgeCases.cs`'s non-generic `EdgeCaseStruct`
+  gained a newly-mapped binary operator (`operator %`) and a unary operator sharing another
+  operator's symbol, and `package-generator-tests.lisp` gained a synthetic-class-plist test
+  asserting the generated wrapper functions and their `:mangled-name`-based invocations.
+* `*generator-version*` bumped 29 → 30.
+
 ## 2.29.0 — 2026-07-04
 
 **Struct-boxing warning corrected; shared-mutable-constant hazard documented.**

@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 29
-;;; Creation Date: 2026-07-04T14:21:19Z
+;;; Generator Version: 30
+;;; Creation Date: 2026-07-04T15:28:03Z
 
 (cl:in-package :cl-user)
 
@@ -1173,8 +1173,15 @@
    #:-
    #:*
    #:/
+   #:&
+   #:^
    #:+
+   #:<<
    #:=
+   #:>>
+   #:>>>
+   #:|
+   #:~
    #:abs
    #:add
    #:all
@@ -1332,8 +1339,15 @@
    #:-
    #:*
    #:/
+   #:&
+   #:^
    #:+
+   #:<<
    #:=
+   #:>>
+   #:>>>
+   #:|
+   #:~
    #:abs
    #:add
    #:all
@@ -1493,8 +1507,15 @@
    #:-
    #:*
    #:/
+   #:&
+   #:^
    #:+
+   #:<<
    #:=
+   #:>>
+   #:>>>
+   #:|
+   #:~
    #:abs
    #:add
    #:all

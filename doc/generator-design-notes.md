@@ -1123,3 +1123,62 @@ independent live verification.
 independent, safely-mutable *copy* of a boxed struct (from a constant, a symbol-macro, or any other
 source) — see `PLAN.md`'s new struct-cloning TODO item for the tracked follow-up to actually solve
 the underlying hazard rather than just warn about it.
+
+## Complete Operator Overload Mapping (Version 30)
+
+`PLAN.md` had a standing TODO, "Add missing operator overload handling," suggesting `AssemblyToLispy.cs`'s
+`GetCleanMethodName` (the sole C#-operator-name → Lisp-symbol mapping table) was missing several
+standard C# operators. Before extending the table, this version's investigation checked whether
+operator *codegen* itself still worked at all, since `assembly-package-generator.lisp`'s
+`non-operator-non-accessor-methods` filter and `simple-method-p`/`clean-method-p` all reject any
+method whose name has an `"op_"` prefix — a check that, read out of context, looks like it excludes
+every operator overload from code generation entirely.
+
+**It does not.** `GetCleanMethodName` runs *before* the generator ever sees the method: it rewrites
+a mapped operator's `:name` metadata field to the clean symbol (`"+"`, `"="`, `"implicit-cast"`,
+etc.) — only an *unmapped* operator (previously, one of the 8 gaps closed by this version) keeps its
+raw `op_Xxx` name. So by the time the generator's `"op_"`-prefix filters run, a mapped operator's
+`:name` no longer starts with `"op_"` and sails through the ordinary clean-method / Master Wrapper
+pipeline untouched — confirmed directly against real checked-in output in `cspackages-test/`:
+
+```lisp
+;; cspackages-test/system-numerics-vector2.lisp
+(cl:defun + (value cl:&optional (right cl:nil supplied-right))
+  ...
+  (dotnet:static <type-str> "op_Addition" value right))
+  ...
+  (dotnet:static <type-str> "op_UnaryPlus" value))
+;; cspackages-test/system-string.lisp
+(cl:defun implicit-cast (value)
+  (dotnet:static <type-str> "op_Implicit" ...))
+```
+
+Unary/binary disambiguation for a symbol shared between two CLR operator names (e.g. `+` covering
+both `op_Addition` and `op_UnaryPlus`) already works purely via arity (the Version 13/14 dispatch
+machinery's optional second argument with `supplied-p`), and the real CLR method is always invoked
+via each overload's `:mangled-name`, never its clean `:name` — so this was never at risk of calling
+the wrong operator.
+
+**What this version actually changes**, given the above: only `AssemblyToLispy.cs`'s
+`GetCleanMethodName` table, in `assembly-package-generator.lisp`'s package-generator (no
+generation-logic changes needed at all):
+
+* The 8 remaining standard C# overloadable operators without a mapping: `op_Modulus` → `%`,
+  `op_BitwiseAnd` → `&`, `op_BitwiseOr` → `|`, `op_ExclusiveOr` → `^`, `op_LeftShift` → `<<`,
+  `op_RightShift` → `>>`, `op_UnsignedRightShift` → `>>>`, `op_OnesComplement` → `~`.
+* C# 11's checked-operator variants, previously entirely unmapped: `op_CheckedAddition` → `+!`,
+  `op_CheckedSubtraction` → `-!`, `op_CheckedMultiply` → `*!`, `op_CheckedDivision` → `/!`,
+  `op_CheckedUnaryNegation` → `-!` (shared with `op_CheckedSubtraction`, mirroring how unchecked
+  `-` is already shared between `op_Subtraction`/`op_UnaryNegation`), `op_CheckedExplicit` →
+  `explicit-cast!`. The `!` suffix lets a checked operator coexist on the same type as its
+  unchecked counterpart without a naming collision.
+
+Test coverage was also added where none existed before: previously, the only operator exercised by
+any test was `op_Addition` on the synthetic `GenericClass<T>` (`AssemblyToLispyTestTarget/EdgeCases.cs`),
+and only for metadata `:mangled-name` extraction (`tests/synthetic-target.test.lisp`) — `GenericClass<T>`
+being generic means its operator is filtered out of actual code generation by the (unrelated)
+generic-type-parameter exclusion, so no test ever exercised generated operator wrapper *code*.
+`EdgeCaseStruct` (non-generic) gained a newly-mapped binary operator (`operator %`) and a unary
+operator sharing the `-` symbol with a same-named binary operator, and `package-generator-tests.lisp`
+gained a synthetic-class-plist codegen test (mirroring its existing indexer/field-codegen tests)
+asserting the generated wrapper functions and their `:mangled-name`-based CLR invocations.

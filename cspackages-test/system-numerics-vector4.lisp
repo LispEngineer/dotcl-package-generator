@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector4
-;;; Generator Version: 29
-;;; Creation Date: 2026-07-04T14:21:19Z
+;;; Generator Version: 30
+;;; Creation Date: 2026-07-04T15:28:03Z
 
 (cl:in-package :system-numerics-vector4)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Numerics.Vector4"))
 (cl:defconstant <type-str> "System.Numerics.Vector4")
-(cl:defconstant <creation> "2026-07-04T14:21:19Z")
-(cl:defconstant <version> 29)
+(cl:defconstant <creation> "2026-07-04T15:28:03Z")
+(cl:defconstant <version> 30)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -440,6 +440,24 @@ new(Single, Single, Single, Single)
                     :method-name "/"
                     :supplied-args (cl:append (cl:list :left left) (cl:list :right right))))))
 
+(cl:defun & (left right)
+  "Summary: Computes the bitwise-and of two vectors.
+Returns: The bitwise-and of left and right.
+Parameters:
+  - left (System.Numerics.Vector4): The vector to bitwise-and with right.
+  - right (System.Numerics.Vector4): The vector to bitwise-and with left.
+"
+  (dotnet:static <type-str> "op_BitwiseAnd" (cl:the (dotnet "System.Numerics.Vector4") left) (cl:the (dotnet "System.Numerics.Vector4") right)))
+
+(cl:defun ^ (left right)
+  "Summary: Computes the exclusive-or of two vectors.
+Returns: The exclusive-or of left and right.
+Parameters:
+  - left (System.Numerics.Vector4): The vector to exclusive-or with right.
+  - right (System.Numerics.Vector4): The vector to exclusive-or with left.
+"
+  (dotnet:static <type-str> "op_ExclusiveOr" (cl:the (dotnet "System.Numerics.Vector4") left) (cl:the (dotnet "System.Numerics.Vector4") right)))
+
 (cl:defun + (value cl:&optional (right cl:nil supplied-right))
   "Master wrapper for System.Numerics.Vector4.+ overloads. Dispatches at runtime.
 
@@ -467,6 +485,15 @@ new(Single, Single, Single, Single)
                     :method-name "+"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-right (cl:list :right right)))))))
 
+(cl:defun << (value shift-amount)
+  "Summary: Shifts each element of a vector left by the specified amount.
+Returns: A vector whose elements where shifted left by shiftCount.
+Parameters:
+  - value (System.Numerics.Vector4): The vector whose elements are to be shifted.
+  - shift-amount (System.Int32): 
+"
+  (dotnet:static <type-str> "op_LeftShift" (cl:the (dotnet "System.Numerics.Vector4") value) (cl:the (dotnet "System.Int32") shift-amount)))
+
 (cl:defun = (left right)
   "Summary: Returns a value that indicates whether each pair of elements in two specified vectors is equal.
 Returns: if left and right are equal; otherwise, .
@@ -475,6 +502,41 @@ Parameters:
   - right (System.Numerics.Vector4): The second vector to compare.
 "
   (dotnet:static <type-str> "op_Equality" (cl:the (dotnet "System.Numerics.Vector4") left) (cl:the (dotnet "System.Numerics.Vector4") right)))
+
+(cl:defun >> (value shift-amount)
+  "Summary: Shifts (signed) each element of a vector right by the specified amount.
+Returns: A vector whose elements where shifted right by shiftCount.
+Parameters:
+  - value (System.Numerics.Vector4): The vector whose elements are to be shifted.
+  - shift-amount (System.Int32): 
+"
+  (dotnet:static <type-str> "op_RightShift" (cl:the (dotnet "System.Numerics.Vector4") value) (cl:the (dotnet "System.Int32") shift-amount)))
+
+(cl:defun >>> (value shift-amount)
+  "Summary: Shifts (unsigned) each element of a vector right by the specified amount.
+Returns: A vector whose elements where shifted right by shiftCount.
+Parameters:
+  - value (System.Numerics.Vector4): The vector whose elements are to be shifted.
+  - shift-amount (System.Int32): 
+"
+  (dotnet:static <type-str> "op_UnsignedRightShift" (cl:the (dotnet "System.Numerics.Vector4") value) (cl:the (dotnet "System.Int32") shift-amount)))
+
+(cl:defun | (left right)
+  "Summary: Computes the bitwise-or of two vectors.
+Returns: The bitwise-or of left and right.
+Parameters:
+  - left (System.Numerics.Vector4): The vector to bitwise-or with right.
+  - right (System.Numerics.Vector4): The vector to bitwise-or with left.
+"
+  (dotnet:static <type-str> "op_BitwiseOr" (cl:the (dotnet "System.Numerics.Vector4") left) (cl:the (dotnet "System.Numerics.Vector4") right)))
+
+(cl:defun ~ (value)
+  "Summary: Computes the ones-complement of a vector.
+Returns: A vector whose elements are the ones-complement of the corresponding elements in vector.
+Parameters:
+  - value (System.Numerics.Vector4): 
+"
+  (dotnet:static <type-str> "op_OnesComplement" (cl:the (dotnet "System.Numerics.Vector4") value)))
 
 (cl:defun abs (value)
   "Summary: Returns a vector whose elements are the absolute values of each of the specified vector's elements.

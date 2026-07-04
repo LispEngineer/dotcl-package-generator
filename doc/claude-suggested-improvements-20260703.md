@@ -140,17 +140,15 @@ Enum values only work today by accident: enum members are reflected as ordinary
 * **Difficulty: Medium** — flags-aware helpers and deliberate per-enum-type grouping/doc
   comments are a moderate, well-scoped addition.
 
-## 7. Operator overload coverage is incomplete
+## 7. Operator overload coverage is incomplete — DONE (2026-07-04)
 
-`GetCleanMethodName` (`AssemblyToLispy.cs:700-726`) maps only
-`+ - * / = != < > <= >= unary+ unary- ! ++ -- true false implicit explicit`. Missing:
-`%` (Modulus), `&`, `|`, `^`, `<<`, `>>`, `>>>` (unsigned right shift), `~`
-(OnesComplement), and C# 11 checked-operator variants. These fall through unmapped,
-keeping the raw `op_*` name instead of an idiomatic symbol.
-
-* **Priority: Medium** — bitwise/modulus operators appear regularly on numeric,
-  flags-enum, and vector/matrix-like types.
-* **Difficulty: Low** — extending one static mapping table.
+`GetCleanMethodName` (`AssemblyToLispy.cs`) now also maps `%` (Modulus), `&`, `|`, `^`, `<<`,
+`>>`, `>>>` (unsigned right shift), `~` (OnesComplement), and C# 11's checked-operator variants
+(suffixed `!`, e.g. `+!` for `op_CheckedAddition`). No generator-side codegen changes were
+needed — a mapped operator's `:name` is already its clean symbol by the time
+`assembly-package-generator.lisp`'s `"op_"`-prefix filters run, so it flows through the existing
+clean-method/Master Wrapper pipeline exactly like the previously-mapped operators. See
+`doc/generator-design-notes.md`'s Version 30 section and `PLAN.md`'s corresponding entry.
 
 ## 8. Generic class name mangling via backticks (already tracked in `PLAN.md`)
 

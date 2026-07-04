@@ -730,6 +730,20 @@ namespace PackageGenerator {
                     case "op_False": return "false";
                     case "op_Implicit": return "implicit-cast";
                     case "op_Explicit": return "explicit-cast";
+                    case "op_Modulus": return "%";
+                    case "op_BitwiseAnd": return "&";
+                    case "op_BitwiseOr": return "|";
+                    case "op_ExclusiveOr": return "^";
+                    case "op_LeftShift": return "<<";
+                    case "op_RightShift": return ">>";
+                    case "op_UnsignedRightShift": return ">>>";
+                    case "op_OnesComplement": return "~";
+                    case "op_CheckedAddition": return "+!";
+                    case "op_CheckedSubtraction": return "-!";
+                    case "op_CheckedMultiply": return "*!";
+                    case "op_CheckedDivision": return "/!";
+                    case "op_CheckedUnaryNegation": return "-!";
+                    case "op_CheckedExplicit": return "explicit-cast!";
                 }
             }
             return name;
