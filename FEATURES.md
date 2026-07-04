@@ -341,13 +341,16 @@ avoid retaining a direct reference to a `--constant-properties`-cached constant 
 you intend to mutate it; construct a fresh instance via the type's own constructor
 (`new`) instead.
 
-This document does not revise or re-verify the separate, similar-sounding claim in
-`doc/generator-design-notes.md`'s "Struct Mutation, Boxing, and Overload Resolution
-(Version 16)" section, about struct-mutating **instance methods** (e.g.
-`Vector2.Normalize()`) discarding their mutation — that scenario involves a different
-call path (`dotnet:invoke` on a method, not a property setter) and has not been
-independently tested; treat its guidance (prefer a static method returning a new struct)
-as still in force until verified.
+This same finding extends to struct-mutating **instance methods**, not just property
+`setf`: a live REPL check confirmed calling a `void`-returning mutating instance method
+(e.g. `Vector2.Normalize()`) also mutates the receiver in place, correctly — the
+similar-sounding claim in `doc/generator-design-notes.md`'s "Struct Mutation, Boxing, and
+Overload Resolution (Version 16)" section has been corrected accordingly. The one real
+caveat there: since such a method returns `void`/`nil`, never write `(setf v
+(v2:normalize v))` — that overwrites `v` with `nil`. Call `(v2:normalize v)` alone and let
+it mutate `v` in place. The same aliasing hazard described above applies here too: if the
+struct is aliased elsewhere (e.g. a cached constant), the mutation is visible through
+every alias.
 
 
 

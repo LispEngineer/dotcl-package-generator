@@ -434,19 +434,58 @@ In the Lisp wrapper package generator, methods are grouped by name to generate o
 
 In Version 16, this was resolved by tracking `is-static-overload-p` per individual clean method overload (via `(getf cm :is-static)`) rather than using the group-wide `static-p`. This ensures that static overloads grouped with instance methods (such as `Vector2.Normalize(Vector2)`) are correctly generated as static wrappers utilizing `dotnet:static` without requiring an implicit `obj` receiver.
 
-### 2. Struct Boxing & In-Place Mutation Failures
+### 2. Struct Boxing & In-Place Mutation — CORRECTED (2026-07-04)
 
-C# structures (like `Vector2` or `Color`) are value types (structs). In the Common Lisp / DotNet CLR interop layer, invoking any instance method on a value type receiver (such as calling the instance method `Normalize()` on a `Vector2` instance) requires boxing the structure into a heap-allocated `.NET` object wrapper.
+**This subsection originally claimed** that calling a struct-mutating instance method
+(such as `Vector2.Normalize()`, which mutates in place and returns `void`) only mutates a
+throwaway boxed copy on the heap, discarded once the call returns, leaving the original
+Lisp reference unmodified — with a worked (but never actually run) example claiming
+`(v2:normalize (v2:new normal-x normal-y))` leaves the vector un-normalized.
 
-Any mutations performed by that instance method are applied only to the boxed copy on the heap. Once the method invocation returns, the boxed copy is discarded, and the original Lisp reference or local variable remains completely unmodified.
+**A live `make repl` session against `dotcl-dungeonslime` disproved this**, exactly as the
+"Instance Properties and Struct 'Boxing Mutation'" section's own claim was disproven (see
+its corrected text and the Version 29 section above — this is the same underlying
+mechanism, just reached via a mutating method call instead of a property `setf`):
+```lisp
+DUNGEON-SLIME> (defparameter v (v2:new 3.0 4.0))
+V
+DUNGEON-SLIME> v
+#<DOTNET Microsoft.Xna.Framework.Vector2 {X:3 Y:4}>
+DUNGEON-SLIME> (v2:normalize v)
+NIL
+DUNGEON-SLIME> v
+#<DOTNET Microsoft.Xna.Framework.Vector2 {X:0.6 Y:0.8}>
+```
+`v` **was** normalized in place. `v` is a `#<DOTNET ...>` reference to a boxed CLR object,
+not a raw Lisp value; DotCL's typed-receiver invocation path (the
+`(the (dotnet "Type") obj!)` wrapper this repo's own Version 10 introduced specifically to
+enable the `constrained.`+`callvirt` IL pattern for value-type virtual dispatch — see "Direct
+Method Calls via Type Declarations" above) operates on that exact boxed instance. There is
+no separate "discard the mutated copy" step for a mutating instance method any more than
+there was for a property setter.
 
-Furthermore, because the instance method `Normalize()` returns `void`, the Lisp wrapper function evaluates to `nil`. Consequently:
-1. Calling something like `(v2:normalize (v2:new normal-x normal-y))` returns `nil`.
-2. The original vector is not normalized (since the mutation was performed on a boxed copy that was immediately discarded).
-3. The resulting `nil` normal vector can cause subsequent operations relying on the "mutated" value to fail silently or behave incorrectly.
+`(v2:normalize v)` printing `NIL` is a *separate*, still-true fact, unrelated to whether the
+mutation stuck: `Normalize()` returns `void` in C#, so the Lisp wrapper function itself
+always evaluates to `nil`. The original text conflated "the expression's return value is
+`nil`" with "the mutation was lost" — they are independent facts, and only the first one is
+true.
 
-**Workaround**: callers should prefer static methods returning a new struct instance (or a
-hand-written Lisp-native helper) over relying on in-place instance-method mutation of structs.
+**The one part of the original guidance that remains genuinely useful**: because
+`Normalize()` (and any `void`-returning mutating method) evaluates to `nil`, writing
+`(setf v (v2:normalize v))` would overwrite `v` with `nil` — a real footgun, just an
+unrelated one from the "mutation is lost" claim. Correct usage is `(v2:normalize v)` alone
+(mutates `v` in place; discard the `nil` return value), not reassigning `v` from the call's
+result.
+
+**Corrected workaround guidance**: preferring a static method that returns a new struct
+instance (e.g. `Vector2.Normalize(Vector2)`) is no longer necessary *for correctness* — the
+generated instance-method wrapper mutates in place correctly. It may still be a reasonable
+*style* preference to avoid surprise mutation-through-aliasing: the same aliasing hazard the
+Version 29 section describes for property `setf` applies equally here — if the struct being
+mutated is aliased elsewhere (most notably, a `--constant-properties`-cached `defconstant`),
+calling a mutating instance method on it mutates that shared instance too, silently and
+permanently. But that is a caution about aliasing, not a claim that instance-method mutation
+doesn't work.
 
 ## Idiomatic Lisp Naming Conventions (Version 17)
 
