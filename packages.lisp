@@ -49,10 +49,7 @@
   (:local-nicknames
     (:object :system-object)
     (:type :system-type))
-  (:export #:add3
-            #:dotnet-p
-            #:boxed-dotnet-p
-            #:get-type
+  (:export #:get-type
             #:get-type-full-name))
 
 (defpackage :assembly-package-generator

@@ -7,12 +7,6 @@
 
 (format *error-output* "[monoutils.lisp] Loading in package ~S~%" *package*)
 
-(setf (documentation 'monoutils:dotnet-p 'function)
-  "Returns T if this is a Lisp-wrapped C#/CLR object")
-
-(setf (documentation 'monoutils:boxed-dotnet-p 'function)
-  "Returns T if this is a Lisp Wrapped & Boxed (i.e., type hinted) C#/CLR object.")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type helper functions
 
@@ -43,7 +37,3 @@
       (handler-case
         (type:full-name typ)
         (error () nil)))))
-
-(eval-when (:load-toplevel :execute)
-  (format *error-output* "[monoutils.lisp] Initializing MonoUtilsRegistrar...~%")
-  (dotnet:static "MonoUtilsRegistrar" "Initialize"))

@@ -133,15 +133,20 @@ reflection and runs before DotCL boots.
   XML-doc-comment parsing and signature matching, generic/backtick type-name formatting,
   default-value-to-Lisp-literal conversion, operator-name mangling (`op_Addition` → `+`), etc.
   `AssemblyToLispyTest` (bottom of the file) is the C# half of `--test`.
-* **`MonoUtils.cs`** — small set of C#-implemented Lisp primitives (registered into DotCL via
-  `MonoUtilsRegistrar.Initialize()`), exposed to Lisp as the `MONOUTILS` package
-  (`monoutils.lisp` re-exports them). As of Version 23, neither the generator's own code nor
-  *generated* package code references `monoutils:*` at all (both call sites were replaced
-  with stock DotCL primitives — `dotnet:resolve-type`/`dotnet:object-type` — so generated
-  output ships self-contained); `monoutils:get-type` is used only by this repo's own test
-  suite (`tests/framework.lisp`/`tests/synthetic-target.test.lisp`) for live-CLR semantic
-  verification. See `doc/package-generator-dependencies.md` for the full dependency list in
-  both directions.
+* **`MonoUtils.cs`** — a handful of plain C# reflection helpers
+  (`GetTypeMethods`/`GetTypeProperties`/`GetTypeFields`/`GetTypeConstructors`), used only by
+  this repo's own test suite (`tests/framework.lisp`), invoked via ordinary
+  `dotnet:static "MonoUtils" "..."` reflection calls — no Lisp-package-symbol registration
+  is involved (the former `MonoUtilsRegistrar`/`MONOUTILS`-package-symbol-registration
+  machinery, and the C# primitives it registered — `monoutils:dotnet-p`/`boxed-dotnet-p` —
+  were removed once nothing referenced them; see `doc/package-generator-dependencies.md`'s
+  history of the Version 23 self-containment work). `monoutils.lisp` (still exposed as the
+  `MONOUTILS` package, for its two remaining plain Lisp functions `get-type`/
+  `get-type-full-name`) is likewise used only by this repo's own test suite
+  (`tests/framework.lisp`/`tests/synthetic-target.test.lisp`), for live-CLR semantic
+  verification. Neither file's content is used by the generator itself or by generated
+  package code — see `doc/package-generator-dependencies.md` for the full dependency list
+  in both directions.
 * **`assembly-package-generator.lisp`** — the code generator proper. Entry points
   `run-assembly-package-generator-batch` → `generate-assembly-packages-batch` (which resolves
   and validates every requested class against its assembly's metadata *before* generating

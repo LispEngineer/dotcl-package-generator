@@ -9,7 +9,7 @@ NUPKG_DIR = nupkg
 
 # Tool package version. The minor version tracks assembly-package-generator.lisp's
 # internal *generator-version* (currently 29), so they stay visibly in sync.
-VERSION = 2.29.0
+VERSION = 2.29.1
 
 # Reference assembly directory for the standard .NET metadata used by `test`
 # to exercise Stage 1/Stage 2 generation end-to-end. This is the Arch Linux

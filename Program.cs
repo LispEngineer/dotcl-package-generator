@@ -143,7 +143,6 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
         File.WriteAllText(manifestFile, manifest.ToString());
 
         DotclHost.Initialize();
-        MonoUtilsRegistrar.Initialize();
         LoadDotclManifest();
 
         string asdPath = Path.Combine(AppContext.BaseDirectory, AsdFileName);
@@ -172,7 +171,6 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
 // NEXT: Program invocations that require DotCL to be running
 
 DotclHost.Initialize();
-MonoUtilsRegistrar.Initialize();
 LoadDotclManifest();
 
 if (printVersion) {
