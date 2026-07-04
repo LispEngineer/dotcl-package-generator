@@ -135,9 +135,13 @@ reflection and runs before DotCL boots.
   `AssemblyToLispyTest` (bottom of the file) is the C# half of `--test`.
 * **`MonoUtils.cs`** — small set of C#-implemented Lisp primitives (registered into DotCL via
   `MonoUtilsRegistrar.Initialize()`), exposed to Lisp as the `MONOUTILS` package
-  (`monoutils.lisp` re-exports them). Used both by the generator itself and by *generated*
-  package code at runtime (e.g. `monoutils:dotnet-p`, `monoutils:get-type` — see
-  `doc/package-generator-dependencies.md` for the full dependency list in both directions).
+  (`monoutils.lisp` re-exports them). As of Version 23, neither the generator's own code nor
+  *generated* package code references `monoutils:*` at all (both call sites were replaced
+  with stock DotCL primitives — `dotnet:resolve-type`/`dotnet:object-type` — so generated
+  output ships self-contained); `monoutils:get-type` is used only by this repo's own test
+  suite (`tests/framework.lisp`/`tests/synthetic-target.test.lisp`) for live-CLR semantic
+  verification. See `doc/package-generator-dependencies.md` for the full dependency list in
+  both directions.
 * **`assembly-package-generator.lisp`** — the code generator proper. Entry points
   `run-assembly-package-generator-batch` → `generate-assembly-packages-batch` (which resolves
   and validates every requested class against its assembly's metadata *before* generating
@@ -193,13 +197,18 @@ reflection and runs before DotCL boots.
   safe suffixed forms (`quote!`, `function!`, `t!`, `nil!`) rather than being shadowed.
   `Is*`-prefixed predicates become `*?` (`IsEmpty` → `empty?`); this is deliberately distinct
   from Lisp's usual "-p" suffix.
-* Overloaded methods/constructors: a "clean" overload (no ref/out/params/generics/defaults)
-  gets a real typed wrapper; multiple clean overloads get one `&rest`/`&optional`
-  runtime-dispatching wrapper plus type-suffixed direct-call wrappers (e.g.
-  `contains-vector-2`); "dirty" overloads are skipped but documented in a comment. See
+* Overloaded methods/constructors: a "clean" overload (no ref/out/params/defaults; a
+  generic method's own type argument(s) are fine, at any positive arity) gets a real typed
+  wrapper; multiple clean overloads collapse into one Master Wrapper — `name` (`name*` too,
+  if the name is overloaded as both instance and static) — with no separate type-suffixed
+  direct-call functions (removed in Version 24; a method name overloaded across *different*
+  generic arities gets at most one extra `name<>` dispatcher instead, added in Version 28).
+  "Dirty" overloads are skipped but documented in a comment. See
   `doc/generator-design-notes.md`'s per-version sections for the exact dispatch rules
   (positional-prefix computation, static/instance grouping, etc.) before modifying this logic
-  — it has non-obvious history (e.g. static/instance method-name collisions, struct boxing
-  losing mutations across `dotnet:invoke` calls).
+  — it has non-obvious history (e.g. static/instance method-name collisions, and struct
+  property/field `setf`/mutating-method calls actually mutating a shared boxed .NET instance
+  in place, which can silently corrupt anything aliasing that same instance — see the
+  "Instance Properties and Struct 'Boxing Mutation'"/Version 16/Version 29 sections).
 * After any hand-edit to a `.lisp` file, run `make check-parens` (or
   `python3 check_parens.py <file>`) before assuming a build failure is something else.

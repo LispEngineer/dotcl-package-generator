@@ -98,6 +98,9 @@ Each type entry plist contains the following entries, by key:
   * `:interface` (an interface type)
   * `:enum` (an enumeration type)
   * `:delegate` (a delegate type)
+* `:enum-underlying-type` (String or omitted): Present only when `:kind` is `:enum`; the
+  fully qualified name of the enum's underlying integral type (e.g. `"System.Int32"`, via
+  `Enum.GetUnderlyingType(type)`). Omitted for every other `:kind`.
 * `:documentation` (Documentation Plist or omitted): A plist containing the type-level XML
   documentation summary. Omitted if no documentation is found.
 * `:superclass` (String or `nil`): The fully qualified name of the base class. 
@@ -182,6 +185,11 @@ Each type entry plist contains the following entries, by key:
     otherwise `t`.
   * `:extension-method` (Keyword `t` or omitted): Omitted if the method is not an extension
     method; otherwise `t`.
+  * `:is-generic` (Keyword `t` or omitted): Omitted if the method has no generic type
+    arguments of its own; otherwise `t`.
+  * `:generic-arity` (Integer or omitted): The method's own number of generic type
+    arguments (via `MethodInfo.GetGenericArguments().Length`). Present only when
+    `:is-generic` is `t`; omitted for a non-generic method.
   * `:return-type` (String): The fully qualified return type of the method (using
     simplified backtick notation for generic types).
   * `:assembly-qualified-return-type` (String or omitted): The full assembly-qualified

@@ -132,7 +132,7 @@ registration form, regardless of the C# type's kind:
 (cl:defconstant <type> (dotnet:resolve-type "System.Numerics.Vector2"))
 (cl:defconstant <type-str> "System.Numerics.Vector2")
 (cl:defconstant <creation> "2026-07-04T12:18:00Z")
-(cl:defconstant <version> 28)
+(cl:defconstant <version> 29)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

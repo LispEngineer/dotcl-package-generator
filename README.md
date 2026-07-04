@@ -123,13 +123,13 @@ a local build as the system-wide `dotcl-packagegen` command.
 
 # Design Notes
 
-Please see [generator-design-notes](doc/generator-design-notes.md] for some internal
+Please see [generator-design-notes](doc/generator-design-notes.md) for some internal
 details on how the generator works.
 
 
 # Future Directions
 
-Please see [PLANS](PLANS.md) for some of the planned future directions,
+Please see [PLAN](PLAN.md) for some of the planned future directions,
 as well as [suggested-improvements](doc/claude-suggested-improvements-20260703.md).
 
 

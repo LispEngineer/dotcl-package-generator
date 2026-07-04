@@ -247,6 +247,17 @@ This is the shared-mutable-constant hazard described in the Version 29 section b
 
 *(from implementation-notes.md, "Local Nickname Migration and TimeSpan Operator Dispatchers")*
 
+**Superseded.** This section describes the Version 13 implementation. Two things it
+describes no longer exist in current-version generated output: `monoutils:dotnet-p` was
+replaced by `dotnet:object-type` in Version 23 (see "Self-Contained Runtime Support"
+below), and the separate type-suffixed wrapper functions this section names (e.g.
+`+-time-span-time-span`, `*-time-span-double`) were removed entirely in Version 24
+("Overload Consolidation," below) — today's Master Wrapper `cond` calls
+`dotnet:static`/`dotnet:invoke` directly, inline, with no separate named function per
+overload. The dispatch-by-argument-count-and-type *idea* this section describes is still
+exactly how operator overloads work today; only the specific named-function mechanism it
+describes has changed.
+
 Standard operators like `+`, `-`, `*`, and `/` are overloaded in C#'s
 `System.TimeSpan`. The package generator emitted generic runtime dispatchers for
 these, passing the operator strings directly to `dotnet:static` (e.g., `(apply
@@ -384,7 +395,7 @@ zero-parameter constructor when a type has multiple clean constructors. The runt
 ### 1. Type-Based Operator Dispatching (Version 13)
 The C# Lisp Package Generator has been enhanced in Version 13 to automatically generate type- and argument-count-aware dispatch wrappers for C# operator overloads (methods whose name starts with `"op_"` in C#, such as `op_Addition` and `op_Subtraction`, which are mapped to Lisp symbols like `+` and `-`):
 * **Runtime Dispatch**: For overloaded operators, instead of outputting generic `(apply #'dotnet:static ...)` calls with raw operator symbols (e.g. `"+"` or `"-"`) which fail with `System.MissingMethodException`, the generator now emits a Lisp `cond` block.
-* **Overload Selection**: The `cond` block inspects the runtime argument count and types (numbers, booleans, strings, or `.NET` objects) and dispatches the call to the corresponding type-suffixed generated overload functions (e.g. `+-time-span-time-span` or `*-time-span-double`).
+* **Overload Selection**: The `cond` block inspects the runtime argument count and types (numbers, booleans, strings, or `.NET` objects) and dispatches the call to the corresponding type-suffixed generated overload functions (e.g. `+-time-span-time-span` or `*-time-span-double`). **Superseded in Version 24** ("Overload Consolidation," below): these separate type-suffixed functions were removed entirely; the same `cond`-based dispatch logic now calls `dotnet:static`/`dotnet:invoke` directly, inline, inside one Master Wrapper.
 * **Safe Fallback**: If no overload matches the argument patterns, a descriptive runtime error is thrown.
 
 ### 2. Standard Lisp Package Qualification (Version 14)
