@@ -1245,3 +1245,64 @@ static read-write property (`StaticReadWriteProperty`), and a static write-only 
 shape, and `package-generator-tests.lisp` gained a synthetic-class-plist codegen test (7.1)
 asserting the generated getter/`setf`/`set-name` functions and their exports, mirroring the
 existing instance-field codegen test's structure.
+
+## Deriving `*generator-version*` from `dotcl-packagegen.asd` (Version 31 follow-up)
+
+`Makefile`'s `VERSION` (the CLI/tool package version, e.g. `2.31.0`) and
+`assembly-package-generator.lisp`'s `*generator-version*` (the generated-file-format version, e.g.
+`31`, the minor component of `VERSION`) had to be hand-kept in lockstep across three files
+(`Makefile`, `dotcl-packagegen.asd`, and this file's own `defparameter`) — exactly the kind of
+duplication that caused a real drift bug (the Version 31 fix itself shipped with `Makefile`'s
+`VERSION` and `dotcl-packagegen.asd`'s `:version` left at the stale `2.30.0`). `Makefile`'s `VERSION`
+was fixed first, by shelling out to `grep` against the `.asd`'s `:version` line. The natural
+next step was to make `*generator-version*` likewise read from `dotcl-packagegen.asd` — via ASDF's
+own introspection this time, since the code is already Lisp with ASDF loaded, not a shell script —
+so the `.asd` becomes the single source of truth for both.
+
+**The obvious approach doesn't work.** `utils.lisp` already had exactly the right-looking
+building block: `utils:qualify-path`, which takes a bare filename, returns it unchanged if it
+resolves relative to the current working directory, and otherwise re-resolves it against
+`utils:+base-directory+` (the running executable's own directory, where the `.asd` is copied
+alongside the compiled fasls — see the `.csproj`'s "Copy for Runtime 'version' Introspection"
+`Content` item). Plugging `(utils:qualify-path "dotcl-packagegen.asd")` straight into
+`utils:get-system-version` (which wraps `asdf:load-asd` + `asdf:component-version`, the same
+mechanism `--version`'s `utils:print-system-version` already used) built and ran fine — until
+invoked from within a checkout of this very repo, where `dotcl-packagegen.asd`'s *source* also
+happens to exist relative to the current working directory. In that case `qualify-path`'s first
+branch matches and hands back the bare relative string `"dotcl-packagegen.asd"` (no directory
+component at all), and `asdf:load-asd` cannot cope with that: it fails at load time (not compile
+time) with `SIMPLE-ERROR: Invalid relative pathname #P"" for component ("dotcl-packagegen")` — a
+classic ASDF complaint that arises when a system ends up with an empty/relative `:pathname`. The
+build itself succeeds, since the failing form only runs when the fasl is *loaded* (e.g. by
+`dotcl-packagegen --version` or `--test`), not when it's compiled — so this class of bug is easy to
+ship without noticing if you only run `make build` and not `make test`.
+
+**The fix**: bypass `qualify-path` entirely and always build an absolute path by combining
+`utils:+base-directory+` with the filename directly (`(uiop:native-namestring (utils:path-combine
+utils:+base-directory+ "dotcl-packagegen.asd"))`), mirroring what `Program.cs`'s `PrintVersion`
+already did in C# (`Path.Combine(AppContext.BaseDirectory, AsdFileName)`) — an absolute path is
+required, cwd-relative resolution is never appropriate here, and `qualify-path`'s cwd-preferring
+fallback (added for a different scenario: loading this codebase's own game-project sibling,
+`dotcl-dungeonslime`, from a `load-repl.lisp` where `+base-directory+` points at the installed
+`dotcl` tool's own directory rather than the game's) is actively the wrong tool for a case where
+the *correct* file (an absolute, base-directory-relative one) already exists and a *decoy* file
+(the bare relative name, coincidentally also readable) is what cwd-preference finds first.
+
+The resulting `*generator-version*` value form:
+
+```lisp
+(defparameter *generator-version*
+  (let* ((asd-path (uiop:native-namestring
+                     (utils:path-combine utils:+base-directory+ "dotcl-packagegen.asd")))
+         (version-string (utils:get-system-version asd-path "dotcl-packagegen")))
+    (parse-integer (second (uiop:split-string version-string :separator "."))))
+  ...)
+```
+
+One more ordering pitfall avoided: `assembly-package-generator.lisp` defines its own local
+`split-string` (semicolon-splitting helper for `--constant-properties` lists) further down the
+same file, *after* `*generator-version*`'s `defparameter`. Reusing that name here would silently
+resolve to `cl:nil`/an undefined-function error at load time, since Lisp forms in a file load
+strictly top-to-bottom and the local `split-string` wouldn't exist yet — `uiop:split-string`
+(already used elsewhere in this file, e.g. via the sibling `uiop:string-prefix-p`) sidesteps the
+whole ordering question by not depending on anything defined later in the same file.

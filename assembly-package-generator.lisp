@@ -10,8 +10,26 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 31
-  "Integer version number for the generated Lisp source files.
+(defparameter *generator-version*
+  ;; Always resolve against +base-directory+ (the running executable's own
+  ;; directory, where the .asd is copied alongside the compiled fasls -- see
+  ;; the csproj's "Copy for Runtime 'version' Introspection" Content item)
+  ;; rather than utils:qualify-path, which prefers a bare relative filename
+  ;; if one happens to exist relative to the current working directory --
+  ;; e.g. when running from a checkout of this repo, where the source
+  ;; dotcl-packagegen.asd also resolves relative to cwd. asdf:load-asd
+  ;; cannot handle that bare relative pathname (errors with "Invalid
+  ;; relative pathname"), so an absolute path is required, mirroring
+  ;; Program.cs's PrintVersion (Path.Combine(AppContext.BaseDirectory, ...)).
+  (let* ((asd-path (uiop:native-namestring
+                     (utils:path-combine utils:+base-directory+ "dotcl-packagegen.asd")))
+         (version-string (utils:get-system-version asd-path "dotcl-packagegen")))
+    (parse-integer (second (uiop:split-string version-string :separator "."))))
+  "Integer version number for the generated Lisp source files, read from
+   dotcl-packagegen.asd's :version (via ASDF's own system introspection,
+   same mechanism as utils:print-system-version) rather than hardcoded here,
+   so the two can never drift apart. The middle (minor) component of the
+   dotted x.y.z version string is used, e.g. \"2.31.0\" -> 31.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
    2 - Added symbol-macro support for C# static properties/fields and Lisp symbol shadowing.
