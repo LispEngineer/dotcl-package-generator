@@ -121,3 +121,6 @@ deploy: package
 clean:
 	dotnet clean dotcl-packagegen.csproj
 	rm -rf bin obj AssemblyToLispyTestTarget/bin AssemblyToLispyTestTarget/obj $(NUPKG_DIR)
+
+version:
+	echo $(VERSION)
