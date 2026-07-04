@@ -7,9 +7,11 @@ BIN_DIR := $(shell dotnet build dotcl-packagegen.csproj -getProperty:OutputPath 
 EXECUTABLE := $(BIN_DIR)dotcl-packagegen
 NUPKG_DIR = nupkg
 
-# Tool package version. The minor version tracks assembly-package-generator.lisp's
-# internal *generator-version* (currently 30), so they stay visibly in sync.
-VERSION = 2.30.0
+# Tool package version, read from dotcl-packagegen.asd's :version so it is
+# only ever defined in one place. The minor version tracks
+# assembly-package-generator.lisp's internal *generator-version*, so they
+# stay visibly in sync.
+VERSION := $(shell grep -m1 -oP ':version\s+"\K[^"]+' dotcl-packagegen.asd)
 
 # Reference assembly directory for the standard .NET metadata used by `test`
 # to exercise Stage 1/Stage 2 generation end-to-end. This is the Arch Linux
@@ -106,6 +108,7 @@ package:
 	# Builds Release binaries for every RuntimeIdentifier and produces the
 	# installable NuGet package(s) (per-RID packages plus the meta package
 	# that dispatches to them) in $(NUPKG_DIR)/, stamped with $(VERSION).
+	@test -n "$(VERSION)" || (echo "VERSION could not be read from dotcl-packagegen.asd" >&2 && exit 1)
 	dotnet pack dotcl-packagegen.csproj -c Release -o $(NUPKG_DIR) -p:PackageVersion=$(VERSION)
 
 deploy: package
