@@ -53,6 +53,8 @@ type list/`nil` falls through to the plain `base-name` function instead of error
   * any static property or field that is
     *writeable* (settable) generates nothing at all, regardless of whether it's also
     readable.
+  * **Not handled — see Unsupported Features:** a plain mutable *static* field (not
+    `readonly`, not `const`) generates nothing at all.
 
 * Handle overloaded indexers, per:
   * C# indexer (`this[...]`) threads its index parameter(s) through
@@ -60,6 +62,8 @@ type list/`nil` falls through to the plain `base-name` function instead of error
   * An **overloaded indexer** (distinct index-parameter signatures on the same name, e.g.
     `this[int]` alongside `this[string]`) is not yet supported — no function is generated;
     every signature is instead listed in a comment (see Unsupported Features).
+
+* Handle all the remaining ("dirty") overload cases.
 
 * See if there is some way to programmatically figure out the `--constant-properties`
   but I really think it requires looking at the source code (or disassembly).

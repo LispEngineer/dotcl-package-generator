@@ -12,7 +12,7 @@ design rationale behind each rule below, see `doc/generator-design-notes.md`.
 The final section, **Unsupported Features**, lists C# and CIL features this tool does not
 yet translate — including a few real silent gaps, not just documented TODOs.
 
----
+
 
 ## Conventions
 
@@ -149,7 +149,7 @@ Integration" section for the namespace-collision caveat this carries: CLOS regis
 keys only on the type's *short* name, so two same-named types in different namespaces
 share one CLOS class).
 
----
+
 
 ## Constructors
 
@@ -177,7 +177,7 @@ constructor present in the reflected metadata gets a wrapper, including a protec
 (useful on an abstract base class if you need it for subclassing scenarios in Lisp, but
 not directly instantiable at runtime the normal way).
 
----
+
 
 ## Static Constants and Symbol Macros
 
@@ -217,7 +217,7 @@ opted it in as a constant.
 *writeable* (settable) generates nothing at all, regardless of whether it's also
 readable.
 
----
+
 
 ## Instance Properties (including Indexers)
 
@@ -243,10 +243,58 @@ positionally, unless the indexer itself is overloaded, in which case it is unsup
 * Mutating a **struct's** (value type's) property via the generated `setf` may only
   mutate a boxed copy, discarded once the call returns, leaving the original Lisp value
   unchanged — a comment noting this is automatically inserted above every struct property
-  mutator (see `doc/generator-design-notes.md`'s "Struct Boxing" notes for the underlying
-  CLR mechanism and a workaround).
+  mutator:
+  ```lisp
+  ;; Note: Modifying a property of a value type (struct) via setf may only mutate
+  ;; a boxed copy, leaving the original unchanged. Use caution with structs.
+  ```
+  Reference types (classes) never suffer from this; only struct/enum (`:kind :struct`/
+  `:enum`, `is-value-type-p`) receivers get the comment.
 
----
+### Struct Boxing Caveat and Workaround
+
+**Summary:** setting a struct property/field's value from Lisp is only reliable when the
+new value is produced by an actual invoked .NET conversion call, not by `dotnet:box` or a
+bare `the`-declared literal; struct-mutating *instance methods* (as opposed to
+properties/fields) should be avoided in favor of a static factory method wherever one
+exists.
+
+`dotnet:invoke`'s setter path boxes a struct receiver at the CLR boundary. Per
+`doc/generator-design-notes.md`'s "Instance Properties and Struct 'Boxing Mutation'"
+notes (there, using DungeonSlime's own `#!!System.Convert.ToByte`-style reader-macro
+shorthand for a static-method call — not available in this standalone repo; the
+equivalent below uses this repo's own `dotnet:static`, per `doc/dotnet-dotcl-interop.md`),
+a real transcript demonstrates the difference in outcome depending on how the new value
+is produced:
+```lisp
+DUNGEON-SLIME> (setf (color:r x) (dotnet:box 37 "System.Byte"))
+#<DOTNET-BOXED Byte 37>
+DUNGEON-SLIME> x
+#<DOTNET Microsoft.Xna.Framework.Color {R:37 G:255 B:255 A:255}>   ; unchanged
+DUNGEON-SLIME> (setf (color:r x) (dotnet:static "System.Convert" "ToByte" 40))
+#<DOTNET System.Byte 40>
+DUNGEON-SLIME> x
+#<DOTNET Microsoft.Xna.Framework.Color {R:40 G:255 B:255 A:255}>   ; correctly mutated
+DUNGEON-SLIME> (setf (color:r x) (the (dotnet "System.Byte") 55))
+Error: Method 'Microsoft.Xna.Framework.Color.set_R' not found.
+```
+**The workaround:** pass the new value through a real invoked conversion call (e.g.
+`(dotnet:static "System.Convert" "ToByte" 40)`, or any other genuine `dotnet:static`/
+`dotnet:invoke` call to a real CLR conversion routine) rather than `dotnet:box`-ing a raw
+Lisp value or type-hinting it with `the` — only a genuinely CLR-invoked value round-trips
+correctly into the setter. This is a caveat for *callers* of generated code; the
+generator itself does not (and cannot, from the C# side alone) work around it — it only
+emits the warning comment above.
+
+For struct-mutating **instance methods** that return `void` (e.g. `Vector2.Normalize()`,
+covered separately in `doc/generator-design-notes.md`'s "Struct Mutation, Boxing, and
+Overload Resolution (Version 16)" section), the recommended workaround is different:
+prefer the equivalent **static** method overload that returns a new struct value (e.g.
+`Vector2.Normalize(Vector2)` static) or a hand-written Lisp-native helper, rather than
+relying on in-place mutation of a boxed receiver whose mutated copy is discarded the
+moment the call returns.
+
+
 
 ## Instance Fields
 
@@ -265,13 +313,13 @@ has no direct field-write equivalent:
   (cl:setf (dotnet:invoke (cl:the (dotnet "Fq.Type") obj!) "FieldName") new-value))
 ```
 
-The same struct-boxing-mutation caveat comment as instance properties is emitted above
-the setter for value-type fields.
+The same struct-boxing-mutation caveat comment as instance properties (see "Struct
+Boxing Caveat and Workaround" above) is emitted above the setter for value-type fields.
 
 **Not handled — see Unsupported Features:** a plain mutable *static* field (not
 `readonly`, not `const`) generates nothing at all.
 
----
+
 
 ## Methods and Method Overloads
 
@@ -311,7 +359,7 @@ excluded — see Unsupported Features).
   human-readable signature plus that overload's own XML-doc Summary/Returns/Parameters —
   so the full set of available overloads stays documented on the one function.
 
----
+
 
 ## Generic Methods
 
@@ -355,7 +403,7 @@ counting the type argument(s) it's given.
 See `doc/generator-design-notes.md`'s Version 27/28 sections for the full history of this
 feature (arity-1-only → any arity → the current two-tier dispatch).
 
----
+
 
 ## Type Kind (class / struct / interface / enum / delegate)
 
@@ -375,7 +423,7 @@ receiver is treated as a value type for the boxing-mutation warning comment.
   (`Invoke`, `BeginInvoke`, `EndInvoke`, etc.) generate ordinary method wrappers; nothing
   currently treats a delegate as a first-class Lisp function value.
 
----
+
 
 ## Nested and Generic Types
 
@@ -385,8 +433,10 @@ type's own reflection-facing identity (`<type-str>`, CLOS registration, etc.) is
 completely untouched.
 
 ```
-Microsoft.Xna.Framework.Graphics.SpriteFont+Glyph  -> microsoft-xna-framework-graphics-sprite-font-glyph
-System.Collections.Generic.Dictionary`2            -> system-collections-generic-dictionary-2
+Microsoft.Xna.Framework.Graphics.SpriteFont+Glyph -> microsoft-xna-framework-graphics-sprite-font-glyph
+
+System.Collections.Generic.Dictionary`2 ->
+system-collections-generic-dictionary-2
 ```
 
 A generic type's *own* type parameters (e.g. `List<T>`'s `T`) are a different matter from
@@ -394,7 +444,7 @@ a generic *method's* type parameters (above) — see Unsupported Features: a mem
 signature mentions the enclosing type's own open type parameter is silently excluded, not
 generated at all.
 
----
+
 
 ## Documentation
 
@@ -402,11 +452,11 @@ generated at all.
 function's Lisp docstring (or, for constants/symbol-macros, a `(cl:documentation ...)`
 `setf` form), when present in the assembly's sidecar `.xml` file.
 
----
 
-## Unsupported Features
 
-### C# Features
+# Unsupported Features
+
+## C# Features
 
 * **Static settable properties/fields.** Any static property that is writeable (whether
   read-write or write-only) generates *nothing* — no getter, no setter, no comment. The
@@ -414,68 +464,82 @@ function's Lisp docstring (or, for constants/symbol-macros, a `(cl:documentation
   genuine silent gap, not merely an unimplemented-but-documented case (unlike the dirty
   overload comment below) — it mirrors the bug public instance fields had before
   Version 27, just not yet fixed for the static case.
+
 * **A generic type's own type parameters.** A member whose parameter or return type
   mentions the *declaring* generic type's own unresolved type parameter (e.g.
   `List<T>.Add(T item)`, as opposed to a generic *method's* own type parameter, which
   *is* supported — see "Generic Methods" above) is silently excluded from the method
   list entirely, with no comment. Only members whose signature doesn't reference the
   enclosing type's open parameters are considered at all.
+
 * **Overloaded indexers.** A C# indexer overloaded across distinct index-parameter
   signatures (e.g. `this[int]` alongside `this[string]`) generates no function — every
   signature is documented in a comment, since picking which one a single generated
   function should dispatch to isn't well-defined without a full type-based `cond`
   dispatch (the same treatment overloaded methods get, but not yet extended to
   indexers).
+
 * **Dirty method/constructor/indexer overloads** — any overload using `ref`, `out`,
   `ref readonly`/`in`, `params`, or a default parameter value — is not generated; its
   signature is documented in a comment. (Explicitly planned future work per `PLAN.md`:
   a `-ref` suffix naming convention with `out` → multiple Lisp return values.)
+
 * **Events** are not reflected at all — no `:events` key exists in the metadata schema,
   and `AssemblyToLispy.cs` never calls `Type.GetEvents()`.
   * The `AddHandler`/`RemoveHandler`/backing-delegate-field accessor methods of an event
     are typically compiler-generated and filtered out at the reflection stage anyway
     (see `doc/assembly-to-lispy.md`'s `CompilerGeneratedAttribute` filtering).
+
 * **Generic constraints** (`where T : ...`) are not reflected — no `:generic-constraints`
   key exists yet (tracked as Phase 4 future work in `doc/assembly-to-lispy.md`).
+
 * **Custom attributes** (`[Obsolete]`, `[Serializable]`'s value, custom attributes, etc.)
   are not reflected as data — no `:attributes` key exists yet, beyond the handful of
   type-level boolean `:flags` already captured (`:abstract`, `:sealed`, `:serializable`,
   etc.).
+
 * **Extension methods** are flagged in the metadata (`:extension-method`,
   `:extension-this`) but the generator does not yet do anything special with that
   information — an extension method still generates as an ordinary static method on its
   declaring (usually `static`) class, with the extended type as an ordinary leading
   parameter, not as a method callable on the extended type's own receiver.
+
 * **Operator overload rough edges.** Conversion operators (`op_Implicit`/`op_Explicit`,
   mapped to `implicit-cast`/`explicit-cast`) and some multi-branch operator dispatch
   (e.g. `Enumerable.Average()`'s generated `cond` has many branches that are all
   identical because the dispatcher only ever distinguishes ".NET object vs. not") are
   known-rough areas flagged as ongoing work in `PLAN.md`'s Miscellaneous section, not
   fully polished yet.
+
 * **Explicit interface implementations** (a method implementing `IFoo.Bar()` while also
   exposing a different `Bar()` publicly) are not specifically detected or disambiguated
   from an ordinary method of the same clean name.
+
 * **Static abstract/virtual interface members** (C# 11 "generic math" feature) are
   reflected like any other member, but invoking a wrapper for one only makes sense
   through a concrete implementing type — there is no special dispatch support for
   resolving the implementation from an interface-typed reference.
 
-### CIL Features (not necessarily surfaced by C#)
+## CIL Features (not necessarily surfaced by C#)
 
 * **Non-public members.** Only `public` and `protected` members are ever reflected —
   `private`/`internal`/`private protected` members are invisible to this tool by design,
   at the `AssemblyToLispy.cs` reflection stage, not the generator.
+
 * **Pointers and unsafe code** (`void*`, function pointers, `stackalloc`, etc.) have no
   interop story here — no pointer-typed parameter/return value gets any special dotnet
   interop treatment; a member using one would need to be excluded or would generate
   broken code.
+
 * **Ref returns** (`ref T Method()`) are not specially detected or represented in the
   metadata — no `:ref-return` flag exists, unlike `ref`/`out`/`in` *parameters*, which are
   captured.
+
 * **Multi-dimensional and jagged array nuances** beyond simple parameter/return typing
   are not specially modeled — an array-typed member is reflected and generated the same
   as any other type, relying entirely on DotCL's own generic `dotnet:invoke` machinery to
   handle the actual array object at runtime.
+
 * **By-ref locals, `stackalloc`, and other IL-only value-lifetime constructs** are
   compiler-internal and never surface through .NET reflection metadata to begin with, so
   there is nothing for this tool to translate.
