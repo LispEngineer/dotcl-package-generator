@@ -1,21 +1,21 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
-;;; Generator Version: 26
-;;; Creation Date: 2026-07-04T01:45:08Z
+;;; Generator Version: 27
+;;; Creation Date: 2026-07-04T02:31:19Z
 
 (cl:in-package :system-linq-enumerable)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-04T01:45:08Z")
-(cl:defconstant <version> 26)
+(cl:defconstant <creation> "2026-07-04T02:31:19Z")
+(cl:defconstant <version> 27)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
   (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
                  (dotnet:resolve-type "System.Linq.Enumerable")))
 
-(cl:defun aggregate (type source func)
+(cl:defun aggregate-arity-1 (type source func)
   "Summary: Applies an accumulator function over a sequence.
 Returns: The final accumulator value.
 Parameters:
@@ -24,8 +24,64 @@ Parameters:
 "
   (dotnet:static-generic <type-str> "Aggregate" (cl:list type) source func))
 
-;; The following C# System.Linq.Enumerable.AggregateBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun aggregate-arity-2 (type-1 type-2 source seed func)
+  "Summary: Applies an accumulator function over a sequence. The specified seed value is used as the initial accumulator value.
+Returns: The final accumulator value.
+Parameters:
+  - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 to aggregate over.
+  - seed (TAccumulate): The initial accumulator value.
+  - func (System.Func`3[TAccumulate, TSource, TAccumulate]): An accumulator function to be invoked on each element.
+"
+  (dotnet:static-generic <type-str> "Aggregate" (cl:list type-1 type-2) source seed func))
+
+(cl:defun aggregate-arity-3 (type-1 type-2 type-3 source seed func result-selector)
+  "Summary: Applies an accumulator function over a sequence. The specified seed value is used as the initial accumulator value, and the specified function is used to select the result value.
+Returns: The transformed final accumulator value.
+Parameters:
+  - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 to aggregate over.
+  - seed (TAccumulate): The initial accumulator value.
+  - func (System.Func`3[TAccumulate, TSource, TAccumulate]): An accumulator function to be invoked on each element.
+  - result-selector (System.Func`2[TAccumulate, TResult]): A function to transform the final accumulator value into the result value.
+"
+  (dotnet:static-generic <type-str> "Aggregate" (cl:list type-1 type-2 type-3) source seed func result-selector))
+
+(cl:defun aggregate-by (type-1 type-2 type-3 source key-selector seed func cl:&key (key-comparer cl:nil supplied-key-comparer))
+  "Master wrapper for System.Linq.Enumerable.AggregateBy overloads. Dispatches at runtime.
+
+AggregateBy(IEnumerable, Func, TAccumulate, Func, IEqualityComparer) -> KeyValuePair
+  Summary: Applies an accumulator function over a sequence, grouping results by key.
+  Returns: An enumerable containing the aggregates corresponding to each key deriving from source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 to aggregate over.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - seed (TAccumulate): The initial accumulator value.
+    - func (System.Func`3[TAccumulate, TSource, TAccumulate]): An accumulator function to be invoked on each element.
+    - key-comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
+
+AggregateBy(IEnumerable, Func, Func, Func, IEqualityComparer) -> KeyValuePair
+  Summary: Applies an accumulator function over a sequence, grouping results by key.
+  Returns: An enumerable containing the aggregates corresponding to each key deriving from source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 to aggregate over.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - seed-selector (System.Func`2[TKey, TAccumulate]): A factory for the initial accumulator value.
+    - func (System.Func`3[TAccumulate, TSource, TAccumulate]): An accumulator function to be invoked on each element.
+    - key-comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null seed) (dotnet:object-type seed)) (cl:or (cl:null func) (dotnet:object-type func)) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer)))
+     (dotnet:static-generic <type-str> "AggregateBy" (cl:list type-1 type-2 type-3) source key-selector seed func key-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null seed) (dotnet:object-type seed)) (cl:or (cl:null func) (dotnet:object-type func)) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer)))
+     (dotnet:static-generic <type-str> "AggregateBy" (cl:list type-1 type-2 type-3) source key-selector seed func key-comparer))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "AggregateBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:list :seed seed) (cl:list :func func) (cl:when supplied-key-comparer (cl:list :key-comparer key-comparer)))))))
+
+;; Note: System.Linq.Enumerable.AggregateBy also has the following overloads with special
+;; parameter types (ref, out, params, or defaults) that are not
+;; yet supported:
 ;;   AggregateBy(IEnumerable, Func, TAccumulate, Func, IEqualityComparer) -> KeyValuePair
 ;;   AggregateBy(IEnumerable, Func, Func, Func, IEqualityComparer) -> KeyValuePair
 
@@ -82,7 +138,7 @@ Parameters:
 "
   (dotnet:static-generic <type-str> "AsEnumerable" (cl:list type) source))
 
-(cl:defun average (source cl:&optional (selector cl:nil supplied-selector))
+(cl:defun average (source)
   "Master wrapper for System.Linq.Enumerable.Average overloads. Dispatches at runtime.
 
 Average(Int32]) -> Double
@@ -144,6 +200,36 @@ Average(Decimal]]) -> Decimal]
   Returns: The average of the sequence of values, or if the source sequence is empty or contains only values that are .
   Parameters:
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to calculate the average of.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Average" source))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "Average"
+                    :supplied-args (cl:append (cl:list :source source))))))
+
+(cl:defun average-arity-1 (type source selector)
+  "Master wrapper for System.Linq.Enumerable.Average overloads. Dispatches at runtime.
 
 Average(IEnumerable, Int32]) -> Double
   Summary: Computes the average of a sequence of System.Int32 values that are obtained by invoking a transform function on each element of the input sequence.
@@ -216,51 +302,31 @@ Average(IEnumerable, Decimal]]) -> Decimal]
     - selector (System.Func`2[TSource, System.Nullable`1[System.Decimal]]): A transform function to apply to each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Average" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Average" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Average"
-                    :supplied-args (cl:append (cl:list :source source) (cl:when supplied-selector (cl:list :selector selector)))))))
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :selector selector))))))
 
 (cl:defun cast (type source)
   "Summary: Casts the elements of an System.Collections.IEnumerable to the specified type.
@@ -344,8 +410,29 @@ Count(IEnumerable, Boolean]) -> Int32
                     :method-name "Count"
                     :supplied-args (cl:append (cl:list :source source) (cl:when supplied-predicate (cl:list :predicate predicate)))))))
 
-;; The following C# System.Linq.Enumerable.CountBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun count-by (type-1 type-2 source key-selector cl:&key (key-comparer cl:nil supplied-key-comparer))
+  "Master wrapper for System.Linq.Enumerable.CountBy overloads. Dispatches at runtime.
+
+CountBy(IEnumerable, Func, IEqualityComparer) -> Int32]]
+  Summary: Returns the count of elements in the source sequence grouped by key.
+  Returns: An enumerable containing the frequencies of each key occurrence in source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence that contains elements to be counted.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - key-comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer)))
+     (dotnet:static-generic <type-str> "CountBy" (cl:list type-1 type-2) source key-selector key-comparer))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "CountBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-key-comparer (cl:list :key-comparer key-comparer)))))))
+
+;; Note: System.Linq.Enumerable.CountBy also has the following overloads with special
+;; parameter types (ref, out, params, or defaults) that are not
+;; yet supported:
 ;;   CountBy(IEnumerable, Func, IEqualityComparer) -> Int32]]
 
 (cl:defun default-if-empty (type source cl:&optional (default-value cl:nil supplied-default-value))
@@ -402,8 +489,34 @@ Distinct(IEnumerable, IEqualityComparer) -> IEnumerable
                     :method-name "Distinct"
                     :supplied-args (cl:append (cl:list :source source) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
-;; The following C# System.Linq.Enumerable.DistinctBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun distinct-by (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.DistinctBy overloads. Dispatches at runtime.
+
+DistinctBy(IEnumerable, Func) -> IEnumerable
+  Summary: Returns distinct elements from a sequence according to a specified key selector function.
+  Returns: An System.Collections.Generic.IEnumerable`1 that contains distinct elements from the source sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): The sequence to remove duplicate elements from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+
+DistinctBy(IEnumerable, Func, IEqualityComparer) -> IEnumerable
+  Summary: Returns distinct elements from a sequence according to a specified key selector function and using a specified comparer to compare keys.
+  Returns: An System.Collections.Generic.IEnumerable`1 that contains distinct elements from the source sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): The sequence to remove duplicate elements from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "DistinctBy" (cl:list type-1 type-2) source key-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "DistinctBy" (cl:list type-1 type-2) source key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "DistinctBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun element-at (type source index)
   "Master wrapper for System.Linq.Enumerable.ElementAt overloads. Dispatches at runtime.
@@ -496,8 +609,36 @@ Except(IEnumerable, IEnumerable, IEqualityComparer) -> IEnumerable
                     :method-name "Except"
                     :supplied-args (cl:append (cl:list :first first) (cl:list :second second) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
-;; The following C# System.Linq.Enumerable.ExceptBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun except-by (type-1 type-2 first second key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.ExceptBy overloads. Dispatches at runtime.
+
+ExceptBy(IEnumerable, IEnumerable, Func) -> IEnumerable
+  Summary: Produces the set difference of two sequences according to a specified key selector function.
+  Returns: A sequence that contains the set difference of the elements of two sequences.
+  Parameters:
+    - first (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose keys that are not also in second will be returned.
+    - second (System.Collections.Generic.IEnumerable`1[TKey]): An System.Collections.Generic.IEnumerable`1 whose keys that also occur in the first sequence will cause those elements to be removed from the returned sequence.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+
+ExceptBy(IEnumerable, IEnumerable, Func, IEqualityComparer) -> IEnumerable
+  Summary: Produces the set difference of two sequences according to a specified key selector function.
+  Returns: A sequence that contains the set difference of the elements of two sequences.
+  Parameters:
+    - first (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose keys that are not also in second will be returned.
+    - second (System.Collections.Generic.IEnumerable`1[TKey]): An System.Collections.Generic.IEnumerable`1 whose keys that also occur in the first sequence will cause those elements to be removed from the returned sequence.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 to compare values.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "ExceptBy" (cl:list type-1 type-2) first second key-selector comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "ExceptBy" (cl:list type-1 type-2) first second key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "ExceptBy"
+                    :supplied-args (cl:append (cl:list :first first) (cl:list :second second) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun first (type source cl:&optional (predicate cl:nil supplied-predicate))
   "Master wrapper for System.Linq.Enumerable.First overloads. Dispatches at runtime.
@@ -572,11 +713,154 @@ FirstOrDefault(IEnumerable, Boolean], TSource) -> TSource
                     :method-name "FirstOrDefault"
                     :supplied-args (cl:append (cl:list :source source) (cl:when supplied-default-value (cl:list :default-value default-value)) (cl:when supplied-default-value2 (cl:list :default-value2 default-value2)))))))
 
-;; The following C# System.Linq.Enumerable.GroupBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun group-by-arity-2 (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.GroupBy overloads. Dispatches at runtime.
 
-;; The following C# System.Linq.Enumerable.GroupJoin overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+GroupBy(IEnumerable, Func) -> IGrouping
+  Summary: Groups the elements of a sequence according to a specified key selector function.
+  Returns: An IEnumerable<IGrouping<TKey, TSource>> in C# or IEnumerable(Of IGrouping(Of TKey, TSource)) in Visual Basic where each System.Linq.IGrouping`2 object contains a sequence of objects and a key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose elements to group.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+
+GroupBy(IEnumerable, Func, IEqualityComparer) -> IGrouping
+  Summary: Groups the elements of a sequence according to a specified key selector function and compares the keys by using a specified comparer.
+  Returns: An IEnumerable<IGrouping<TKey, TSource>> in C# or IEnumerable(Of IGrouping(Of TKey, TSource)) in Visual Basic where each System.Linq.IGrouping`2 object contains a collection of objects and a key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose elements to group.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2) source key-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2) source key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "GroupBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun group-by-arity-3 (type-1 type-2 type-3 source key-selector element-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.GroupBy overloads. Dispatches at runtime.
+
+GroupBy(IEnumerable, Func, Func) -> IGrouping
+  Summary: Groups the elements of a sequence according to a specified key selector function and projects the elements for each group by using a specified function.
+  Returns: An IEnumerable<IGrouping<TKey, TElement>> in C# or IEnumerable(Of IGrouping(Of TKey, TElement)) in Visual Basic where each System.Linq.IGrouping`2 object contains a collection of objects of type and a key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose elements to group.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - element-selector (System.Func`2[TSource, TElement]): A function to map each source element to an element in the System.Linq.IGrouping`2.
+
+GroupBy(IEnumerable, Func, IEnumerable) -> IEnumerable
+  Summary: Groups the elements of a sequence according to a specified key selector function and creates a result value from each group and its key.
+  Returns: A collection of elements of type where each element represents a projection over a group and its key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose elements to group.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - result-selector (System.Func`3[TKey, System.Collections.Generic.IEnumerable`1[TSource], TResult]): A function to create a result value from each group.
+
+GroupBy(IEnumerable, Func, Func, IEqualityComparer) -> IGrouping
+  Summary: Groups the elements of a sequence according to a key selector function. The keys are compared by using a comparer and each group's elements are projected by using a specified function.
+  Returns: An IEnumerable<IGrouping<TKey, TElement>> in C# or IEnumerable(Of IGrouping(Of TKey, TElement)) in Visual Basic where each System.Linq.IGrouping`2 object contains a collection of objects of type and a key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose elements to group.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - element-selector (System.Func`2[TSource, TElement]): A function to map each source element to an element in an System.Linq.IGrouping`2.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
+
+GroupBy(IEnumerable, Func, IEnumerable, IEqualityComparer) -> IEnumerable
+  Summary: Groups the elements of a sequence according to a specified key selector function and creates a result value from each group and its key. The keys are compared by using a specified comparer.
+  Returns: A collection of elements of type where each element represents a projection over a group and its key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose elements to group.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - result-selector (System.Func`3[TKey, System.Collections.Generic.IEnumerable`1[TSource], TResult]): A function to create a result value from each group.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3) source key-selector element-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3) source key-selector element-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3) source key-selector element-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3) source key-selector element-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "GroupBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:list :element-selector element-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun group-by-arity-4 (type-1 type-2 type-3 type-4 source key-selector element-selector result-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.GroupBy overloads. Dispatches at runtime.
+
+GroupBy(IEnumerable, Func, Func, IEnumerable) -> IEnumerable
+  Summary: Groups the elements of a sequence according to a specified key selector function and creates a result value from each group and its key. The elements of each group are projected by using a specified function.
+  Returns: A collection of elements of type where each element represents a projection over a group and its key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose elements to group.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - element-selector (System.Func`2[TSource, TElement]): A function to map each source element to an element in an System.Linq.IGrouping`2.
+    - result-selector (System.Func`3[TKey, System.Collections.Generic.IEnumerable`1[TElement], TResult]): A function to create a result value from each group.
+
+GroupBy(IEnumerable, Func, Func, IEnumerable, IEqualityComparer) -> IEnumerable
+  Summary: Groups the elements of a sequence according to a specified key selector function and creates a result value from each group and its key. Key values are compared by using a specified comparer, and the elements of each group are projected by using a specified function.
+  Returns: A collection of elements of type where each element represents a projection over a group and its key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose elements to group.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - element-selector (System.Func`2[TSource, TElement]): A function to map each source element to an element in an System.Linq.IGrouping`2.
+    - result-selector (System.Func`3[TKey, System.Collections.Generic.IEnumerable`1[TElement], TResult]): A function to create a result value from each group.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3 type-4) source key-selector element-selector result-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3 type-4) source key-selector element-selector result-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "GroupBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:list :element-selector element-selector) (cl:list :result-selector result-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun group-join (type-1 type-2 type-3 type-4 outer inner outer-key-selector inner-key-selector result-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.GroupJoin overloads. Dispatches at runtime.
+
+GroupJoin(IEnumerable, IEnumerable, Func, Func, IEnumerable) -> IEnumerable
+  Summary: Correlates the elements of two sequences based on equality of keys and groups the results. The default equality comparer is used to compare keys.
+  Returns: An System.Collections.Generic.IEnumerable`1 that contains elements of type that are obtained by performing a grouped join on two sequences.
+  Parameters:
+    - outer (System.Collections.Generic.IEnumerable`1[TOuter]): The first sequence to join.
+    - inner (System.Collections.Generic.IEnumerable`1[TInner]): The sequence to join to the first sequence.
+    - outer-key-selector (System.Func`2[TOuter, TKey]): A function to extract the join key from each element of the first sequence.
+    - inner-key-selector (System.Func`2[TInner, TKey]): A function to extract the join key from each element of the second sequence.
+    - result-selector (System.Func`3[TOuter, System.Collections.Generic.IEnumerable`1[TInner], TResult]): A function to create a result element from an element from the first sequence and a collection of matching elements from the second sequence.
+
+GroupJoin(IEnumerable, IEnumerable, Func, Func, IEnumerable, IEqualityComparer) -> IEnumerable
+  Summary: Correlates the elements of two sequences based on key equality and groups the results. A specified System.Collections.Generic.IEqualityComparer`1 is used to compare keys.
+  Returns: An System.Collections.Generic.IEnumerable`1 that contains elements of type that are obtained by performing a grouped join on two sequences.
+  Parameters:
+    - outer (System.Collections.Generic.IEnumerable`1[TOuter]): The first sequence to join.
+    - inner (System.Collections.Generic.IEnumerable`1[TInner]): The sequence to join to the first sequence.
+    - outer-key-selector (System.Func`2[TOuter, TKey]): A function to extract the join key from each element of the first sequence.
+    - inner-key-selector (System.Func`2[TInner, TKey]): A function to extract the join key from each element of the second sequence.
+    - result-selector (System.Func`3[TOuter, System.Collections.Generic.IEnumerable`1[TInner], TResult]): A function to create a result element from an element from the first sequence and a collection of matching elements from the second sequence.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to hash and compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "GroupJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector comparer))
+    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "GroupJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "GroupJoin"
+                    :supplied-args (cl:append (cl:list :outer outer) (cl:list :inner inner) (cl:list :outer-key-selector outer-key-selector) (cl:list :inner-key-selector inner-key-selector) (cl:list :result-selector result-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun index (type source)
   "Summary: Returns an enumerable that incorporates the element's index into a tuple.
@@ -624,11 +908,71 @@ Intersect(IEnumerable, IEnumerable, IEqualityComparer) -> IEnumerable
                     :method-name "Intersect"
                     :supplied-args (cl:append (cl:list :first first) (cl:list :second second) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
-;; The following C# System.Linq.Enumerable.IntersectBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun intersect-by (type-1 type-2 first second key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.IntersectBy overloads. Dispatches at runtime.
 
-;; The following C# System.Linq.Enumerable.Join overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+IntersectBy(IEnumerable, IEnumerable, Func) -> IEnumerable
+  Summary: Produces the set intersection of two sequences according to a specified key selector function.
+  Returns: A sequence that contains the elements that form the set intersection of two sequences.
+  Parameters:
+    - first (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose distinct elements that also appear in second will be returned.
+    - second (System.Collections.Generic.IEnumerable`1[TKey]): An System.Collections.Generic.IEnumerable`1 whose distinct elements that also appear in the first sequence will be returned.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+
+IntersectBy(IEnumerable, IEnumerable, Func, IEqualityComparer) -> IEnumerable
+  Summary: Produces the set intersection of two sequences according to a specified key selector function.
+  Returns: A sequence that contains the elements that form the set intersection of two sequences.
+  Parameters:
+    - first (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose distinct elements that also appear in second will be returned.
+    - second (System.Collections.Generic.IEnumerable`1[TKey]): An System.Collections.Generic.IEnumerable`1 whose distinct elements that also appear in the first sequence will be returned.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "IntersectBy" (cl:list type-1 type-2) first second key-selector comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "IntersectBy" (cl:list type-1 type-2) first second key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "IntersectBy"
+                    :supplied-args (cl:append (cl:list :first first) (cl:list :second second) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun join (type-1 type-2 type-3 type-4 outer inner outer-key-selector inner-key-selector result-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.Join overloads. Dispatches at runtime.
+
+Join(IEnumerable, IEnumerable, Func, Func, Func) -> IEnumerable
+  Summary: Correlates the elements of two sequences based on matching keys. The default equality comparer is used to compare keys.
+  Returns: An System.Collections.Generic.IEnumerable`1 that has elements of type that are obtained by performing an inner join on two sequences.
+  Parameters:
+    - outer (System.Collections.Generic.IEnumerable`1[TOuter]): The first sequence to join.
+    - inner (System.Collections.Generic.IEnumerable`1[TInner]): The sequence to join to the first sequence.
+    - outer-key-selector (System.Func`2[TOuter, TKey]): A function to extract the join key from each element of the first sequence.
+    - inner-key-selector (System.Func`2[TInner, TKey]): A function to extract the join key from each element of the second sequence.
+    - result-selector (System.Func`3[TOuter, TInner, TResult]): A function to create a result element from two matching elements.
+
+Join(IEnumerable, IEnumerable, Func, Func, Func, IEqualityComparer) -> IEnumerable
+  Summary: Correlates the elements of two sequences based on matching keys. A specified System.Collections.Generic.IEqualityComparer`1 is used to compare keys.
+  Returns: An System.Collections.Generic.IEnumerable`1 that has elements of type that are obtained by performing an inner join on two sequences.
+  Parameters:
+    - outer (System.Collections.Generic.IEnumerable`1[TOuter]): The first sequence to join.
+    - inner (System.Collections.Generic.IEnumerable`1[TInner]): The sequence to join to the first sequence.
+    - outer-key-selector (System.Func`2[TOuter, TKey]): A function to extract the join key from each element of the first sequence.
+    - inner-key-selector (System.Func`2[TInner, TKey]): A function to extract the join key from each element of the second sequence.
+    - result-selector (System.Func`3[TOuter, TInner, TResult]): A function to create a result element from two matching elements.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to hash and compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "Join" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector comparer))
+    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "Join" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "Join"
+                    :supplied-args (cl:append (cl:list :outer outer) (cl:list :inner inner) (cl:list :outer-key-selector outer-key-selector) (cl:list :inner-key-selector inner-key-selector) (cl:list :result-selector result-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun last (type source cl:&optional (predicate cl:nil supplied-predicate))
   "Master wrapper for System.Linq.Enumerable.Last overloads. Dispatches at runtime.
@@ -703,8 +1047,40 @@ LastOrDefault(IEnumerable, Boolean], TSource) -> TSource
                     :method-name "LastOrDefault"
                     :supplied-args (cl:append (cl:list :source source) (cl:when supplied-default-value (cl:list :default-value default-value)) (cl:when supplied-default-value2 (cl:list :default-value2 default-value2)))))))
 
-;; The following C# System.Linq.Enumerable.LeftJoin overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun left-join (type-1 type-2 type-3 type-4 outer inner outer-key-selector inner-key-selector result-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.LeftJoin overloads. Dispatches at runtime.
+
+LeftJoin(IEnumerable, IEnumerable, Func, Func, Func) -> IEnumerable
+  Summary: Correlates the elements of two sequences based on matching keys. The default equality comparer is used to compare keys.
+  Returns: An System.Collections.Generic.IEnumerable`1 that has elements of type that are obtained by performing a left outer join on two sequences.
+  Parameters:
+    - outer (System.Collections.Generic.IEnumerable`1[TOuter]): The first sequence to join.
+    - inner (System.Collections.Generic.IEnumerable`1[TInner]): The sequence to join to the first sequence.
+    - outer-key-selector (System.Func`2[TOuter, TKey]): A function to extract the join key from each element of the first sequence.
+    - inner-key-selector (System.Func`2[TInner, TKey]): A function to extract the join key from each element of the second sequence.
+    - result-selector (System.Func`3[TOuter, TInner, TResult]): A function to create a result element from two matching elements.
+
+LeftJoin(IEnumerable, IEnumerable, Func, Func, Func, IEqualityComparer) -> IEnumerable
+  Summary: Correlates the elements of two sequences based on matching keys. A specified System.Collections.Generic.IEqualityComparer`1 is used to compare keys.
+  Returns: An System.Collections.Generic.IEnumerable`1 that has elements of type that are obtained by performing a left outer join on two sequences.
+  Parameters:
+    - outer (System.Collections.Generic.IEnumerable`1[TOuter]): The first sequence to join.
+    - inner (System.Collections.Generic.IEnumerable`1[TInner]): The sequence to join to the first sequence.
+    - outer-key-selector (System.Func`2[TOuter, TKey]): A function to extract the join key from each element of the first sequence.
+    - inner-key-selector (System.Func`2[TInner, TKey]): A function to extract the join key from each element of the second sequence.
+    - result-selector (System.Func`3[TOuter, TInner, TResult]): A function to create a result element from two matching elements.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to hash and compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "LeftJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector comparer))
+    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "LeftJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "LeftJoin"
+                    :supplied-args (cl:append (cl:list :outer outer) (cl:list :inner inner) (cl:list :outer-key-selector outer-key-selector) (cl:list :inner-key-selector inner-key-selector) (cl:list :result-selector result-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun long-count (type source cl:&optional (predicate cl:nil supplied-predicate))
   "Master wrapper for System.Linq.Enumerable.LongCount overloads. Dispatches at runtime.
@@ -733,7 +1109,7 @@ LongCount(IEnumerable, Boolean]) -> Int64
                     :method-name "LongCount"
                     :supplied-args (cl:append (cl:list :source source) (cl:when supplied-predicate (cl:list :predicate predicate)))))))
 
-(cl:defun max (source cl:&optional (comparer cl:nil supplied-comparer))
+(cl:defun max (source)
   "Master wrapper for System.Linq.Enumerable.Max overloads. Dispatches at runtime.
 
 Max(Int32]) -> Int32
@@ -795,6 +1171,36 @@ Max(Decimal]]) -> Decimal]
   Returns: A value of type Nullable<Decimal> in C# or Nullable(Of Decimal) in Visual Basic that corresponds to the maximum value in the sequence.
   Parameters:
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to determine the maximum value of.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Max" source))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "Max"
+                    :supplied-args (cl:append (cl:list :source source))))))
+
+(cl:defun max-arity-1 (type source cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.Max overloads. Dispatches at runtime.
 
 Max(IEnumerable) -> TSource
   Summary: Returns the maximum value in a generic sequence.
@@ -881,59 +1287,74 @@ Max(IEnumerable, Decimal]]) -> Decimal]
 "
   (cl:cond
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Max" source comparer))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Max" source))
+     (dotnet:static-generic <type-str> "Max" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Max"
                     :supplied-args (cl:append (cl:list :source source) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
-;; The following C# System.Linq.Enumerable.MaxBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun max-arity-2 (type-1 type-2 source selector)
+  "Summary: Invokes a transform function on each element of a generic sequence and returns the maximum resulting value.
+Returns: The maximum value in the sequence.
+Parameters:
+  - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to determine the maximum value of.
+  - selector (System.Func`2[TSource, TResult]): A transform function to apply to each element.
+"
+  (dotnet:static-generic <type-str> "Max" (cl:list type-1 type-2) source selector))
 
-(cl:defun min (source cl:&optional (comparer cl:nil supplied-comparer))
+(cl:defun max-by (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.MaxBy overloads. Dispatches at runtime.
+
+MaxBy(IEnumerable, Func) -> TSource
+  Summary: Returns the maximum value in a generic sequence according to a specified key selector function.
+  Returns: The value with the maximum key in the sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to determine the maximum value of.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+
+MaxBy(IEnumerable, Func, IComparer) -> TSource
+  Summary: Returns the maximum value in a generic sequence according to a specified key selector function and key comparer.
+  Returns: The value with the maximum key in the sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to determine the maximum value of.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - comparer (System.Collections.Generic.IComparer`1[TKey]): The System.Collections.Generic.IComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "MaxBy" (cl:list type-1 type-2) source key-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "MaxBy" (cl:list type-1 type-2) source key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "MaxBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun min (source)
   "Master wrapper for System.Linq.Enumerable.Min overloads. Dispatches at runtime.
 
 Min(Int32]) -> Int32
@@ -995,6 +1416,36 @@ Min(Decimal]]) -> Decimal]
   Returns: The value that corresponds to the minimum value in the sequence.
   Parameters:
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to determine the minimum value of.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Min" source))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "Min"
+                    :supplied-args (cl:append (cl:list :source source))))))
+
+(cl:defun min-arity-1 (type source cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.Min overloads. Dispatches at runtime.
 
 Min(IEnumerable) -> TSource
   Summary: Returns the minimum value in a generic sequence.
@@ -1081,57 +1532,72 @@ Min(IEnumerable, Decimal]]) -> Decimal]
 "
   (cl:cond
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
-     (dotnet:static <type-str> "Min" source comparer))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
     ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
-     (dotnet:static <type-str> "Min" source))
+     (dotnet:static-generic <type-str> "Min" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Min"
                     :supplied-args (cl:append (cl:list :source source) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
-;; The following C# System.Linq.Enumerable.MinBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun min-arity-2 (type-1 type-2 source selector)
+  "Summary: Invokes a transform function on each element of a generic sequence and returns the minimum resulting value.
+Returns: The minimum value in the sequence.
+Parameters:
+  - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to determine the minimum value of.
+  - selector (System.Func`2[TSource, TResult]): A transform function to apply to each element.
+"
+  (dotnet:static-generic <type-str> "Min" (cl:list type-1 type-2) source selector))
+
+(cl:defun min-by (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.MinBy overloads. Dispatches at runtime.
+
+MinBy(IEnumerable, Func) -> TSource
+  Summary: Returns the minimum value in a generic sequence according to a specified key selector function.
+  Returns: The value with the minimum key in the sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to determine the minimum value of.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+
+MinBy(IEnumerable, Func, IComparer) -> TSource
+  Summary: Returns the minimum value in a generic sequence according to a specified key selector function and key comparer.
+  Returns: The value with the minimum key in the sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to determine the minimum value of.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - comparer (System.Collections.Generic.IComparer`1[TKey]): The System.Collections.Generic.IComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "MinBy" (cl:list type-1 type-2) source key-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "MinBy" (cl:list type-1 type-2) source key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "MinBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun of-type (type source)
   "Summary: Filters the elements of an System.Collections.IEnumerable based on a specified type.
@@ -1168,11 +1634,63 @@ Order(IEnumerable, IComparer) -> IOrderedEnumerable
                     :method-name "Order"
                     :supplied-args (cl:append (cl:list :source source) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
-;; The following C# System.Linq.Enumerable.OrderBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun order-by (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.OrderBy overloads. Dispatches at runtime.
 
-;; The following C# System.Linq.Enumerable.OrderByDescending overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+OrderBy(IEnumerable, Func) -> IOrderedEnumerable
+  Summary: Sorts the elements of a sequence in ascending order according to a key.
+  Returns: An System.Linq.IOrderedEnumerable`1 whose elements are sorted according to a key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to order.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from an element.
+
+OrderBy(IEnumerable, Func, IComparer) -> IOrderedEnumerable
+  Summary: Sorts the elements of a sequence in ascending order by using a specified comparer.
+  Returns: An System.Linq.IOrderedEnumerable`1 whose elements are sorted according to a key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to order.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from an element.
+    - comparer (System.Collections.Generic.IComparer`1[TKey]): An System.Collections.Generic.IComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "OrderBy" (cl:list type-1 type-2) source key-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "OrderBy" (cl:list type-1 type-2) source key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "OrderBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun order-by-descending (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.OrderByDescending overloads. Dispatches at runtime.
+
+OrderByDescending(IEnumerable, Func) -> IOrderedEnumerable
+  Summary: Sorts the elements of a sequence in descending order according to a key.
+  Returns: An System.Linq.IOrderedEnumerable`1 whose elements are sorted in descending order according to a key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to order.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from an element.
+
+OrderByDescending(IEnumerable, Func, IComparer) -> IOrderedEnumerable
+  Summary: Sorts the elements of a sequence in descending order by using a specified comparer.
+  Returns: An System.Linq.IOrderedEnumerable`1 whose elements are sorted in descending order according to a key.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to order.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from an element.
+    - comparer (System.Collections.Generic.IComparer`1[TKey]): An System.Collections.Generic.IComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "OrderByDescending" (cl:list type-1 type-2) source key-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "OrderByDescending" (cl:list type-1 type-2) source key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "OrderByDescending"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun order-descending (type source cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.OrderDescending overloads. Dispatches at runtime.
@@ -1252,14 +1770,126 @@ Reverse(TSource[]) -> IEnumerable
                     :method-name "Reverse"
                     :supplied-args (cl:append (cl:list :source source))))))
 
-;; The following C# System.Linq.Enumerable.RightJoin overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun right-join (type-1 type-2 type-3 type-4 outer inner outer-key-selector inner-key-selector result-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.RightJoin overloads. Dispatches at runtime.
 
-;; The following C# System.Linq.Enumerable.Select overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+RightJoin(IEnumerable, IEnumerable, Func, Func, Func) -> IEnumerable
+  Summary: Correlates the elements of two sequences based on matching keys. The default equality comparer is used to compare keys.
+  Returns: An System.Collections.Generic.IEnumerable`1 that has elements of type that are obtained by performing a right outer join on two sequences.
+  Parameters:
+    - outer (System.Collections.Generic.IEnumerable`1[TOuter]): The first sequence to join.
+    - inner (System.Collections.Generic.IEnumerable`1[TInner]): The sequence to join to the first sequence.
+    - outer-key-selector (System.Func`2[TOuter, TKey]): A function to extract the join key from each element of the first sequence.
+    - inner-key-selector (System.Func`2[TInner, TKey]): A function to extract the join key from each element of the second sequence.
+    - result-selector (System.Func`3[TOuter, TInner, TResult]): A function to create a result element from two matching elements.
 
-;; The following C# System.Linq.Enumerable.SelectMany overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+RightJoin(IEnumerable, IEnumerable, Func, Func, Func, IEqualityComparer) -> IEnumerable
+  Summary: Correlates the elements of two sequences based on matching keys. A specified System.Collections.Generic.IEqualityComparer`1 is used to compare keys.
+  Returns: An System.Collections.Generic.IEnumerable`1 that has elements of type that are obtained by performing a right outer join on two sequences.
+  Parameters:
+    - outer (System.Collections.Generic.IEnumerable`1[TOuter]): The first sequence to join.
+    - inner (System.Collections.Generic.IEnumerable`1[TInner]): The sequence to join to the first sequence.
+    - outer-key-selector (System.Func`2[TOuter, TKey]): A function to extract the join key from each element of the first sequence.
+    - inner-key-selector (System.Func`2[TInner, TKey]): A function to extract the join key from each element of the second sequence.
+    - result-selector (System.Func`3[TOuter, TInner, TResult]): A function to create a result element from two matching elements.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to hash and compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "RightJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector comparer))
+    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "RightJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "RightJoin"
+                    :supplied-args (cl:append (cl:list :outer outer) (cl:list :inner inner) (cl:list :outer-key-selector outer-key-selector) (cl:list :inner-key-selector inner-key-selector) (cl:list :result-selector result-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun select (type-1 type-2 source selector)
+  "Master wrapper for System.Linq.Enumerable.Select overloads. Dispatches at runtime.
+
+Select(IEnumerable, Func) -> IEnumerable
+  Summary: Projects each element of a sequence into a new form.
+  Returns: An System.Collections.Generic.IEnumerable`1 whose elements are the result of invoking the transform function on each element of source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to invoke a transform function on.
+    - selector (System.Func`2[TSource, TResult]): A transform function to apply to each element.
+
+Select(IEnumerable, Int32, TResult]) -> IEnumerable
+  Summary: Projects each element of a sequence into a new form by incorporating the element's index.
+  Returns: An System.Collections.Generic.IEnumerable`1 whose elements are the result of invoking the transform function on each element of source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to invoke a transform function on.
+    - selector (System.Func`3[TSource, System.Int32, TResult]): A transform function to apply to each source element; the second parameter of the function represents the index of the source element.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Select" (cl:list type-1 type-2) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Select" (cl:list type-1 type-2) source selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "Select"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :selector selector))))))
+
+(cl:defun select-many-arity-2 (type-1 type-2 source selector)
+  "Master wrapper for System.Linq.Enumerable.SelectMany overloads. Dispatches at runtime.
+
+SelectMany(IEnumerable, IEnumerable) -> IEnumerable
+  Summary: Projects each element of a sequence to an System.Collections.Generic.IEnumerable`1 and flattens the resulting sequences into one sequence.
+  Returns: An System.Collections.Generic.IEnumerable`1 whose elements are the result of invoking the one-to-many transform function on each element of the input sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to project.
+    - selector (System.Func`2[TSource, System.Collections.Generic.IEnumerable`1[TResult]]): A transform function to apply to each element.
+
+SelectMany(IEnumerable, IEnumerable) -> IEnumerable
+  Summary: Projects each element of a sequence to an System.Collections.Generic.IEnumerable`1, and flattens the resulting sequences into one sequence. The index of each source element is used in the projected form of that element.
+  Returns: An System.Collections.Generic.IEnumerable`1 whose elements are the result of invoking the one-to-many transform function on each element of an input sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to project.
+    - selector (System.Func`3[TSource, System.Int32, System.Collections.Generic.IEnumerable`1[TResult]]): A transform function to apply to each source element; the second parameter of the function represents the index of the source element.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "SelectMany" (cl:list type-1 type-2) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "SelectMany" (cl:list type-1 type-2) source selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "SelectMany"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :selector selector))))))
+
+(cl:defun select-many-arity-3 (type-1 type-2 type-3 source collection-selector result-selector)
+  "Master wrapper for System.Linq.Enumerable.SelectMany overloads. Dispatches at runtime.
+
+SelectMany(IEnumerable, IEnumerable, Func) -> IEnumerable
+  Summary: Projects each element of a sequence to an System.Collections.Generic.IEnumerable`1, flattens the resulting sequences into one sequence, and invokes a result selector function on each element therein. The index of each source element is used in the intermediate projected form of that element.
+  Returns: An System.Collections.Generic.IEnumerable`1 whose elements are the result of invoking the one-to-many transform function collectionSelector on each element of source and then mapping each of those sequence elements and their corresponding source element to a result element.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to project.
+    - collection-selector (System.Func`3[TSource, System.Int32, System.Collections.Generic.IEnumerable`1[TCollection]]): A transform function to apply to each source element; the second parameter of the function represents the index of the source element.
+    - result-selector (System.Func`3[TSource, TCollection, TResult]): A transform function to apply to each element of the intermediate sequence.
+
+SelectMany(IEnumerable, IEnumerable, Func) -> IEnumerable
+  Summary: Projects each element of a sequence to an System.Collections.Generic.IEnumerable`1, flattens the resulting sequences into one sequence, and invokes a result selector function on each element therein.
+  Returns: An System.Collections.Generic.IEnumerable`1 whose elements are the result of invoking the one-to-many transform function collectionSelector on each element of source and then mapping each of those sequence elements and their corresponding source element to a result element.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence of values to project.
+    - collection-selector (System.Func`2[TSource, System.Collections.Generic.IEnumerable`1[TCollection]]): A transform function to apply to each element of the input sequence.
+    - result-selector (System.Func`3[TSource, TCollection, TResult]): A transform function to apply to each element of the intermediate sequence.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null collection-selector) (dotnet:object-type collection-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)))
+     (dotnet:static-generic <type-str> "SelectMany" (cl:list type-1 type-2 type-3) source collection-selector result-selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null collection-selector) (dotnet:object-type collection-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)))
+     (dotnet:static-generic <type-str> "SelectMany" (cl:list type-1 type-2 type-3) source collection-selector result-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "SelectMany"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :collection-selector collection-selector) (cl:list :result-selector result-selector))))))
 
 (cl:defun sequence (type start end-inclusive step)
   "Summary: Generates a sequence that begins with start and yields additional values each incremented by step until endInclusive is reached.
@@ -1427,7 +2057,7 @@ SkipWhile(IEnumerable, Boolean]) -> IEnumerable
                     :method-name "SkipWhile"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :predicate predicate))))))
 
-(cl:defun sum (source cl:&optional (selector cl:nil supplied-selector))
+(cl:defun sum (source)
   "Master wrapper for System.Linq.Enumerable.Sum overloads. Dispatches at runtime.
 
 Sum(Int32]) -> Int32
@@ -1489,6 +2119,36 @@ Sum(Decimal]]) -> Decimal]
   Returns: The sum of the values in the sequence.
   Parameters:
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to calculate the sum of.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+     (dotnet:static <type-str> "Sum" source))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "Sum"
+                    :supplied-args (cl:append (cl:list :source source))))))
+
+(cl:defun sum-arity-1 (type source selector)
+  "Master wrapper for System.Linq.Enumerable.Sum overloads. Dispatches at runtime.
 
 Sum(IEnumerable, Int32]) -> Int32
   Summary: Computes the sum of the sequence of System.Int32 values that are obtained by invoking a transform function on each element of the input sequence.
@@ -1561,51 +2221,31 @@ Sum(IEnumerable, Decimal]]) -> Decimal]
     - selector (System.Func`2[TSource, System.Nullable`1[System.Decimal]]): A transform function to apply to each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-selector (cl:or (cl:null selector) (dotnet:object-type selector)))
-     (dotnet:static <type-str> "Sum" source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-selector))
-     (dotnet:static <type-str> "Sum" source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+     (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "Sum"
-                    :supplied-args (cl:append (cl:list :source source) (cl:when supplied-selector (cl:list :selector selector)))))))
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :selector selector))))))
 
 (cl:defun take (type source count)
   "Master wrapper for System.Linq.Enumerable.Take overloads. Dispatches at runtime.
@@ -1672,11 +2312,63 @@ TakeWhile(IEnumerable, Boolean]) -> IEnumerable
                     :method-name "TakeWhile"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :predicate predicate))))))
 
-;; The following C# System.Linq.Enumerable.ThenBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun then-by (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.ThenBy overloads. Dispatches at runtime.
 
-;; The following C# System.Linq.Enumerable.ThenByDescending overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+ThenBy(IOrderedEnumerable, Func) -> IOrderedEnumerable
+  Summary: Performs a subsequent ordering of the elements in a sequence in ascending order according to a key.
+  Returns: An System.Linq.IOrderedEnumerable`1 whose elements are sorted according to a key.
+  Parameters:
+    - source (System.Linq.IOrderedEnumerable`1[TSource]): An System.Linq.IOrderedEnumerable`1 that contains elements to sort.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+
+ThenBy(IOrderedEnumerable, Func, IComparer) -> IOrderedEnumerable
+  Summary: Performs a subsequent ordering of the elements in a sequence in ascending order by using a specified comparer.
+  Returns: An System.Linq.IOrderedEnumerable`1 whose elements are sorted according to a key.
+  Parameters:
+    - source (System.Linq.IOrderedEnumerable`1[TSource]): An System.Linq.IOrderedEnumerable`1 that contains elements to sort.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+    - comparer (System.Collections.Generic.IComparer`1[TKey]): An System.Collections.Generic.IComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "ThenBy" (cl:list type-1 type-2) source key-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "ThenBy" (cl:list type-1 type-2) source key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "ThenBy"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun then-by-descending (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.ThenByDescending overloads. Dispatches at runtime.
+
+ThenByDescending(IOrderedEnumerable, Func) -> IOrderedEnumerable
+  Summary: Performs a subsequent ordering of the elements in a sequence in descending order, according to a key.
+  Returns: An System.Linq.IOrderedEnumerable`1 whose elements are sorted in descending order according to a key.
+  Parameters:
+    - source (System.Linq.IOrderedEnumerable`1[TSource]): An System.Linq.IOrderedEnumerable`1 that contains elements to sort.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+
+ThenByDescending(IOrderedEnumerable, Func, IComparer) -> IOrderedEnumerable
+  Summary: Performs a subsequent ordering of the elements in a sequence in descending order by using a specified comparer.
+  Returns: An System.Linq.IOrderedEnumerable`1 whose elements are sorted in descending order according to a key.
+  Parameters:
+    - source (System.Linq.IOrderedEnumerable`1[TSource]): An System.Linq.IOrderedEnumerable`1 that contains elements to sort.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+    - comparer (System.Collections.Generic.IComparer`1[TKey]): An System.Collections.Generic.IComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "ThenByDescending" (cl:list type-1 type-2) source key-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "ThenByDescending" (cl:list type-1 type-2) source key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "ThenByDescending"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun to-array (type source)
   "Summary: Creates an array from a System.Collections.Generic.IEnumerable`1.
@@ -1686,8 +2378,99 @@ Parameters:
 "
   (dotnet:static-generic <type-str> "ToArray" (cl:list type) source))
 
-;; The following C# System.Linq.Enumerable.ToDictionary overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun to-dictionary-arity-2 (type-1 type-2 source cl:&optional (comparer cl:nil supplied-comparer) (comparer2 cl:nil supplied-comparer2))
+  "Master wrapper for System.Linq.Enumerable.ToDictionary overloads. Dispatches at runtime.
+
+ToDictionary(KeyValuePair) -> Dictionary
+  Summary: Creates a dictionary from an enumeration according to the default comparer for the key type.
+  Returns: A dictionary that contains keys and values from source and uses the default comparer for the key type.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]): The enumeration to create a dictionary from.
+
+ToDictionary(ValueTuple) -> Dictionary
+  Summary: Creates a dictionary from an enumeration according to the default comparer for the key type.
+  Returns: A dictionary that contains keys and values from source and uses default comparer for the key type.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[System.ValueTuple`2[TKey, TValue]]): The enumeration to create a dictionary from.
+
+ToDictionary(KeyValuePair, IEqualityComparer) -> Dictionary
+  Summary: Creates a dictionary from an enumeration according to specified key comparer.
+  Returns: A dictionary that contains keys and values from source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]): The enumeration to create a dictionary from.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An equality comparer to compare keys.
+
+ToDictionary(ValueTuple, IEqualityComparer) -> Dictionary
+  Summary: Creates a dictionary from an enumeration according to specified key equality comparer.
+  Returns: A dictionary that contains keys and values from source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[System.ValueTuple`2[TKey, TValue]]): The enumeration to create a dictionary from.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An equality comparer to compare keys.
+
+ToDictionary(IEnumerable, Func) -> Dictionary
+  Summary: Creates a System.Collections.Generic.Dictionary`2 from an System.Collections.Generic.IEnumerable`1 according to a specified key selector function.
+  Returns: A System.Collections.Generic.Dictionary`2 that contains keys and values. The values within each group are in the same order as in source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 to create a System.Collections.Generic.Dictionary`2 from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+
+ToDictionary(IEnumerable, Func, IEqualityComparer) -> Dictionary
+  Summary: Creates a System.Collections.Generic.Dictionary`2 from an System.Collections.Generic.IEnumerable`1 according to a specified key selector function and key comparer.
+  Returns: A System.Collections.Generic.Dictionary`2 that contains keys and values. The values within each group are in the same order as in source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 to create a System.Collections.Generic.Dictionary`2 from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:object-type comparer2)))
+     (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source comparer comparer2))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+     (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+     (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+     (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer) (cl:not supplied-comparer2))
+     (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer) (cl:not supplied-comparer2))
+     (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "ToDictionary"
+                    :supplied-args (cl:append (cl:list :source source) (cl:when supplied-comparer (cl:list :comparer comparer)) (cl:when supplied-comparer2 (cl:list :comparer2 comparer2)))))))
+
+(cl:defun to-dictionary-arity-3 (type-1 type-2 type-3 source key-selector element-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.ToDictionary overloads. Dispatches at runtime.
+
+ToDictionary(IEnumerable, Func, Func) -> Dictionary
+  Summary: Creates a System.Collections.Generic.Dictionary`2 from an System.Collections.Generic.IEnumerable`1 according to specified key selector and element selector functions.
+  Returns: A System.Collections.Generic.Dictionary`2 that contains values of type selected from the input sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 to create a System.Collections.Generic.Dictionary`2 from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+    - element-selector (System.Func`2[TSource, TElement]): A transform function to produce a result element value from each element.
+
+ToDictionary(IEnumerable, Func, Func, IEqualityComparer) -> Dictionary
+  Summary: Creates a System.Collections.Generic.Dictionary`2 from an System.Collections.Generic.IEnumerable`1 according to a specified key selector function, a comparer, and an element selector function.
+  Returns: A System.Collections.Generic.Dictionary`2 that contains values of type selected from the input sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 to create a System.Collections.Generic.Dictionary`2 from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+    - element-selector (System.Func`2[TSource, TElement]): A transform function to produce a result element value from each element.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2 type-3) source key-selector element-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2 type-3) source key-selector element-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "ToDictionary"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:list :element-selector element-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun to-hash-set (type source cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.ToHashSet overloads. Dispatches at runtime.
@@ -1724,8 +2507,65 @@ Parameters:
 "
   (dotnet:static-generic <type-str> "ToList" (cl:list type) source))
 
-;; The following C# System.Linq.Enumerable.ToLookup overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun to-lookup-arity-2 (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.ToLookup overloads. Dispatches at runtime.
+
+ToLookup(IEnumerable, Func) -> ILookup
+  Summary: Creates a System.Linq.Lookup`2 from an System.Collections.Generic.IEnumerable`1 according to a specified key selector function.
+  Returns: A System.Linq.Lookup`2 that contains keys and values. The values within each group are in the same order as in source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): The System.Collections.Generic.IEnumerable`1 to create a System.Linq.Lookup`2 from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+
+ToLookup(IEnumerable, Func, IEqualityComparer) -> ILookup
+  Summary: Creates a System.Linq.Lookup`2 from an System.Collections.Generic.IEnumerable`1 according to a specified key selector function and key comparer.
+  Returns: A System.Linq.Lookup`2 that contains keys and values. The values within each group are in the same order as in source.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): The System.Collections.Generic.IEnumerable`1 to create a System.Linq.Lookup`2 from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "ToLookup" (cl:list type-1 type-2) source key-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "ToLookup" (cl:list type-1 type-2) source key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "ToLookup"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun to-lookup-arity-3 (type-1 type-2 type-3 source key-selector element-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.ToLookup overloads. Dispatches at runtime.
+
+ToLookup(IEnumerable, Func, Func) -> ILookup
+  Summary: Creates a System.Linq.Lookup`2 from an System.Collections.Generic.IEnumerable`1 according to specified key selector and element selector functions.
+  Returns: A System.Linq.Lookup`2 that contains values of type selected from the input sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): The System.Collections.Generic.IEnumerable`1 to create a System.Linq.Lookup`2 from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+    - element-selector (System.Func`2[TSource, TElement]): A transform function to produce a result element value from each element.
+
+ToLookup(IEnumerable, Func, Func, IEqualityComparer) -> ILookup
+  Summary: Creates a System.Linq.Lookup`2 from an System.Collections.Generic.IEnumerable`1 according to a specified key selector function, a comparer and an element selector function.
+  Returns: A System.Linq.Lookup`2 that contains values of type selected from the input sequence.
+  Parameters:
+    - source (System.Collections.Generic.IEnumerable`1[TSource]): The System.Collections.Generic.IEnumerable`1 to create a System.Linq.Lookup`2 from.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract a key from each element.
+    - element-selector (System.Func`2[TSource, TElement]): A transform function to produce a result element value from each element.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "ToLookup" (cl:list type-1 type-2 type-3) source key-selector element-selector comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "ToLookup" (cl:list type-1 type-2 type-3) source key-selector element-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "ToLookup"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:list :element-selector element-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 ;; The following C# System.Linq.Enumerable.TryGetNonEnumeratedCount overloads have special parameter types
 ;; (ref, out, params, or defaults) and are not yet supported:
@@ -1760,8 +2600,36 @@ Union(IEnumerable, IEnumerable, IEqualityComparer) -> IEnumerable
                     :method-name "Union"
                     :supplied-args (cl:append (cl:list :first first) (cl:list :second second) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
-;; The following C# System.Linq.Enumerable.UnionBy overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun union-by (type-1 type-2 first second key-selector cl:&optional (comparer cl:nil supplied-comparer))
+  "Master wrapper for System.Linq.Enumerable.UnionBy overloads. Dispatches at runtime.
+
+UnionBy(IEnumerable, IEnumerable, Func) -> IEnumerable
+  Summary: Produces the set union of two sequences according to a specified key selector function.
+  Returns: An System.Collections.Generic.IEnumerable`1 that contains the elements from both input sequences, excluding duplicates.
+  Parameters:
+    - first (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose distinct elements form the first set for the union.
+    - second (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose distinct elements form the second set for the union.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+
+UnionBy(IEnumerable, IEnumerable, Func, IEqualityComparer) -> IEnumerable
+  Summary: Produces the set union of two sequences according to a specified key selector function.
+  Returns: An System.Collections.Generic.IEnumerable`1 that contains the elements from both input sequences, excluding duplicates.
+  Parameters:
+    - first (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose distinct elements form the first set for the union.
+    - second (System.Collections.Generic.IEnumerable`1[TSource]): An System.Collections.Generic.IEnumerable`1 whose distinct elements form the second set for the union.
+    - key-selector (System.Func`2[TSource, TKey]): A function to extract the key for each element.
+    - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 to compare values.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+     (dotnet:static-generic <type-str> "UnionBy" (cl:list type-1 type-2) first second key-selector comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+     (dotnet:static-generic <type-str> "UnionBy" (cl:list type-1 type-2) first second key-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "UnionBy"
+                    :supplied-args (cl:append (cl:list :first first) (cl:list :second second) (cl:list :key-selector key-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun where (type source predicate)
   "Master wrapper for System.Linq.Enumerable.Where overloads. Dispatches at runtime.
@@ -1791,6 +2659,42 @@ Where(IEnumerable, Boolean]) -> IEnumerable
                     :method-name "Where"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :predicate predicate))))))
 
-;; The following C# System.Linq.Enumerable.Zip overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+(cl:defun zip-arity-2 (type-1 type-2 first second)
+  "Summary: Produces a sequence of tuples with elements from the two specified sequences.
+Returns: A sequence of tuples with elements taken from the first and second sequences, in that order.
+Parameters:
+  - first (System.Collections.Generic.IEnumerable`1[TFirst]): The first sequence to merge.
+  - second (System.Collections.Generic.IEnumerable`1[TSecond]): The second sequence to merge.
+"
+  (dotnet:static-generic <type-str> "Zip" (cl:list type-1 type-2) first second))
+
+(cl:defun zip-arity-3 (type-1 type-2 type-3 first second result-selector)
+  "Master wrapper for System.Linq.Enumerable.Zip overloads. Dispatches at runtime.
+
+Zip(IEnumerable, IEnumerable, Func) -> IEnumerable
+  Summary: Applies a specified function to the corresponding elements of two sequences, producing a sequence of the results.
+  Returns: An System.Collections.Generic.IEnumerable`1 that contains merged elements of two input sequences.
+  Parameters:
+    - first (System.Collections.Generic.IEnumerable`1[TFirst]): The first sequence to merge.
+    - second (System.Collections.Generic.IEnumerable`1[TSecond]): The second sequence to merge.
+    - result-selector (System.Func`3[TFirst, TSecond, TResult]): A function that specifies how to merge the elements from the two sequences.
+
+Zip(IEnumerable, IEnumerable, IEnumerable) -> ValueTuple
+  Summary: Produces a sequence of tuples with elements from the three specified sequences.
+  Returns: A sequence of tuples with elements taken from the first, second, and third sequences, in that order.
+  Parameters:
+    - first (System.Collections.Generic.IEnumerable`1[TFirst]): The first sequence to merge.
+    - second (System.Collections.Generic.IEnumerable`1[TSecond]): The second sequence to merge.
+    - third (System.Collections.Generic.IEnumerable`1[TThird]): The third sequence to merge.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)))
+     (dotnet:static-generic <type-str> "Zip" (cl:list type-1 type-2 type-3) first second result-selector))
+    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)))
+     (dotnet:static-generic <type-str> "Zip" (cl:list type-1 type-2 type-3) first second result-selector))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-LINQ-ENUMERABLE"
+                    :class-name <type-str>
+                    :method-name "Zip"
+                    :supplied-args (cl:append (cl:list :first first) (cl:list :second second) (cl:list :result-selector result-selector))))))
 

@@ -15,7 +15,30 @@ TODO
 * Add the Assembly to the per-package comment in `packages.lisp`
 
 
+# Multi-Type Arity Improvements
+
+* Reconsider the multi-arity overloads with suffix `arity-#` naming
+  convention. Maybe have a suffix like `<>` which indicates that it
+  takes a type parameter. Example: `aggregate<>` or `aggregate<2>`?
+
+* Take type arguments in two forms:
+  * A single type
+  * A list of types (or other sequence)
+  * This would allow the multi-arity overloads to use a single type specified
+    version, e.g., just `aggregate<>` for all possible arities.
+
+
 # Miscellaneous
+
+* Add missing operator overload handling.
+
+* See if there is some way to programmatically figure out the `--constant-properties`
+  but I really think it requires looking at the source code (or disassembly).
+
+* Check the generated code for `System.Linq.Enumerable.Average()`. It has
+  a cond with a ton of branches that are *literally all identical* because
+  the system only checks if it's a dotnet object. This can be
+  simplified or improved.
 
 * Handle generic classes name mangling using backticks more elegantly.
   * Backticks have special meaning in Lisp so we cannot include them in the
@@ -281,6 +304,33 @@ is a really foundational change that will help a lot in the future.
 
 
 # DONE
+
+* Public instance fields (e.g. a plain mutable field on a simple data-holder class or struct)
+  generated nothing at all — no getter, no setter, no comment. `public-instance-field-p` existed
+  but was never called anywhere.
+  * DONE (Generator Version 27): public instance fields now generate a getter always, and (unless
+    the field is C#'s `readonly`, reflected as `:init-only`) a setter. Since a field has no
+    `get_Foo`/`set_Foo` accessor method the way a property does, the getter uses `dotnet:invoke`'s
+    built-in field-read support directly, and the setter uses the `setf`-expansion of
+    `dotnet:invoke` itself (the idiomatic way to write a field/property/indexer directly per
+    `doc/dotnet-dotcl-interop.md`), since `dotnet:invoke` has no field-write equivalent. See
+    `doc/generator-design-notes.md`'s "Public Instance Fields and Multi-Type-Argument Generic
+    Methods (Version 27)" section and `RELEASES.md`'s 2.27.0 entry.
+
+* Generic methods with more than one of their own type argument (e.g. LINQ's
+  `Select<TSource,TResult>`, `Join`, `ToDictionary<TSource,TKey,TResult>`) were excluded entirely —
+  the generator only supported exactly one type argument (Generator Version 12).
+  * DONE (Generator Version 27): any positive generic arity is now supported
+    (`generic-method-arity-supported-p`), generalizing the previous single hardcoded `type`
+    parameter to `type-1`..`type-N` (`generic-type-param-names`; arity 1 keeps the legacy bare
+    `type` name, so existing arity-1 generated code and callers are unaffected). Handled as a
+    special case: the same C# method name overloaded across *different* generic arities (e.g.
+    `System.Linq.Enumerable.Aggregate`'s arity-1/2/3 overloads) can't share one Lisp function's
+    lambda list, so each arity now gets its own arity-suffixed function (`aggregate-arity-1`,
+    `aggregate-arity-2`, ...) instead of being incorrectly merged
+    (`split-by-generic-arity`/`generate-method-name-wrappers`). See
+    `doc/generator-design-notes.md`'s "Public Instance Fields and Multi-Type-Argument Generic
+    Methods (Version 27)" section and `RELEASES.md`'s 2.27.0 entry.
 
 * Indexers (C#'s `this[...]`, e.g. `Dictionary<TKey,TValue>`'s `Item`) generated a getter/setter
   taking only the receiver `obj!`, with no index/key argument at all — `AssemblyToLispy.cs` never

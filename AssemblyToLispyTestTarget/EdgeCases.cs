@@ -95,6 +95,12 @@ namespace AssemblyToLispyTestTarget
         public int PublicField;
 
         /// <summary>
+        /// A public read-only field, to test that the generator only emits a
+        /// getter (no setter) for a public instance field marked readonly.
+        /// </summary>
+        public readonly int ReadOnlyField;
+
+        /// <summary>
         /// A read-only property.
         /// </summary>
         public string ReadOnlyProperty { get; }
@@ -139,7 +145,7 @@ namespace AssemblyToLispyTestTarget
     }
 
     /// <summary>
-    /// A class containing generic methods of one type argument for testing.
+    /// A class containing generic methods of one or more type arguments for testing.
     /// </summary>
     public class GenericMethodTestClass
     {
@@ -157,6 +163,46 @@ namespace AssemblyToLispyTestTarget
         public static T Create<T>()
         {
             return default(T)!;
+        }
+
+        /// <summary>
+        /// A generic instance method of two type arguments, to test support
+        /// for generic methods with more than one type argument.
+        /// </summary>
+        public T2 Convert<T1, T2>(T1 value)
+        {
+            return default(T2)!;
+        }
+
+        /// <summary>
+        /// A generic static method of three type arguments (mirrors the
+        /// shape of System.Linq.Enumerable's 3-type-argument Aggregate
+        /// overload).
+        /// </summary>
+        public static T3 Zip<T1, T2, T3>(T1 a, T2 b)
+        {
+            return default(T3)!;
+        }
+
+        /// <summary>
+        /// Overload 1 of 2: same name as below, but generic arity 1 --
+        /// mirrors System.Linq.Enumerable's Aggregate, which has same-named
+        /// overloads of generic arity 1, 2, and 3. The generator must treat
+        /// these as distinct, separately-named wrappers rather than merging
+        /// them into one (a single Lisp function's lambda list can't flex
+        /// between different numbers of generic type-argument parameters).
+        /// </summary>
+        public static T1 Combine<T1>(T1 a, T1 b)
+        {
+            return a;
+        }
+
+        /// <summary>
+        /// Overload 2 of 2: same name as above, but generic arity 2.
+        /// </summary>
+        public static T2 Combine<T1, T2>(T1 a, T2 seed)
+        {
+            return seed;
         }
     }
 

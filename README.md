@@ -80,6 +80,58 @@ standard error. `--version`/`--help` and `--test` boot the DotCL host
 intentionally does not, since it's pure reflection and runs before DotCL boots.
 
 
+# Generated Package Naming: Generic Methods and the `-arity-N` Suffix
+
+C# methods with their own type parameters (e.g. `T Load<T>(string name)`, or LINQ's
+`Select<TSource,TResult>`) generate a Lisp wrapper that takes one extra leading parameter per
+type argument, so the caller can tell DotCL which concrete type(s) to instantiate the method
+with:
+
+* **Arity 1** (exactly one type argument) keeps a single, legacy parameter simply named `type`
+  — e.g. a generic `Load<T>` instance method becomes `(load obj! type name)`.
+* **Arity 2 or more** uses one parameter per type argument, named `type-1`, `type-2`, ...,
+  `type-N` — e.g. a static `Convert<T1,T2>(T1 value)` method becomes
+  `(convert type-1 type-2 value)`.
+
+In both cases, the type-argument parameter(s) come first (after `obj!` for an instance method),
+and are passed through to DotCL's `dotnet:invoke-generic`/`dotnet:static-generic` as a list, e.g.
+`(dotnet:static-generic <type-str> "Convert" (cl:list type-1 type-2) value)`.
+
+## Why some names get an `-arity-N` suffix
+
+A single Lisp function's lambda list can't flex between different numbers of type-argument
+parameters. Most of the time this doesn't matter, since a C# method name's overloads all agree
+on how many type parameters it takes (e.g. every overload of `Select<TSource,TResult>` is arity
+2) — in that case, generation is unaffected by any of this and the method gets its usual plain
+name (`select`), taking `type-1`/`type-2` once regardless of which overload ends up matching at
+runtime.
+
+But C# does allow the *same* method name to be overloaded across *different* generic arities.
+The canonical real-world example is `System.Linq.Enumerable.Aggregate`, which has three
+same-named overloads of generic arity 1, 2, and 3 respectively. Since `aggregate` can't be one
+function that sometimes takes `type` and sometimes takes `type-1 type-2 type-3`, each distinct
+arity instead gets its own function, with the method's usual name suffixed by `-arity-N`:
+
+```lisp
+(aggregate-arity-1 type source func)
+(aggregate-arity-2 type-1 type-2 source seed func)
+(aggregate-arity-3 type-1 type-2 type-3 source seed func result-selector)
+```
+
+Note that in this situation *none* of the variants keep the bare, unsuffixed name (`aggregate`)
+— there's no well-defined reason one arity should "win" over the others, so all of them are
+suffixed for consistency and to make it obvious at a glance that a family of arity variants
+exists. This only ever happens for a method name whose overloads genuinely disagree on generic
+arity; it does not affect non-generic methods (which still consolidate down to a single Master
+Wrapper per name, per the usual overload-dispatch rules) or a generic method name whose overloads
+all share one arity.
+
+See `doc/generator-design-notes.md`'s "Public Instance Fields and Multi-Type-Argument Generic
+Methods (Version 27)" section for the full implementation details, including how this interacts
+with the static/instance mixed-mode `*`-suffix naming. This naming convention is a candidate for
+future refinement (see `PLAN.md`), but is the current, tested behavior as of generator version 27.
+
+
 # Building & Testing
 
 A `Makefile` is provided with the following targets:

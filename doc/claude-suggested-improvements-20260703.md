@@ -57,7 +57,13 @@ wrong thing at runtime.
   property get/set pattern (`assembly-package-generator.lisp:1040-1071`) extended to pass
   the index argument(s) through.
 
-## 2. Public instance fields — silently dropped, no codegen path at all
+## 2. Public instance fields — **FIXED in generator version 27**
+
+> **Update (2026-07-03):** fixed. See `RELEASES.md`'s 2.27.0 entry and
+> `doc/generator-design-notes.md`'s "Public Instance Fields and Multi-Type-Argument Generic
+> Methods (Version 27)" section. The description below is left as-is for historical context.
+
+Public instance fields — silently dropped, no codegen path at all
 
 `public-instance-field-p` (`assembly-package-generator.lisp:171-174`) is defined but
 never invoked anywhere in the file. There is no codegen branch for public instance
@@ -70,7 +76,15 @@ marking them as skipped (unlike dirty overloads, which at least leave a comment)
   codegen branch mirroring the existing get/set-property pattern
   (`assembly-package-generator.lisp:1040-1071`).
 
-## 3. Generic methods with arity ≥ 2 — excludes most of LINQ
+## 3. Generic methods with arity ≥ 2 — **FIXED in generator version 27**
+
+> **Update (2026-07-03):** fixed. See `RELEASES.md`'s 2.27.0 entry and
+> `doc/generator-design-notes.md`'s "Public Instance Fields and Multi-Type-Argument Generic
+> Methods (Version 27)" section, which also covers the same-name/different-arity case (e.g.
+> `Enumerable.Aggregate`) that generalizing arity naively would have gotten wrong. The description
+> below is left as-is for historical context.
+
+Generic methods with arity ≥ 2 — excludes most of LINQ
 
 `clean-method-p`/`simple-method-p` (`assembly-package-generator.lisp:204,230`) hard-restrict
 generic methods to arity ≤ 1 (`(or (not is-generic) (eql arity 1))`). Any method with 2+

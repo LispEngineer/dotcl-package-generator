@@ -8,8 +8,8 @@ EXECUTABLE := $(BIN_DIR)dotcl-packagegen
 NUPKG_DIR = nupkg
 
 # Tool package version. The minor version tracks assembly-package-generator.lisp's
-# internal *generator-version* (currently 26), so they stay visibly in sync.
-VERSION = 2.26.0
+# internal *generator-version* (currently 27), so they stay visibly in sync.
+VERSION = 2.27.0
 
 # Reference assembly directory for the standard .NET metadata used by `test`
 # to exercise Stage 1/Stage 2 generation end-to-end. This is the Arch Linux
@@ -48,8 +48,18 @@ test: build
 	      --class System.Object \
 	      --class System.Type \
 	      --class System.String \
+				--class System.Array --constant-properties "MaxLength" \
 	      --class System.TimeZoneInfo \
+				--class System.Convert \
+				--class System.Text.StringBuilder \
 	      --class 'System.TimeZoneInfo+AdjustmentRule' \
+				--class 'System.ValueTuple`2' \
+				--class 'System.ValueTuple`3' \
+				--class 'System.ValueTuple`4' \
+				--class 'System.ValueTuple`5' \
+				--class 'System.ValueTuple`6' \
+				--class 'System.ValueTuple`7' \
+				--class 'System.ValueTuple`8' \
 	    --assembly $(REF_DIR)System.Linq.dll \
 	      --class System.Linq.Enumerable \
 	    --assembly $(REF_DIR)System.Xml.ReaderWriter.dll \
@@ -57,8 +67,16 @@ test: build
 	    --assembly $(REF_DIR)System.Collections.dll \
 	      --class 'System.Collections.Generic.Dictionary`2' \
 	      --class 'System.Collections.Generic.Dictionary`2+KeyCollection' \
-	      --class 'System.Collections.Generic.Dictionary`2+ValueCollection'
-	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo; System.Convert
+	      --class 'System.Collections.Generic.Dictionary`2+ValueCollection' \
+				--class 'System.Collections.Generic.List`1' \
+				--class 'System.Collections.Generic.SortedList`2' \
+			--assembly $(REF_DIR)System.Numerics.Vectors.dll \
+			  --class 'System.Numerics.Vector2' --constant-properties "*" \
+			  --class 'System.Numerics.Vector3' --constant-properties "*" \
+			  --class 'System.Numerics.Vector4' --constant-properties "*"
+	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo;
+	# System.Collections.Generic.List, SortedList; System.Text.StringBuilder;
+	# System.Drawing.Point/F; Size/F
 	# Undo any changes that only changed typestamp
 	./revert-cspackages-timestamps.sh
 	python3 check_parens.py $(GEN_TEST_DIR)/*.lisp $(GEN_TEST_DIR)/*.asd

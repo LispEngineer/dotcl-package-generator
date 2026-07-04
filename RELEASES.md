@@ -10,6 +10,35 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.27.0 — 2026-07-03
+
+**Public instance fields and multi-type-argument generic methods:** the two remaining
+highest-priority capability gaps identified in
+`doc/claude-suggested-improvements-20260703.md` are now supported.
+
+* **Public instance fields** (e.g. a public mutable field on a plain data-holder class) were
+  silently dropped entirely — no getter, no setter, no comment. They now generate a getter, and
+  (unless the field is C#'s `readonly`) a setter. Since a field has no `get_Foo`/`set_Foo` accessor
+  method the way a property does, the getter relies on `dotnet:invoke`'s built-in field-read
+  support (passing the bare field name), and the setter uses the `setf`-expansion of
+  `dotnet:invoke` itself — the idiomatic DotCL way to write a field or property directly (see
+  `doc/dotnet-dotcl-interop.md`) — since `dotnet:invoke` has no field-write equivalent.
+* **Generic methods with more than one type argument** (e.g. LINQ's `Select<TSource,TResult>`,
+  `Join`, `ToDictionary<TSource,TKey,TResult>`) were previously excluded entirely — the generator
+  only supported exactly one type argument. Every such method now generates, taking one Lisp
+  parameter per type argument (`type-1`, `type-2`, ... — arity 1 keeps the legacy bare `type` name,
+  so nothing about existing arity-1 generated code or callers changes). The one caveat: when the
+  *same* C# method name is overloaded across *different* generic arities (e.g.
+  `System.Linq.Enumerable.Aggregate`, overloaded at arity 1, 2, and 3), one Lisp function's lambda
+  list can't flex between different numbers of type-argument parameters, so each arity now
+  generates its own arity-suffixed function (`aggregate-arity-1`, `aggregate-arity-2`,
+  `aggregate-arity-3`) instead of being incorrectly merged into one. The overwhelmingly common case
+  — a non-generic method, or a generic method whose every overload shares the same arity (e.g.
+  `Select`) — is entirely unaffected and keeps its plain name.
+
+See `doc/generator-design-notes.md`'s "Public Instance Fields and Multi-Type-Argument Generic
+Methods (Version 27)" section for full implementation details.
+
 ## 2.26.0 — 2026-07-03
 
 **Indexer fix:** C# indexers (`this[...]`, e.g. `Dictionary<TKey,TValue>`'s `Item`) generated a

@@ -113,6 +113,11 @@
             (:name "GenericArity1" :is-static t :is-generic t :generic-arity 1 :return-type "T" :parameters nil)
             ;; 7. Generic method with arity 2
             (:name "GenericArity2" :is-static t :is-generic t :generic-arity 2 :return-type "T" :parameters nil)
+            ;; 8. Generic method with arity 3 (e.g. LINQ's Aggregate<TSource,TAccumulate,TResult>)
+            (:name "GenericArity3" :is-static t :is-generic t :generic-arity 3 :return-type "T" :parameters nil)
+            ;; 9. Malformed: :is-generic t but no (or a non-positive) :generic-arity
+            (:name "GenericArityMissing" :is-static t :is-generic t :return-type "T" :parameters nil)
+            (:name "GenericArityZero" :is-static t :is-generic t :generic-arity 0 :return-type "T" :parameters nil)
             )))
 
     (assert-test (assembly-package-generator::simple-method-p
@@ -154,8 +159,117 @@
     (assert-test (assembly-package-generator::simple-method-p
                   (nth 7 methods-list)
                   methods-list)
+                t
+                "simple-method-p accepts generic method of arity 2 (arity > 1 is now supported)")
+
+    (assert-test (assembly-package-generator::simple-method-p
+                  (nth 8 methods-list)
+                  methods-list)
+                t
+                "simple-method-p accepts generic method of arity 3")
+
+    (assert-test (assembly-package-generator::simple-method-p
+                  (nth 9 methods-list)
+                  methods-list)
                 nil
-                "simple-method-p rejects generic method of arity 2"))
+                "simple-method-p rejects a generic method with a missing :generic-arity")
+
+    (assert-test (assembly-package-generator::simple-method-p
+                  (nth 10 methods-list)
+                  methods-list)
+                nil
+                "simple-method-p rejects a generic method with :generic-arity 0"))
+
+  ;; 3.1 Test generic-type-param-names: the arity-1 case keeps the legacy
+  ;; single "type" name (so existing arity-1 generated code and callers are
+  ;; unaffected), while arity > 1 introduces "type-1".."type-N".
+  (assert-test (assembly-package-generator::generic-type-param-names 1)
+              '("type")
+              "generic-type-param-names 1 returns the legacy singular 'type' name")
+
+  (assert-test (assembly-package-generator::generic-type-param-names 2)
+              '("type-1" "type-2")
+              "generic-type-param-names 2 returns type-1 and type-2")
+
+  (assert-test (assembly-package-generator::generic-type-param-names 3)
+              '("type-1" "type-2" "type-3")
+              "generic-type-param-names 3 returns type-1 through type-3")
+
+  ;; 3.2 Test split-by-generic-arity: overloads of the same C# method name
+  ;; that disagree on generic arity (e.g. System.Linq.Enumerable's
+  ;; Aggregate<TSource>, Aggregate<TSource,TAccumulate>, and
+  ;; Aggregate<TSource,TAccumulate,TResult>) must split into separate cells,
+  ;; since one Lisp function's lambda list cannot flex between different
+  ;; numbers of generic type-argument parameters; overloads sharing an
+  ;; arity (or all non-generic) must stay together in one cell.
+  (let ((aggregate-like
+          (list '(:name "Aggregate" :is-static t :is-generic t :generic-arity 1
+                  :return-type "TSource"
+                  :parameters ((:name "source" :type "System.Collections.Generic.IEnumerable`1[TSource]")
+                               (:name "func" :type "System.Func`3[TSource, TSource, TSource]")))
+                '(:name "Aggregate" :is-static t :is-generic t :generic-arity 2
+                  :return-type "TAccumulate"
+                  :parameters ((:name "source" :type "System.Collections.Generic.IEnumerable`1[TSource]")
+                               (:name "seed" :type "TAccumulate")
+                               (:name "func" :type "System.Func`3[TAccumulate, TSource, TAccumulate]")))
+                '(:name "Aggregate" :is-static t :is-generic t :generic-arity 3
+                  :return-type "TResult"
+                  :parameters ((:name "source" :type "System.Collections.Generic.IEnumerable`1[TSource]")
+                               (:name "seed" :type "TAccumulate")
+                               (:name "func" :type "System.Func`3[TAccumulate, TSource, TAccumulate]")
+                               (:name "resultSelector" :type "System.Func`2[TAccumulate, TResult]"))))))
+    (assert-test (length (assembly-package-generator::split-by-generic-arity aggregate-like))
+                3
+                "split-by-generic-arity splits Aggregate's arity-1/2/3 overloads into 3 cells")
+
+    (assert-test (mapcar (lambda (cell) (getf (first cell) :generic-arity))
+                         (assembly-package-generator::split-by-generic-arity aggregate-like))
+                '(1 2 3)
+                "split-by-generic-arity preserves first-seen arity order (1, 2, 3)")
+
+    (assert-test (mapcar #'assembly-package-generator::generic-arity-suffix
+                         (assembly-package-generator::split-by-generic-arity aggregate-like))
+                '("-arity-1" "-arity-2" "-arity-3")
+                "generic-arity-suffix names each Aggregate cell distinctly")
+
+    (assert-test (assembly-package-generator::method-name-wrapper-names aggregate-like "aggregate")
+                '("aggregate-arity-1" "aggregate-arity-2" "aggregate-arity-3")
+                "method-name-wrapper-names lists all 3 arity-suffixed names for multi-arity Aggregate"))
+
+  ;; 3.3 Test split-by-generic-arity / method-name-wrapper-names in the
+  ;; common single-arity case (e.g. LINQ's Select<TSource,TResult>, which
+  ;; has multiple overloads that all share generic-arity 2): must stay in
+  ;; one cell and keep the plain (unsuffixed) base name, exactly as if
+  ;; generic-arity splitting didn't exist.
+  (let ((select-like
+          (list '(:name "Select" :is-static t :is-generic t :generic-arity 2
+                  :return-type "System.Collections.Generic.IEnumerable`1[TResult]"
+                  :parameters ((:name "source" :type "System.Collections.Generic.IEnumerable`1[TSource]")
+                               (:name "selector" :type "System.Func`2[TSource, TResult]")))
+                '(:name "Select" :is-static t :is-generic t :generic-arity 2
+                  :return-type "System.Collections.Generic.IEnumerable`1[TResult]"
+                  :parameters ((:name "source" :type "System.Collections.Generic.IEnumerable`1[TSource]")
+                               (:name "selector" :type "System.Func`3[TSource, System.Int32, TResult]"))))))
+    (assert-test (length (assembly-package-generator::split-by-generic-arity select-like))
+                1
+                "split-by-generic-arity keeps same-arity Select overloads in one cell")
+
+    (assert-test (assembly-package-generator::method-name-wrapper-names select-like "select")
+                '("select")
+                "method-name-wrapper-names keeps the plain base name when there's only one arity cell"))
+
+  ;; 3.4 Non-generic methods of the same name (ordinary overloads) must
+  ;; also stay in one cell (nil generic-arity key for all of them).
+  (let ((ordinary-overloads
+          (list '(:name "Write" :is-static t :return-type "System.Void" :parameters nil)
+                '(:name "Write" :is-static t :return-type "System.Void"
+                  :parameters ((:name "value" :type "System.String"))))))
+    (assert-test (length (assembly-package-generator::split-by-generic-arity ordinary-overloads))
+                1
+                "split-by-generic-arity keeps non-generic overloads in one cell")
+    (assert-test (assembly-package-generator::method-name-wrapper-names ordinary-overloads "write")
+                '("write")
+                "method-name-wrapper-names keeps the plain base name for non-generic overloads"))
 
   ;; 3.5 Test clean-constructor-p and constructor-overload-name helper logic using mock plists
   (let ((ctors-list
@@ -459,6 +573,157 @@
                         "generate-class-file documents an overloaded indexer as not yet supported")
             (assert-test (search "(cl:defun item " contents) nil
                         "generate-class-file does not emit a guessing defun for an overloaded indexer")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
+  ;; 7. Public instance fields: generate-class-file must emit a getter (and,
+  ;;    unless the field is read-only) a setter for every public instance
+  ;;    field, using dotnet:invoke's GetField support for the getter and the
+  ;;    setf-expansion of dotnet:invoke (documented in
+  ;;    doc/dotnet-dotcl-interop.md) for the setter, since fields have no
+  ;;    get_Foo/set_Foo accessor methods to invoke by name the way properties do.
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.Fielded"
+             :kind :class
+             :fields ((:name "Count" :type "System.Int32" :public t
+                       :documentation (:summary "A mutable public instance field."))
+                      (:name "Id" :type "System.Int32" :public t :init-only t
+                       :documentation (:summary "A read-only public instance field.")))
+             :properties nil
+             :methods nil
+             :constructors nil))
+         (out-dir (merge-pathnames "package-generator-tests-fields-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-fielded.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun count (obj!)" contents))) t
+                        "generate-class-file emits a getter for a mutable public instance field")
+            (assert-test (not (null (search "(dotnet:invoke (cl:the (dotnet \"Fixture.Fielded\") obj!) \"Count\"))" contents))) t
+                        "generate-class-file's field getter invokes the field by its C# name")
+            (assert-test (not (null (search "(cl:defun (cl:setf count) (new-value obj!)" contents))) t
+                        "generate-class-file emits a setter for a mutable public instance field")
+            (assert-test (not (null (search "(cl:setf (dotnet:invoke (cl:the (dotnet \"Fixture.Fielded\") obj!) \"Count\") new-value))" contents))) t
+                        "generate-class-file's field setter uses the setf-expansion of dotnet:invoke")
+            (assert-test (not (null (search "(cl:defun id (obj!)" contents))) t
+                        "generate-class-file emits a getter for a read-only public instance field")
+            (assert-test (search "(cl:defun (cl:setf id)" contents) nil
+                        "generate-class-file emits no setter for a read-only (:init-only) public instance field"))
+          (multiple-value-bind (exports shadows) (assembly-package-generator::compute-package-exports-and-shadows class-plist nil)
+            (declare (ignore shadows))
+            (assert-test (and (member "count" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports the mutable field's name")
+            (assert-test (and (member "id" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports the read-only field's name too (getter only)")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
+  ;; 8. Generic method of arity 2, single (non-overloaded) signature: must
+  ;;    go through generate-single-overload with two type-argument
+  ;;    parameters (type-1, type-2) instead of the legacy single "type".
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.Converter"
+             :kind :class
+             :fields nil
+             :properties nil
+             :methods ((:name "Convert" :is-static t :is-generic t :generic-arity 2
+                        :return-type "T2"
+                        :parameters ((:name "value" :type "T1"))))
+             :constructors nil))
+         (out-dir (merge-pathnames "package-generator-tests-generic-arity2-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-converter.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun convert (type-1 type-2 value)" contents))) t
+                        "generate-class-file's arity-2 generic method takes type-1 and type-2 parameters")
+            (assert-test (not (null (search "(dotnet:static-generic <type-str> \"Convert\" (cl:list type-1 type-2) value))" contents))) t
+                        "generate-class-file's arity-2 generic method passes both type arguments to dotnet:static-generic")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
+  ;; 9. Generic method of arity 2 with multiple overloads sharing that
+  ;;    arity (e.g. LINQ's Select<TSource,TResult>, overloaded on the
+  ;;    selector's own parameter count): must produce one Master Wrapper
+  ;;    (not two functions), taking type-1/type-2 once, dispatching at
+  ;;    runtime between the two clean overloads exactly like a non-generic
+  ;;    overloaded method would.
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.Selector"
+             :kind :class
+             :fields nil
+             :properties nil
+             :methods ((:name "Select" :is-static t :is-generic t :generic-arity 2
+                        :return-type "T2"
+                        :parameters ((:name "source" :type "T1") (:name "selector" :type "T2")))
+                       (:name "Select" :is-static t :is-generic t :generic-arity 2
+                        :return-type "T2"
+                        :parameters ((:name "source" :type "T1") (:name "selector" :type "T2") (:name "extra" :type "System.Int32"))))
+             :constructors nil))
+         (out-dir (merge-pathnames "package-generator-tests-generic-arity2-overload-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-selector.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun select (type-1 type-2 source selector" contents))) t
+                        "generate-class-file's Master Wrapper for overloaded arity-2 generics binds type-1/type-2 once")
+            (assert-test (not (null (search "(dotnet:static-generic <type-str> \"Select\" (cl:list type-1 type-2)" contents))) t
+                        "generate-class-file's Master Wrapper dispatch action passes both type arguments")
+            (assert-test (search "(cl:defun select-arity-2" contents) nil
+                        "generate-class-file does not arity-suffix a name with only one generic-arity cell")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
+  ;; 10. Same C# method name overloaded across *different* generic arities
+  ;;     (System.Linq.Enumerable's real-world Aggregate<TSource>,
+  ;;     Aggregate<TSource,TAccumulate>, and
+  ;;     Aggregate<TSource,TAccumulate,TResult>): one Lisp function's lambda
+  ;;     list can't flex between different type-argument counts, so each
+  ;;     arity must become its own arity-suffixed function, and none of them
+  ;;     should claim the bare "aggregate" name.
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.Aggregator"
+             :kind :class
+             :fields nil
+             :properties nil
+             :methods ((:name "Aggregate" :is-static t :is-generic t :generic-arity 1
+                        :return-type "T1"
+                        :parameters ((:name "source" :type "T1") (:name "func" :type "System.Object")))
+                       (:name "Aggregate" :is-static t :is-generic t :generic-arity 2
+                        :return-type "T2"
+                        :parameters ((:name "source" :type "T1") (:name "seed" :type "T2") (:name "func" :type "System.Object"))))
+             :constructors nil))
+         (out-dir (merge-pathnames "package-generator-tests-generic-multi-arity-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-aggregator.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun aggregate-arity-1 (type source func)" contents))) t
+                        "generate-class-file gives the arity-1 Aggregate overload its own arity-suffixed function")
+            (assert-test (not (null (search "(cl:defun aggregate-arity-2 (type-1 type-2 source seed func)" contents))) t
+                        "generate-class-file gives the arity-2 Aggregate overload its own arity-suffixed function")
+            (assert-test (search "(cl:defun aggregate (" contents) nil
+                        "generate-class-file does not emit a bare-named function when Aggregate spans multiple arities"))
+          (multiple-value-bind (exports shadows) (assembly-package-generator::compute-package-exports-and-shadows class-plist nil)
+            (declare (ignore shadows))
+            (assert-test (and (member "aggregate-arity-1" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports aggregate-arity-1")
+            (assert-test (and (member "aggregate-arity-2" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports aggregate-arity-2")
+            (assert-test (and (member "aggregate" exports :test #'string=) t) nil
+                        "compute-package-exports-and-shadows does not export a bare 'aggregate' for the multi-arity case")))
       (when (probe-file out-dir)
         (uiop:delete-directory-tree out-dir :validate t))))
 

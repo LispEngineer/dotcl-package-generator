@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 26
+(defparameter *generator-version* 27
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -40,7 +40,8 @@
    23 - Generated output is now self-contained: it no longer references this tool's own monoutils/utils packages (monoutils:dotnet-p was backed by a native primitive registered by this tool's own MonoUtilsRegistrar, unavailable to any downstream host). The per-class <type> constant and the parameter type-check fallback now use stock dotnet:resolve-type / dotnet:object-type instead of monoutils:get-type / monoutils:dotnet-p, and the csharp-overload-not-found condition is emitted as csharp-assembly-utils:csharp-overload-not-found instead of utils:csharp-overload-not-found. A single-pass invocation now also emits csharp-assembly-utils.lisp (generate-batch-utils-file), holding that condition; its defpackage form is copied into packages.lisp ahead of the per-class defpackage forms (generate-batch-packages-file). Both are copied verbatim from real, standalone-loadable template files (csharp-assembly-utils-package.template.lisp, csharp-assembly-utils.template.lisp) rather than synthesized via format. csharp-assembly-packages.asd's :components gained a csharp-assembly-utils :file (:depends-on (\"packages\")), and every class :file's :depends-on became (\"packages\" \"csharp-assembly-utils\").
    24 - Overload consolidation: the type-suffixed per-overload direct-call functions previously emitted (and exported) alongside every multi-overload method's Master Wrapper and every multi-constructor type's passthrough new (e.g. contains-vector-2, new-single-single) are no longer generated or exported at all; the existing Master Wrapper cond dispatch already selects the correct overload precisely, so those functions were pure redundancy. Constructors gained their own Master Wrapper (generate-constructor-master-wrapper), replacing the old (apply #'dotnet:new <type-str> args) &rest passthrough with the same supplied-p-based precise dispatch methods already had; every class now emits at most one new regardless of constructor overload count (methods still emit a second, *-suffixed wrapper only when a name is overloaded as both instance and static). To compensate for the lost per-overload functions' individual docstrings, every Master Wrapper's docstring (method or constructor) now enumerates all of its covered overloads' signatures plus each overload's own XML-doc-sourced Summary/Returns/Parameters text (format-combined-overloads-docstring/format-overload-doc-block), so the full set of available overloads stays documented on the one remaining function. Giving constructors a Master Wrapper exposed a latent bug in collect-optional-positional-params: each positional dispatch slot's representative parameter name is picked arbitrarily from whichever overload happens to have one there, so two overloads with unrelated arities can coincidentally reuse the same parameter name at two different slots (e.g. System.TimeSpan's 3-arg and 4-arg constructors each have an unrelated 'seconds' parameter, at index 2 and index 3 respectively), which previously produced an invalid lambda-list with a duplicate variable name. uniquify-positional-params now numeric-suffixes any such collision before the lambda-list/cond-block/docstring are generated.
    25 - The hardcoded instance-method/property receiver parameter is now named obj! instead of obj, since map-param-name (the only function that maps a C# parameter name to a generated Lisp parameter name) never appends a trailing '!' to anything, guaranteeing obj! can never collide with a mapped C# parameter name. Previously, a C# instance method with its own parameter literally named obj (e.g. System.Object.Equals(object obj)) generated an invalid lambda list with a duplicate obj binding.
-   26 - Fixed indexers (C#'s this[...]): AssemblyToLispy.cs now captures a property's own index parameters via GetIndexParameters(), the same way a method's parameters are captured, instead of silently dropping them. Previously an indexer's generated getter/setter (e.g. Dictionary<TKey,TValue>'s Item) took only the receiver (obj!) with no index/key argument at all, producing a wrapper that could never actually retrieve or store a value. Instance properties are now grouped by name (group-properties-by-name) before generation, since ordinary properties are never overloaded but indexers can be (distinct index-parameter signatures on the same name); a single-signature group's getter/setter now thread its index parameter(s) through to get_Item/set_Item positionally (index params before the value on the setter, matching C#'s own parameter order), while a group with more than one signature (an overloaded indexer) is left unimplemented, documented in a comment (mirroring dirty-method/dirty-constructor handling) rather than guessing which overload a single generated function should dispatch to.")
+   26 - Fixed indexers (C#'s this[...]): AssemblyToLispy.cs now captures a property's own index parameters via GetIndexParameters(), the same way a method's parameters are captured, instead of silently dropping them. Previously an indexer's generated getter/setter (e.g. Dictionary<TKey,TValue>'s Item) took only the receiver (obj!) with no index/key argument at all, producing a wrapper that could never actually retrieve or store a value. Instance properties are now grouped by name (group-properties-by-name) before generation, since ordinary properties are never overloaded but indexers can be (distinct index-parameter signatures on the same name); a single-signature group's getter/setter now thread its index parameter(s) through to get_Item/set_Item positionally (index params before the value on the setter, matching C#'s own parameter order), while a group with more than one signature (an overloaded indexer) is left unimplemented, documented in a comment (mirroring dirty-method/dirty-constructor handling) rather than guessing which overload a single generated function should dispatch to.
+   27 - Added support for public instance fields and for generic methods of more than one type argument, the two remaining known capability gaps flagged as highest-priority in doc/claude-suggested-improvements-20260703.md. (1) Public instance fields (public-instance-field-p, previously unused dead code) now generate a getter and, unless the field is C#'s readonly (:init-only), a setter: since a field has no get_Foo/set_Foo accessor method the way a property does, the getter uses dotnet:invoke's built-in field-read support (passing the bare field name), while the setter uses the setf-expansion of dotnet:invoke itself (the idiomatic DotCL way to write a field or property directly, per doc/dotnet-dotcl-interop.md), since dotnet:invoke has no equivalent field-write support. (2) simple-method-p/clean-method-p no longer restrict generic methods to exactly one type argument (generic-method-arity-supported-p now accepts any positive :generic-arity); generate-single-overload, generate-master-wrapper, and format-master-overload-action all generalize the previous single hardcoded 'type' parameter to generic-type-param-names' arity-many 'type-1'..'type-N' parameters (arity 1 keeps the legacy bare 'type' name, so existing arity-1 generated code and callers are unaffected), passed through as (cl:list type-1 type-2 ...) to dotnet:invoke-generic/dotnet:static-generic. Since a single Lisp function's lambda list cannot flex between different numbers of generic type-argument parameters, overloads of the *same* C# method name that disagree on generic arity (e.g. System.Linq.Enumerable's Aggregate, overloaded at arity 1, 2, and 3) can no longer share one wrapper: split-by-generic-arity partitions a method-name group's clean overloads into one sub-list per distinct arity, and generate-method-name-wrappers (replacing the four near-identical single/master-wrapper-dispatch call sites previously duplicated across the mixed-mode/single-mode branches) generates one function per sub-list, arity-suffixed (generic-arity-suffix, e.g. aggregate-arity-1, aggregate-arity-2) whenever a name spans more than one arity; the overwhelmingly common single-arity case (including every non-generic method) is entirely unaffected and keeps its plain (or '*'-suffixed) name. method-name-wrapper-names mirrors this naming for compute-package-exports-and-shadows without re-running code generation.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -210,11 +211,93 @@
   "Checks if a C# type signature string represents an uninstantiated generic type parameter (contains an exclamation point)."
   (and type-str (find #\! type-str)))
 
+(defun generic-type-param-names (arity)
+  "Returns ARITY distinct Lisp parameter names for a generic method's type
+   arguments (each bound by the caller to a .NET type -- a type-name string,
+   alias, or System.Type object -- for dotnet:invoke-generic/static-generic
+   to instantiate the method with). ARITY 1 keeps the single legacy name
+   \"type\" (pre-dating support for arity > 1, and still the common case);
+   ARITY > 1 uses \"type-1\" through \"type-ARITY\" so each type argument
+   gets its own binding."
+  (if (= arity 1)
+      (list "type")
+      (loop for i from 1 to arity collect (format nil "type-~D" i))))
+
+(defun generic-method-arity-supported-p (is-generic arity)
+  "Returns t if a generic method's ARITY is one this generator can wrap: any
+   method is fine if it isn't generic at all (IS-GENERIC nil); a generic
+   method needs a positive integer ARITY (one Lisp type-argument parameter
+   is generated per type argument -- see generic-type-param-names)."
+  (or (not is-generic)
+      (and (integerp arity) (> arity 0))))
+
+(defun method-generic-cell-key (m)
+  "Returns a key identifying method plist M's generic-arity 'cell': nil for
+   a non-generic method, or its (integer) :generic-arity for a generic one.
+   See split-by-generic-arity."
+  (and (getf m :is-generic) (getf m :generic-arity)))
+
+(defun split-by-generic-arity (methods)
+  "Partitions METHODS (already-clean method plists sharing one C# method
+   name and one static/instance mode) into an ordered list of sub-lists,
+   one per distinct generic-arity 'cell' (method-generic-cell-key),
+   preserving first-seen order within each cell and across cells.
+
+   A single generated Lisp function can only bind one fixed number of
+   generic type-argument parameters (one Lisp parameter per type argument --
+   see generic-type-param-names), so overloads of the same C# method name
+   that disagree on generic arity cannot share one wrapper's lambda list.
+   The canonical real-world example is System.Linq.Enumerable's Aggregate,
+   which has three same-named overloads of generic arity 1, 2, and 3
+   respectively: METHODS (Aggregate's clean, e.g. all-static, overloads)
+   would split into three single-method cells here, one per arity, so each
+   gets generated as its own function (see generate-method-name-wrappers)
+   instead of being incorrectly merged into one.
+
+   The overwhelmingly common case -- a non-generic method, or a generic
+   method whose every overload shares the same arity -- returns a single
+   one-cell list, so callers can treat \"only one cell\" as \"nothing
+   changes from before generic-arity splitting existed.\""
+  (let ((table (make-hash-table :test #'eql))
+        (order nil))
+    (dolist (m methods)
+      (let ((key (method-generic-cell-key m)))
+        (unless (nth-value 1 (gethash key table))
+          (push key order))
+        (push m (gethash key table))))
+    (mapcar (lambda (key) (nreverse (gethash key table))) (nreverse order))))
+
+(defun generic-arity-suffix (cell)
+  "Returns \"\" for a non-generic CELL (a list of method plists sharing one
+   method-generic-cell-key, from split-by-generic-arity), or \"-arity-N\"
+   for a generic CELL of arity N, to disambiguate multiple generic-arity
+   variants of the same method name from each other when a method name
+   splits into more than one cell (see generate-method-name-wrappers)."
+  (let ((m (first cell)))
+    (if (getf m :is-generic)
+        (format nil "-arity-~D" (getf m :generic-arity))
+        "")))
+
+(defun method-name-wrapper-names (clean-methods base-name)
+  "Returns the list of Lisp function name(s) generate-method-name-wrappers
+   will define for CLEAN-METHODS (already static/instance-partitioned
+   overloads of one C# method name) under BASE-NAME: just (list BASE-NAME)
+   in the common case of a single generic-arity cell, or one
+   BASE-NAME-suffixed name per cell (generic-arity-suffix) when
+   CLEAN-METHODS spans more than one. Kept separate from
+   generate-method-name-wrappers so compute-package-exports-and-shadows can
+   list exactly the same names packages.lisp should export without
+   re-running the actual code-generation logic."
+  (let ((cells (split-by-generic-arity clean-methods)))
+    (if (> (length cells) 1)
+        (mapcar (lambda (cell) (concatenate 'string base-name (generic-arity-suffix cell))) cells)
+        (list base-name))))
+
 (defun simple-method-p (method all-methods)
   "Returns t if the method qualifies for Phase 1 compilation.
    Criteria:
    - No overloads (exactly one method signature with this name in the class).
-   - No generic parameters/return type (or exactly one generic type argument).
+   - No generic parameters/return type (or any positive number of generic type arguments).
    - No default parameter values.
    - No special parameter modifiers (ref, out, ref-readonly, params).
    - No operator overloads.
@@ -232,8 +315,8 @@
          (not (uiop:string-prefix-p "set_" name))
          ;; Check for no overloads in the class
          (= 1 (count name all-methods :key (lambda (m) (getf m :name)) :test #'string=))
-         ;; Only support generic methods if they have exactly one type argument
-         (or (not is-generic) (eql arity 1))
+         ;; Support generic methods of any positive arity
+         (generic-method-arity-supported-p is-generic arity)
          ;; Check return type for generic markers
          (not (generic-type-p (getf method :return-type)))
          ;; Check all parameters
@@ -247,7 +330,8 @@
                  params))))
 
 (defun clean-method-p (method)
-  "Returns t if the method is 'clean' (no ref/out/params/defaults/generics).
+  "Returns t if the method is 'clean' (no ref/out/params/defaults, and any
+   generic type arguments have a supported positive arity).
    Unlike simple-method-p, this does NOT check for uniqueness of the method name,
    allowing it to be used for overloaded methods."
   (let* ((name (getf method :name))
@@ -258,8 +342,8 @@
          (not (uiop:string-prefix-p "op_" name))
          (not (uiop:string-prefix-p "get_" name))
          (not (uiop:string-prefix-p "set_" name))
-         ;; Only support generic methods if they have exactly one type argument
-         (or (not is-generic) (eql arity 1))
+         ;; Support generic methods of any positive arity
+         (generic-method-arity-supported-p is-generic arity)
          (not (generic-type-p (getf method :return-type)))
          (every (lambda (p)
                   (and (not (getf p :out))
@@ -588,17 +672,22 @@
                        (cl:t
                         (map-param-name (cl:getf p :name)))))))
 
-(cl:defun format-master-overload-action (cm fq-name name static-p is-generic-p prefix opt-params)
-  "Generates C# invocation code for cm, mapping parameter names to the master wrapper's bound variables."
+(cl:defun format-master-overload-action (cm fq-name name static-p is-generic-p generic-type-names prefix opt-params)
+  "Generates C# invocation code for cm, mapping parameter names to the
+   master wrapper's bound variables. GENERIC-TYPE-NAMES (from
+   generic-type-param-names) is the ordered list of Lisp type-argument
+   variable names bound by the wrapper's own lambda list; ignored unless
+   IS-GENERIC-P."
   (cl:let* ((param-names (master-overload-param-names cm prefix opt-params))
-            (dotnet-method-name (cl:or (cl:getf cm :mangled-name) name)))
+            (dotnet-method-name (cl:or (cl:getf cm :mangled-name) name))
+            (type-args-str (cl:format nil "~{~A~^ ~}" generic-type-names)))
     (cl:cond
       ((cl:and static-p is-generic-p)
-       (cl:format nil "(dotnet:static-generic <type-str> \"~A\" (cl:list type)~@[ ~{~A~^ ~}~])" dotnet-method-name param-names))
+       (cl:format nil "(dotnet:static-generic <type-str> \"~A\" (cl:list ~A)~@[ ~{~A~^ ~}~])" dotnet-method-name type-args-str param-names))
       (static-p
        (cl:format nil "(dotnet:static <type-str> \"~A\"~@[ ~{~A~^ ~}~])" dotnet-method-name param-names))
       (is-generic-p
-       (cl:format nil "(dotnet:invoke-generic (cl:the (dotnet \"~A\") obj!) \"~A\" (cl:list type)~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name param-names))
+       (cl:format nil "(dotnet:invoke-generic (cl:the (dotnet \"~A\") obj!) \"~A\" (cl:list ~A)~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name type-args-str param-names))
       (cl:t
        (cl:format nil "(dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name param-names)))))
 
@@ -619,8 +708,13 @@
     (cl:format nil "(cl:append ~{~A~^ ~})" (cl:nreverse parts))))
 
 (cl:defun generate-master-wrapper (stream methods name mname fq-name static-p is-generic-p)
-  "Generates Master Wrapper defun with precise dispatch cond block and fallback error signaling."
-  (cl:let* ((raw-prefix (common-parameter-prefix methods))
+  "Generates Master Wrapper defun with precise dispatch cond block and fallback error signaling.
+   When IS-GENERIC-P, every method in METHODS is assumed to share the same
+   :generic-arity (the arity of the first is used to compute the wrapper's
+   type-argument parameter names -- see generic-type-param-names)."
+  (cl:let* ((generic-arity (cl:and is-generic-p (cl:getf (cl:first methods) :generic-arity)))
+            (generic-type-names (cl:and is-generic-p (generic-type-param-names generic-arity)))
+            (raw-prefix (common-parameter-prefix methods))
             (prefix-len (cl:length raw-prefix))
             (max-mand-len (max-mandatory-parameter-len methods))
             (raw-opt-params (collect-optional-positional-params methods prefix-len max-mand-len))
@@ -631,7 +725,7 @@
             (key-params (collect-key-params methods max-mand-len))
             (args-list nil))
     (cl:when is-generic-p
-      (cl:setf args-list (cl:append args-list (cl:list "type"))))
+      (cl:setf args-list (cl:append args-list generic-type-names)))
     (cl:unless static-p
       (cl:setf args-list (cl:append args-list (cl:list "obj!"))))
     (cl:setf args-list (cl:append args-list prefix-names))
@@ -660,7 +754,7 @@
     (cl:let ((sorted-methods (cl:sort (cl:copy-list methods) #'> :key (cl:lambda (m) (cl:length (cl:getf m :parameters))))))
       (cl:dolist (cm sorted-methods)
         (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
-              (action-str (format-master-overload-action cm fq-name name static-p is-generic-p prefix opt-params)))
+              (action-str (format-master-overload-action cm fq-name name static-p is-generic-p generic-type-names prefix opt-params)))
           (cl:format stream "    (~A~%" cond-str)
           (cl:format stream "     ~A)~%" action-str))))
 
@@ -735,14 +829,16 @@
             (returns (cl:getf m-doc :returns))
             (params (cl:getf m :parameters))
             (is-generic-p (cl:getf m :is-generic))
+            (generic-type-names (cl:and is-generic-p (generic-type-param-names (cl:getf m :generic-arity))))
+            (generic-type-args-str (cl:format nil "~{~A~^ ~}" generic-type-names))
             (param-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) params))
             (args-str (cl:cond
                         ((cl:and static-p is-generic-p)
-                         (cl:format nil "type~@[ ~{~A~^ ~}~]" param-names))
+                         (cl:format nil "~A~@[ ~{~A~^ ~}~]" generic-type-args-str param-names))
                         (static-p
                          (cl:format nil "~{~A~^ ~}" param-names))
                         (is-generic-p
-                         (cl:format nil "type obj!~@[ ~{~A~^ ~}~]" param-names))
+                         (cl:format nil "~A obj!~@[ ~{~A~^ ~}~]" generic-type-args-str param-names))
                         (cl:t
                          (cl:format nil "obj!~@[ ~{~A~^ ~}~]" param-names))))
             (docstring (build-docstring summary returns params m-doc))
@@ -762,15 +858,39 @@
          (cl:format stream "  \"~A\"~%" escaped-docstring))
        (cl:cond
          ((cl:and static-p is-generic-p)
-          (cl:format stream "  (dotnet:static-generic <type-str> \"~A\" (cl:list type)~@[ ~{~A~^ ~}~]))~%~%" dotnet-method-name param-names))
+          (cl:format stream "  (dotnet:static-generic <type-str> \"~A\" (cl:list ~A)~@[ ~{~A~^ ~}~]))~%~%" dotnet-method-name generic-type-args-str param-names))
          (static-p
           (cl:if static-typed-args
               (cl:format stream "  (dotnet:static <type-str> \"~A\"~@[~{ ~A~}~]))~%~%" dotnet-method-name static-typed-args)
               (cl:format stream "  (dotnet:static <type-str> \"~A\"~@[ ~{~A~^ ~}~]))~%~%" dotnet-method-name param-names)))
          (is-generic-p
-          (cl:format stream "  (dotnet:invoke-generic (cl:the (dotnet \"~A\") obj!) \"~A\" (cl:list type)~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name param-names))
+          (cl:format stream "  (dotnet:invoke-generic (cl:the (dotnet \"~A\") obj!) \"~A\" (cl:list ~A)~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name generic-type-args-str param-names))
          (cl:t
           (cl:format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name param-names)))))
+
+(defun generate-method-name-wrappers (stream clean-methods name base-name fq-name static-p)
+  "Generates one or more Lisp wrapper function(s) for one C# method NAME's
+   already static/instance-partitioned CLEAN-METHODS, under BASE-NAME.
+
+   In the common case -- CLEAN-METHODS is non-generic, or every overload
+   shares the same generic arity -- this generates exactly one function
+   (or Master Wrapper) named BASE-NAME, exactly as if generic-arity
+   splitting didn't exist. When CLEAN-METHODS spans more than one
+   generic-arity cell (split-by-generic-arity; e.g. Enumerable.Aggregate's
+   arity-1/2/3 overloads), each cell gets its own function instead, named
+   BASE-NAME suffixed by its arity (generic-arity-suffix), since one Lisp
+   function's lambda list cannot flex between different numbers of generic
+   type-argument parameters. method-name-wrapper-names computes the same
+   set of names without generating any code, for
+   compute-package-exports-and-shadows."
+  (let ((cells (split-by-generic-arity clean-methods)))
+    (dolist (cell cells)
+      (let ((mname (if (> (length cells) 1)
+                        (concatenate 'string base-name (generic-arity-suffix cell))
+                        base-name)))
+        (if (and (= (length cell) 1) (not (complex-group-p cell)))
+            (generate-single-overload stream (first cell) mname fq-name static-p)
+            (generate-master-wrapper stream cell name mname fq-name static-p (getf (first cell) :is-generic)))))))
 
 (defun format-overload-test (cm)
   "Generates a Lisp conditional test expression string for checking if the runtime arguments match the method's parameters."
@@ -804,6 +924,7 @@
          (runtime-fields-all (remove-if-not #'runtime-readonly-field-p fields))
          (pure-const-fields (remove-if-not (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
          (dynamic-const-fields (remove-if (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
+         (instance-fields (remove-if-not #'public-instance-field-p fields))
          (const-props (remove-if-not #'constant-property-p properties))
          (pure-const-props (remove-if-not (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
          (dynamic-const-props (remove-if (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
@@ -848,6 +969,13 @@
       (push (format nil "+~A+" (camel-to-kebab (getf f :name))) exports))
     (dolist (f dynamic-const-fields)
       (push (map-member-name (getf f :name)) exports))
+    ;; Public instance fields: a getter is always exported (all public
+    ;; instance fields are readable); the setf-able name is the same
+    ;; symbol, so it needs no separate export entry -- omitted only when
+    ;; the field is read-only (:init-only), matching how instance
+    ;; properties only export a plain setf-able name when :writeable.
+    (dolist (f instance-fields)
+      (push (map-member-name (getf f :name)) exports))
     (dolist (p pure-const-props)
       (push (format nil "+~A+" (camel-to-kebab (getf p :name))) exports))
     (dolist (p dynamic-const-props)
@@ -866,21 +994,29 @@
             (if readable
                 (push pname exports)
                 (push (format nil "set-~A" pname) exports))))))
-    ;; Collect method exports from method groups
+    ;; Collect method exports from method groups. Mirrors
+    ;; generate-method-name-wrappers' own naming exactly (via
+    ;; method-name-wrapper-names) so a method name split into multiple
+    ;; generic-arity-suffixed functions (e.g. Enumerable.Aggregate's arity
+    ;; 1/2/3 overloads) exports every one of them, not just a bare name.
     (dolist (group method-groups)
       (let* ((name (car group))
              (clean-methods (remove-if-not #'clean-method-p (cdr group)))
-             (clean-count (length clean-methods))
              (kebab-name (map-member-name name))
              (static-clean (remove-if-not (lambda (m) (getf m :is-static)) clean-methods))
              (instance-clean (remove-if-not (lambda (m) (not (getf m :is-static))) clean-methods))
              (static-count (length static-clean))
              (instance-count (length instance-clean))
              (mixed-mode-p (and (> static-count 0) (> instance-count 0))))
-        (when (> clean-count 0)
-          (push kebab-name exports)
-          (when mixed-mode-p
-            (push (concatenate 'string kebab-name "*") exports)))))
+        (cond
+          (mixed-mode-p
+           (let ((static-kebab-name (concatenate 'string kebab-name "*")))
+             (dolist (n (method-name-wrapper-names instance-clean kebab-name)) (push n exports))
+             (dolist (n (method-name-wrapper-names static-clean static-kebab-name)) (push n exports))))
+          ((> static-count 0)
+           (dolist (n (method-name-wrapper-names static-clean kebab-name)) (push n exports)))
+          ((> instance-count 0)
+           (dolist (n (method-name-wrapper-names instance-clean kebab-name)) (push n exports))))))
 
     ;; Remove duplicates from exports while preserving order
     (setf exports (remove-duplicates (nreverse exports) :test #'string= :from-end t))
@@ -925,6 +1061,7 @@
            (runtime-fields-all (remove-if-not #'runtime-readonly-field-p fields))
            (pure-const-fields (remove-if-not (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
            (dynamic-const-fields (remove-if (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
+           (instance-fields (remove-if-not #'public-instance-field-p fields))
            (const-props (remove-if-not #'constant-property-p properties))
            (pure-const-props (remove-if-not (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
            (dynamic-const-props (remove-if (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
@@ -1128,6 +1265,32 @@
                             (format stream "  \"~A\"~%" doc-str))
                           (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~] new-value))~%~%" fq-name set-method index-param-names))))))))
 
+        ;; Public Instance Fields: unlike properties (which have named
+        ;; get_Foo/set_Foo accessor methods to invoke), a field has no
+        ;; accessor method at all -- dotnet:invoke's BindingFlags.GetField
+        ;; lets it read a field by name directly, but there is no
+        ;; equivalent SetField-only invoke; the idiomatic DotCL way to
+        ;; write a field is the setf-expansion of dotnet:invoke itself
+        ;; (see doc/dotnet-dotcl-interop.md), which is what the setter
+        ;; below uses.
+        (dolist (f instance-fields)
+          (let* ((fname (map-member-name (getf f :name)))
+                 (writeable (not (getf f :init-only)))
+                 (f-doc (getf (getf f :documentation) :summary))
+                 (doc-str (if f-doc (escape-lisp-string f-doc) "")))
+            (format stream "(cl:defun ~A (obj!)~%" fname)
+            (when (> (length doc-str) 0)
+              (format stream "  \"~A\"~%" doc-str))
+            (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"))~%~%" fq-name (getf f :name))
+            (when writeable
+              (when is-value-type-p
+                (format stream ";; Note: Modifying a field of a value type (struct) via setf may only mutate~%")
+                (format stream ";; a boxed copy, leaving the original unchanged. Use caution with structs.~%"))
+              (format stream "(cl:defun (cl:setf ~A) (new-value obj!)~%" fname)
+              (when (> (length doc-str) 0)
+                (format stream "  \"~A\"~%" doc-str))
+              (format stream "  (cl:setf (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\") new-value))~%~%" fq-name (getf f :name)))))
+
         ;; Methods - Generated from method groups with overload handling
         (dolist (group method-groups)
           (let* ((name (car group))
@@ -1157,27 +1320,19 @@
                (cl:cond
                  (mixed-mode-p
                   ;; Mixed-Mode: instance name is kebab-name, static name is kebab-name*
+                  ;; (each further split into per-generic-arity-cell functions
+                  ;; by generate-method-name-wrappers when needed)
                   (cl:let ((static-kebab-name (concatenate 'string kebab-name "*")))
-                    ;; Instance wrappers
-                    (cl:if (cl:and (= instance-count 1) (cl:not (complex-group-p instance-clean)))
-                           (generate-single-overload stream (first instance-clean) kebab-name fq-name nil)
-                           (generate-master-wrapper stream instance-clean name kebab-name fq-name nil (getf (first instance-clean) :is-generic)))
-                    ;; Static wrappers
-                    (cl:if (cl:and (= static-count 1) (cl:not (complex-group-p static-clean)))
-                           (generate-single-overload stream (first static-clean) static-kebab-name fq-name t)
-                           (generate-master-wrapper stream static-clean name static-kebab-name fq-name t (getf (first static-clean) :is-generic)))))
+                    (generate-method-name-wrappers stream instance-clean name kebab-name fq-name nil)
+                    (generate-method-name-wrappers stream static-clean name static-kebab-name fq-name t)))
                  (t
                   ;; Single-Mode: name is kebab-name
                   (cl:cond
                     ((> static-count 0)
-                     (cl:if (cl:and (= static-count 1) (cl:not (complex-group-p static-clean)))
-                            (generate-single-overload stream (first static-clean) kebab-name fq-name t)
-                            (generate-master-wrapper stream static-clean name kebab-name fq-name t (getf (first static-clean) :is-generic))))
+                     (generate-method-name-wrappers stream static-clean name kebab-name fq-name t))
                     ((> instance-count 0)
-                     (cl:if (cl:and (= instance-count 1) (cl:not (complex-group-p instance-clean)))
-                            (generate-single-overload stream (first instance-clean) kebab-name fq-name nil)
-                            (generate-master-wrapper stream instance-clean name kebab-name fq-name nil (getf (first instance-clean) :is-generic)))))))
-               
+                     (generate-method-name-wrappers stream instance-clean name kebab-name fq-name nil)))))
+
                ;; Emit dirty overload doc-comment if any
                (when (> dirty-count 0)
                  (format stream ";; Note: ~A.~A also has the following overloads with special~%" fq-name name)

@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 26
-;;; Creation Date: 2026-07-04T01:45:08Z
+;;; Generator Version: 27
+;;; Creation Date: 2026-07-04T02:31:19Z
 
 (cl:in-package :cl-user)
 
@@ -335,6 +335,7 @@
    #:compare-ordinal
    #:compare-to
    #:concat
+   #:concat-arity-1
    #:contains
    #:copy
    #:copy-to
@@ -344,6 +345,9 @@
    #:equals
    #:equals*
    #:format
+   #:format-arity-1
+   #:format-arity-2
+   #:format-arity-3
    #:get-enumerator
    #:get-hash-code
    #:get-hash-code*
@@ -359,6 +363,7 @@
    #:null-or-empty?
    #:null-or-white-space?
    #:join
+   #:join-arity-1
    #:last-index-of
    #:last-index-of-any
    #:normalize
@@ -381,6 +386,71 @@
    #:trim-end
    #:trim-start
    #:try-copy-to
+  ))
+
+;;; Source File: system-array.lisp
+;;; C# Class: System.Array
+;;; Constant Properties: MaxLength
+(cl:defpackage :system-array
+  (:use :cl)
+  (:shadow
+   #:length
+   #:fill
+   #:find
+   #:reverse
+   #:sort
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:+max-length+
+   #:fixed-size?
+   #:read-only?
+   #:synchronized?
+   #:length
+   #:long-length
+   #:rank
+   #:sync-root
+   #:as-read-only
+   #:binary-search
+   #:binary-search-arity-1
+   #:clear
+   #:clone
+   #:constrained-copy
+   #:convert-all
+   #:copy
+   #:copy-to
+   #:create-instance
+   #:create-instance-from-array-type
+   #:empty
+   #:exists
+   #:fill
+   #:find
+   #:find-all
+   #:find-index
+   #:find-last
+   #:find-last-index
+   #:for-each
+   #:get-enumerator
+   #:get-length
+   #:get-long-length
+   #:get-lower-bound
+   #:get-upper-bound
+   #:get-value
+   #:index-of
+   #:index-of-arity-1
+   #:initialize
+   #:last-index-of
+   #:last-index-of-arity-1
+   #:reverse
+   #:reverse-arity-1
+   #:set-value
+   #:sort
+   #:sort-arity-1
+   #:sort-arity-2
+   #:true-for-all
   ))
 
 ;;; Source File: system-time-zone-info.lisp
@@ -424,6 +494,84 @@
    #:to-string
   ))
 
+;;; Source File: system-convert.lisp
+;;; C# Class: System.Convert
+;;; Constant Properties: (none)
+(cl:defpackage :system-convert
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:db-null
+   #:change-type
+   #:from-base64-char-array
+   #:from-base64-string
+   #:from-hex-string
+   #:get-type-code
+   #:db-null?
+   #:to-base64-char-array
+   #:to-base64-string
+   #:to-boolean
+   #:to-byte
+   #:to-char
+   #:to-date-time
+   #:to-decimal
+   #:to-double
+   #:to-hex-string
+   #:to-hex-string-lower
+   #:to-int16
+   #:to-int32
+   #:to-int64
+   #:to-s-byte
+   #:to-single
+   #:to-string
+   #:to-u-int16
+   #:to-u-int32
+   #:to-u-int64
+  ))
+
+;;; Source File: system-text-string-builder.lisp
+;;; C# Class: System.Text.StringBuilder
+;;; Constant Properties: (none)
+(cl:defpackage :system-text-string-builder
+  (:use :cl)
+  (:shadow
+   #:length
+   #:append
+   #:remove
+   #:replace
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:capacity
+   #:chars
+   #:length
+   #:max-capacity
+   #:append
+   #:append-format
+   #:append-format-arity-1
+   #:append-format-arity-2
+   #:append-format-arity-3
+   #:append-join
+   #:append-join-arity-1
+   #:append-line
+   #:clear
+   #:copy-to
+   #:ensure-capacity
+   #:equals
+   #:get-chunks
+   #:insert
+   #:remove
+   #:replace
+   #:to-string
+  ))
+
 ;;; Source File: system-time-zone-info-adjustment-rule.lisp
 ;;; C# Class: System.TimeZoneInfo+AdjustmentRule
 ;;; Constant Properties: (none)
@@ -443,6 +591,163 @@
    #:create-adjustment-rule
    #:equals
    #:get-hash-code
+  ))
+
+;;; Source File: system-value-tuple-2.lisp
+;;; C# Class: System.ValueTuple`2
+;;; Constant Properties: (none)
+(cl:defpackage :system-value-tuple-2
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:item1
+   #:item2
+   #:compare-to
+   #:equals
+   #:get-hash-code
+   #:to-string
+  ))
+
+;;; Source File: system-value-tuple-3.lisp
+;;; C# Class: System.ValueTuple`3
+;;; Constant Properties: (none)
+(cl:defpackage :system-value-tuple-3
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:item1
+   #:item2
+   #:item3
+   #:compare-to
+   #:equals
+   #:get-hash-code
+   #:to-string
+  ))
+
+;;; Source File: system-value-tuple-4.lisp
+;;; C# Class: System.ValueTuple`4
+;;; Constant Properties: (none)
+(cl:defpackage :system-value-tuple-4
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:item1
+   #:item2
+   #:item3
+   #:item4
+   #:compare-to
+   #:equals
+   #:get-hash-code
+   #:to-string
+  ))
+
+;;; Source File: system-value-tuple-5.lisp
+;;; C# Class: System.ValueTuple`5
+;;; Constant Properties: (none)
+(cl:defpackage :system-value-tuple-5
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:item1
+   #:item2
+   #:item3
+   #:item4
+   #:item5
+   #:compare-to
+   #:equals
+   #:get-hash-code
+   #:to-string
+  ))
+
+;;; Source File: system-value-tuple-6.lisp
+;;; C# Class: System.ValueTuple`6
+;;; Constant Properties: (none)
+(cl:defpackage :system-value-tuple-6
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:item1
+   #:item2
+   #:item3
+   #:item4
+   #:item5
+   #:item6
+   #:compare-to
+   #:equals
+   #:get-hash-code
+   #:to-string
+  ))
+
+;;; Source File: system-value-tuple-7.lisp
+;;; C# Class: System.ValueTuple`7
+;;; Constant Properties: (none)
+(cl:defpackage :system-value-tuple-7
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:item1
+   #:item2
+   #:item3
+   #:item4
+   #:item5
+   #:item6
+   #:item7
+   #:compare-to
+   #:equals
+   #:get-hash-code
+   #:to-string
+  ))
+
+;;; Source File: system-value-tuple-8.lisp
+;;; C# Class: System.ValueTuple`8
+;;; Constant Properties: (none)
+(cl:defpackage :system-value-tuple-8
+  (:use :cl)
+  (:shadow
+   #:rest
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:item1
+   #:item2
+   #:item3
+   #:item4
+   #:item5
+   #:item6
+   #:item7
+   #:rest
+   #:compare-to
+   #:equals
+   #:get-hash-code
+   #:to-string
   ))
 
 ;;; Source File: system-linq-enumerable.lisp
@@ -466,40 +771,66 @@
    #:<type-str>
    #:<creation>
    #:<version>
-   #:aggregate
+   #:aggregate-arity-1
+   #:aggregate-arity-2
+   #:aggregate-arity-3
+   #:aggregate-by
    #:all
    #:any
    #:append
    #:as-enumerable
    #:average
+   #:average-arity-1
    #:cast
    #:chunk
    #:concat
    #:contains
    #:count
+   #:count-by
    #:default-if-empty
    #:distinct
+   #:distinct-by
    #:element-at
    #:element-at-or-default
    #:empty
    #:except
+   #:except-by
    #:first
    #:first-or-default
+   #:group-by-arity-2
+   #:group-by-arity-3
+   #:group-by-arity-4
+   #:group-join
    #:index
    #:infinite-sequence
    #:intersect
+   #:intersect-by
+   #:join
    #:last
    #:last-or-default
+   #:left-join
    #:long-count
    #:max
+   #:max-arity-1
+   #:max-arity-2
+   #:max-by
    #:min
+   #:min-arity-1
+   #:min-arity-2
+   #:min-by
    #:of-type
    #:order
+   #:order-by
+   #:order-by-descending
    #:order-descending
    #:prepend
    #:range
    #:repeat
    #:reverse
+   #:right-join
+   #:select
+   #:select-many-arity-2
+   #:select-many-arity-3
    #:sequence
    #:sequence-equal
    #:shuffle
@@ -509,14 +840,24 @@
    #:skip-last
    #:skip-while
    #:sum
+   #:sum-arity-1
    #:take
    #:take-last
    #:take-while
+   #:then-by
+   #:then-by-descending
    #:to-array
+   #:to-dictionary-arity-2
+   #:to-dictionary-arity-3
    #:to-hash-set
    #:to-list
+   #:to-lookup-arity-2
+   #:to-lookup-arity-3
    #:union
+   #:union-by
    #:where
+   #:zip-arity-2
+   #:zip-arity-3
   ))
 
 ;;; Source File: system-xml-xml-reader.lisp
@@ -704,5 +1045,572 @@
    #:count
    #:copy-to
    #:get-enumerator
+  ))
+
+;;; Source File: system-collections-generic-list-1.lisp
+;;; C# Class: System.Collections.Generic.List`1
+;;; Constant Properties: (none)
+(cl:defpackage :system-collections-generic-list-1
+  (:use :cl)
+  (:shadow
+   #:count
+   #:find
+   #:remove
+   #:reverse
+   #:sort
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:capacity
+   #:count
+   #:item
+   #:add
+   #:add-range
+   #:as-read-only
+   #:binary-search
+   #:clear
+   #:contains
+   #:convert-all
+   #:copy-to
+   #:ensure-capacity
+   #:exists
+   #:find
+   #:find-all
+   #:find-index
+   #:find-last
+   #:find-last-index
+   #:for-each
+   #:get-enumerator
+   #:get-range
+   #:index-of
+   #:insert
+   #:insert-range
+   #:last-index-of
+   #:remove
+   #:remove-all
+   #:remove-at
+   #:remove-range
+   #:reverse
+   #:slice
+   #:sort
+   #:to-array
+   #:trim-excess
+   #:true-for-all
+  ))
+
+;;; Source File: system-collections-generic-sorted-list-2.lisp
+;;; C# Class: System.Collections.Generic.SortedList`2
+;;; Constant Properties: (none)
+(cl:defpackage :system-collections-generic-sorted-list-2
+  (:use :cl)
+  (:shadow
+   #:count
+   #:values
+   #:remove
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:capacity
+   #:comparer
+   #:count
+   #:item
+   #:keys
+   #:values
+   #:add
+   #:clear
+   #:contains-key
+   #:contains-value
+   #:get-enumerator
+   #:get-key-at-index
+   #:get-value-at-index
+   #:index-of-key
+   #:index-of-value
+   #:remove
+   #:remove-at
+   #:set-value-at-index
+   #:trim-excess
+  ))
+
+;;; Source File: system-numerics-vector2.lisp
+;;; C# Class: System.Numerics.Vector2
+;;; Constant Properties: *
+(cl:defpackage :system-numerics-vector2
+  (:use :cl)
+  (:shadow
+   #:-
+   #:*
+   #:/
+   #:+
+   #:=
+   #:abs
+   #:cos
+   #:count
+   #:exp
+   #:length
+   #:load
+   #:log
+   #:max
+   #:min
+   #:round
+   #:sin
+   #:truncate
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:x
+   #:y
+   #:+all-bits-set+
+   #:+e+
+   #:+epsilon+
+   #:+nan+
+   #:+negative-infinity+
+   #:+negative-zero+
+   #:+one+
+   #:+pi+
+   #:+positive-infinity+
+   #:+tau+
+   #:+unit-x+
+   #:+unit-y+
+   #:+zero+
+   #:item
+   #:-
+   #:*
+   #:/
+   #:+
+   #:=
+   #:abs
+   #:add
+   #:all
+   #:all-where-all-bits-set
+   #:and-not
+   #:any
+   #:any-where-all-bits-set
+   #:bitwise-and
+   #:bitwise-or
+   #:clamp
+   #:clamp-native
+   #:conditional-select
+   #:copy-sign
+   #:copy-to
+   #:cos
+   #:count
+   #:count-where-all-bits-set
+   #:create
+   #:create-scalar
+   #:create-scalar-unsafe
+   #:cross
+   #:degrees-to-radians
+   #:distance
+   #:distance-squared
+   #:divide
+   #:dot
+   #:equals
+   #:equals*
+   #:equals-all
+   #:equals-any
+   #:exp
+   #:fused-multiply-add
+   #:get-hash-code
+   #:greater-than
+   #:greater-than-all
+   #:greater-than-any
+   #:greater-than-or-equal
+   #:greater-than-or-equal-all
+   #:greater-than-or-equal-any
+   #:hypot
+   #:index-of
+   #:index-of-where-all-bits-set
+   #:even-integer?
+   #:finite?
+   #:infinity?
+   #:integer?
+   #:nan?
+   #:negative?
+   #:negative-infinity?
+   #:normal?
+   #:odd-integer?
+   #:positive?
+   #:positive-infinity?
+   #:subnormal?
+   #:zero?
+   #:last-index-of
+   #:last-index-of-where-all-bits-set
+   #:length
+   #:length-squared
+   #:lerp
+   #:less-than
+   #:less-than-all
+   #:less-than-any
+   #:less-than-or-equal
+   #:less-than-or-equal-all
+   #:less-than-or-equal-any
+   #:load
+   #:load-aligned
+   #:load-aligned-non-temporal
+   #:log
+   #:log2
+   #:max
+   #:max-magnitude
+   #:max-magnitude-number
+   #:max-native
+   #:max-number
+   #:min
+   #:min-magnitude
+   #:min-magnitude-number
+   #:min-native
+   #:min-number
+   #:multiply
+   #:multiply-add-estimate
+   #:negate
+   #:none
+   #:none-where-all-bits-set
+   #:normalize
+   #:not=
+   #:ones-complement
+   #:radians-to-degrees
+   #:reflect
+   #:round
+   #:shuffle
+   #:sin
+   #:sin-cos
+   #:square-root
+   #:subtract
+   #:sum
+   #:to-string
+   #:transform
+   #:transform-normal
+   #:truncate
+   #:try-copy-to
+   #:xor
+  ))
+
+;;; Source File: system-numerics-vector3.lisp
+;;; C# Class: System.Numerics.Vector3
+;;; Constant Properties: *
+(cl:defpackage :system-numerics-vector3
+  (:use :cl)
+  (:shadow
+   #:-
+   #:*
+   #:/
+   #:+
+   #:=
+   #:abs
+   #:cos
+   #:count
+   #:exp
+   #:length
+   #:load
+   #:log
+   #:max
+   #:min
+   #:round
+   #:sin
+   #:truncate
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:x
+   #:y
+   #:z
+   #:+all-bits-set+
+   #:+e+
+   #:+epsilon+
+   #:+nan+
+   #:+negative-infinity+
+   #:+negative-zero+
+   #:+one+
+   #:+pi+
+   #:+positive-infinity+
+   #:+tau+
+   #:+unit-x+
+   #:+unit-y+
+   #:+unit-z+
+   #:+zero+
+   #:item
+   #:-
+   #:*
+   #:/
+   #:+
+   #:=
+   #:abs
+   #:add
+   #:all
+   #:all-where-all-bits-set
+   #:and-not
+   #:any
+   #:any-where-all-bits-set
+   #:bitwise-and
+   #:bitwise-or
+   #:clamp
+   #:clamp-native
+   #:conditional-select
+   #:copy-sign
+   #:copy-to
+   #:cos
+   #:count
+   #:count-where-all-bits-set
+   #:create
+   #:create-scalar
+   #:create-scalar-unsafe
+   #:cross
+   #:degrees-to-radians
+   #:distance
+   #:distance-squared
+   #:divide
+   #:dot
+   #:equals
+   #:equals*
+   #:equals-all
+   #:equals-any
+   #:exp
+   #:fused-multiply-add
+   #:get-hash-code
+   #:greater-than
+   #:greater-than-all
+   #:greater-than-any
+   #:greater-than-or-equal
+   #:greater-than-or-equal-all
+   #:greater-than-or-equal-any
+   #:hypot
+   #:index-of
+   #:index-of-where-all-bits-set
+   #:even-integer?
+   #:finite?
+   #:infinity?
+   #:integer?
+   #:nan?
+   #:negative?
+   #:negative-infinity?
+   #:normal?
+   #:odd-integer?
+   #:positive?
+   #:positive-infinity?
+   #:subnormal?
+   #:zero?
+   #:last-index-of
+   #:last-index-of-where-all-bits-set
+   #:length
+   #:length-squared
+   #:lerp
+   #:less-than
+   #:less-than-all
+   #:less-than-any
+   #:less-than-or-equal
+   #:less-than-or-equal-all
+   #:less-than-or-equal-any
+   #:load
+   #:load-aligned
+   #:load-aligned-non-temporal
+   #:log
+   #:log2
+   #:max
+   #:max-magnitude
+   #:max-magnitude-number
+   #:max-native
+   #:max-number
+   #:min
+   #:min-magnitude
+   #:min-magnitude-number
+   #:min-native
+   #:min-number
+   #:multiply
+   #:multiply-add-estimate
+   #:negate
+   #:none
+   #:none-where-all-bits-set
+   #:normalize
+   #:not=
+   #:ones-complement
+   #:radians-to-degrees
+   #:reflect
+   #:round
+   #:shuffle
+   #:sin
+   #:sin-cos
+   #:square-root
+   #:subtract
+   #:sum
+   #:to-string
+   #:transform
+   #:transform-normal
+   #:truncate
+   #:try-copy-to
+   #:xor
+  ))
+
+;;; Source File: system-numerics-vector4.lisp
+;;; C# Class: System.Numerics.Vector4
+;;; Constant Properties: *
+(cl:defpackage :system-numerics-vector4
+  (:use :cl)
+  (:shadow
+   #:-
+   #:*
+   #:/
+   #:+
+   #:=
+   #:abs
+   #:cos
+   #:count
+   #:exp
+   #:length
+   #:load
+   #:log
+   #:max
+   #:min
+   #:round
+   #:sin
+   #:truncate
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:w
+   #:x
+   #:y
+   #:z
+   #:+all-bits-set+
+   #:+e+
+   #:+epsilon+
+   #:+nan+
+   #:+negative-infinity+
+   #:+negative-zero+
+   #:+one+
+   #:+pi+
+   #:+positive-infinity+
+   #:+tau+
+   #:+unit-w+
+   #:+unit-x+
+   #:+unit-y+
+   #:+unit-z+
+   #:+zero+
+   #:item
+   #:-
+   #:*
+   #:/
+   #:+
+   #:=
+   #:abs
+   #:add
+   #:all
+   #:all-where-all-bits-set
+   #:and-not
+   #:any
+   #:any-where-all-bits-set
+   #:bitwise-and
+   #:bitwise-or
+   #:clamp
+   #:clamp-native
+   #:conditional-select
+   #:copy-sign
+   #:copy-to
+   #:cos
+   #:count
+   #:count-where-all-bits-set
+   #:create
+   #:create-scalar
+   #:create-scalar-unsafe
+   #:cross
+   #:degrees-to-radians
+   #:distance
+   #:distance-squared
+   #:divide
+   #:dot
+   #:equals
+   #:equals*
+   #:equals-all
+   #:equals-any
+   #:exp
+   #:fused-multiply-add
+   #:get-hash-code
+   #:greater-than
+   #:greater-than-all
+   #:greater-than-any
+   #:greater-than-or-equal
+   #:greater-than-or-equal-all
+   #:greater-than-or-equal-any
+   #:hypot
+   #:index-of
+   #:index-of-where-all-bits-set
+   #:even-integer?
+   #:finite?
+   #:infinity?
+   #:integer?
+   #:nan?
+   #:negative?
+   #:negative-infinity?
+   #:normal?
+   #:odd-integer?
+   #:positive?
+   #:positive-infinity?
+   #:subnormal?
+   #:zero?
+   #:last-index-of
+   #:last-index-of-where-all-bits-set
+   #:length
+   #:length-squared
+   #:lerp
+   #:less-than
+   #:less-than-all
+   #:less-than-any
+   #:less-than-or-equal
+   #:less-than-or-equal-all
+   #:less-than-or-equal-any
+   #:load
+   #:load-aligned
+   #:load-aligned-non-temporal
+   #:log
+   #:log2
+   #:max
+   #:max-magnitude
+   #:max-magnitude-number
+   #:max-native
+   #:max-number
+   #:min
+   #:min-magnitude
+   #:min-magnitude-number
+   #:min-native
+   #:min-number
+   #:multiply
+   #:multiply-add-estimate
+   #:negate
+   #:none
+   #:none-where-all-bits-set
+   #:normalize
+   #:not=
+   #:ones-complement
+   #:radians-to-degrees
+   #:round
+   #:shuffle
+   #:sin
+   #:sin-cos
+   #:square-root
+   #:subtract
+   #:sum
+   #:to-string
+   #:transform
+   #:truncate
+   #:try-copy-to
+   #:xor
   ))
 

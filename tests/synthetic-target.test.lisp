@@ -79,7 +79,24 @@
           (let ((params (getf indexer :parameters)))
             (assert-equal 1 (length params) "Indexer should have exactly 1 index parameter")
             (assert-equal "index" (getf (nth 0 params) :name) "Indexer's index parameter is named index")
-            (assert-equal "System.Int32" (getf (nth 0 params) :type) "Indexer's index parameter is System.Int32"))))))
+            (assert-equal "System.Int32" (getf (nth 0 params) :type) "Indexer's index parameter is System.Int32"))))
+
+      ;; Test public instance fields: PublicField is mutable, ReadOnlyField
+      ;; is readonly. Both must be captured as public, non-static fields;
+      ;; only ReadOnlyField carries :init-only, which downstream codegen
+      ;; uses to decide whether to emit a setter.
+      (let ((pub-field (find-if (lambda (f) (string= (getf f :name) "PublicField")) (getf strc :fields))))
+        (assert-not-null pub-field "Should find PublicField")
+        (when pub-field
+          (assert-true (getf pub-field :public) "PublicField should be public")
+          (assert-equal nil (getf pub-field :static) "PublicField should not be static")
+          (assert-equal nil (getf pub-field :init-only) "PublicField should not be init-only (it's mutable)")))
+      (let ((ro-field (find-if (lambda (f) (string= (getf f :name) "ReadOnlyField")) (getf strc :fields))))
+        (assert-not-null ro-field "Should find ReadOnlyField")
+        (when ro-field
+          (assert-true (getf ro-field :public) "ReadOnlyField should be public")
+          (assert-equal nil (getf ro-field :static) "ReadOnlyField should not be static")
+          (assert-true (getf ro-field :init-only) "ReadOnlyField should be init-only (it's C# readonly)")))))
 
   ;; Test Extensions
   (let ((ext (find-if (lambda (cls) (string= (getf cls :name) "Extensions")) *metadata*)))
@@ -107,7 +124,37 @@
         (when create-method
           (assert-true (getf create-method :is-generic) "Create method should be generic")
           (assert-equal 1 (getf create-method :generic-arity) "Create generic-arity should be 1")
-          (assert-true (getf create-method :is-static) "Create method should be static")))))
+          (assert-true (getf create-method :is-static) "Create method should be static")))
+
+      ;; Test generic methods with more than one type argument (the
+      ;; capability being added alongside arity-1 support): Convert<T1,T2>
+      ;; and Zip<T1,T2,T3> must both reflect a positive :generic-arity
+      ;; matching their declared number of type parameters.
+      (let ((convert-method (find-if (lambda (m) (string= (getf m :name) "Convert")) (getf gmc :methods))))
+        (assert-not-null convert-method "Should find Convert method")
+        (when convert-method
+          (assert-true (getf convert-method :is-generic) "Convert method should be generic")
+          (assert-equal 2 (getf convert-method :generic-arity) "Convert generic-arity should be 2")
+          (assert-equal nil (getf convert-method :is-static) "Convert method should be instance")))
+      (let ((zip-method (find-if (lambda (m) (string= (getf m :name) "Zip")) (getf gmc :methods))))
+        (assert-not-null zip-method "Should find Zip method")
+        (when zip-method
+          (assert-true (getf zip-method :is-generic) "Zip method should be generic")
+          (assert-equal 3 (getf zip-method :generic-arity) "Zip generic-arity should be 3")
+          (assert-true (getf zip-method :is-static) "Zip method should be static")))
+
+      ;; Test the same method name overloaded across *different* generic
+      ;; arities (Combine<T1> vs Combine<T1,T2>, mirroring
+      ;; System.Linq.Enumerable's real-world Aggregate): both overloads must
+      ;; be present in :methods with their own distinct :generic-arity, so
+      ;; the generator can split them into separately-named wrappers
+      ;; (see split-by-generic-arity in package-generator-tests.lisp).
+      (let ((combine-methods (remove-if-not (lambda (m) (string= (getf m :name) "Combine")) (getf gmc :methods))))
+        (assert-equal 2 (length combine-methods) "Should find exactly 2 Combine overloads")
+        (assert-true (find 1 combine-methods :key (lambda (m) (getf m :generic-arity)))
+                     "One Combine overload should have generic-arity 1")
+        (assert-true (find 2 combine-methods :key (lambda (m) (getf m :generic-arity)))
+                     "The other Combine overload should have generic-arity 2"))))
 
   ;; Test nested types (NestingContainer+NestedLevel2 and
   ;; NestingContainer+NestedLevel2+NestedLevel3): the CIL '+' separator

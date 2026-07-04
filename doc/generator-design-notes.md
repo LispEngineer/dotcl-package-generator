@@ -811,3 +811,108 @@ actually retrieve or store a value at runtime — calling it would either error 
    received the identical grouping and single-signature-only-exports treatment, so it never
    exports a function name for an overloaded indexer that `generate-class-file` won't actually
    define.
+
+## Public Instance Fields and Multi-Type-Argument Generic Methods (Version 27)
+
+Two capability gaps, both flagged as highest-priority in
+`doc/claude-suggested-improvements-20260703.md`, are addressed together in Version 27.
+
+### Public Instance Fields
+
+Prior to Version 27, a public instance field (e.g. a plain mutable field on a simple data-holder
+class or struct) generated *nothing at all* — no getter, no setter, not even a documenting
+comment the way an unsupported ("dirty") method overload gets. The predicate that should have
+driven this, `public-instance-field-p`, existed but was never called anywhere in the file — a
+silent, invisible gap, and arguably worse than an unsupported feature that's at least documented
+in the generated output.
+
+**Why fields need different codegen than properties.** A C# property has named accessor methods
+(`get_Foo`/`set_Foo`) that the existing instance-property codegen simply invokes by name via
+`dotnet:invoke`. A field has no such accessor methods — reflection reads/writes it directly.
+`dotnet:invoke` (per `doc/dotnet-dotcl-interop.md` and `doc/package-dotnet.md`) does support
+reading a field directly by name (its binding flags include `BindingFlags.GetField`), so the
+getter is just as simple as a property's:
+```lisp
+(dotnet:invoke (cl:the (dotnet "Fq.Type") obj!) "FieldName")
+```
+But `dotnet:invoke` has no field-write equivalent — its own binding flags only cover
+`GetProperty`/`GetField`, not `SetField`. Writing a field (or property, or indexer) directly is
+instead the job of `dotnet:invoke`'s own `setf`-expansion (`dotnet:%set-invoke` under the hood),
+which *does* include `BindingFlags.SetField`. So the setter uses that idiom directly, rather than
+invoking a named setter method the way a property's setter does:
+```lisp
+(cl:setf (dotnet:invoke (cl:the (dotnet "Fq.Type") obj!) "FieldName") new-value)
+```
+
+**Read-only fields.** A C# `readonly` instance field reflects with `:init-only t` in the field
+plist (the same flag already used for static readonly fields, `runtime-readonly-field-p`).
+`InvokeMember`'s `SetField` flag would throw at runtime against a truly readonly field, so the
+generator only emits a setter when `:init-only` is absent — mirroring exactly how an instance
+property already only gets a setter when `:writeable` is present. The getter is always emitted
+(a public field, like a public property, is always at least readable).
+
+**Where it lives:** a new `instance-fields` binding (`(remove-if-not #'public-instance-field-p
+fields)`) alongside the existing `instance-props`/`instance-prop-groups` bindings, in both
+`generate-class-file` and `compute-package-exports-and-shadows`; a new codegen block placed right
+after the Instance Properties block (before Methods) in `generate-class-file`; and a matching
+exports-only loop in `compute-package-exports-and-shadows` (a field's getter and setf-able setter
+share one Lisp symbol, so only one export entry is needed per field, exactly like properties).
+
+### Generic Methods of Arity > 1
+
+Prior to Version 27, `simple-method-p`/`clean-method-p` hard-restricted generic methods to
+`(or (not is-generic) (eql arity 1))` — a method with two or more of its own type parameters (e.g.
+LINQ's `Select<TSource,TResult>`, `Join`, `ToDictionary<TSource,TKey,TResult>`) was classified
+"dirty" and skipped with a comment, the same treatment as a `ref`/`out`/`params` method. This was
+a large practical gap: most of LINQ's `Enumerable` surface is multi-type-argument generic methods.
+
+**Generalizing the wrapper's type-argument parameters.** The arity-1 wrapper (Version 12) hardcoded
+a single Lisp parameter literally named `type`, passed to `dotnet:invoke-generic`/
+`dotnet:static-generic` as `(cl:list type)`. `generic-type-param-names` generalizes this: arity 1
+still returns the single legacy name `("type")` (so existing arity-1 generated code, and any
+caller already passing that parameter positionally, is completely unaffected byte-for-byte), while
+arity N > 1 returns `("type-1" "type-2" ... "type-N")`, one Lisp parameter per type argument.
+`generate-single-overload`, `generate-master-wrapper`, and `format-master-overload-action` all use
+this instead of the hardcoded `"type"`/`(cl:list type)`, passing `(cl:list type-1 type-2 ...)` to
+`dotnet:invoke-generic`/`dotnet:static-generic` so DotCL can instantiate the method with however
+many type arguments it actually needs.
+
+`generic-method-arity-supported-p` replaces the old `(eql arity 1)` check with "any positive
+integer arity", used identically by both `simple-method-p` and `clean-method-p`.
+
+**The same-name, different-arity problem (Aggregate).** Generalizing arity alone isn't safe by
+itself: C# allows the *same* method name to be overloaded across *different* generic arities.
+`System.Linq.Enumerable.Aggregate` is the canonical real-world example — it has three same-named
+overloads, of generic arity 1, 2, and 3 respectively. Before Version 27 this was moot, since arity
+2 and 3 were simply excluded; but naively accepting all arities and merging same-named overloads
+into one wrapper (the existing Master Wrapper machinery groups overloads purely by method name)
+would be actively wrong: **one Lisp function's lambda list cannot flex between different numbers of
+generic type-argument parameters** — a wrapper that binds `type-1 type-2` has no way to also serve
+a 1-type-argument or 3-type-argument call.
+
+The fix splits before generating:
+* `method-generic-cell-key` returns a method's generic-arity "cell" identity: `nil` for a
+  non-generic method, or its integer `:generic-arity` for a generic one.
+* `split-by-generic-arity` partitions a method-name group's (already static/instance-partitioned,
+  already "clean") overloads into one ordered sub-list per distinct cell. The overwhelmingly common
+  case — every overload non-generic, or every generic overload sharing one arity (e.g. `Select`'s
+  two arity-2 overloads, which differ only in an ordinary parameter's type, not generic arity) —
+  produces exactly one cell, so nothing changes from how these already worked.
+* `generic-arity-suffix` names a cell: `""` for non-generic, `"-arity-N"` for arity N.
+* `generate-method-name-wrappers` (which replaces the four near-identical
+  single-overload-or-master-wrapper call sites that used to be duplicated across the
+  mixed-mode/single-mode `cond` branches in `generate-class-file`'s method loop) generates one
+  function per cell, using the plain base name when there's only one cell, or the arity-suffixed
+  name when there's more than one. For `Aggregate`, this produces `aggregate-arity-1`,
+  `aggregate-arity-2`, and `aggregate-arity-3` instead of one broken merged function — and none of
+  them claim the bare `aggregate` name, since which arity "deserves" the unsuffixed name is not
+  well-defined.
+* `method-name-wrapper-names` mirrors `generate-method-name-wrappers`'s naming decisions (same
+  `split-by-generic-arity` call, same suffixing rule) without generating any code, so
+  `compute-package-exports-and-shadows` exports exactly the set of names `generate-class-file` will
+  actually define.
+
+This same per-cell splitting applies uniformly to the mixed-mode (static + instance overloads
+sharing a name) case too: `generate-method-name-wrappers` is called once for the instance-clean
+list and once for the static-clean list (with the static base name already `*`-suffixed as before),
+each independently split by generic arity.

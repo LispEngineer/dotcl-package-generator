@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 26
-;;; Creation Date: 2026-07-04T01:45:08Z
+;;; Generator Version: 27
+;;; Creation Date: 2026-07-04T02:31:19Z
 
 (cl:in-package :system-string)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-04T01:45:08Z")
-(cl:defconstant <version> 26)
+(cl:defconstant <creation> "2026-07-04T02:31:19Z")
+(cl:defconstant <version> 27)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -322,12 +322,6 @@ Concat(Object]) -> String
   Parameters:
     - args (System.ReadOnlySpan`1[System.Object]): A span of objects that contains the elements to concatenate.
 
-Concat(IEnumerable) -> String
-  Summary: Concatenates the members of an System.Collections.Generic.IEnumerable`1 implementation.
-  Returns: The concatenated members in values.
-  Parameters:
-    - values (System.Collections.Generic.IEnumerable`1[T]): A collection object that implements the System.Collections.Generic.IEnumerable`1 interface.
-
 Concat(String]) -> String
   Summary: Concatenates the members of a constructed System.Collections.Generic.IEnumerable`1 collection of type System.String.
   Returns: The concatenated strings in values, or System.String.Empty if values is an empty .
@@ -428,13 +422,19 @@ Concat(Char], Char], Char], Char]) -> String
      (dotnet:static <type-str> "Concat" arg0))
     ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
-     (dotnet:static <type-str> "Concat" arg0))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "Concat"
                     :supplied-args (cl:append (cl:list :arg0 arg0) (cl:when supplied-arg1 (cl:list :arg1 arg1)) (cl:when supplied-arg2 (cl:list :arg2 arg2)) (cl:when supplied-str3 (cl:list :str3 str3)))))))
+
+(cl:defun concat-arity-1 (type values)
+  "Summary: Concatenates the members of an System.Collections.Generic.IEnumerable`1 implementation.
+Returns: The concatenated members in values.
+Parameters:
+  - values (System.Collections.Generic.IEnumerable`1[T]): A collection object that implements the System.Collections.Generic.IEnumerable`1 interface.
+"
+  (dotnet:static-generic <type-str> "Concat" (cl:list type) values))
 
 ;; Note: System.String.Concat also has the following overloads with special
 ;; parameter types (ref, out, params, or defaults) that are not
@@ -693,14 +693,6 @@ Format(IFormatProvider, String, Object]) -> String
     - format (System.String): A composite format string.
     - args (System.ReadOnlySpan`1[System.Object]): An object span that contains zero or more objects to format.
 
-Format(IFormatProvider, CompositeFormat, TArg0) -> String
-  Summary: Replaces the format item or items in a System.Text.CompositeFormat with the string representation of the corresponding objects in the specified format.
-  Returns: The formatted string.
-  Parameters:
-    - provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
-    - format (System.Text.CompositeFormat): A System.Text.CompositeFormat.
-    - arg0 (TArg0): The first object to format.
-
 Format(IFormatProvider, CompositeFormat, Object]) -> String
   Summary: Replaces the format item or items in a System.Text.CompositeFormat with the string representation of the corresponding objects in the specified format.
   Returns: The formatted string.
@@ -752,8 +744,6 @@ Format(IFormatProvider, String, Object, Object, Object) -> String
      (dotnet:static <type-str> "Format" format arg0 arg1))
     ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
-     (dotnet:static <type-str> "Format" format arg0 arg1))
     ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0))
     ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
@@ -763,6 +753,39 @@ Format(IFormatProvider, String, Object, Object, Object) -> String
                     :class-name <type-str>
                     :method-name "Format"
                     :supplied-args (cl:append (cl:list :format format) (cl:list :arg0 arg0) (cl:when supplied-arg1 (cl:list :arg1 arg1)) (cl:when supplied-arg2 (cl:list :arg2 arg2)) (cl:when supplied-arg22 (cl:list :arg22 arg22)))))))
+
+(cl:defun format-arity-1 (type provider format arg0)
+  "Summary: Replaces the format item or items in a System.Text.CompositeFormat with the string representation of the corresponding objects in the specified format.
+Returns: The formatted string.
+Parameters:
+  - provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+  - format (System.Text.CompositeFormat): A System.Text.CompositeFormat.
+  - arg0 (TArg0): The first object to format.
+"
+  (dotnet:static-generic <type-str> "Format" (cl:list type) provider format arg0))
+
+(cl:defun format-arity-2 (type-1 type-2 provider format arg0 arg1)
+  "Summary: Replaces the format item or items in a System.Text.CompositeFormat with the string representation of the corresponding objects in the specified format.
+Returns: The formatted string.
+Parameters:
+  - provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+  - format (System.Text.CompositeFormat): A System.Text.CompositeFormat.
+  - arg0 (TArg0): The first object to format.
+  - arg1 (TArg1): The second object to format.
+"
+  (dotnet:static-generic <type-str> "Format" (cl:list type-1 type-2) provider format arg0 arg1))
+
+(cl:defun format-arity-3 (type-1 type-2 type-3 provider format arg0 arg1 arg2)
+  "Summary: Replaces the format item or items in a System.Text.CompositeFormat with the string representation of the corresponding objects in the specified format.
+Returns: The formatted string.
+Parameters:
+  - provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+  - format (System.Text.CompositeFormat): A System.Text.CompositeFormat.
+  - arg0 (TArg0): The first object to format.
+  - arg1 (TArg1): The second object to format.
+  - arg2 (TArg2): The third object to format.
+"
+  (dotnet:static-generic <type-str> "Format" (cl:list type-1 type-2 type-3) provider format arg0 arg1 arg2))
 
 ;; Note: System.String.Format also has the following overloads with special
 ;; parameter types (ref, out, params, or defaults) that are not
@@ -1086,20 +1109,6 @@ Join(String, Object]) -> String
     - separator (System.String): The string to use as a separator. separator is included in the returned string only if values has more than one element.
     - values (System.ReadOnlySpan`1[System.Object]): A span of objects whose string representations will be concatenated.
 
-Join(Char, IEnumerable) -> String
-  Summary: Concatenates the members of a collection, using the specified separator between each member.
-  Returns: A string that consists of the members of values delimited by the separator character. -or- System.String.Empty if values has no elements.
-  Parameters:
-    - separator (System.Char): The character to use as a separator. separator is included in the returned string only if values has more than one element.
-    - values (System.Collections.Generic.IEnumerable`1[T]): A collection that contains the objects to concatenate.
-
-Join(String, IEnumerable) -> String
-  Summary: Concatenates the members of a collection, using the specified separator between each member.
-  Returns: A string that consists of the elements of values delimited by the separator string. -or- System.String.Empty if values has no elements.
-  Parameters:
-    - separator (System.String): The string to use as a separator. separator is included in the returned string only if values has more than one element.
-    - values (System.Collections.Generic.IEnumerable`1[T]): A collection that contains the objects to concatenate.
-
 Join(Char, String[], Int32, Int32) -> String
   Summary: Concatenates an array of strings, using the specified separator between each member, starting with the element in value located at the startIndex position, and concatenating up to count elements.
   Returns: A string that consists of count elements of value starting at startIndex delimited by the separator character. -or- System.String.Empty if count is zero.
@@ -1133,15 +1142,39 @@ Join(String, String[], Int32, Int32) -> String
      (dotnet:static <type-str> "Join" separator value))
     ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
-     (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
-     (dotnet:static <type-str> "Join" separator value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
                     :method-name "Join"
                     :supplied-args (cl:append (cl:list :separator separator) (cl:list :value value) (cl:when supplied-start-index (cl:list :start-index start-index)) (cl:when supplied-count (cl:list :count count)))))))
+
+(cl:defun join-arity-1 (type separator values)
+  "Master wrapper for System.String.Join overloads. Dispatches at runtime.
+
+Join(Char, IEnumerable) -> String
+  Summary: Concatenates the members of a collection, using the specified separator between each member.
+  Returns: A string that consists of the members of values delimited by the separator character. -or- System.String.Empty if values has no elements.
+  Parameters:
+    - separator (System.Char): The character to use as a separator. separator is included in the returned string only if values has more than one element.
+    - values (System.Collections.Generic.IEnumerable`1[T]): A collection that contains the objects to concatenate.
+
+Join(String, IEnumerable) -> String
+  Summary: Concatenates the members of a collection, using the specified separator between each member.
+  Returns: A string that consists of the elements of values delimited by the separator string. -or- System.String.Empty if values has no elements.
+  Parameters:
+    - separator (System.String): The string to use as a separator. separator is included in the returned string only if values has more than one element.
+    - values (System.Collections.Generic.IEnumerable`1[T]): A collection that contains the objects to concatenate.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:null values) (dotnet:object-type values)))
+     (dotnet:static-generic <type-str> "Join" (cl:list type) separator values))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:object-type values)))
+     (dotnet:static-generic <type-str> "Join" (cl:list type) separator values))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-STRING"
+                    :class-name <type-str>
+                    :method-name "Join"
+                    :supplied-args (cl:append (cl:list :separator separator) (cl:list :values values))))))
 
 ;; Note: System.String.Join also has the following overloads with special
 ;; parameter types (ref, out, params, or defaults) that are not
