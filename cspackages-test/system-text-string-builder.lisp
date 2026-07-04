@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Text.StringBuilder
-;;; Generator Version: 27
-;;; Creation Date: 2026-07-04T02:31:19Z
+;;; Generator Version: 28
+;;; Creation Date: 2026-07-04T03:03:10Z
 
 (cl:in-package :system-text-string-builder)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Text.StringBuilder"))
 (cl:defconstant <type-str> "System.Text.StringBuilder")
-(cl:defconstant <creation> "2026-07-04T02:31:19Z")
-(cl:defconstant <version> 27)
+(cl:defconstant <creation> "2026-07-04T03:03:10Z")
+(cl:defconstant <version> 28)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -447,6 +447,25 @@ Parameters:
 "
   (dotnet:invoke-generic (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" (cl:list type-1 type-2 type-3) provider format arg0 arg1 arg2))
 
+(cl:defun append-format<> (types cl:&rest args)
+  "Dispatches append-format<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic append-format overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function append-format) args))
+      (1 (cl:apply (cl:function append-format-arity-1) (cl:append type-list args)))
+      (2 (cl:apply (cl:function append-format-arity-2) (cl:append type-list args)))
+      (3 (cl:apply (cl:function append-format-arity-3) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-TEXT-STRING-BUILDER"
+                      :class-name <type-str>
+                      :method-name "append-format<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
+
 ;; Note: System.Text.StringBuilder.AppendFormat also has the following overloads with special
 ;; parameter types (ref, out, params, or defaults) that are not
 ;; yet supported:
@@ -527,6 +546,23 @@ AppendJoin(Char, IEnumerable) -> StringBuilder
                     :class-name <type-str>
                     :method-name "AppendJoin"
                     :supplied-args (cl:append (cl:list :separator separator) (cl:list :values values))))))
+
+(cl:defun append-join<> (types cl:&rest args)
+  "Dispatches append-join<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic append-join overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function append-join) args))
+      (1 (cl:apply (cl:function append-join-arity-1) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-TEXT-STRING-BUILDER"
+                      :class-name <type-str>
+                      :method-name "append-join<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.Text.StringBuilder.AppendJoin also has the following overloads with special
 ;; parameter types (ref, out, params, or defaults) that are not

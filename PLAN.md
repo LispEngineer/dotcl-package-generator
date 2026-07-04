@@ -15,7 +15,7 @@ TODO
 * Add the Assembly to the per-package comment in `packages.lisp`
 
 
-# Multi-Type Arity Improvements
+# **DONE** Multi-Type Arity Improvements
 
 * Reconsider the multi-arity overloads with suffix `arity-#` naming
   convention. Maybe have a suffix like `<>` which indicates that it
@@ -26,6 +26,23 @@ TODO
   * A list of types (or other sequence)
   * This would allow the multi-arity overloads to use a single type specified
     version, e.g., just `aggregate<>` for all possible arities.
+
+## Implementation Notes
+
+**DONE** in generator version 28 (2.28.0). Replaced the `-arity-N` suffix scheme with a two-tier
+dispatch mirroring the Version 24 Overload Consolidation's `*` static/instance convention, so a
+method-name group's public surface stays at most two names. `generic-arity-dispatch-mode`
+classifies a method name's generic-arity cells as `:single` (the common case -- generates bare
+`base-name`, unchanged), `:split-with-plain` (a non-generic overload coexists with generic ones --
+generates `base-name` plus a `base-name<>` dispatcher), or `:split-all-generic` (every overload is
+generic but at different arities, e.g. `Enumerable.Aggregate`'s arity-1/2/3 overloads -- `base-name`
+itself becomes the dispatcher, no `<>` needed). The dispatcher takes the type argument(s) as its
+first parameter -- a single type, or a `cl:list` of types (arity = its length), distinguished via
+`cl:listp` -- and applies the rest of its arguments through to an internal, unexported per-arity
+function (the old `-arity-N` bodies, reused verbatim). In the `:split-with-plain` case, an empty
+type list/`nil` falls through to the plain `base-name` function instead of erroring. See
+`doc/generator-design-notes.md`'s "Generic-Arity Two-Tier Dispatch (Version 28)" section and
+`RELEASES.md`'s `2.28.0` entry.
 
 
 # Miscellaneous

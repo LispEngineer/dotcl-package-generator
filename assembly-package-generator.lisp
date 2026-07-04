@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 27
+(defparameter *generator-version* 28
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -41,7 +41,8 @@
    24 - Overload consolidation: the type-suffixed per-overload direct-call functions previously emitted (and exported) alongside every multi-overload method's Master Wrapper and every multi-constructor type's passthrough new (e.g. contains-vector-2, new-single-single) are no longer generated or exported at all; the existing Master Wrapper cond dispatch already selects the correct overload precisely, so those functions were pure redundancy. Constructors gained their own Master Wrapper (generate-constructor-master-wrapper), replacing the old (apply #'dotnet:new <type-str> args) &rest passthrough with the same supplied-p-based precise dispatch methods already had; every class now emits at most one new regardless of constructor overload count (methods still emit a second, *-suffixed wrapper only when a name is overloaded as both instance and static). To compensate for the lost per-overload functions' individual docstrings, every Master Wrapper's docstring (method or constructor) now enumerates all of its covered overloads' signatures plus each overload's own XML-doc-sourced Summary/Returns/Parameters text (format-combined-overloads-docstring/format-overload-doc-block), so the full set of available overloads stays documented on the one remaining function. Giving constructors a Master Wrapper exposed a latent bug in collect-optional-positional-params: each positional dispatch slot's representative parameter name is picked arbitrarily from whichever overload happens to have one there, so two overloads with unrelated arities can coincidentally reuse the same parameter name at two different slots (e.g. System.TimeSpan's 3-arg and 4-arg constructors each have an unrelated 'seconds' parameter, at index 2 and index 3 respectively), which previously produced an invalid lambda-list with a duplicate variable name. uniquify-positional-params now numeric-suffixes any such collision before the lambda-list/cond-block/docstring are generated.
    25 - The hardcoded instance-method/property receiver parameter is now named obj! instead of obj, since map-param-name (the only function that maps a C# parameter name to a generated Lisp parameter name) never appends a trailing '!' to anything, guaranteeing obj! can never collide with a mapped C# parameter name. Previously, a C# instance method with its own parameter literally named obj (e.g. System.Object.Equals(object obj)) generated an invalid lambda list with a duplicate obj binding.
    26 - Fixed indexers (C#'s this[...]): AssemblyToLispy.cs now captures a property's own index parameters via GetIndexParameters(), the same way a method's parameters are captured, instead of silently dropping them. Previously an indexer's generated getter/setter (e.g. Dictionary<TKey,TValue>'s Item) took only the receiver (obj!) with no index/key argument at all, producing a wrapper that could never actually retrieve or store a value. Instance properties are now grouped by name (group-properties-by-name) before generation, since ordinary properties are never overloaded but indexers can be (distinct index-parameter signatures on the same name); a single-signature group's getter/setter now thread its index parameter(s) through to get_Item/set_Item positionally (index params before the value on the setter, matching C#'s own parameter order), while a group with more than one signature (an overloaded indexer) is left unimplemented, documented in a comment (mirroring dirty-method/dirty-constructor handling) rather than guessing which overload a single generated function should dispatch to.
-   27 - Added support for public instance fields and for generic methods of more than one type argument, the two remaining known capability gaps flagged as highest-priority in doc/claude-suggested-improvements-20260703.md. (1) Public instance fields (public-instance-field-p, previously unused dead code) now generate a getter and, unless the field is C#'s readonly (:init-only), a setter: since a field has no get_Foo/set_Foo accessor method the way a property does, the getter uses dotnet:invoke's built-in field-read support (passing the bare field name), while the setter uses the setf-expansion of dotnet:invoke itself (the idiomatic DotCL way to write a field or property directly, per doc/dotnet-dotcl-interop.md), since dotnet:invoke has no equivalent field-write support. (2) simple-method-p/clean-method-p no longer restrict generic methods to exactly one type argument (generic-method-arity-supported-p now accepts any positive :generic-arity); generate-single-overload, generate-master-wrapper, and format-master-overload-action all generalize the previous single hardcoded 'type' parameter to generic-type-param-names' arity-many 'type-1'..'type-N' parameters (arity 1 keeps the legacy bare 'type' name, so existing arity-1 generated code and callers are unaffected), passed through as (cl:list type-1 type-2 ...) to dotnet:invoke-generic/dotnet:static-generic. Since a single Lisp function's lambda list cannot flex between different numbers of generic type-argument parameters, overloads of the *same* C# method name that disagree on generic arity (e.g. System.Linq.Enumerable's Aggregate, overloaded at arity 1, 2, and 3) can no longer share one wrapper: split-by-generic-arity partitions a method-name group's clean overloads into one sub-list per distinct arity, and generate-method-name-wrappers (replacing the four near-identical single/master-wrapper-dispatch call sites previously duplicated across the mixed-mode/single-mode branches) generates one function per sub-list, arity-suffixed (generic-arity-suffix, e.g. aggregate-arity-1, aggregate-arity-2) whenever a name spans more than one arity; the overwhelmingly common single-arity case (including every non-generic method) is entirely unaffected and keeps its plain (or '*'-suffixed) name. method-name-wrapper-names mirrors this naming for compute-package-exports-and-shadows without re-running code generation.")
+   27 - Added support for public instance fields and for generic methods of more than one type argument, the two remaining known capability gaps flagged as highest-priority in doc/claude-suggested-improvements-20260703.md. (1) Public instance fields (public-instance-field-p, previously unused dead code) now generate a getter and, unless the field is C#'s readonly (:init-only), a setter: since a field has no get_Foo/set_Foo accessor method the way a property does, the getter uses dotnet:invoke's built-in field-read support (passing the bare field name), while the setter uses the setf-expansion of dotnet:invoke itself (the idiomatic DotCL way to write a field or property directly, per doc/dotnet-dotcl-interop.md), since dotnet:invoke has no equivalent field-write support. (2) simple-method-p/clean-method-p no longer restrict generic methods to exactly one type argument (generic-method-arity-supported-p now accepts any positive :generic-arity); generate-single-overload, generate-master-wrapper, and format-master-overload-action all generalize the previous single hardcoded 'type' parameter to generic-type-param-names' arity-many 'type-1'..'type-N' parameters (arity 1 keeps the legacy bare 'type' name, so existing arity-1 generated code and callers are unaffected), passed through as (cl:list type-1 type-2 ...) to dotnet:invoke-generic/dotnet:static-generic. Since a single Lisp function's lambda list cannot flex between different numbers of generic type-argument parameters, overloads of the *same* C# method name that disagree on generic arity (e.g. System.Linq.Enumerable's Aggregate, overloaded at arity 1, 2, and 3) can no longer share one wrapper: split-by-generic-arity partitions a method-name group's clean overloads into one sub-list per distinct arity, and generate-method-name-wrappers (replacing the four near-identical single/master-wrapper-dispatch call sites previously duplicated across the mixed-mode/single-mode branches) generates one function per sub-list, arity-suffixed (generic-arity-suffix, e.g. aggregate-arity-1, aggregate-arity-2) whenever a name spans more than one arity; the overwhelmingly common single-arity case (including every non-generic method) is entirely unaffected and keeps its plain (or '*'-suffixed) name. method-name-wrapper-names mirrors this naming for compute-package-exports-and-shadows without re-running code generation.
+   28 - Replaced the version-27 arity-suffixed export scheme (aggregate-arity-1, aggregate-arity-2, ...) with a two-tier dispatch mirroring the version-24 Overload Consolidation's '*' static/instance convention, so a method-name group's public surface stays at most two names: generic-arity-dispatch-mode classifies a method name's generic-arity cells (split-by-generic-arity) as :single (the common case: non-generic, or every overload shares one arity -- generates bare base-name exactly as before, byte-identical output), :split-with-plain (a non-generic overload coexists with generic ones at other arities -- generates base-name for the non-generic overload(s) and a new base-name<> dispatcher for the generic cells), or :split-all-generic (every overload is generic but at different arities, e.g. Enumerable.Aggregate's arity-1/2/3 overloads -- base-name itself becomes the dispatcher, no <> suffix needed since there is no non-generic form to disambiguate against). The base-name<>/base-name dispatcher (generate-generic-arity-dispatcher) takes the type argument(s) as its first parameter -- a single .NET type (arity 1) or a cl:list of types (arity = its length), distinguished via cl:listp since a type argument is itself never a list -- and applies the remaining arguments through to an internal, unexported per-arity function (internal-arity-fn-name, reusing the old arity-suffixed names and generate-single-overload/generate-master-wrapper bodies verbatim -- only their export status changes). In the :split-with-plain case, passing an empty list/nil as the type argument to base-name<> falls through to base-name itself rather than erroring. method-name-wrapper-names now reflects this: at most (base-name) or (base-name base-name<>), never the internal per-arity names.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -270,28 +271,77 @@
 (defun generic-arity-suffix (cell)
   "Returns \"\" for a non-generic CELL (a list of method plists sharing one
    method-generic-cell-key, from split-by-generic-arity), or \"-arity-N\"
-   for a generic CELL of arity N, to disambiguate multiple generic-arity
-   variants of the same method name from each other when a method name
-   splits into more than one cell (see generate-method-name-wrappers)."
+   for a generic CELL of arity N. Used only to name the internal
+   (unexported) per-arity function generate-generic-cell-wrapper defines
+   for CELL when a method name splits into more than one cell -- see
+   internal-arity-fn-name and generate-method-name-wrappers's Version 28
+   two-tier dispatch (generic-arity-dispatch-mode)."
   (let ((m (first cell)))
     (if (getf m :is-generic)
         (format nil "-arity-~D" (getf m :generic-arity))
         "")))
 
+(defun generic-arity-dispatch-mode (cells)
+  "Returns one of :single, :split-with-plain, or :split-all-generic,
+   describing how CELLS (from split-by-generic-arity -- one per distinct
+   generic-arity 'cell' of a method name's clean overloads within one
+   static/instance mode) should be exposed publicly:
+
+   :single -- exactly one cell (the non-generic cell alone, or one generic
+   arity alone, e.g. Select<TSource,TResult>'s overloads, which all share
+   arity 2): no dispatch is needed; BASE-NAME is the one and only function,
+   exactly as if generic-arity splitting didn't exist.
+
+   :split-with-plain -- more than one cell, and one of them is the
+   non-generic cell: BASE-NAME handles only that non-generic cell (no type
+   argument); a new BASE-NAME<> dispatcher handles all the generic cells,
+   resolving which one to call by counting the type argument(s) it's given
+   (and falling through to BASE-NAME itself when given an empty list).
+
+   :split-all-generic -- more than one cell, none of them non-generic (e.g.
+   System.Linq.Enumerable.Aggregate, overloaded at generic arity 1, 2, and
+   3, with no non-generic overload at all): BASE-NAME itself becomes the
+   dispatcher (no <> suffix -- there is no non-generic call form it would
+   otherwise need to be disambiguated from)."
+  (cond
+    ((<= (length cells) 1) :single)
+    ((some (lambda (cell) (null (method-generic-cell-key (first cell)))) cells)
+     :split-with-plain)
+    (t :split-all-generic)))
+
+(defun internal-arity-fn-name (base-name cell)
+  "Returns the (unexported) Lisp function name generate-generic-cell-wrapper
+   uses for one generic-arity CELL of BASE-NAME's overloads when more than
+   one cell exists for this name (generic-arity-dispatch-mode is not
+   :single): BASE-NAME suffixed by generic-arity-suffix, e.g.
+   \"aggregate-arity-2\". Never itself exported -- see
+   method-name-wrapper-names / compute-package-exports-and-shadows, which
+   list only BASE-NAME and/or BASE-NAME<>."
+  (concatenate 'string base-name (generic-arity-suffix cell)))
+
 (defun method-name-wrapper-names (clean-methods base-name)
   "Returns the list of Lisp function name(s) generate-method-name-wrappers
-   will define for CLEAN-METHODS (already static/instance-partitioned
-   overloads of one C# method name) under BASE-NAME: just (list BASE-NAME)
-   in the common case of a single generic-arity cell, or one
-   BASE-NAME-suffixed name per cell (generic-arity-suffix) when
-   CLEAN-METHODS spans more than one. Kept separate from
-   generate-method-name-wrappers so compute-package-exports-and-shadows can
-   list exactly the same names packages.lisp should export without
-   re-running the actual code-generation logic."
-  (let ((cells (split-by-generic-arity clean-methods)))
-    (if (> (length cells) 1)
-        (mapcar (lambda (cell) (concatenate 'string base-name (generic-arity-suffix cell))) cells)
-        (list base-name))))
+   will EXPORT for CLEAN-METHODS (already static/instance-partitioned
+   overloads of one C# method name) under BASE-NAME: (list BASE-NAME) in
+   the common single-cell case (generic-arity-dispatch-mode :single,
+   covering all non-generic methods and single-generic-arity methods
+   alike); (list BASE-NAME (concatenate BASE-NAME \"<>\")) when a
+   non-generic overload coexists with generic ones at other arities
+   (:split-with-plain); or (list BASE-NAME) again when every overload is
+   generic but at different arities (:split-all-generic), since BASE-NAME
+   itself becomes the dispatcher then. The internal per-arity functions
+   generate-generic-cell-wrapper defines under internal-arity-fn-name are
+   deliberately never included here -- they stay unexported. Kept separate
+   from generate-method-name-wrappers so compute-package-exports-and-shadows
+   can list exactly the same names packages.lisp should export without
+   re-running the actual code-generation logic. IMPORTANT: this must always
+   mirror exactly what generate-method-name-wrappers emits as exported
+   top-level defuns -- the main drift risk in this file."
+  (let* ((cells (split-by-generic-arity clean-methods))
+         (mode (generic-arity-dispatch-mode cells)))
+    (case mode
+      (:split-with-plain (list base-name (concatenate 'string base-name "<>")))
+      (t (list base-name)))))
 
 (defun simple-method-p (method all-methods)
   "Returns t if the method qualifies for Phase 1 compilation.
@@ -868,29 +918,100 @@
          (cl:t
           (cl:format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~]))~%~%" fq-name dotnet-method-name param-names)))))
 
+(defun generate-generic-cell-wrapper (stream cell name mname fq-name static-p)
+  "Generates the Lisp wrapper function for one generic-arity CELL (a list
+   of method plists sharing one method-generic-cell-key, from
+   split-by-generic-arity) under name MNAME: generate-single-overload for a
+   lone non-complex overload, generate-master-wrapper (unchanged runtime
+   type/optional/key dispatch) for a complex overload group sharing that
+   arity -- e.g. group-by-arity-3's 2 overloads differing by an optional
+   trailing comparer. This existing inner dispatch is unaffected by, and
+   sits underneath, any outer generic-arity dispatch
+   generate-method-name-wrappers adds via generate-generic-arity-dispatcher."
+  (if (and (= (length cell) 1) (not (complex-group-p cell)))
+      (generate-single-overload stream (first cell) mname fq-name static-p)
+      (generate-master-wrapper stream cell name mname fq-name static-p (getf (first cell) :is-generic))))
+
+(defun generate-generic-arity-dispatcher (stream cells base-name dispatcher-name fq-name
+                                           &optional plain-fallback-name)
+  "Generates the DISPATCHER-NAME function (either BASE-NAME<> or, when
+   every overload of this name is generic, bare BASE-NAME itself -- see
+   generic-arity-dispatch-mode) that resolves which of CELLS' internal
+   per-generic-arity functions (internal-arity-fn-name, already emitted by
+   generate-generic-cell-wrapper and never exported) to call at runtime, by
+   counting the type argument(s) passed as its first parameter: a bare
+   (non-list) type selects the arity-1 cell, a cl:list of N types selects
+   the arity-N cell. Type arguments themselves are never Lisp lists, so
+   cl:listp on that first argument unambiguously distinguishes the two
+   calling conventions. The remaining arguments are forwarded verbatim (via
+   &rest/apply) to the resolved internal function, so this dispatcher never
+   needs to know that function's own lambda-list shape (which may itself be
+   a Master Wrapper's &optional/&key lambda list).
+
+   When PLAIN-FALLBACK-NAME is supplied (the :split-with-plain case, set to
+   BASE-NAME), an empty list/nil TYPES argument dispatches straight through
+   to PLAIN-FALLBACK-NAME (the non-generic overload(s)) instead of
+   erroring."
+  (format stream "(cl:defun ~A (types cl:&rest args)~%" dispatcher-name)
+  (format stream "  \"Dispatches ~A by the generic type argument(s) in TYPES: pass a~%" dispatcher-name)
+  (format stream "   single .NET type (a type-name string, alias, or System.Type object) to~%")
+  (format stream "   select the single-type-argument overload, or a cl:list of types to~%")
+  (format stream "   select the overload taking that many type arguments; ARGS are the~%")
+  (format stream "   remaining arguments, forwarded unchanged to the resolved overload.~@[~%   Passing cl:nil or an empty list calls the non-generic ~A overload(s).~]\"~%"
+          plain-fallback-name plain-fallback-name)
+  (format stream "  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))~%")
+  (format stream "    (cl:case (cl:length type-list)~%")
+  (when plain-fallback-name
+    (format stream "      (0 (cl:apply (cl:function ~A) args))~%" plain-fallback-name))
+  (dolist (cell cells)
+    (let* ((m (first cell))
+           (arity (getf m :generic-arity))
+           (internal-name (internal-arity-fn-name base-name cell)))
+      (format stream "      (~D (cl:apply (cl:function ~A) (cl:append type-list args)))~%" arity internal-name)))
+  (format stream "      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
+  (format stream "                      :package-name \"~A\"~%" (string-upcase (type-fq-name-to-pkg-name fq-name)))
+  (format stream "                      :class-name <type-str>~%")
+  (format stream "                      :method-name \"~A\"~%" dispatcher-name)
+  (format stream "                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))~%~%"))
+
 (defun generate-method-name-wrappers (stream clean-methods name base-name fq-name static-p)
-  "Generates one or more Lisp wrapper function(s) for one C# method NAME's
+  "Generates the public Lisp wrapper function(s) for one C# method NAME's
    already static/instance-partitioned CLEAN-METHODS, under BASE-NAME.
 
-   In the common case -- CLEAN-METHODS is non-generic, or every overload
-   shares the same generic arity -- this generates exactly one function
-   (or Master Wrapper) named BASE-NAME, exactly as if generic-arity
-   splitting didn't exist. When CLEAN-METHODS spans more than one
-   generic-arity cell (split-by-generic-arity; e.g. Enumerable.Aggregate's
-   arity-1/2/3 overloads), each cell gets its own function instead, named
-   BASE-NAME suffixed by its arity (generic-arity-suffix), since one Lisp
-   function's lambda list cannot flex between different numbers of generic
-   type-argument parameters. method-name-wrapper-names computes the same
-   set of names without generating any code, for
-   compute-package-exports-and-shadows."
-  (let ((cells (split-by-generic-arity clean-methods)))
-    (dolist (cell cells)
-      (let ((mname (if (> (length cells) 1)
-                        (concatenate 'string base-name (generic-arity-suffix cell))
-                        base-name)))
-        (if (and (= (length cell) 1) (not (complex-group-p cell)))
-            (generate-single-overload stream (first cell) mname fq-name static-p)
-            (generate-master-wrapper stream cell name mname fq-name static-p (getf (first cell) :is-generic)))))))
+   generic-arity-dispatch-mode determines the shape:
+   :single (the overwhelmingly common case -- non-generic, or every
+   overload shares one generic arity) generates exactly BASE-NAME, exactly
+   as if generic-arity splitting didn't exist.
+   :split-with-plain (a non-generic overload coexists with generic ones at
+   other arities) generates BASE-NAME for the non-generic cell alone, an
+   internal (unexported) function per generic cell (internal-arity-fn-name),
+   and a BASE-NAME<> dispatcher (generate-generic-arity-dispatcher) that
+   picks among them by counting type arguments at runtime (falling through
+   to BASE-NAME on an empty type list).
+   :split-all-generic (every overload is generic, just at different
+   arities, e.g. Enumerable.Aggregate's arity-1/2/3 overloads) generates an
+   internal function per cell plus BASE-NAME itself as the dispatcher (no
+   <> suffix needed since there's no non-generic form to disambiguate).
+
+   method-name-wrapper-names computes the same exported name(s) without
+   generating any code, for compute-package-exports-and-shadows."
+  (let* ((cells (split-by-generic-arity clean-methods))
+         (mode (generic-arity-dispatch-mode cells)))
+    (case mode
+      (:single
+       (generate-generic-cell-wrapper stream (first cells) name base-name fq-name static-p))
+      (:split-with-plain
+       (let* ((plain-cell (find-if (lambda (c) (null (method-generic-cell-key (first c)))) cells))
+              (generic-cells (remove plain-cell cells)))
+         (generate-generic-cell-wrapper stream plain-cell name base-name fq-name static-p)
+         (dolist (cell generic-cells)
+           (generate-generic-cell-wrapper stream cell name (internal-arity-fn-name base-name cell) fq-name static-p))
+         (generate-generic-arity-dispatcher stream generic-cells base-name
+                                             (concatenate 'string base-name "<>") fq-name base-name)))
+      (:split-all-generic
+       (dolist (cell cells)
+         (generate-generic-cell-wrapper stream cell name (internal-arity-fn-name base-name cell) fq-name static-p))
+       (generate-generic-arity-dispatcher stream cells base-name base-name fq-name)))))
 
 (defun format-overload-test (cm)
   "Generates a Lisp conditional test expression string for checking if the runtime arguments match the method's parameters."

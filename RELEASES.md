@@ -10,6 +10,28 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.28.0 — 2026-07-03
+
+**Generic-arity two-tier dispatch:** replaces the `2.27.0` arity-suffixed export scheme
+(`aggregate-arity-1`, `aggregate-arity-2`, `aggregate-arity-3`, ...) with a dispatcher mirroring the
+existing `*` static/instance convention, so a generic method name's public surface stays at most two
+names.
+
+* A method name whose overloads span more than one generic arity now exports at most `base-name`
+  and `base-name<>` — never the individual per-arity names, which still exist but are now internal,
+  unexported implementation details.
+* `base-name<>` (or bare `base-name`, when every overload of that name is generic, e.g.
+  `System.Linq.Enumerable.Aggregate`) takes the type argument(s) as its first parameter: pass a
+  single .NET type for the single-type-argument overload, or a `cl:list` of types to select the
+  overload taking that many type arguments — the count is resolved at runtime.
+* When a non-generic overload of a name coexists with generic ones (e.g. a hypothetical `Foo` with
+  both a plain overload and `Foo<T>`), passing an empty list (or `nil`) as the type argument to
+  `foo<>` calls the non-generic `foo` directly, so callers don't need to special-case zero type
+  arguments into a differently-named function.
+
+See `doc/generator-design-notes.md`'s "Generic-Arity Two-Tier Dispatch (Version 28)" section for
+full implementation details.
+
 ## 2.27.0 — 2026-07-03
 
 **Public instance fields and multi-type-argument generic methods:** the two remaining

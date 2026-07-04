@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
-;;; Generator Version: 27
-;;; Creation Date: 2026-07-04T02:31:19Z
+;;; Generator Version: 28
+;;; Creation Date: 2026-07-04T03:03:10Z
 
 (cl:in-package :system-linq-enumerable)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-04T02:31:19Z")
-(cl:defconstant <version> 27)
+(cl:defconstant <creation> "2026-07-04T03:03:10Z")
+(cl:defconstant <version> 28)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -44,6 +44,23 @@ Parameters:
   - result-selector (System.Func`2[TAccumulate, TResult]): A function to transform the final accumulator value into the result value.
 "
   (dotnet:static-generic <type-str> "Aggregate" (cl:list type-1 type-2 type-3) source seed func result-selector))
+
+(cl:defun aggregate (types cl:&rest args)
+  "Dispatches aggregate by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (1 (cl:apply (cl:function aggregate-arity-1) (cl:append type-list args)))
+      (2 (cl:apply (cl:function aggregate-arity-2) (cl:append type-list args)))
+      (3 (cl:apply (cl:function aggregate-arity-3) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "aggregate"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 (cl:defun aggregate-by (type-1 type-2 type-3 source key-selector seed func cl:&key (key-comparer cl:nil supplied-key-comparer))
   "Master wrapper for System.Linq.Enumerable.AggregateBy overloads. Dispatches at runtime.
@@ -327,6 +344,23 @@ Average(IEnumerable, Decimal]]) -> Decimal]
                     :class-name <type-str>
                     :method-name "Average"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :selector selector))))))
+
+(cl:defun average<> (types cl:&rest args)
+  "Dispatches average<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic average overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function average) args))
+      (1 (cl:apply (cl:function average-arity-1) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "average<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 (cl:defun cast (type source)
   "Summary: Casts the elements of an System.Collections.IEnumerable to the specified type.
@@ -827,6 +861,23 @@ GroupBy(IEnumerable, Func, Func, IEnumerable, IEqualityComparer) -> IEnumerable
                     :method-name "GroupBy"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:list :element-selector element-selector) (cl:list :result-selector result-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
+(cl:defun group-by (types cl:&rest args)
+  "Dispatches group-by by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (2 (cl:apply (cl:function group-by-arity-2) (cl:append type-list args)))
+      (3 (cl:apply (cl:function group-by-arity-3) (cl:append type-list args)))
+      (4 (cl:apply (cl:function group-by-arity-4) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "group-by"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
+
 (cl:defun group-join (type-1 type-2 type-3 type-4 outer inner outer-key-selector inner-key-selector result-selector cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.GroupJoin overloads. Dispatches at runtime.
 
@@ -1325,6 +1376,24 @@ Parameters:
 "
   (dotnet:static-generic <type-str> "Max" (cl:list type-1 type-2) source selector))
 
+(cl:defun max<> (types cl:&rest args)
+  "Dispatches max<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic max overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function max) args))
+      (1 (cl:apply (cl:function max-arity-1) (cl:append type-list args)))
+      (2 (cl:apply (cl:function max-arity-2) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "max<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
+
 (cl:defun max-by (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.MaxBy overloads. Dispatches at runtime.
 
@@ -1569,6 +1638,24 @@ Parameters:
   - selector (System.Func`2[TSource, TResult]): A transform function to apply to each element.
 "
   (dotnet:static-generic <type-str> "Min" (cl:list type-1 type-2) source selector))
+
+(cl:defun min<> (types cl:&rest args)
+  "Dispatches min<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic min overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function min) args))
+      (1 (cl:apply (cl:function min-arity-1) (cl:append type-list args)))
+      (2 (cl:apply (cl:function min-arity-2) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "min<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 (cl:defun min-by (type-1 type-2 source key-selector cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.MinBy overloads. Dispatches at runtime.
@@ -1890,6 +1977,22 @@ SelectMany(IEnumerable, IEnumerable, Func) -> IEnumerable
                     :class-name <type-str>
                     :method-name "SelectMany"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :collection-selector collection-selector) (cl:list :result-selector result-selector))))))
+
+(cl:defun select-many (types cl:&rest args)
+  "Dispatches select-many by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (2 (cl:apply (cl:function select-many-arity-2) (cl:append type-list args)))
+      (3 (cl:apply (cl:function select-many-arity-3) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "select-many"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 (cl:defun sequence (type start end-inclusive step)
   "Summary: Generates a sequence that begins with start and yields additional values each incremented by step until endInclusive is reached.
@@ -2247,6 +2350,23 @@ Sum(IEnumerable, Decimal]]) -> Decimal]
                     :method-name "Sum"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :selector selector))))))
 
+(cl:defun sum<> (types cl:&rest args)
+  "Dispatches sum<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic sum overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function sum) args))
+      (1 (cl:apply (cl:function sum-arity-1) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "sum<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
+
 (cl:defun take (type source count)
   "Master wrapper for System.Linq.Enumerable.Take overloads. Dispatches at runtime.
 
@@ -2472,6 +2592,22 @@ ToDictionary(IEnumerable, Func, Func, IEqualityComparer) -> Dictionary
                     :method-name "ToDictionary"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:list :element-selector element-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
+(cl:defun to-dictionary (types cl:&rest args)
+  "Dispatches to-dictionary by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (2 (cl:apply (cl:function to-dictionary-arity-2) (cl:append type-list args)))
+      (3 (cl:apply (cl:function to-dictionary-arity-3) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "to-dictionary"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
+
 (cl:defun to-hash-set (type source cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.ToHashSet overloads. Dispatches at runtime.
 
@@ -2566,6 +2702,22 @@ ToLookup(IEnumerable, Func, Func, IEqualityComparer) -> ILookup
                     :class-name <type-str>
                     :method-name "ToLookup"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:list :element-selector element-selector) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
+
+(cl:defun to-lookup (types cl:&rest args)
+  "Dispatches to-lookup by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (2 (cl:apply (cl:function to-lookup-arity-2) (cl:append type-list args)))
+      (3 (cl:apply (cl:function to-lookup-arity-3) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "to-lookup"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; The following C# System.Linq.Enumerable.TryGetNonEnumeratedCount overloads have special parameter types
 ;; (ref, out, params, or defaults) and are not yet supported:
@@ -2697,4 +2849,20 @@ Zip(IEnumerable, IEnumerable, IEnumerable) -> ValueTuple
                     :class-name <type-str>
                     :method-name "Zip"
                     :supplied-args (cl:append (cl:list :first first) (cl:list :second second) (cl:list :result-selector result-selector))))))
+
+(cl:defun zip (types cl:&rest args)
+  "Dispatches zip by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (2 (cl:apply (cl:function zip-arity-2) (cl:append type-list args)))
+      (3 (cl:apply (cl:function zip-arity-3) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-LINQ-ENUMERABLE"
+                      :class-name <type-str>
+                      :method-name "zip"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 

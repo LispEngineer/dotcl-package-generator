@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 27
-;;; Creation Date: 2026-07-04T02:31:19Z
+;;; Generator Version: 28
+;;; Creation Date: 2026-07-04T03:03:10Z
 
 (cl:in-package :system-string)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-04T02:31:19Z")
-(cl:defconstant <version> 27)
+(cl:defconstant <creation> "2026-07-04T03:03:10Z")
+(cl:defconstant <version> 28)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -436,6 +436,23 @@ Parameters:
 "
   (dotnet:static-generic <type-str> "Concat" (cl:list type) values))
 
+(cl:defun concat<> (types cl:&rest args)
+  "Dispatches concat<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic concat overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function concat) args))
+      (1 (cl:apply (cl:function concat-arity-1) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-STRING"
+                      :class-name <type-str>
+                      :method-name "concat<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
+
 ;; Note: System.String.Concat also has the following overloads with special
 ;; parameter types (ref, out, params, or defaults) that are not
 ;; yet supported:
@@ -786,6 +803,25 @@ Parameters:
   - arg2 (TArg2): The third object to format.
 "
   (dotnet:static-generic <type-str> "Format" (cl:list type-1 type-2 type-3) provider format arg0 arg1 arg2))
+
+(cl:defun format<> (types cl:&rest args)
+  "Dispatches format<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic format overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function format) args))
+      (1 (cl:apply (cl:function format-arity-1) (cl:append type-list args)))
+      (2 (cl:apply (cl:function format-arity-2) (cl:append type-list args)))
+      (3 (cl:apply (cl:function format-arity-3) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-STRING"
+                      :class-name <type-str>
+                      :method-name "format<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.String.Format also has the following overloads with special
 ;; parameter types (ref, out, params, or defaults) that are not
@@ -1175,6 +1211,23 @@ Join(String, IEnumerable) -> String
                     :class-name <type-str>
                     :method-name "Join"
                     :supplied-args (cl:append (cl:list :separator separator) (cl:list :values values))))))
+
+(cl:defun join<> (types cl:&rest args)
+  "Dispatches join<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic join overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function join) args))
+      (1 (cl:apply (cl:function join-arity-1) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-STRING"
+                      :class-name <type-str>
+                      :method-name "join<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.String.Join also has the following overloads with special
 ;; parameter types (ref, out, params, or defaults) that are not

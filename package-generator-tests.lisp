@@ -232,9 +232,32 @@
                 '("-arity-1" "-arity-2" "-arity-3")
                 "generic-arity-suffix names each Aggregate cell distinctly")
 
+    (assert-test (assembly-package-generator::generic-arity-dispatch-mode
+                  (assembly-package-generator::split-by-generic-arity aggregate-like))
+                :split-all-generic
+                "generic-arity-dispatch-mode classifies all-generic multi-arity Aggregate as :split-all-generic")
+
     (assert-test (assembly-package-generator::method-name-wrapper-names aggregate-like "aggregate")
-                '("aggregate-arity-1" "aggregate-arity-2" "aggregate-arity-3")
-                "method-name-wrapper-names lists all 3 arity-suffixed names for multi-arity Aggregate"))
+                '("aggregate")
+                "method-name-wrapper-names exports only bare 'aggregate' (the dispatcher) for multi-arity Aggregate, never the internal -arity-N names"))
+
+  ;; 3.2b :split-with-plain -- a non-generic overload coexists with generic
+  ;; ones at other arities: two exported names, bare base-name (non-generic
+  ;; overload) plus base-name<> (dispatcher over the generic cells).
+  (let ((mixed-generic-and-plain
+          (list '(:name "Foo" :is-static t :return-type "System.Void"
+                  :parameters ((:name "value" :type "System.String")))
+                '(:name "Foo" :is-static t :is-generic t :generic-arity 1
+                  :return-type "T"
+                  :parameters ((:name "value" :type "T"))))))
+    (assert-test (assembly-package-generator::generic-arity-dispatch-mode
+                  (assembly-package-generator::split-by-generic-arity mixed-generic-and-plain))
+                :split-with-plain
+                "generic-arity-dispatch-mode classifies a non-generic+generic mix as :split-with-plain")
+
+    (assert-test (assembly-package-generator::method-name-wrapper-names mixed-generic-and-plain "foo")
+                '("foo" "foo<>")
+                "method-name-wrapper-names exports 'foo' and 'foo<>' when a non-generic overload coexists with generic ones"))
 
   ;; 3.3 Test split-by-generic-arity / method-name-wrapper-names in the
   ;; common single-arity case (e.g. LINQ's Select<TSource,TResult>, which
@@ -688,8 +711,11 @@
   ;;     Aggregate<TSource,TAccumulate>, and
   ;;     Aggregate<TSource,TAccumulate,TResult>): one Lisp function's lambda
   ;;     list can't flex between different type-argument counts, so each
-  ;;     arity must become its own arity-suffixed function, and none of them
-  ;;     should claim the bare "aggregate" name.
+  ;;     arity still gets its own arity-suffixed function body (unchanged
+  ;;     from Version 27), but that function is now internal/unexported --
+  ;;     the bare "aggregate" name is now a public dispatcher
+  ;;     (generate-generic-arity-dispatcher) that resolves the right one at
+  ;;     runtime by counting the type argument(s) it's given.
   (let* ((class-plist
            '(:fully-qualified-name "Fixture.Aggregator"
              :kind :class
@@ -711,19 +737,63 @@
           (let* ((class-file (merge-pathnames "fixture-aggregator.lisp" out-dir))
                  (contents (uiop:read-file-string class-file)))
             (assert-test (not (null (search "(cl:defun aggregate-arity-1 (type source func)" contents))) t
-                        "generate-class-file gives the arity-1 Aggregate overload its own arity-suffixed function")
+                        "generate-class-file still generates the arity-1 Aggregate overload's body (now internal/unexported)")
             (assert-test (not (null (search "(cl:defun aggregate-arity-2 (type-1 type-2 source seed func)" contents))) t
-                        "generate-class-file gives the arity-2 Aggregate overload its own arity-suffixed function")
-            (assert-test (search "(cl:defun aggregate (" contents) nil
-                        "generate-class-file does not emit a bare-named function when Aggregate spans multiple arities"))
+                        "generate-class-file still generates the arity-2 Aggregate overload's body (now internal/unexported)")
+            (assert-test (not (null (search "(cl:defun aggregate (types cl:&rest args)" contents))) t
+                        "generate-class-file emits a bare 'aggregate' dispatcher when Aggregate spans multiple arities")
+            (assert-test (not (null (search "(cl:case (cl:length type-list)" contents))) t
+                        "the aggregate dispatcher dispatches on the count of supplied type arguments")
+            (assert-test (not (null (search "(1 (cl:apply (cl:function aggregate-arity-1) (cl:append type-list args)))" contents))) t
+                        "the aggregate dispatcher's arity-1 case applies aggregate-arity-1")
+            (assert-test (not (null (search "(2 (cl:apply (cl:function aggregate-arity-2) (cl:append type-list args)))" contents))) t
+                        "the aggregate dispatcher's arity-2 case applies aggregate-arity-2"))
           (multiple-value-bind (exports shadows) (assembly-package-generator::compute-package-exports-and-shadows class-plist nil)
             (declare (ignore shadows))
-            (assert-test (and (member "aggregate-arity-1" exports :test #'string=) t) t
-                        "compute-package-exports-and-shadows exports aggregate-arity-1")
-            (assert-test (and (member "aggregate-arity-2" exports :test #'string=) t) t
-                        "compute-package-exports-and-shadows exports aggregate-arity-2")
-            (assert-test (and (member "aggregate" exports :test #'string=) t) nil
-                        "compute-package-exports-and-shadows does not export a bare 'aggregate' for the multi-arity case")))
+            (assert-test (and (member "aggregate-arity-1" exports :test #'string=) t) nil
+                        "compute-package-exports-and-shadows no longer exports the internal aggregate-arity-1")
+            (assert-test (and (member "aggregate-arity-2" exports :test #'string=) t) nil
+                        "compute-package-exports-and-shadows no longer exports the internal aggregate-arity-2")
+            (assert-test (and (member "aggregate" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports the bare 'aggregate' dispatcher for the multi-arity case")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
+  ;; 11. A non-generic overload coexisting with generic ones at other
+  ;;     arities (:split-with-plain): base-name handles the non-generic
+  ;;     call, base-name<> dispatches the generic cells and falls through to
+  ;;     base-name itself when given an empty type list.
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.MixedFoo"
+             :kind :class
+             :fields nil
+             :properties nil
+             :methods ((:name "Foo" :is-static t :return-type "System.Void"
+                        :parameters ((:name "value" :type "System.String")))
+                       (:name "Foo" :is-static t :is-generic t :generic-arity 1
+                        :return-type "T"
+                        :parameters ((:name "value" :type "T"))))
+             :constructors nil))
+         (out-dir (merge-pathnames "package-generator-tests-generic-mixed-plain-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-mixed-foo.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun foo (value)" contents))) t
+                        "generate-class-file gives the non-generic Foo overload the bare base name")
+            (assert-test (not (null (search "(cl:defun foo<> (types cl:&rest args)" contents))) t
+                        "generate-class-file emits a foo<> dispatcher for the generic Foo overload(s)")
+            (assert-test (not (null (search "(0 (cl:apply (cl:function foo) args))" contents))) t
+                        "the foo<> dispatcher's arity-0 case falls through to the plain foo function"))
+          (multiple-value-bind (exports shadows) (assembly-package-generator::compute-package-exports-and-shadows class-plist nil)
+            (declare (ignore shadows))
+            (assert-test (and (member "foo" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports 'foo'")
+            (assert-test (and (member "foo<>" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports 'foo<>'")))
       (when (probe-file out-dir)
         (uiop:delete-directory-tree out-dir :validate t))))
 

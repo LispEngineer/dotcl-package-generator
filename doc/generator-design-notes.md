@@ -916,3 +916,77 @@ This same per-cell splitting applies uniformly to the mixed-mode (static + insta
 sharing a name) case too: `generate-method-name-wrappers` is called once for the instance-clean
 list and once for the static-clean list (with the static base name already `*`-suffixed as before),
 each independently split by generic arity.
+
+## Generic-Arity Two-Tier Dispatch (Version 28)
+
+Version 27's `-arity-N` suffixes fully solved the same-name/different-arity correctness problem
+(see above), but at the cost of an unbounded public export surface: `Enumerable.Aggregate` exported
+three separate names (`aggregate-arity-1`, `aggregate-arity-2`, `aggregate-arity-3`), inconsistent
+with Version 24's Overload Consolidation, which keeps every other overloaded method's public surface
+to at most two names (`foo`/`foo*` for instance vs. static — see "Master Wrapper with Precise
+Dispatch" above). Version 28 brings generic-arity dispatch in line with that precedent: at most one
+new exported name, `base-name<>` (or bare `base-name` in one case below), replaces the whole family
+of arity-suffixed exports; the old per-arity bodies still exist, verbatim, but only as unexported
+internal implementation details.
+
+**Classifying a method name's generic-arity cells.** `generic-arity-dispatch-mode` looks at the
+cells `split-by-generic-arity` already computes for one method name (within one static/instance
+mode) and returns one of three symbols:
+
+* `:single` — exactly one cell (the overwhelmingly common case: every overload non-generic, or every
+  generic overload sharing one arity, e.g. `Select<TSource,TResult>`'s two arity-2 overloads). No
+  dispatch is generated at all; `base-name` is the one and only function, byte-identical to Version
+  27's (and earlier) output for this case.
+* `:split-with-plain` — more than one cell, and one of them is the non-generic (`nil`-keyed) cell:
+  a non-generic overload of this name coexists with generic ones at other arities. `base-name`
+  handles the non-generic overload(s) only (no type argument); a new `base-name<>` dispatcher handles
+  every generic cell.
+* `:split-all-generic` — more than one cell, none of them non-generic (the real-world `Aggregate`
+  case: arity 1, 2, and 3, with no non-generic overload at all). `base-name` itself becomes the
+  dispatcher — no `<>` suffix, since there is no non-generic call form to disambiguate it from.
+
+**The dispatcher.** `generate-generic-arity-dispatcher` emits a function (named `base-name<>` or
+bare `base-name`, per the mode above) whose first parameter, `types`, accepts either a single .NET
+type (a type-name string, alias, or `System.Type` object — treated as arity 1) or a `cl:list` of
+types (arity = its length). `cl:listp` distinguishes the two unambiguously, since a type argument
+is itself never a Lisp list. The remaining arguments are forwarded via `&rest`/`apply` straight
+through to whichever internal per-arity function (`internal-arity-fn-name`, see below) the resolved
+arity names — the dispatcher never needs to know that function's own lambda-list shape, which may
+itself be a Master Wrapper's `&optional`/`&key` list (e.g. `group-by-arity-3`, an arity-3 cell that
+is itself a 2-overload Master Wrapper). A `cl:t` fallback signals the existing
+`csharp-assembly-utils:csharp-overload-not-found` condition (reused, not a new condition type) when
+`types`'s length matches none of the method's known arities.
+
+In the `:split-with-plain` case specifically, the dispatcher also accepts an **empty** list (or
+`nil`) for `types`, in which case it applies straight through to the plain, non-generic `base-name`
+function instead of erroring — so a caller that generically loops over "call this with N type
+arguments" doesn't need to special-case N=0 into a differently-named function. This has no analogue
+in `:split-all-generic`, since there is no non-generic overload to fall through to there; an empty
+`types` list simply falls into the `csharp-overload-not-found` fallback in that case.
+
+**Internal per-arity functions.** The bodies Version 27 generated under `aggregate-arity-1`,
+`aggregate-arity-2`, etc. are unchanged — `generate-generic-cell-wrapper` (an extraction of the
+single-overload-vs-Master-Wrapper branch that Version 27's `generate-method-name-wrappers` already
+had inline) still calls `generate-single-overload`/`generate-master-wrapper` exactly as before per
+cell. Only their *export status* changes: `internal-arity-fn-name` (still just
+`base-name` + `generic-arity-suffix`, unchanged) names them, but `method-name-wrapper-names` no
+longer lists them, so `compute-package-exports-and-shadows` never exports them. They remain
+individually reachable/debuggable via `package::aggregate-arity-2` if ever needed. No new "internal"
+naming convention (e.g. a `%`-prefix) was introduced for this, since none already existed anywhere
+in this file to be consistent with, and reusing the proven Version-27 names/bodies verbatim is the
+lowest-risk option.
+
+**Static/instance interaction.** No change was needed to `generate-class-file`'s method loop: it
+still calls `generate-method-name-wrappers` once per static/instance mode with the same arguments,
+and the static base name is already `*`-suffixed *before* `generate-method-name-wrappers` ever
+appends `<>` — so a name that is both mixed static/instance and multi-arity-generic correctly
+becomes, e.g., `group-by*<>`, with `*` always ordered before `<>`.
+
+**Export-list drift risk.** `method-name-wrapper-names` must always return exactly the set of names
+`generate-method-name-wrappers` actually emits as top-level, non-internal `defun`s — this pairing
+(already flagged as a risk point in the Version 27 section above) is the main way this feature could
+silently regress: if the two functions' case-dispatch logic diverges, `packages.lisp` would either
+under-export (breaking legitimate external callers) or over-export (leaking an internal
+`aggregate-arity-N` name). Both functions branch on the exact same `generic-arity-dispatch-mode`
+value from the exact same `split-by-generic-arity` call, which keeps them mechanically in sync, but
+any future change to one must be mirrored in the other.

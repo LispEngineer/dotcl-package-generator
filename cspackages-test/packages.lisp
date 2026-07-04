@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 27
-;;; Creation Date: 2026-07-04T02:31:19Z
+;;; Generator Version: 28
+;;; Creation Date: 2026-07-04T03:03:10Z
 
 (cl:in-package :cl-user)
 
@@ -335,7 +335,7 @@
    #:compare-ordinal
    #:compare-to
    #:concat
-   #:concat-arity-1
+   #:concat<>
    #:contains
    #:copy
    #:copy-to
@@ -345,9 +345,7 @@
    #:equals
    #:equals*
    #:format
-   #:format-arity-1
-   #:format-arity-2
-   #:format-arity-3
+   #:format<>
    #:get-enumerator
    #:get-hash-code
    #:get-hash-code*
@@ -363,7 +361,7 @@
    #:null-or-empty?
    #:null-or-white-space?
    #:join
-   #:join-arity-1
+   #:join<>
    #:last-index-of
    #:last-index-of-any
    #:normalize
@@ -415,7 +413,7 @@
    #:sync-root
    #:as-read-only
    #:binary-search
-   #:binary-search-arity-1
+   #:binary-search<>
    #:clear
    #:clone
    #:constrained-copy
@@ -440,16 +438,15 @@
    #:get-upper-bound
    #:get-value
    #:index-of
-   #:index-of-arity-1
+   #:index-of<>
    #:initialize
    #:last-index-of
-   #:last-index-of-arity-1
+   #:last-index-of<>
    #:reverse
-   #:reverse-arity-1
+   #:reverse<>
    #:set-value
    #:sort
-   #:sort-arity-1
-   #:sort-arity-2
+   #:sort<>
    #:true-for-all
   ))
 
@@ -555,11 +552,9 @@
    #:max-capacity
    #:append
    #:append-format
-   #:append-format-arity-1
-   #:append-format-arity-2
-   #:append-format-arity-3
+   #:append-format<>
    #:append-join
-   #:append-join-arity-1
+   #:append-join<>
    #:append-line
    #:clear
    #:copy-to
@@ -771,16 +766,14 @@
    #:<type-str>
    #:<creation>
    #:<version>
-   #:aggregate-arity-1
-   #:aggregate-arity-2
-   #:aggregate-arity-3
+   #:aggregate
    #:aggregate-by
    #:all
    #:any
    #:append
    #:as-enumerable
    #:average
-   #:average-arity-1
+   #:average<>
    #:cast
    #:chunk
    #:concat
@@ -797,9 +790,7 @@
    #:except-by
    #:first
    #:first-or-default
-   #:group-by-arity-2
-   #:group-by-arity-3
-   #:group-by-arity-4
+   #:group-by
    #:group-join
    #:index
    #:infinite-sequence
@@ -811,12 +802,10 @@
    #:left-join
    #:long-count
    #:max
-   #:max-arity-1
-   #:max-arity-2
+   #:max<>
    #:max-by
    #:min
-   #:min-arity-1
-   #:min-arity-2
+   #:min<>
    #:min-by
    #:of-type
    #:order
@@ -829,8 +818,7 @@
    #:reverse
    #:right-join
    #:select
-   #:select-many-arity-2
-   #:select-many-arity-3
+   #:select-many
    #:sequence
    #:sequence-equal
    #:shuffle
@@ -840,24 +828,21 @@
    #:skip-last
    #:skip-while
    #:sum
-   #:sum-arity-1
+   #:sum<>
    #:take
    #:take-last
    #:take-while
    #:then-by
    #:then-by-descending
    #:to-array
-   #:to-dictionary-arity-2
-   #:to-dictionary-arity-3
+   #:to-dictionary
    #:to-hash-set
    #:to-list
-   #:to-lookup-arity-2
-   #:to-lookup-arity-3
+   #:to-lookup
    #:union
    #:union-by
    #:where
-   #:zip-arity-2
-   #:zip-arity-3
+   #:zip
   ))
 
 ;;; Source File: system-xml-xml-reader.lisp

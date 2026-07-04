@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Array
-;;; Generator Version: 27
-;;; Creation Date: 2026-07-04T02:31:19Z
+;;; Generator Version: 28
+;;; Creation Date: 2026-07-04T03:03:10Z
 
 (cl:in-package :system-array)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Array"))
 (cl:defconstant <type-str> "System.Array")
-(cl:defconstant <creation> "2026-07-04T02:31:19Z")
-(cl:defconstant <version> 27)
+(cl:defconstant <creation> "2026-07-04T03:03:10Z")
+(cl:defconstant <version> 28)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -157,6 +157,23 @@ BinarySearch(T[], Int32, Int32, T, IComparer) -> Int32
                     :class-name <type-str>
                     :method-name "BinarySearch"
                     :supplied-args (cl:append (cl:list :array array) (cl:list :value value) (cl:when supplied-comparer (cl:list :comparer comparer)) (cl:when supplied-value2 (cl:list :value2 value2)) (cl:when supplied-comparer2 (cl:list :comparer2 comparer2)))))))
+
+(cl:defun binary-search<> (types cl:&rest args)
+  "Dispatches binary-search<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic binary-search overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function binary-search) args))
+      (1 (cl:apply (cl:function binary-search-arity-1) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-ARRAY"
+                      :class-name <type-str>
+                      :method-name "binary-search<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 (cl:defun clear (array cl:&optional (index cl:nil supplied-index) (length cl:nil supplied-length))
   "Master wrapper for System.Array.Clear overloads. Dispatches at runtime.
@@ -722,6 +739,23 @@ IndexOf(T[], T, Int32, Int32) -> Int32
                     :method-name "IndexOf"
                     :supplied-args (cl:append (cl:list :array array) (cl:list :value value) (cl:when supplied-start-index (cl:list :start-index start-index)) (cl:when supplied-count (cl:list :count count)))))))
 
+(cl:defun index-of<> (types cl:&rest args)
+  "Dispatches index-of<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic index-of overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function index-of) args))
+      (1 (cl:apply (cl:function index-of-arity-1) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-ARRAY"
+                      :class-name <type-str>
+                      :method-name "index-of<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
+
 (cl:defun initialize (obj!)
   "Summary: Initializes every element of the value-type System.Array by calling the parameterless constructor of the value type.
 "
@@ -807,6 +841,23 @@ LastIndexOf(T[], T, Int32, Int32) -> Int32
                     :method-name "LastIndexOf"
                     :supplied-args (cl:append (cl:list :array array) (cl:list :value value) (cl:when supplied-start-index (cl:list :start-index start-index)) (cl:when supplied-count (cl:list :count count)))))))
 
+(cl:defun last-index-of<> (types cl:&rest args)
+  "Dispatches last-index-of<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic last-index-of overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function last-index-of) args))
+      (1 (cl:apply (cl:function last-index-of-arity-1) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-ARRAY"
+                      :class-name <type-str>
+                      :method-name "last-index-of<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
+
 ;; The following C# System.Array.Resize overloads have special parameter types
 ;; (ref, out, params, or defaults) and are not yet supported:
 ;;   Resize(ref T[]&, Int32) -> Void
@@ -862,6 +913,23 @@ Reverse(T[], Int32, Int32) -> Void
                     :class-name <type-str>
                     :method-name "Reverse"
                     :supplied-args (cl:append (cl:list :array array) (cl:when supplied-index (cl:list :index index)) (cl:when supplied-length (cl:list :length length)))))))
+
+(cl:defun reverse<> (types cl:&rest args)
+  "Dispatches reverse<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic reverse overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function reverse) args))
+      (1 (cl:apply (cl:function reverse-arity-1) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-ARRAY"
+                      :class-name <type-str>
+                      :method-name "reverse<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 (cl:defun set-value (obj! value index cl:&optional (index2 cl:nil supplied-index2) (index3 cl:nil supplied-index3))
   "Master wrapper for System.Array.SetValue overloads. Dispatches at runtime.
@@ -1114,6 +1182,24 @@ Sort(TKey[], TValue[], Int32, Int32, IComparer) -> Void
                     :class-name <type-str>
                     :method-name "Sort"
                     :supplied-args (cl:append (cl:list :keys keys) (cl:list :items items) (cl:when supplied-comparer (cl:list :comparer comparer)) (cl:when supplied-length (cl:list :length length)) (cl:when supplied-comparer2 (cl:list :comparer2 comparer2)))))))
+
+(cl:defun sort<> (types cl:&rest args)
+  "Dispatches sort<> by the generic type argument(s) in TYPES: pass a
+   single .NET type (a type-name string, alias, or System.Type object) to
+   select the single-type-argument overload, or a cl:list of types to
+   select the overload taking that many type arguments; ARGS are the
+   remaining arguments, forwarded unchanged to the resolved overload.
+   Passing cl:nil or an empty list calls the non-generic sort overload(s)."
+  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))
+    (cl:case (cl:length type-list)
+      (0 (cl:apply (cl:function sort) args))
+      (1 (cl:apply (cl:function sort-arity-1) (cl:append type-list args)))
+      (2 (cl:apply (cl:function sort-arity-2) (cl:append type-list args)))
+      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                      :package-name "SYSTEM-ARRAY"
+                      :class-name <type-str>
+                      :method-name "sort<>"
+                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 (cl:defun true-for-all (type array match)
   "Summary: Determines whether every element in the array matches the conditions defined by the specified predicate.
