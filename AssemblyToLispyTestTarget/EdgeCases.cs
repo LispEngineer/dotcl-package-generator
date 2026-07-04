@@ -99,6 +99,21 @@ namespace AssemblyToLispyTestTarget
         /// </summary>
         public string ReadOnlyProperty { get; }
 
+#pragma warning disable CS0649 // never assigned; only its indexer accessors' existence is under test, not their behavior
+        private readonly int[] _items;
+#pragma warning restore CS0649
+
+        /// <summary>
+        /// An indexer to test capture of a property's own index parameters,
+        /// as distinct from an ordinary method's parameters.
+        /// </summary>
+        /// <param name="index">The index to access.</param>
+        public int this[int index]
+        {
+            get => _items[index];
+            set => _items[index] = value;
+        }
+
         /// <summary>
         /// A method with many parameter modifiers.
         /// </summary>

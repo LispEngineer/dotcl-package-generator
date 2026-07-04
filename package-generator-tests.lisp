@@ -400,4 +400,66 @@
       (when (probe-file out-dir)
         (uiop:delete-directory-tree out-dir :validate t))))
 
+  ;; 6. Indexer codegen: generate-class-file must pass a property's own index
+  ;;    parameters through to get_Item/set_Item, and must skip (with a
+  ;;    documenting comment, not a defun) an indexer overloaded across
+  ;;    multiple index-parameter signatures.
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.Indexed"
+             :kind :class
+             :fields nil
+             :properties ((:name "Item" :type "System.Int32" :readable t :writeable t
+                           :get-method "get_Item" :set-method "set_Item"
+                           :parameters ((:name "index" :type "System.Int32"))))
+             :methods nil
+             :constructors nil))
+         (out-dir (merge-pathnames "package-generator-tests-indexer-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-indexed.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun item (obj! index)" contents))) t
+                        "generate-class-file emits an indexer getter taking the index parameter")
+            (assert-test (not (null (search "\"get_Item\" index))" contents))) t
+                        "generate-class-file's indexer getter passes the index through to get_Item")
+            (assert-test (not (null (search "(cl:defun (cl:setf item) (new-value obj! index)" contents))) t
+                        "generate-class-file emits an indexer setter taking new-value and the index parameter")
+            (assert-test (not (null (search "\"set_Item\" index new-value))" contents))) t
+                        "generate-class-file's indexer setter passes index then new-value to set_Item")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
+  ;; 6.1 Overloaded indexer (multiple index-parameter signatures) is not yet
+  ;;     supported: it must be documented in a comment, not turned into a
+  ;;     (guessed, likely wrong) single defun.
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.OverloadedIndexed"
+             :kind :class
+             :fields nil
+             :properties ((:name "Item" :type "System.Int32" :readable t :writeable t
+                           :get-method "get_Item" :set-method "set_Item"
+                           :parameters ((:name "index" :type "System.Int32")))
+                          (:name "Item" :type "System.Int32" :readable t :writeable t
+                           :get-method "get_Item" :set-method "set_Item"
+                           :parameters ((:name "key" :type "System.String"))))
+             :methods nil
+             :constructors nil))
+         (out-dir (merge-pathnames "package-generator-tests-indexer-overload-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-overloaded-indexed.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "not yet supported" contents))) t
+                        "generate-class-file documents an overloaded indexer as not yet supported")
+            (assert-test (search "(cl:defun item " contents) nil
+                        "generate-class-file does not emit a guessing defun for an overloaded indexer")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
   (format *error-output* "--- Package Generator Tests Completed ---~%"))

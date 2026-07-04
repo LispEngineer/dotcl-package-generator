@@ -765,3 +765,49 @@ appends a trailing `!`. That suffix is only ever produced by `map-member-name`, 
 names*, not parameter names. So no C# parameter, regardless of its name, can ever map to `obj!`.
 This mirrors the existing "protect a name the generator itself needs" pattern established in
 Version 15 for `quote!`/`function!`/`t!`/`nil!`.
+
+## Indexer Support (Version 26)
+
+Prior to Version 26, `AssemblyToLispy.cs`'s `FormatPropertyPlist` never called
+`PropertyInfo.GetIndexParameters()`, so a C# indexer (`this[...]`) reached the generator
+indistinguishable from an ordinary parameterless property. `generate-class-file`'s instance-property
+loop then emitted a getter/setter taking only the receiver (`obj!`) — e.g.
+`Dictionary<TKey,TValue>`'s indexer became `(cl:defun item (obj!) ... "get_Item")`, silently
+dropping the required `key` argument. This wasn't just an unimplemented feature: the generated
+function *looked* correct (it compiled, exported, and had a plausible name) but could never
+actually retrieve or store a value at runtime — calling it would either error out inside
+`dotnet:invoke` (wrong arity for `get_Item`) or, worse, silently misbehave.
+
+**The fix, in two parts:**
+
+1. **Reflection (`AssemblyToLispy.cs`)**: `FormatPropertyPlist` now calls
+   `prop.GetIndexParameters()` and, when non-empty, formats them via the existing
+   `FormatParameterPlist` (the same helper methods and constructors already use) into a
+   `:parameters` key on the property plist — structurally identical to how a method's own
+   parameters are represented. An ordinary (non-indexer) property still omits `:parameters`
+   entirely, so existing consumers of the metadata format are unaffected.
+
+2. **Codegen (`assembly-package-generator.lisp`)**: a property plist carrying `:parameters` is now
+   an indexer (`indexer-property-p`). Since ordinary C# properties can never be overloaded but
+   indexers can (e.g. `this[int]` alongside `this[string]` on the same class — both reflect as
+   distinct `PropertyInfo` entries both named `Item`), instance properties are first grouped by
+   name (`group-properties-by-name`, mirroring `method-groups`'s hash-table grouping) before
+   generation:
+   * A group with exactly one property plist generates as before, except the getter/setter's
+     lambda list and `dotnet:invoke` call now thread the index parameter(s) through positionally,
+     inserted between the receiver (`obj!`) and, for the setter, the new value — matching C#'s own
+     `set_Item(index..., value)` parameter order. An ordinary property (no index parameters) emits
+     byte-for-byte the same code as before Version 26, since the conditional `~@[ ... ~]` `format`
+     directives contribute nothing when there are no index parameters to insert.
+   * A group with two or more property plists (an overloaded indexer) is **not yet supported** —
+     picking which signature a single generated function should dispatch to isn't well-defined
+     without the same kind of type-based `cond` dispatch overloaded methods already get. Rather
+     than guess (and risk silently generating a wrapper for the wrong signature), the generator
+     documents every signature in a comment and emits no function at all, mirroring the existing
+     dirty-method/dirty-constructor "documented but unsupported" treatment
+     (`method-signature-str`/`constructor-signature-str`'s sibling, `property-signature-str`).
+   `compute-package-exports-and-shadows` (which independently determines `packages.lisp`'s
+   `defpackage` exports without re-running `generate-class-file`'s own body-generation logic)
+   received the identical grouping and single-signature-only-exports treatment, so it never
+   exports a function name for an overloaded indexer that `generate-class-file` won't actually
+   define.

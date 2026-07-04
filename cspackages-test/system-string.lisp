@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 25
-;;; Creation Date: 2026-07-03T21:58:34Z
+;;; Generator Version: 26
+;;; Creation Date: 2026-07-04T01:45:08Z
 
 (cl:in-package :system-string)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-03T21:58:34Z")
-(cl:defconstant <version> 25)
+(cl:defconstant <creation> "2026-07-04T01:45:08Z")
+(cl:defconstant <version> 26)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -101,8 +101,8 @@ new(SByte*, Int32, Int32, Encoding)
 (cl:define-symbol-macro empty (dotnet:static <type-str> "Empty"))
 (cl:setf (cl:documentation (cl:quote empty) (cl:quote cl:variable)) "Represents the empty string. This field is read-only.")
 
-(cl:defun chars (obj!)
-  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "get_Chars"))
+(cl:defun chars (obj! index)
+  (dotnet:invoke (cl:the (dotnet "System.String") obj!) "get_Chars" index))
 
 (cl:defun length (obj!)
   "Gets the number of characters in the current System.String object."

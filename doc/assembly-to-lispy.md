@@ -134,6 +134,10 @@ Each type entry plist contains the following entries, by key:
     otherwise the name of the getter method.
   * `:set-method` (String or omitted): Omitted if there is no visible setter;
     otherwise the name of the setter method.
+  * `:parameters` (List of Parameter Plists or omitted): An ordered list of plists for
+    each index parameter, formatted identically to a method's own `:parameters`. Present
+    only for an indexer (C#'s `this[...]`); omitted for an ordinary property, which has
+    no index parameters.
   * `:documentation` (Documentation Plist or omitted): Omitted if no documentation is
     found; otherwise a plist containing property documentation.
 * `:fields` (List of Field Plists or omitted): A list of plists containing
@@ -300,6 +304,9 @@ This sub-phase extracts member variables and metadata accessors:
     * `:writeable`: `t` or `nil`.
     * `:static`: `t` or `nil`.
     * The names of the get and set methods (if any)
+    * `:parameters`: for an indexer (`this[...]`), the index parameters (via
+      `PropertyInfo.GetIndexParameters()`), formatted the same way as a method's
+      parameters; omitted for an ordinary property.
     * Any other relevant information from `PropertyInfo`
 * **Fields**:
   * Extract using `type.GetFields()`.

@@ -316,7 +316,7 @@
           (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Property entry is not a plist: ~S~%" context prop))
         (progn
           (when (not (validate-plist-keys prop '(:name :type)
-                                         '(:name :type :assembly-qualified-type :readable :writeable :static :get-method :set-method :documentation)
+                                         '(:name :type :assembly-qualified-type :readable :writeable :static :get-method :set-method :parameters :documentation)
                                          context))
             (setf valid nil))
           (let ((pname (getf prop :name))
@@ -327,6 +327,7 @@
                 (p-static (getf prop :static))
                 (p-get (getf prop :get-method))
                 (p-set (getf prop :set-method))
+                (p-params (getf prop :parameters))
                 (p-doc (getf prop :documentation)))
             (when (and pname (not (stringp pname)))
               (setf valid nil)
@@ -352,6 +353,13 @@
             (when (and p-set (not (stringp p-set)))
               (setf valid nil)
               (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :set-method must be a string, got ~S~%" context p-set))
+            (when (and p-params (not (listp p-params)))
+              (setf valid nil)
+              (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :parameters must be a list, got ~S~%" context p-params))
+            (when p-params
+              (dolist (p p-params)
+                (when (not (validate-parameter-schema p (format nil "~A (Indexer Parameter ~A)" context (getf p :name))))
+                  (setf valid nil))))
             (when (not (validate-documentation-schema p-doc context))
               (setf valid nil))
             (when c#type

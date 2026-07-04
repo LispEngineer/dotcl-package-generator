@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Xml.XmlReader
-;;; Generator Version: 25
-;;; Creation Date: 2026-07-03T21:58:34Z
+;;; Generator Version: 26
+;;; Creation Date: 2026-07-04T01:45:08Z
 
 (cl:in-package :system-xml-xml-reader)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Xml.XmlReader"))
 (cl:defconstant <type-str> "System.Xml.XmlReader")
-(cl:defconstant <creation> "2026-07-03T21:58:34Z")
-(cl:defconstant <version> 25)
+(cl:defconstant <creation> "2026-07-04T01:45:08Z")
+(cl:defconstant <version> 26)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -64,14 +64,11 @@
   "When overridden in a derived class, gets a value indicating whether the current node is an empty element (for example, <MyElement/>)."
   (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj!) "get_IsEmptyElement"))
 
-(cl:defun item (obj!)
-  (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj!) "get_Item"))
-
-(cl:defun item (obj!)
-  (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj!) "get_Item"))
-
-(cl:defun item (obj!)
-  (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj!) "get_Item"))
+;; Note: System.Xml.XmlReader's indexer "Item" has multiple overloaded signatures,
+;; which are not yet supported:
+;;   Item[Int32] -> String
+;;   Item[String] -> String
+;;   Item[String, String] -> String
 
 (cl:defun local-name (obj!)
   "When overridden in a derived class, gets the local name of the current node."

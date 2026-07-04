@@ -8,8 +8,8 @@ EXECUTABLE := $(BIN_DIR)dotcl-packagegen
 NUPKG_DIR = nupkg
 
 # Tool package version. The minor version tracks assembly-package-generator.lisp's
-# internal *generator-version* (currently 25), so they stay visibly in sync.
-VERSION = 2.25.0
+# internal *generator-version* (currently 26), so they stay visibly in sync.
+VERSION = 2.26.0
 
 # Reference assembly directory for the standard .NET metadata used by `test`
 # to exercise Stage 1/Stage 2 generation end-to-end. This is the Arch Linux

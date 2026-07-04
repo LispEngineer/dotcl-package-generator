@@ -396,7 +396,8 @@ namespace PackageGenerator {
         /// <summary>
         ///   Formats the metadata of a property as a Common Lisp property plist string.
         ///   The plist contains the property name, type information, readability/writeability,
-        ///   static modifier, accessor names, and optional XML documentation.
+        ///   static modifier, accessor names, optional index parameters (for indexers, i.e.
+        ///   C#'s this[...]), and optional XML documentation.
         /// </summary>
         /// <param name="prop">The property reflection metadata info.</param>
         /// <param name="xmlDoc">The dictionary of XML documentation elements mapped by member name.</param>
@@ -405,6 +406,15 @@ namespace PackageGenerator {
             var parts = new List<string>();
             parts.Add($":name {EscapeLispString(prop.Name)}");
             parts.Add(FormatTypeField(":type", prop.PropertyType));
+
+            // Indexers (C#'s this[...]) carry index parameters on the property itself,
+            // just like a method's parameters; capture them the same way so callers
+            // (get_Item/set_Item) can be generated with the index argument(s) intact.
+            var indexParameters = prop.GetIndexParameters();
+            if (indexParameters.Length > 0) {
+                var indexParamPlists = indexParameters.Select(p => FormatParameterPlist(p)).ToList();
+                parts.Add($":parameters ({string.Join(" ", indexParamPlists)})");
+            }
 
             var getMethod = prop.GetMethod;
             var setMethod = prop.SetMethod;

@@ -65,7 +65,21 @@
             (assert-equal "hello" (getf (nth 0 params) :default-value) "First default is string hello")
             (assert-equal 42 (getf (nth 1 params) :default-value) "Second default is int 42")
             (assert-equal nil (getf (nth 2 params) :default-value) "Third default is null (nil)")
-            (assert-equal #\A (getf (nth 3 params) :default-value) "Fourth default is char A"))))))
+            (assert-equal #\A (getf (nth 3 params) :default-value) "Fourth default is char A"))))
+
+      ;; Test the indexer (this[int]): it must be captured with its own
+      ;; :parameters (index parameters), the same way a method's parameters
+      ;; are captured, so downstream codegen can pass the index argument(s)
+      ;; through to get_Item/set_Item.
+      (let ((indexer (find-if (lambda (p) (string= (getf p :name) "Item")) (getf strc :properties))))
+        (assert-not-null indexer "Should find the Item indexer property")
+        (when indexer
+          (assert-true (getf indexer :readable) "Indexer should be readable")
+          (assert-true (getf indexer :writeable) "Indexer should be writeable")
+          (let ((params (getf indexer :parameters)))
+            (assert-equal 1 (length params) "Indexer should have exactly 1 index parameter")
+            (assert-equal "index" (getf (nth 0 params) :name) "Indexer's index parameter is named index")
+            (assert-equal "System.Int32" (getf (nth 0 params) :type) "Indexer's index parameter is System.Int32"))))))
 
   ;; Test Extensions
   (let ((ext (find-if (lambda (cls) (string= (getf cls :name) "Extensions")) *metadata*)))

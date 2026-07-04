@@ -282,6 +282,19 @@ is a really foundational change that will help a lot in the future.
 
 # DONE
 
+* Indexers (C#'s `this[...]`, e.g. `Dictionary<TKey,TValue>`'s `Item`) generated a getter/setter
+  taking only the receiver `obj!`, with no index/key argument at all — `AssemblyToLispy.cs` never
+  captured a property's own index parameters, so the generated wrapper could compile and export
+  but could never actually retrieve or store a value at runtime.
+  * DONE (Generator Version 26): `FormatPropertyPlist` now captures index parameters via
+    `PropertyInfo.GetIndexParameters()` under a `:parameters` key, formatted identically to a
+    method's own parameters. The generator threads them through to `get_Item`/`set_Item`
+    positionally (index parameter(s) first, then the new value on the setter). An indexer
+    overloaded across multiple index-parameter signatures is documented in a comment rather than
+    guessed at, the same treatment dirty method/constructor overloads already get. See
+    `doc/generator-design-notes.md`'s "Indexer Support (Version 26)" section and `RELEASES.md`'s
+    2.26.0 entry.
+
 * Copy the `revert-cspackages-timestamps.sh` from DungeonSlime to here,
   and use it in the `cspackages-test` directory for the `make test` target.
   * Extended it to the other date in `.asd` file too.

@@ -28,7 +28,13 @@ Items are ordered roughly by priority, highest first.
 
 ---
 
-## 1. Indexers (`this[]`) — **currently generates broken code**
+## 1. Indexers (`this[]`) — **FIXED in generator version 26**
+
+> **Update (2026-07-03):** fixed. See `RELEASES.md`'s 2.26.0 entry and
+> `doc/generator-design-notes.md`'s "Indexer Support (Version 26)" section. The description below
+> is left as-is for historical context (what was broken and why).
+
+Indexers (`this[]`) — **currently generates broken code**
 
 `FormatPropertyPlist` (`AssemblyToLispy.cs:404-443`) never captures index parameters for
 indexer properties. This isn't just a missing feature — it actively emits a

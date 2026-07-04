@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 25
-;;; Creation Date: 2026-07-03T21:58:34Z
+;;; Generator Version: 26
+;;; Creation Date: 2026-07-04T01:45:08Z
 
 (cl:in-package :cl-user)
 
@@ -545,7 +545,6 @@
    #:has-value
    #:default?
    #:empty-element?
-   #:item
    #:local-name
    #:name
    #:namespace-uri

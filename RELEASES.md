@@ -10,6 +10,20 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.26.0 — 2026-07-03
+
+**Indexer fix:** C# indexers (`this[...]`, e.g. `Dictionary<TKey,TValue>`'s `Item`) generated a
+getter/setter that took only the receiver (`obj!`) with no index/key argument at all — the
+metadata reflection layer (`AssemblyToLispy.cs`) never captured a property's own index parameters,
+so the generated wrapper could never actually retrieve or store a value at runtime. Index
+parameters are now captured via `PropertyInfo.GetIndexParameters()` the same way a method's
+parameters are captured, and threaded through to `get_Item`/`set_Item` positionally by the
+generator (index parameter(s) first, then the new value on the setter, matching C#'s own parameter
+order). An indexer overloaded across multiple index-parameter signatures (e.g. `this[int]` and
+`this[string]` on the same class) is not yet supported; it is now documented in a comment (the same
+treatment as a dirty method/constructor overload) instead of the previous behavior of silently
+generating a broken wrapper for the last-seen signature.
+
 ## 2.25.0 — 2026-07-03
 
 **Receiver-parameter collision fix:** the hardcoded receiver parameter for instance methods and

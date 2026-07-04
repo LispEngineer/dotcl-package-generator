@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 25
-;;; Creation Date: 2026-07-03T21:58:34Z
+;;; Generator Version: 26
+;;; Creation Date: 2026-07-04T01:45:08Z
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-03T21:58:34Z")
-(cl:defconstant <version> 25)
+(cl:defconstant <creation> "2026-07-04T01:45:08Z")
+(cl:defconstant <version> 26)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -102,11 +102,11 @@ new(SerializationInfo, StreamingContext)
   "Gets the number of key/value pairs contained in the System.Collections.Generic.Dictionary`2."
   (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "get_Count"))
 
-(cl:defun item (obj!)
-  (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "get_Item"))
+(cl:defun item (obj! key)
+  (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "get_Item" key))
 
-(cl:defun (cl:setf item) (new-value obj!)
-  (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "set_Item" new-value))
+(cl:defun (cl:setf item) (new-value obj! key)
+  (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "set_Item" key new-value))
 
 (cl:defun keys (obj!)
   "Gets a collection containing the keys in the System.Collections.Generic.Dictionary`2."
