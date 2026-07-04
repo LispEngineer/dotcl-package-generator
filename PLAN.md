@@ -47,6 +47,35 @@ type list/`nil` falls through to the plain `base-name` function instead of error
 
 # Miscellaneous
 
+* **HIGH PRIORITY**: Provide a safe way to **clone/copy a boxed struct instance** (e.g.
+  one obtained from a `--constant-properties` constant, a `define-symbol-macro` constant,
+  or an ordinary property/method return) so users can get an independent, freely-mutable
+  copy without corrupting shared state.
+  * Motivation: a struct obtained from Lisp is a `#<DOTNET ...>` reference to a boxed CLR
+    object, not a value-copied Lisp datum. `dotnet:invoke`'s `setf`-expansion mutates
+    that exact boxed object in place. For a `--constant-properties`-cached `defconstant`
+    (whose value form runs exactly once and is reused forever), this means mutating the
+    "constant" through *any* alias corrupts it permanently, program-wide — confirmed via
+    a live REPL session where mutating a `color:r`-aliased local (`x`, bound via
+    `(defparameter x color:+white+)`) also permanently mutated `color:+white+` itself.
+    See `doc/generator-design-notes.md`'s Version 29 section and `FEATURES.md`'s "Static
+    Constants and Symbol Macros" / "Struct Boxing Caveat" sections for the full incident
+    writeup — this item is that investigation's tracked follow-up fix, not yet
+    implemented (Version 29 was documentation-only, by explicit decision, to avoid the
+    performance cost of abandoning `defconstant` caching for hot constants like
+    `Vector2.Zero`).
+  * No clone/copy-struct primitive is currently documented in
+    `doc/dotnet-dotcl-interop.md`. Two possible directions:
+    1. A new DotCL-side primitive (e.g. unbox-then-rebox a value type, or a generic
+       `MemberwiseClone`-style call DotCL exposes to Lisp) — would need to originate in
+       DotCL itself, a separate project.
+    2. A generator-emitted per-type helper built from the struct's own
+       constructor/settable-property-and-field values (e.g. a generated `clone-vector2`
+       that reads every settable property/field off the source instance and passes them
+       to `new`) — implementable entirely in this repo, though it needs to handle
+       structs whose full state isn't reconstructible via a public constructor plus
+       public settable members.
+
 * Add missing operator overload handling.
 
 * Implement read/write for static properties and fields per this:
@@ -97,6 +126,13 @@ type list/`nil` falls through to the plain `base-name` function instead of error
   * Consider casting mutator parameters to the correct type, e.g.,
     `(#!!System.Convert.ToByte 37)`, or `(dotnet:box 37 "System.Byte")`
     in the mutator function implementation
+    * **RESOLVED/MOOT (2026-07-04)**: a live REPL check showed a plain `(dotnet:box 37
+      "System.Byte")` value already mutates a struct property correctly with no special
+      casting needed — `dotnet:box`, a real invoked conversion call, and a `the`-typed
+      literal all behaved identically. No casting is required for correctness here. See
+      `doc/generator-design-notes.md`'s Version 29 section. (The struct-mutation
+      *aliasing* hazard this same investigation uncovered is a separate, unrelated issue
+      — tracked as this section's new struct-cloning TODO item above.)
   * Add documentation comments that indicate the return type and
     expected input type(s) of any parameters.
   * Change IsSomething methods to `something?` methods

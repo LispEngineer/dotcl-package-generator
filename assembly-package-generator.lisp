@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 28
+(defparameter *generator-version* 29
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -42,7 +42,8 @@
    25 - The hardcoded instance-method/property receiver parameter is now named obj! instead of obj, since map-param-name (the only function that maps a C# parameter name to a generated Lisp parameter name) never appends a trailing '!' to anything, guaranteeing obj! can never collide with a mapped C# parameter name. Previously, a C# instance method with its own parameter literally named obj (e.g. System.Object.Equals(object obj)) generated an invalid lambda list with a duplicate obj binding.
    26 - Fixed indexers (C#'s this[...]): AssemblyToLispy.cs now captures a property's own index parameters via GetIndexParameters(), the same way a method's parameters are captured, instead of silently dropping them. Previously an indexer's generated getter/setter (e.g. Dictionary<TKey,TValue>'s Item) took only the receiver (obj!) with no index/key argument at all, producing a wrapper that could never actually retrieve or store a value. Instance properties are now grouped by name (group-properties-by-name) before generation, since ordinary properties are never overloaded but indexers can be (distinct index-parameter signatures on the same name); a single-signature group's getter/setter now thread its index parameter(s) through to get_Item/set_Item positionally (index params before the value on the setter, matching C#'s own parameter order), while a group with more than one signature (an overloaded indexer) is left unimplemented, documented in a comment (mirroring dirty-method/dirty-constructor handling) rather than guessing which overload a single generated function should dispatch to.
    27 - Added support for public instance fields and for generic methods of more than one type argument, the two remaining known capability gaps flagged as highest-priority in doc/claude-suggested-improvements-20260703.md. (1) Public instance fields (public-instance-field-p, previously unused dead code) now generate a getter and, unless the field is C#'s readonly (:init-only), a setter: since a field has no get_Foo/set_Foo accessor method the way a property does, the getter uses dotnet:invoke's built-in field-read support (passing the bare field name), while the setter uses the setf-expansion of dotnet:invoke itself (the idiomatic DotCL way to write a field or property directly, per doc/dotnet-dotcl-interop.md), since dotnet:invoke has no equivalent field-write support. (2) simple-method-p/clean-method-p no longer restrict generic methods to exactly one type argument (generic-method-arity-supported-p now accepts any positive :generic-arity); generate-single-overload, generate-master-wrapper, and format-master-overload-action all generalize the previous single hardcoded 'type' parameter to generic-type-param-names' arity-many 'type-1'..'type-N' parameters (arity 1 keeps the legacy bare 'type' name, so existing arity-1 generated code and callers are unaffected), passed through as (cl:list type-1 type-2 ...) to dotnet:invoke-generic/dotnet:static-generic. Since a single Lisp function's lambda list cannot flex between different numbers of generic type-argument parameters, overloads of the *same* C# method name that disagree on generic arity (e.g. System.Linq.Enumerable's Aggregate, overloaded at arity 1, 2, and 3) can no longer share one wrapper: split-by-generic-arity partitions a method-name group's clean overloads into one sub-list per distinct arity, and generate-method-name-wrappers (replacing the four near-identical single/master-wrapper-dispatch call sites previously duplicated across the mixed-mode/single-mode branches) generates one function per sub-list, arity-suffixed (generic-arity-suffix, e.g. aggregate-arity-1, aggregate-arity-2) whenever a name spans more than one arity; the overwhelmingly common single-arity case (including every non-generic method) is entirely unaffected and keeps its plain (or '*'-suffixed) name. method-name-wrapper-names mirrors this naming for compute-package-exports-and-shadows without re-running code generation.
-   28 - Replaced the version-27 arity-suffixed export scheme (aggregate-arity-1, aggregate-arity-2, ...) with a two-tier dispatch mirroring the version-24 Overload Consolidation's '*' static/instance convention, so a method-name group's public surface stays at most two names: generic-arity-dispatch-mode classifies a method name's generic-arity cells (split-by-generic-arity) as :single (the common case: non-generic, or every overload shares one arity -- generates bare base-name exactly as before, byte-identical output), :split-with-plain (a non-generic overload coexists with generic ones at other arities -- generates base-name for the non-generic overload(s) and a new base-name<> dispatcher for the generic cells), or :split-all-generic (every overload is generic but at different arities, e.g. Enumerable.Aggregate's arity-1/2/3 overloads -- base-name itself becomes the dispatcher, no <> suffix needed since there is no non-generic form to disambiguate against). The base-name<>/base-name dispatcher (generate-generic-arity-dispatcher) takes the type argument(s) as its first parameter -- a single .NET type (arity 1) or a cl:list of types (arity = its length), distinguished via cl:listp since a type argument is itself never a list -- and applies the remaining arguments through to an internal, unexported per-arity function (internal-arity-fn-name, reusing the old arity-suffixed names and generate-single-overload/generate-master-wrapper bodies verbatim -- only their export status changes). In the :split-with-plain case, passing an empty list/nil as the type argument to base-name<> falls through to base-name itself rather than erroring. method-name-wrapper-names now reflects this: at most (base-name) or (base-name base-name<>), never the internal per-arity names.")
+   28 - Replaced the version-27 arity-suffixed export scheme (aggregate-arity-1, aggregate-arity-2, ...) with a two-tier dispatch mirroring the version-24 Overload Consolidation's '*' static/instance convention, so a method-name group's public surface stays at most two names: generic-arity-dispatch-mode classifies a method name's generic-arity cells (split-by-generic-arity) as :single (the common case: non-generic, or every overload shares one arity -- generates bare base-name exactly as before, byte-identical output), :split-with-plain (a non-generic overload coexists with generic ones at other arities -- generates base-name for the non-generic overload(s) and a new base-name<> dispatcher for the generic cells), or :split-all-generic (every overload is generic but at different arities, e.g. Enumerable.Aggregate's arity-1/2/3 overloads -- base-name itself becomes the dispatcher, no <> suffix needed since there is no non-generic form to disambiguate against). The base-name<>/base-name dispatcher (generate-generic-arity-dispatcher) takes the type argument(s) as its first parameter -- a single .NET type (arity 1) or a cl:list of types (arity = its length), distinguished via cl:listp since a type argument is itself never a list -- and applies the remaining arguments through to an internal, unexported per-arity function (internal-arity-fn-name, reusing the old arity-suffixed names and generate-single-overload/generate-master-wrapper bodies verbatim -- only their export status changes). In the :split-with-plain case, passing an empty list/nil as the type argument to base-name<> falls through to base-name itself rather than erroring. method-name-wrapper-names now reflects this: at most (base-name) or (base-name base-name<>), never the internal per-arity names.
+   29 - Documentation-only correction, no dispatch/behavior change: the struct-boxing warning comment above instance property/field mutators previously claimed setf 'may only mutate a boxed copy, leaving the original unchanged' -- backwards. A live REPL check against dotcl-dungeonslime proved mutation actually succeeds in place, and, more importantly, that a --constant-properties-selected (or, in principle, literal/const) defconstant of a mutable struct type is a single boxed .NET object shared and re-returned on every reference for the life of the program, since defconstant's value form runs exactly once -- mutating it through any alias (e.g. a defparameter bound to it) permanently corrupts the 'constant' everywhere, silently. The mutator comment is corrected to describe this aliasing hazard accurately (emit-shared-mutable-constant-warning at the three is-value-type-p property/field-mutator sites), and a new warning comment is now emitted above every literal-fields/pure-const-fields/pure-const-props defconstant whose type is not a known-safe immutable-primitive-type-p type (numeric primitives, System.String, System.Char, System.Boolean, System.IntPtr/UIntPtr) -- a deliberately broad allowlist, since this repo has no cross-type metadata available at generation time to precisely determine some other type's mutability. See doc/generator-design-notes.md's corrected \"Instance Properties and Struct 'Boxing Mutation'\" section and its new Version 29 section for the full transcript and root-cause explanation.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -175,6 +176,51 @@
   "Checks if a field plist defines a public instance field."
   (and (not (getf field :static))
        (getf field :public)))
+
+(defparameter *immutable-primitive-types*
+  '("System.Boolean" "System.Byte" "System.SByte" "System.Int16" "System.UInt16"
+    "System.Int32" "System.UInt32" "System.Int64" "System.UInt64" "System.Single"
+    "System.Double" "System.Decimal" "System.Char" "System.String" "System.IntPtr"
+    "System.UIntPtr")
+  "Fully-qualified C# type names with no settable instance state reachable from Lisp,
+   safe to cache once in a defconstant with no shared-mutable-state hazard. Deliberately
+   a broad allowlist rather than a precise per-type mutability check (see
+   immutable-primitive-type-p): this repo has no cross-type metadata available at
+   generation time to determine whether some *other* type has settable members, so
+   anything not on this list -- including every struct with settable properties/fields,
+   e.g. System.Numerics.Vector2 or Microsoft.Xna.Framework.Color -- is treated as
+   potentially unsafe to cache, and gets a warning comment (see
+   literal-fields/pure-const-fields/pure-const-props generation in generate-class-file).")
+
+(defun immutable-primitive-type-p (type-str)
+  "Returns t if TYPE-STR (a field/property's fully-qualified C# type) is a known-safe,
+   effectively immutable primitive -- see *immutable-primitive-types*."
+  (and type-str (member type-str *immutable-primitive-types* :test #'string=) t))
+
+(defun emit-shared-mutable-constant-warning (stream type-str)
+  "Writes a warning comment to STREAM above a defconstant for a field/property of
+   TYPE-STR, unless TYPE-STR is a known-safe immutable-primitive-type-p type. A
+   defconstant's value form runs exactly once, so this constant is a single boxed .NET
+   object shared and re-returned on every reference to it for the life of the program;
+   if TYPE-STR is a mutable value type (a struct with settable properties/fields, e.g.
+   System.Numerics.Vector2 or Microsoft.Xna.Framework.Color), mutating this object --
+   through this constant, or through ANY other Lisp/C# reference that aliases the same
+   boxed instance -- permanently corrupts it for every future reference, since the same
+   box is shared, not freshly re-fetched the way a define-symbol-macro constant is. See
+   FEATURES.md's \"Static Constants and Symbol Macros\" section for the full
+   explanation and worked example of this hazard."
+  (unless (immutable-primitive-type-p type-str)
+    (format stream ";; WARNING: this is a single, permanently-cached boxed .NET object --~%")
+    (format stream ";; the defconstant form below only runs once. If ~A is a mutable~%" type-str)
+    (format stream ";; value type (struct) with settable properties/fields, mutating this~%")
+    (format stream ";; object -- through this binding, or through ANY other reference that~%")
+    (format stream ";; aliases the same boxed instance -- permanently corrupts it for every~%")
+    (format stream ";; future reference to this constant, for the life of the program.~%")
+    (format stream ";; There is currently no supported way to obtain an independent,~%")
+    (format stream ";; safely-mutable copy of this value from Lisp; construct a fresh~%")
+    (format stream ";; instance via the type's own constructor (new) if you need to mutate~%")
+    (format stream ";; a copy. See FEATURES.md's \"Static Constants and Symbol Macros\"~%")
+    (format stream ";; section and doc/generator-design-notes.md for the full explanation.~%")))
 
 (defun indexer-property-p (prop)
   "Checks if a property plist represents a C# indexer (this[...]), i.e. it
@@ -1291,6 +1337,7 @@
           (let* ((cname (format nil "+~A+" (camel-to-kebab (getf f :name))))
                  (f-doc (getf (getf f :documentation) :summary))
                  (doc-str (if f-doc (escape-lisp-string f-doc) "")))
+            (emit-shared-mutable-constant-warning stream (getf f :type))
             (format stream "(cl:defconstant ~A (dotnet:static <type-str> \"~A\"))~%" cname (getf f :name))
             (if (> (length doc-str) 0)
                 (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
@@ -1301,6 +1348,7 @@
           (let* ((cname (format nil "+~A+" (camel-to-kebab (getf f :name))))
                  (f-doc (getf (getf f :documentation) :summary))
                  (doc-str (if f-doc (escape-lisp-string f-doc) "")))
+            (emit-shared-mutable-constant-warning stream (getf f :type))
             (format stream "(cl:defconstant ~A (dotnet:static <type-str> \"~A\"))~%" cname (getf f :name))
             (if (> (length doc-str) 0)
                 (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
@@ -1322,6 +1370,7 @@
           (let* ((cname (format nil "+~A+" (camel-to-kebab (getf p :name))))
                  (p-doc (getf (getf p :documentation) :summary))
                  (doc-str (if p-doc (escape-lisp-string p-doc) "")))
+            (emit-shared-mutable-constant-warning stream (getf p :type))
             (format stream "(cl:defconstant ~A (dotnet:static <type-str> \"~A\"))~%" cname (getf p :name))
             (if (> (length doc-str) 0)
                 (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
@@ -1371,16 +1420,24 @@
                     (if readable
                         (progn
                           (when is-value-type-p
-                            (format stream ";; Note: Modifying a property of a value type (struct) via setf may only mutate~%")
-                            (format stream ";; a boxed copy, leaving the original unchanged. Use caution with structs.~%"))
+                            (format stream ";; Note: obj! here is a boxed reference to a .NET value type (struct).~%")
+                            (format stream ";; This setf mutates that exact boxed instance in place -- it does NOT~%")
+                            (format stream ";; silently discard the change. However, if obj! is an alias of a shared~%")
+                            (format stream ";; or cached value (e.g. a constant defined via defconstant), this mutates~%")
+                            (format stream ";; that shared instance for every other reference to it too. See~%")
+                            (format stream ";; FEATURES.md's \"Struct Boxing Caveat\" section for details.~%"))
                           (format stream "(cl:defun (cl:setf ~A) (new-value obj!~@[ ~{~A~^ ~}~])~%" pname index-param-names)
                           (when (> (length doc-str) 0)
                             (format stream "  \"~A\"~%" doc-str))
                           (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~] new-value))~%~%" fq-name set-method index-param-names))
                         (progn
                           (when is-value-type-p
-                            (format stream ";; Note: Modifying a property of a value type (struct) via setf may only mutate~%")
-                            (format stream ";; a boxed copy, leaving the original unchanged. Use caution with structs.~%"))
+                            (format stream ";; Note: obj! here is a boxed reference to a .NET value type (struct).~%")
+                            (format stream ";; This setf mutates that exact boxed instance in place -- it does NOT~%")
+                            (format stream ";; silently discard the change. However, if obj! is an alias of a shared~%")
+                            (format stream ";; or cached value (e.g. a constant defined via defconstant), this mutates~%")
+                            (format stream ";; that shared instance for every other reference to it too. See~%")
+                            (format stream ";; FEATURES.md's \"Struct Boxing Caveat\" section for details.~%"))
                           (format stream "(cl:defun set-~A (obj!~@[ ~{~A~^ ~}~] new-value)~%" pname index-param-names)
                           (when (> (length doc-str) 0)
                             (format stream "  \"~A\"~%" doc-str))
@@ -1405,8 +1462,12 @@
             (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"))~%~%" fq-name (getf f :name))
             (when writeable
               (when is-value-type-p
-                (format stream ";; Note: Modifying a field of a value type (struct) via setf may only mutate~%")
-                (format stream ";; a boxed copy, leaving the original unchanged. Use caution with structs.~%"))
+                (format stream ";; Note: obj! here is a boxed reference to a .NET value type (struct).~%")
+                (format stream ";; This setf mutates that exact boxed instance in place -- it does NOT~%")
+                (format stream ";; silently discard the change. However, if obj! is an alias of a shared~%")
+                (format stream ";; or cached value (e.g. a constant defined via defconstant), this mutates~%")
+                (format stream ";; that shared instance for every other reference to it too. See~%")
+                (format stream ";; FEATURES.md's \"Struct Boxing Caveat\" section for details.~%"))
               (format stream "(cl:defun (cl:setf ~A) (new-value obj!)~%" fname)
               (when (> (length doc-str) 0)
                 (format stream "  \"~A\"~%" doc-str))

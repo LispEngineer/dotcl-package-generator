@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ValueTuple`3
-;;; Generator Version: 28
-;;; Creation Date: 2026-07-04T03:03:10Z
+;;; Generator Version: 29
+;;; Creation Date: 2026-07-04T14:21:19Z
 
 (cl:in-package :system-value-tuple-3)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.ValueTuple`3"))
 (cl:defconstant <type-str> "System.ValueTuple`3")
-(cl:defconstant <creation> "2026-07-04T03:03:10Z")
-(cl:defconstant <version> 28)
+(cl:defconstant <creation> "2026-07-04T14:21:19Z")
+(cl:defconstant <version> 29)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -42,8 +42,12 @@ new(T1, T2, T3)
   "Gets the value of the current System.ValueTuple`3 instance's first element."
   (dotnet:invoke (cl:the (dotnet "System.ValueTuple`3") obj!) "Item1"))
 
-;; Note: Modifying a field of a value type (struct) via setf may only mutate
-;; a boxed copy, leaving the original unchanged. Use caution with structs.
+;; Note: obj! here is a boxed reference to a .NET value type (struct).
+;; This setf mutates that exact boxed instance in place -- it does NOT
+;; silently discard the change. However, if obj! is an alias of a shared
+;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; that shared instance for every other reference to it too. See
+;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item1) (new-value obj!)
   "Gets the value of the current System.ValueTuple`3 instance's first element."
   (cl:setf (dotnet:invoke (cl:the (dotnet "System.ValueTuple`3") obj!) "Item1") new-value))
@@ -52,8 +56,12 @@ new(T1, T2, T3)
   "Gets the value of the current System.ValueTuple`3 instance's second element."
   (dotnet:invoke (cl:the (dotnet "System.ValueTuple`3") obj!) "Item2"))
 
-;; Note: Modifying a field of a value type (struct) via setf may only mutate
-;; a boxed copy, leaving the original unchanged. Use caution with structs.
+;; Note: obj! here is a boxed reference to a .NET value type (struct).
+;; This setf mutates that exact boxed instance in place -- it does NOT
+;; silently discard the change. However, if obj! is an alias of a shared
+;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; that shared instance for every other reference to it too. See
+;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item2) (new-value obj!)
   "Gets the value of the current System.ValueTuple`3 instance's second element."
   (cl:setf (dotnet:invoke (cl:the (dotnet "System.ValueTuple`3") obj!) "Item2") new-value))
@@ -62,8 +70,12 @@ new(T1, T2, T3)
   "Gets the value of the current System.ValueTuple`3 instance's third element."
   (dotnet:invoke (cl:the (dotnet "System.ValueTuple`3") obj!) "Item3"))
 
-;; Note: Modifying a field of a value type (struct) via setf may only mutate
-;; a boxed copy, leaving the original unchanged. Use caution with structs.
+;; Note: obj! here is a boxed reference to a .NET value type (struct).
+;; This setf mutates that exact boxed instance in place -- it does NOT
+;; silently discard the change. However, if obj! is an alias of a shared
+;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; that shared instance for every other reference to it too. See
+;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item3) (new-value obj!)
   "Gets the value of the current System.ValueTuple`3 instance's third element."
   (cl:setf (dotnet:invoke (cl:the (dotnet "System.ValueTuple`3") obj!) "Item3") new-value))

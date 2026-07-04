@@ -206,12 +206,52 @@ opted it in as a constant.
   (cl:define-symbol-macro local (dotnet:static <type-str> "Local"))
   ```
   Passing `--constant-properties` with the field/property's name (or `"*"` for all) forces
-  it to `defconstant` instead — safe only when you know the value genuinely never changes
-  (e.g. `Vector2.Zero`). Despite the flag's name, it applies identically to matching
+  it to `defconstant` instead. Despite the flag's name, it applies identically to matching
   *fields* as well as properties.
 
 * Both forms get a `cl:setf (cl:documentation ...)` line attaching the XML-doc summary
   (if any) as the symbol's Lisp `variable` documentation.
+
+**⚠️ `--constant-properties` hazard for struct-typed constants.** `defconstant`'s value
+form runs exactly *once*, and `dotnet:static` returns a *reference* to a boxed CLR object,
+not a value-copied Lisp datum — so a `--constant-properties`-selected field/property whose
+type is a mutable struct (e.g. `Vector2.Zero`, `Color.White` — the exact examples this
+tool's own README/CLAUDE.md use to demonstrate the flag!) becomes a single boxed instance
+shared and re-returned by *every* reference to that constant for the remaining life of the
+program. Mutating it — through the constant directly, or through any other Lisp binding
+that happens to alias the same boxed instance — silently corrupts it everywhere, forever.
+The default `define-symbol-macro` path has no such hazard, since it re-invokes
+`dotnet:static` (and thus the real C# getter, which per ordinary value-type semantics
+returns an independent copy every time) on every single reference.
+
+Because of this, the generator now emits a detailed warning comment above every
+`--constant-properties`-selected `defconstant` (and above true C# literal/`const`-field
+`defconstant`s, applied uniformly, though C# cannot express a non-primitive `const` so
+that path is a no-op safety net in practice) whose type is not a recognized safe,
+effectively-immutable primitive:
+```lisp
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector2 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
+(cl:defconstant +zero+ (dotnet:static <type-str> "Zero"))
+```
+This is a deliberately broad allowlist-based check (numeric primitives, `System.String`,
+`System.Char`, `System.Boolean`, `System.IntPtr`/`UIntPtr` are considered safe; everything
+else gets the warning), not a precise per-type mutability check — the generator only ever
+sees one type's own metadata at a time, with no cross-type lookup available to confirm
+whether some *other* referenced type actually has settable instance members. See
+`doc/generator-design-notes.md`'s Version 29 section for the full incident writeup
+(including the live REPL transcript that surfaced this) and `PLAN.md` for the tracked
+follow-up work (a safe way to *clone* a boxed struct, which would actually solve this
+rather than just warn about it).
 
 **Not handled — see Unsupported Features:** any static property or field that is
 *writeable* (settable) generates nothing at all, regardless of whether it's also
@@ -240,59 +280,74 @@ positionally, unless the indexer itself is overloaded, in which case it is unsup
 * An **overloaded indexer** (distinct index-parameter signatures on the same name, e.g.
   `this[int]` alongside `this[string]`) is not yet supported — no function is generated;
   every signature is instead listed in a comment (see Unsupported Features).
-* Mutating a **struct's** (value type's) property via the generated `setf` may only
-  mutate a boxed copy, discarded once the call returns, leaving the original Lisp value
-  unchanged — a comment noting this is automatically inserted above every struct property
-  mutator:
+* Mutating a **struct's** (value type's) property via the generated `setf` mutates the
+  exact boxed `.NET` instance `obj!` refers to, in place — a comment noting this, and its
+  real caveat (aliasing, not data loss — see below), is automatically inserted above
+  every struct property mutator:
   ```lisp
-  ;; Note: Modifying a property of a value type (struct) via setf may only mutate
-  ;; a boxed copy, leaving the original unchanged. Use caution with structs.
+  ;; Note: obj! here is a boxed reference to a .NET value type (struct).
+  ;; This setf mutates that exact boxed instance in place -- it does NOT
+  ;; silently discard the change. However, if obj! is an alias of a shared
+  ;; or cached value (e.g. a constant defined via defconstant), this mutates
+  ;; that shared instance for every other reference to it too. See
+  ;; FEATURES.md's "Struct Boxing Caveat" section for details.
   ```
-  Reference types (classes) never suffer from this; only struct/enum (`:kind :struct`/
-  `:enum`, `is-value-type-p`) receivers get the comment.
+  Reference types (classes) never suffer from any special caveat here; only struct/enum
+  (`:kind :struct`/`:enum`, `is-value-type-p`) receivers get the comment (though, as the
+  comment notes, reference-type aliasing has the exact same "shared object" property in
+  ordinary C#/Lisp too — it just isn't singled out with a comment here).
 
-### Struct Boxing Caveat and Workaround
+### Struct Boxing Caveat
 
-**Summary:** setting a struct property/field's value from Lisp is only reliable when the
-new value is produced by an actual invoked .NET conversion call, not by `dotnet:box` or a
-bare `the`-declared literal; struct-mutating *instance methods* (as opposed to
-properties/fields) should be avoided in favor of a static factory method wherever one
-exists.
+**Summary:** setting a struct's property/field via the generated `setf` mutator
+**succeeds**, in place, on the exact boxed `.NET` object the receiver refers to —
+regardless of how the new value argument was produced (`dotnet:box`, a real invoked
+conversion call, and a `the`-typed literal all behave identically). The real caveat isn't
+data loss; it's **aliasing**: if that boxed object is shared by more than one Lisp
+binding — most dangerously, a `--constant-properties`-cached `defconstant` — mutating it
+through any one alias mutates it for every other alias too, including the "constant."
 
-`dotnet:invoke`'s setter path boxes a struct receiver at the CLR boundary. Per
-`doc/generator-design-notes.md`'s "Instance Properties and Struct 'Boxing Mutation'"
-notes (there, using DungeonSlime's own `#!!System.Convert.ToByte`-style reader-macro
-shorthand for a static-method call — not available in this standalone repo; the
-equivalent below uses this repo's own `dotnet:static`, per `doc/dotnet-dotcl-interop.md`),
-a real transcript demonstrates the difference in outcome depending on how the new value
-is produced:
+A struct obtained from Lisp (via `dotnet:new`, `dotnet:static`, a property getter, or a
+stored constant) is never a raw unboxed Lisp value — it's a `#<DOTNET ...>` reference to
+a boxed CLR object. `dotnet:invoke`'s `setf`-expansion mutates that exact object directly.
+A real, verified `make repl` transcript against `dotcl-dungeonslime` demonstrates this,
+and then reveals the actual hazard:
 ```lisp
+DUNGEON-SLIME> (defparameter x color:+white+)
+DUNGEON-SLIME> x
+#<DOTNET Microsoft.Xna.Framework.Color {R:255 G:255 B:255 A:255}>
 DUNGEON-SLIME> (setf (color:r x) (dotnet:box 37 "System.Byte"))
-#<DOTNET-BOXED Byte 37>
 DUNGEON-SLIME> x
-#<DOTNET Microsoft.Xna.Framework.Color {R:37 G:255 B:255 A:255}>   ; unchanged
+#<DOTNET Microsoft.Xna.Framework.Color {R:37 G:255 B:255 A:255}>
 DUNGEON-SLIME> (setf (color:r x) (dotnet:static "System.Convert" "ToByte" 40))
-#<DOTNET System.Byte 40>
 DUNGEON-SLIME> x
-#<DOTNET Microsoft.Xna.Framework.Color {R:40 G:255 B:255 A:255}>   ; correctly mutated
+#<DOTNET Microsoft.Xna.Framework.Color {R:40 G:255 B:255 A:255}>
 DUNGEON-SLIME> (setf (color:r x) (the (dotnet "System.Byte") 55))
-Error: Method 'Microsoft.Xna.Framework.Color.set_R' not found.
+DUNGEON-SLIME> x
+#<DOTNET Microsoft.Xna.Framework.Color {R:55 G:255 B:255 A:255}>
+DUNGEON-SLIME> color:+white+
+#<DOTNET Microsoft.Xna.Framework.Color {R:55 G:255 B:255 A:255}>
 ```
-**The workaround:** pass the new value through a real invoked conversion call (e.g.
-`(dotnet:static "System.Convert" "ToByte" 40)`, or any other genuine `dotnet:static`/
-`dotnet:invoke` call to a real CLR conversion routine) rather than `dotnet:box`-ing a raw
-Lisp value or type-hinting it with `the` — only a genuinely CLR-invoked value round-trips
-correctly into the setter. This is a caveat for *callers* of generated code; the
-generator itself does not (and cannot, from the C# side alone) work around it — it only
-emits the warning comment above.
+`color:+white+` — a `defconstant` — was permanently mutated, because `x` was bound to the
+*exact same box* `+white+` had always pointed to (`defconstant`'s value form runs once and
+is cached forever; `defparameter x color:+white+` just copies that reference, not the
+struct's contents). See "Static Constants and Symbol Macros" above for the full mechanism
+and why `define-symbol-macro`-based constants don't share this hazard.
 
-For struct-mutating **instance methods** that return `void` (e.g. `Vector2.Normalize()`,
-covered separately in `doc/generator-design-notes.md`'s "Struct Mutation, Boxing, and
-Overload Resolution (Version 16)" section), the recommended workaround is different:
-prefer the equivalent **static** method overload that returns a new struct value (e.g.
-`Vector2.Normalize(Vector2)` static) or a hand-written Lisp-native helper, rather than
-relying on in-place mutation of a boxed receiver whose mutated copy is discarded the
-moment the call returns.
+**No workaround currently exists** to safely obtain an independent, mutable copy of a
+cached struct constant from Lisp — this is tracked as a prioritized follow-up in
+`PLAN.md` (a safe struct-clone capability), not solved in this pass. In the meantime,
+avoid retaining a direct reference to a `--constant-properties`-cached constant anywhere
+you intend to mutate it; construct a fresh instance via the type's own constructor
+(`new`) instead.
+
+This document does not revise or re-verify the separate, similar-sounding claim in
+`doc/generator-design-notes.md`'s "Struct Mutation, Boxing, and Overload Resolution
+(Version 16)" section, about struct-mutating **instance methods** (e.g.
+`Vector2.Normalize()`) discarding their mutation — that scenario involves a different
+call path (`dotnet:invoke` on a method, not a property setter) and has not been
+independently tested; treat its guidance (prefer a static method returning a new struct)
+as still in force until verified.
 
 
 
@@ -313,8 +368,8 @@ has no direct field-write equivalent:
   (cl:setf (dotnet:invoke (cl:the (dotnet "Fq.Type") obj!) "FieldName") new-value))
 ```
 
-The same struct-boxing-mutation caveat comment as instance properties (see "Struct
-Boxing Caveat and Workaround" above) is emitted above the setter for value-type fields.
+The same corrected struct-boxing comment as instance properties (see "Struct Boxing
+Caveat" above) is emitted above the setter for value-type fields.
 
 **Not handled — see Unsupported Features:** a plain mutable *static* field (not
 `readonly`, not `const`) generates nothing at all.

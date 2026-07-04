@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 28
-;;; Creation Date: 2026-07-04T03:03:10Z
+;;; Generator Version: 29
+;;; Creation Date: 2026-07-04T14:21:19Z
 
 (cl:in-package :system-time-span)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-04T03:03:10Z")
-(cl:defconstant <version> 28)
+(cl:defconstant <creation> "2026-07-04T14:21:19Z")
+(cl:defconstant <version> 29)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -144,12 +144,45 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
 (cl:defconstant +ticks-per-second+ (dotnet:static <type-str> "TicksPerSecond"))
 (cl:setf (cl:documentation (cl:quote +ticks-per-second+) (cl:quote cl:variable)) "Represents the number of ticks in 1 second.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.TimeSpan is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +max-value+ (dotnet:static <type-str> "MaxValue"))
 (cl:setf (cl:documentation (cl:quote +max-value+) (cl:quote cl:variable)) "Represents the maximum System.TimeSpan value. This field is read-only.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.TimeSpan is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +min-value+ (dotnet:static <type-str> "MinValue"))
 (cl:setf (cl:documentation (cl:quote +min-value+) (cl:quote cl:variable)) "Represents the minimum System.TimeSpan value. This field is read-only.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.TimeSpan is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +zero+ (dotnet:static <type-str> "Zero"))
 (cl:setf (cl:documentation (cl:quote +zero+) (cl:quote cl:variable)) "Represents the zero System.TimeSpan value. This field is read-only.")
 

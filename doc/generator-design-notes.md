@@ -191,26 +191,28 @@ for the tooling that implements this check (ported from `dotcl-dungeonslime`).
 
 ## Instance Properties and Struct "Boxing Mutation"
 
-*(from implementation-notes.md)*
+*(originally from implementation-notes.md; corrected in Version 29 — see that section
+below for the full story of what was wrong and how it was found)*
 
 The generator (`assembly-package-generator.lisp`) emits accessor (`property-name`)
 and mutator (`(setf property-name)`) functions for C# instance properties.
 
-When invoking a setter on an instance property of a **value type (struct)** via `dotnet:invoke`,
-DotCL boxes the struct. Modifying a property through the generated Lisp `setf` mutator
-(e.g., `(setf (property-name my-struct) new-val)`) might only mutate the boxed copy inside
-the CLR boundary, leaving the original `my-struct` variable in Lisp unmodified.
+A struct (value type) obtained from Lisp — via `dotnet:new`, `dotnet:static`, a property
+getter, or a stored constant — is never a raw unboxed Lisp value; it's a `#<DOTNET ...>`
+reference to a boxed CLR object. Invoking a setter on an instance property of that boxed
+struct via `dotnet:invoke`'s `setf`-expansion mutates *that exact boxed instance* directly
+— it does **not** discard the mutation on some separate throwaway copy. This holds
+regardless of how the new value argument is itself produced (`dotnet:box`, a real invoked
+conversion call, or a `the`-typed literal all behave identically here).
 
-Therefore, users should exercise caution when mutating properties on C# structs from Lisp.
-A comment
-```lisp
-;; Note: Modifying a property of a value type (struct) via setf may only mutate
-;; a boxed copy, leaving the original unchanged. Use caution with structs.
-```
-is automatically inserted above property mutators generated for structs to alert users
-of this behavior.
-
-Reference types (classes) do not suffer from this issue.
+The practical caveat this leaves is not "the mutation is lost" but the opposite: **if
+that boxed instance is aliased anywhere else** — another Lisp variable bound to the same
+object, or (much more importantly) a `defconstant` constant that was only ever
+one-time-evaluated to that exact box — mutating it through any one alias mutates it for
+every other alias too. See the Version 29 section below for why this makes
+`--constant-properties`-selected struct constants (e.g. `Vector2.Zero`, `Color.White`)
+a genuine hazard, and `FEATURES.md`'s "Struct Boxing Caveat" section for user-facing
+guidance.
 
 In addition, Lisp properties with only a setter (write-only properties) are generated
 with the name `set-propertyname` and accept the receiver as the first argument:
@@ -218,22 +220,28 @@ with the name `set-propertyname` and accept the receiver as the first argument:
 
 ### Example Transcript
 
+Real, verified `make repl` output against `dotcl-dungeonslime` (loads generated packages
+including `color:`):
+
 ```lisp
 DUNGEON-SLIME> (defparameter x color:+white+)
-X
 DUNGEON-SLIME> x
-#<DOTNET Microsoft.Xna.Framework.Color {R:37 G:255 B:255 A:255}>
+#<DOTNET Microsoft.Xna.Framework.Color {R:255 G:255 B:255 A:255}>
 DUNGEON-SLIME> (setf (color:r x) (dotnet:box 37 "System.Byte"))
-#<DOTNET-BOXED Byte 37>
 DUNGEON-SLIME> x
 #<DOTNET Microsoft.Xna.Framework.Color {R:37 G:255 B:255 A:255}>
-DUNGEON-SLIME> (setf (color:r x) (#!!System.Convert.ToByte 40))
-#<DOTNET System.Byte 40>
+DUNGEON-SLIME> (setf (color:r x) (dotnet:static "System.Convert" "ToByte" 40))
 DUNGEON-SLIME> x
 #<DOTNET Microsoft.Xna.Framework.Color {R:40 G:255 B:255 A:255}>
 DUNGEON-SLIME> (setf (color:r x) (the (dotnet "System.Byte") 55))
-Error: Method 'Microsoft.Xna.Framework.Color.set_R' not found.
+DUNGEON-SLIME> x
+#<DOTNET Microsoft.Xna.Framework.Color {R:55 G:255 B:255 A:255}>
+DUNGEON-SLIME> color:+white+
+#<DOTNET Microsoft.Xna.Framework.Color {R:55 G:255 B:255 A:255}>
 ```
+
+Note the last line: `color:+white+` — a `defconstant` — was itself permanently mutated.
+This is the shared-mutable-constant hazard described in the Version 29 section below.
 
 ## TimeSpan Standard Operator Dispatchers
 
@@ -990,3 +998,78 @@ under-export (breaking legitimate external callers) or over-export (leaking an i
 `aggregate-arity-N` name). Both functions branch on the exact same `generic-arity-dispatch-mode`
 value from the exact same `split-by-generic-arity` call, which keeps them mechanically in sync, but
 any future change to one must be mirrored in the other.
+
+## Struct-Boxing Warnings Corrected; Shared-Mutable-Constant Hazard Documented (Version 29)
+
+The "Instance Properties and Struct 'Boxing Mutation'" section above (and the comment the
+generator emitted above every struct/enum property/field mutator) claimed that `setf`-mutating a
+struct's property "may only mutate a boxed copy, leaving the original unchanged." That transcript
+was itself suspect on inspection: it showed `color:+white+` printing as `R:37 G:255 B:255 A:255`
+(White should print `R:255 ...`) and used DungeonSlime's own `#!!System.Convert.ToByte`-style
+reader-macro shorthand, unavailable in this standalone repo — strong signs it was never actually
+run against a live REPL, just carried over from `dotcl-dungeonslime`'s docs uncritically.
+
+A real `make repl` session against `dotcl-dungeonslime` (which loads generated packages including
+`color:`) disproved the claim outright: `x` starts as genuine White, and all three ways of
+producing the new value (`dotnet:box`, a real invoked `dotnet:static` conversion call, and a
+`the`-typed literal) correctly mutate `x` in place, with no error and no silently-discarded
+mutation — see the corrected transcript above. **Mutation succeeds.**
+
+**The real, more serious finding** came from one further check: `color:+white+` itself — a
+`defconstant` — had been permanently mutated too:
+```lisp
+DUNGEON-SLIME> color:+white+
+#<DOTNET Microsoft.Xna.Framework.Color {R:55 G:255 B:255 A:255}>
+```
+
+**Root cause.** `(cl:defconstant +white+ (dotnet:static <type-str> "White"))` evaluates its value
+form exactly once; that one call to the real C# `Color.White` getter returns one boxed CLR object,
+and that *exact* box is what `+white+` is bound to for the remaining life of the program.
+`(defparameter x color:+white+)` binds `x` to the *same* box — Lisp variables holding a `DOTNET`
+object hold a reference, not a value-copy. Mutating a property through *either* binding mutates
+that one shared box, including every other place in the program that reads `+white+` from then on,
+permanently and silently. By contrast, the default (non-`--constant-properties`) path —
+`(cl:define-symbol-macro local (dotnet:static <type-str> "Local"))` — re-evaluates `dotnet:static`
+on *every* reference, so each access re-invokes the real C# getter, which (ordinary .NET
+value-type semantics: every read of a value-type-returning member yields an independent copy)
+returns a freshly-boxed instance each time. That path has no sharing hazard.
+
+So the bug is structural to `--constant-properties` (and, in principle, true C# `:literal`/`const`
+fields, though C# cannot express a non-primitive `const`, so that path is a no-op safety net in
+practice, not a real-world risk today): caching a *mutable value type* into a `defconstant` silently
+creates global shared mutable state disguised as an immutable constant — and the flagship examples
+this repo's own `CLAUDE.md`/`README.md` give for `--constant-properties` (`Vector2.Zero`,
+`Color.White`) are exactly the highest-risk case.
+
+**The fix in this version is documentation-only — no dispatch/codegen behavior changed.**
+`defconstant`'s entire point is to avoid re-invoking `dotnet:static` on every access (important for
+something as hot as `Vector2.Zero`); falling back to `define-symbol-macro` for struct-typed
+constants would eliminate the hazard but at an unacceptable performance cost for exactly the case
+people reach for the flag for. Instead:
+
+* The three `is-value-type-p` property/field mutator comment sites in `generate-class-file` were
+  reworded to describe the *actual* hazard (in-place mutation of a possibly-aliased boxed instance)
+  instead of the disproven "mutation is silently lost" claim.
+* A new `emit-shared-mutable-constant-warning` helper emits a detailed warning comment above every
+  `literal-fields`/`pure-const-fields`/`pure-const-props` `defconstant` whose type is not a
+  known-safe, effectively-immutable primitive (`immutable-primitive-type-p`, checked against a new
+  `*immutable-primitive-types*` allowlist of numeric primitives, `System.String`, `System.Char`,
+  `System.Boolean`, `System.IntPtr`/`UIntPtr`). This is deliberately a broad allowlist rather than a
+  precise per-type mutability check: `generate-class-file` only ever sees one type's own metadata at
+  a time, with no cross-type lookup available to determine whether some *other* referenced type
+  (e.g. a constant property returning a type declared in a different assembly) has settable
+  instance members — so anything not provably safe gets the warning, including every struct with
+  settable properties/fields.
+* `*generator-version*` bumped 28 → 29 since generated file *text* changes (comments), matching this
+  repo's precedent for comment/wording-only version bumps (e.g. Version 25).
+
+**What this version does *not* do**, per explicit user direction: it does not touch the separate,
+similar-sounding Version 16 "Struct Mutation, Boxing, and Overload Resolution" section's claim about
+struct-mutating *instance methods* (e.g. `Vector2.Normalize()`) discarding their mutation — that
+claim was not tested in this investigation (only property `setf` was), and is left as-is pending
+independent live verification.
+
+**Real follow-up work, not delivered here:** users currently have no supported way to obtain an
+independent, safely-mutable *copy* of a boxed struct (from a constant, a symbol-macro, or any other
+source) — see `PLAN.md`'s new struct-cloning TODO item for the tracked follow-up to actually solve
+the underlying hazard rather than just warn about it.

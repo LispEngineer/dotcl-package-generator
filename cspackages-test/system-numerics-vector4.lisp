@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector4
-;;; Generator Version: 28
-;;; Creation Date: 2026-07-04T03:03:10Z
+;;; Generator Version: 29
+;;; Creation Date: 2026-07-04T14:21:19Z
 
 (cl:in-package :system-numerics-vector4)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Numerics.Vector4"))
 (cl:defconstant <type-str> "System.Numerics.Vector4")
-(cl:defconstant <creation> "2026-07-04T03:03:10Z")
-(cl:defconstant <version> 28)
+(cl:defconstant <creation> "2026-07-04T14:21:19Z")
+(cl:defconstant <version> 29)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -70,56 +70,225 @@ new(Single, Single, Single, Single)
                     :method-name "new"
                     :supplied-args (cl:append (cl:when supplied-value (cl:list :value value)) (cl:when supplied-w (cl:list :w w)) (cl:when supplied-w2 (cl:list :w2 w2)) (cl:when supplied-w3 (cl:list :w3 w3)))))))
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +all-bits-set+ (dotnet:static <type-str> "AllBitsSet"))
 (cl:setf (cl:documentation (cl:quote +all-bits-set+) (cl:quote cl:variable)) "Gets a vector where all bits are set to 1.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +e+ (dotnet:static <type-str> "E"))
 (cl:setf (cl:documentation (cl:quote +e+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to System.Single.E.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +epsilon+ (dotnet:static <type-str> "Epsilon"))
 (cl:setf (cl:documentation (cl:quote +epsilon+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to System.Single.Epsilon.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +nan+ (dotnet:static <type-str> "NaN"))
 (cl:setf (cl:documentation (cl:quote +nan+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to System.Single.NaN.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +negative-infinity+ (dotnet:static <type-str> "NegativeInfinity"))
 (cl:setf (cl:documentation (cl:quote +negative-infinity+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to System.Single.NegativeInfinity.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +negative-zero+ (dotnet:static <type-str> "NegativeZero"))
 (cl:setf (cl:documentation (cl:quote +negative-zero+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to System.Single.NegativeZero.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +one+ (dotnet:static <type-str> "One"))
 (cl:setf (cl:documentation (cl:quote +one+) (cl:quote cl:variable)) "Gets a vector whose 4 elements are equal to one.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +pi+ (dotnet:static <type-str> "Pi"))
 (cl:setf (cl:documentation (cl:quote +pi+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to System.Single.Pi.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +positive-infinity+ (dotnet:static <type-str> "PositiveInfinity"))
 (cl:setf (cl:documentation (cl:quote +positive-infinity+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to System.Single.PositiveInfinity.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +tau+ (dotnet:static <type-str> "Tau"))
 (cl:setf (cl:documentation (cl:quote +tau+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to System.Single.Tau.")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +unit-w+ (dotnet:static <type-str> "UnitW"))
 (cl:setf (cl:documentation (cl:quote +unit-w+) (cl:quote cl:variable)) "Gets the vector (0,0,0,1).")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +unit-x+ (dotnet:static <type-str> "UnitX"))
 (cl:setf (cl:documentation (cl:quote +unit-x+) (cl:quote cl:variable)) "Gets the vector (1,0,0,0).")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +unit-y+ (dotnet:static <type-str> "UnitY"))
 (cl:setf (cl:documentation (cl:quote +unit-y+) (cl:quote cl:variable)) "Gets the vector (0,1,0,0).")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +unit-z+ (dotnet:static <type-str> "UnitZ"))
 (cl:setf (cl:documentation (cl:quote +unit-z+) (cl:quote cl:variable)) "Gets the vector (0,0,1,0).")
 
+;; WARNING: this is a single, permanently-cached boxed .NET object --
+;; the defconstant form below only runs once. If System.Numerics.Vector4 is a mutable
+;; value type (struct) with settable properties/fields, mutating this
+;; object -- through this binding, or through ANY other reference that
+;; aliases the same boxed instance -- permanently corrupts it for every
+;; future reference to this constant, for the life of the program.
+;; There is currently no supported way to obtain an independent,
+;; safely-mutable copy of this value from Lisp; construct a fresh
+;; instance via the type's own constructor (new) if you need to mutate
+;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
+;; section and doc/generator-design-notes.md for the full explanation.
 (cl:defconstant +zero+ (dotnet:static <type-str> "Zero"))
 (cl:setf (cl:documentation (cl:quote +zero+) (cl:quote cl:variable)) "Gets a vector whose 4 elements are equal to zero.")
 
 (cl:defun item (obj! index)
   (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "get_Item" index))
 
-;; Note: Modifying a property of a value type (struct) via setf may only mutate
-;; a boxed copy, leaving the original unchanged. Use caution with structs.
+;; Note: obj! here is a boxed reference to a .NET value type (struct).
+;; This setf mutates that exact boxed instance in place -- it does NOT
+;; silently discard the change. However, if obj! is an alias of a shared
+;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; that shared instance for every other reference to it too. See
+;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item) (new-value obj! index)
   (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "set_Item" index new-value))
 
@@ -127,8 +296,12 @@ new(Single, Single, Single, Single)
   "The W component of the vector."
   (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "W"))
 
-;; Note: Modifying a field of a value type (struct) via setf may only mutate
-;; a boxed copy, leaving the original unchanged. Use caution with structs.
+;; Note: obj! here is a boxed reference to a .NET value type (struct).
+;; This setf mutates that exact boxed instance in place -- it does NOT
+;; silently discard the change. However, if obj! is an alias of a shared
+;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; that shared instance for every other reference to it too. See
+;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf w) (new-value obj!)
   "The W component of the vector."
   (cl:setf (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "W") new-value))
@@ -137,8 +310,12 @@ new(Single, Single, Single, Single)
   "The X component of the vector."
   (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "X"))
 
-;; Note: Modifying a field of a value type (struct) via setf may only mutate
-;; a boxed copy, leaving the original unchanged. Use caution with structs.
+;; Note: obj! here is a boxed reference to a .NET value type (struct).
+;; This setf mutates that exact boxed instance in place -- it does NOT
+;; silently discard the change. However, if obj! is an alias of a shared
+;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; that shared instance for every other reference to it too. See
+;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf x) (new-value obj!)
   "The X component of the vector."
   (cl:setf (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "X") new-value))
@@ -147,8 +324,12 @@ new(Single, Single, Single, Single)
   "The Y component of the vector."
   (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "Y"))
 
-;; Note: Modifying a field of a value type (struct) via setf may only mutate
-;; a boxed copy, leaving the original unchanged. Use caution with structs.
+;; Note: obj! here is a boxed reference to a .NET value type (struct).
+;; This setf mutates that exact boxed instance in place -- it does NOT
+;; silently discard the change. However, if obj! is an alias of a shared
+;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; that shared instance for every other reference to it too. See
+;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf y) (new-value obj!)
   "The Y component of the vector."
   (cl:setf (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "Y") new-value))
@@ -157,8 +338,12 @@ new(Single, Single, Single, Single)
   "The Z component of the vector."
   (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "Z"))
 
-;; Note: Modifying a field of a value type (struct) via setf may only mutate
-;; a boxed copy, leaving the original unchanged. Use caution with structs.
+;; Note: obj! here is a boxed reference to a .NET value type (struct).
+;; This setf mutates that exact boxed instance in place -- it does NOT
+;; silently discard the change. However, if obj! is an alias of a shared
+;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; that shared instance for every other reference to it too. See
+;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf z) (new-value obj!)
   "The Z component of the vector."
   (cl:setf (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector4") obj!) "Z") new-value))

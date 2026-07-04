@@ -10,6 +10,36 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.29.0 — 2026-07-04
+
+**Struct-boxing warning corrected; shared-mutable-constant hazard documented.**
+Documentation-only fix — no dispatch/codegen behavior changed.
+
+* The comment previously emitted above every struct/enum instance property/field
+  mutator claimed `setf` "may only mutate a boxed copy, leaving the original unchanged."
+  A live REPL check against `dotcl-dungeonslime` disproved this: mutation succeeds, in
+  place, on the exact boxed `.NET` object the receiver refers to, regardless of how the
+  new value is produced. The comment now describes the real caveat instead: if that
+  boxed object is aliased elsewhere, mutating it through any one alias mutates it
+  everywhere.
+* The same investigation surfaced a more serious finding: a `--constant-properties`-
+  selected (or true C# literal/`const`) `defconstant` of a mutable struct type (e.g.
+  `Vector2.Zero`, `Color.White` — this tool's own flagship `--constant-properties`
+  examples) is a *single* boxed instance, cached once and shared by every reference to
+  that constant for the life of the program, since `defconstant`'s value form only ever
+  runs once. Mutating it through any alias silently corrupts the "constant" everywhere,
+  permanently. A new warning comment is now emitted above any such `defconstant` whose
+  type isn't a recognized safe, immutable primitive.
+* No fallback to `define-symbol-macro` was made for struct-typed constants — that would
+  eliminate the hazard but at an unacceptable performance cost for exactly the
+  high-frequency constants (`Vector2.Zero`, etc.) people use `--constant-properties` for.
+  A real fix (a safe way to clone/copy a boxed struct) is tracked as a prioritized
+  follow-up in `PLAN.md`, not delivered in this release.
+
+See `doc/generator-design-notes.md`'s "Struct-Boxing Warnings Corrected;
+Shared-Mutable-Constant Hazard Documented (Version 29)" section for the full incident
+writeup, including the REPL transcript that surfaced this.
+
 ## 2.28.0 — 2026-07-03
 
 **Generic-arity two-tier dispatch:** replaces the `2.27.0` arity-suffixed export scheme

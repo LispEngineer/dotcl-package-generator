@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo+AdjustmentRule
-;;; Generator Version: 28
-;;; Creation Date: 2026-07-04T03:03:10Z
+;;; Generator Version: 29
+;;; Creation Date: 2026-07-04T14:21:19Z
 
 (cl:in-package :system-time-zone-info-adjustment-rule)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.TimeZoneInfo+AdjustmentRule"))
 (cl:defconstant <type-str> "System.TimeZoneInfo+AdjustmentRule")
-(cl:defconstant <creation> "2026-07-04T03:03:10Z")
-(cl:defconstant <version> 28)
+(cl:defconstant <creation> "2026-07-04T14:21:19Z")
+(cl:defconstant <version> 29)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
