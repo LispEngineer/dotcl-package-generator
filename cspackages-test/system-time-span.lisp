@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 30
-;;; Creation Date: 2026-07-04T15:28:03Z
+;;; Generator Version: 31
+;;; Creation Date: 2026-07-04T16:50:34Z
 
 (cl:in-package :system-time-span)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-04T15:28:03Z")
-(cl:defconstant <version> 30)
+(cl:defconstant <creation> "2026-07-04T16:50:34Z")
+(cl:defconstant <version> 31)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

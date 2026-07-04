@@ -159,6 +159,24 @@ namespace AssemblyToLispyTestTarget
         {
             return a;
         }
+
+        /// <summary>
+        /// A plain mutable static field (not readonly, not const), to test
+        /// that the generator emits both a getter and a setter for it.
+        /// </summary>
+        public static int MutableStaticField;
+
+        /// <summary>
+        /// A static read-write property, to test that the generator emits
+        /// both a getter and a setf-able setter for it.
+        /// </summary>
+        public static int StaticReadWriteProperty { get; set; }
+
+        /// <summary>
+        /// A static write-only property, to test that the generator emits
+        /// only a set-name function (no getter, no setf) for it.
+        /// </summary>
+        public static int StaticWriteOnlyProperty { set { } }
     }
 
     /// <summary>

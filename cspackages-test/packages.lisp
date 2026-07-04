@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 30
-;;; Creation Date: 2026-07-04T15:28:03Z
+;;; Generator Version: 31
+;;; Creation Date: 2026-07-04T16:50:34Z
 
 (cl:in-package :cl-user)
 
@@ -22,6 +22,72 @@
            #:csharp-overload-class-name
            #:csharp-overload-method-name
            #:csharp-overload-supplied-args))
+
+;;; Source File: system-console.lisp
+;;; C# Class: System.Console
+;;; Constant Properties: (none)
+(cl:defpackage :system-console
+  (:use :cl)
+  (:shadow
+   #:error
+   #:read
+   #:read-line
+   #:write
+   #:write-line
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:caps-lock
+   #:error
+   #:in
+   #:error-redirected?
+   #:input-redirected?
+   #:output-redirected?
+   #:key-available
+   #:largest-window-height
+   #:largest-window-width
+   #:number-lock
+   #:out
+   #:background-color
+   #:buffer-height
+   #:buffer-width
+   #:cursor-left
+   #:cursor-size
+   #:cursor-top
+   #:cursor-visible
+   #:foreground-color
+   #:input-encoding
+   #:output-encoding
+   #:title
+   #:treat-control-c-as-input
+   #:window-height
+   #:window-left
+   #:window-top
+   #:window-width
+   #:beep
+   #:clear
+   #:get-cursor-position
+   #:move-buffer-area
+   #:open-standard-error
+   #:open-standard-input
+   #:open-standard-output
+   #:read
+   #:read-key
+   #:read-line
+   #:reset-color
+   #:set-buffer-size
+   #:set-cursor-position
+   #:set-error
+   #:set-in
+   #:set-out
+   #:set-window-position
+   #:set-window-size
+   #:write
+   #:write-line
+  ))
 
 ;;; Source File: system-time-span.lisp
 ;;; C# Class: System.TimeSpan
@@ -1618,5 +1684,287 @@
    #:truncate
    #:try-copy-to
    #:xor
+  ))
+
+;;; Source File: system-diagnostics-debug.lisp
+;;; C# Class: System.Diagnostics.Debug
+;;; Constant Properties: (none)
+(cl:defpackage :system-diagnostics-debug
+  (:use :cl)
+  (:shadow
+   #:assert
+   #:close
+   #:print
+   #:write
+   #:write-line
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:auto-flush
+   #:indent-level
+   #:indent-size
+   #:assert
+   #:close
+   #:fail
+   #:flush
+   #:indent
+   #:print
+   #:set-provider
+   #:unindent
+   #:write
+   #:write-if
+   #:write-line
+   #:write-line-if
+  ))
+
+;;; Source File: system-globalization-culture-info.lisp
+;;; C# Class: System.Globalization.CultureInfo
+;;; Constant Properties: (none)
+(cl:defpackage :system-globalization-culture-info
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:installed-ui-culture
+   #:invariant-culture
+   #:current-culture
+   #:current-ui-culture
+   #:default-thread-current-culture
+   #:default-thread-current-ui-culture
+   #:calendar
+   #:compare-info
+   #:culture-types
+   #:date-time-format
+   #:display-name
+   #:english-name
+   #:ietf-language-tag
+   #:neutral-culture?
+   #:read-only?
+   #:keyboard-layout-id
+   #:lcid
+   #:name
+   #:native-name
+   #:number-format
+   #:optional-calendars
+   #:parent
+   #:text-info
+   #:three-letter-iso-language-name
+   #:three-letter-windows-language-name
+   #:two-letter-iso-language-name
+   #:use-user-override
+   #:clear-cached-data
+   #:clone
+   #:create-specific-culture
+   #:equals
+   #:get-console-fallback-ui-culture
+   #:get-culture-info
+   #:get-culture-info-by-ietf-language-tag
+   #:get-cultures
+   #:get-format
+   #:get-hash-code
+   #:read-only
+   #:to-string
+  ))
+
+;;; Source File: system-net-service-point-manager.lisp
+;;; C# Class: System.Net.ServicePointManager
+;;; Constant Properties: (none)
+(cl:defpackage :system-net-service-point-manager
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:+default-non-persistent-connection-limit+
+   #:+default-persistent-connection-limit+
+   #:encryption-policy
+   #:check-certificate-revocation-list
+   #:default-connection-limit
+   #:dns-refresh-timeout
+   #:enable-dns-round-robin
+   #:expect100-continue
+   #:max-service-point-idle-time
+   #:max-service-points
+   #:reuse-port
+   #:security-protocol
+   #:server-certificate-validation-callback
+   #:use-nagle-algorithm
+   #:find-service-point
+   #:set-tcp-keep-alive
+  ))
+
+;;; Source File: system-environment.lisp
+;;; C# Class: System.Environment
+;;; Constant Properties: (none)
+(cl:defpackage :system-environment
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:command-line
+   #:cpu-usage
+   #:current-managed-thread-id
+   #:has-shutdown-started
+   #:is64-bit-operating-system
+   #:is64-bit-process
+   #:privileged-process?
+   #:machine-name
+   #:new-line
+   #:os-version
+   #:process-id
+   #:processor-count
+   #:process-path
+   #:stack-trace
+   #:system-directory
+   #:system-page-size
+   #:tick-count
+   #:tick-count64
+   #:user-domain-name
+   #:user-interactive
+   #:user-name
+   #:version
+   #:working-set
+   #:current-directory
+   #:exit-code
+   #:exit
+   #:expand-environment-variables
+   #:fail-fast
+   #:get-command-line-args
+   #:get-environment-variable
+   #:get-environment-variables
+   #:get-folder-path
+   #:get-logical-drives
+   #:set-environment-variable
+  ))
+
+;;; Source File: system-app-domain.lisp
+;;; C# Class: System.AppDomain
+;;; Constant Properties: (none)
+(cl:defpackage :system-app-domain
+  (:use :cl)
+  (:shadow
+   #:load
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:current-domain
+   #:monitoring-survived-process-memory-size
+   #:monitoring-is-enabled
+   #:base-directory
+   #:dynamic-directory
+   #:friendly-name
+   #:id
+   #:fully-trusted?
+   #:homogenous?
+   #:monitoring-survived-memory-size
+   #:monitoring-total-allocated-memory-size
+   #:monitoring-total-processor-time
+   #:permission-set
+   #:relative-search-path
+   #:setup-information
+   #:shadow-copy-files
+   #:append-private-path
+   #:apply-policy
+   #:clear-private-path
+   #:clear-shadow-copy-path
+   #:create-domain
+   #:create-instance
+   #:create-instance-and-unwrap
+   #:create-instance-from
+   #:create-instance-from-and-unwrap
+   #:execute-assembly
+   #:execute-assembly-by-name
+   #:get-assemblies
+   #:get-current-thread-id
+   #:get-data
+   #:compatibility-switch-set?
+   #:default-app-domain?
+   #:finalizing-for-unload?
+   #:load
+   #:reflection-only-get-assemblies
+   #:set-cache-path
+   #:set-data
+   #:set-dynamic-base
+   #:set-principal-policy
+   #:set-shadow-copy-files
+   #:set-shadow-copy-path
+   #:set-thread-principal
+   #:to-string
+   #:unload
+  ))
+
+;;; Source File: system-threading-thread.lisp
+;;; C# Class: System.Threading.Thread
+;;; Constant Properties: (none)
+(cl:defpackage :system-threading-thread
+  (:use :cl)
+  (:shadow
+   #:abort
+   #:sleep
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:current-thread
+   #:current-principal
+   #:apartment-state
+   #:current-culture
+   #:current-ui-culture
+   #:execution-context
+   #:alive?
+   #:background?
+   #:thread-pool-thread?
+   #:managed-thread-id
+   #:name
+   #:priority
+   #:thread-state
+   #:abort
+   #:allocate-data-slot
+   #:allocate-named-data-slot
+   #:begin-critical-region
+   #:begin-thread-affinity
+   #:disable-com-object-eager-cleanup
+   #:end-critical-region
+   #:end-thread-affinity
+   #:finalize
+   #:free-named-data-slot
+   #:get-apartment-state
+   #:get-compressed-stack
+   #:get-current-processor-id
+   #:get-data
+   #:get-domain
+   #:get-domain-id
+   #:get-hash-code
+   #:get-named-data-slot
+   #:interrupt
+   #:join
+   #:memory-barrier
+   #:reset-abort
+   #:resume
+   #:set-apartment-state
+   #:set-compressed-stack
+   #:set-data
+   #:sleep
+   #:spin-wait
+   #:start
+   #:suspend
+   #:try-set-apartment-state
+   #:unsafe-start
+   #:yield
   ))
 

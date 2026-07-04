@@ -10,7 +10,7 @@
 
 (in-package :assembly-package-generator)
 
-(defparameter *generator-version* 30
+(defparameter *generator-version* 31
   "Integer version number for the generated Lisp source files.
    Version history:
    1 - Initial generator mapping C# classes to Lisp packages.
@@ -44,7 +44,8 @@
    27 - Added support for public instance fields and for generic methods of more than one type argument, the two remaining known capability gaps flagged as highest-priority in doc/claude-suggested-improvements-20260703.md. (1) Public instance fields (public-instance-field-p, previously unused dead code) now generate a getter and, unless the field is C#'s readonly (:init-only), a setter: since a field has no get_Foo/set_Foo accessor method the way a property does, the getter uses dotnet:invoke's built-in field-read support (passing the bare field name), while the setter uses the setf-expansion of dotnet:invoke itself (the idiomatic DotCL way to write a field or property directly, per doc/dotnet-dotcl-interop.md), since dotnet:invoke has no equivalent field-write support. (2) simple-method-p/clean-method-p no longer restrict generic methods to exactly one type argument (generic-method-arity-supported-p now accepts any positive :generic-arity); generate-single-overload, generate-master-wrapper, and format-master-overload-action all generalize the previous single hardcoded 'type' parameter to generic-type-param-names' arity-many 'type-1'..'type-N' parameters (arity 1 keeps the legacy bare 'type' name, so existing arity-1 generated code and callers are unaffected), passed through as (cl:list type-1 type-2 ...) to dotnet:invoke-generic/dotnet:static-generic. Since a single Lisp function's lambda list cannot flex between different numbers of generic type-argument parameters, overloads of the *same* C# method name that disagree on generic arity (e.g. System.Linq.Enumerable's Aggregate, overloaded at arity 1, 2, and 3) can no longer share one wrapper: split-by-generic-arity partitions a method-name group's clean overloads into one sub-list per distinct arity, and generate-method-name-wrappers (replacing the four near-identical single/master-wrapper-dispatch call sites previously duplicated across the mixed-mode/single-mode branches) generates one function per sub-list, arity-suffixed (generic-arity-suffix, e.g. aggregate-arity-1, aggregate-arity-2) whenever a name spans more than one arity; the overwhelmingly common single-arity case (including every non-generic method) is entirely unaffected and keeps its plain (or '*'-suffixed) name. method-name-wrapper-names mirrors this naming for compute-package-exports-and-shadows without re-running code generation.
    28 - Replaced the version-27 arity-suffixed export scheme (aggregate-arity-1, aggregate-arity-2, ...) with a two-tier dispatch mirroring the version-24 Overload Consolidation's '*' static/instance convention, so a method-name group's public surface stays at most two names: generic-arity-dispatch-mode classifies a method name's generic-arity cells (split-by-generic-arity) as :single (the common case: non-generic, or every overload shares one arity -- generates bare base-name exactly as before, byte-identical output), :split-with-plain (a non-generic overload coexists with generic ones at other arities -- generates base-name for the non-generic overload(s) and a new base-name<> dispatcher for the generic cells), or :split-all-generic (every overload is generic but at different arities, e.g. Enumerable.Aggregate's arity-1/2/3 overloads -- base-name itself becomes the dispatcher, no <> suffix needed since there is no non-generic form to disambiguate against). The base-name<>/base-name dispatcher (generate-generic-arity-dispatcher) takes the type argument(s) as its first parameter -- a single .NET type (arity 1) or a cl:list of types (arity = its length), distinguished via cl:listp since a type argument is itself never a list -- and applies the remaining arguments through to an internal, unexported per-arity function (internal-arity-fn-name, reusing the old arity-suffixed names and generate-single-overload/generate-master-wrapper bodies verbatim -- only their export status changes). In the :split-with-plain case, passing an empty list/nil as the type argument to base-name<> falls through to base-name itself rather than erroring. method-name-wrapper-names now reflects this: at most (base-name) or (base-name base-name<>), never the internal per-arity names.
    29 - Documentation-only correction, no dispatch/behavior change: the struct-boxing warning comment above instance property/field mutators previously claimed setf 'may only mutate a boxed copy, leaving the original unchanged' -- backwards. A live REPL check against dotcl-dungeonslime proved mutation actually succeeds in place, and, more importantly, that a --constant-properties-selected (or, in principle, literal/const) defconstant of a mutable struct type is a single boxed .NET object shared and re-returned on every reference for the life of the program, since defconstant's value form runs exactly once -- mutating it through any alias (e.g. a defparameter bound to it) permanently corrupts the 'constant' everywhere, silently. The mutator comment is corrected to describe this aliasing hazard accurately (emit-shared-mutable-constant-warning at the three is-value-type-p property/field-mutator sites), and a new warning comment is now emitted above every literal-fields/pure-const-fields/pure-const-props defconstant whose type is not a known-safe immutable-primitive-type-p type (numeric primitives, System.String, System.Char, System.Boolean, System.IntPtr/UIntPtr) -- a deliberately broad allowlist, since this repo has no cross-type metadata available at generation time to precisely determine some other type's mutability. See doc/generator-design-notes.md's corrected \"Instance Properties and Struct 'Boxing Mutation'\" section and its new Version 29 section for the full transcript and root-cause explanation.
-   30 - AssemblyToLispy.cs's GetCleanMethodName gained mappings for the 8 remaining standard C# overloadable operators previously left as raw op_Xxx names (op_Modulus -> %, op_BitwiseAnd -> &, op_BitwiseOr -> |, op_ExclusiveOr -> ^, op_LeftShift -> <<, op_RightShift -> >>, op_UnsignedRightShift -> >>>, op_OnesComplement -> ~) and C# 11's checked-operator variants, suffixed with '!' to coexist alongside their unchecked counterparts on the same type (op_CheckedAddition -> +!, op_CheckedSubtraction -> -!, op_CheckedMultiply -> *!, op_CheckedDivision -> /!, op_CheckedUnaryNegation -> -! shared with op_CheckedSubtraction the same way unchecked '-' is already shared between op_Subtraction/op_UnaryNegation, op_CheckedExplicit -> explicit-cast!). No change was needed in this file: a mapped operator's :name is already its clean Lisp symbol (not a raw op_-prefixed name) by the time non-operator-non-accessor-methods/simple-method-p/clean-method-p run their 'op_' prefix checks, so any newly-mapped operator flows through the existing clean-method/Master Wrapper pipeline exactly like the previously-mapped +/-/*//,=,etc. do today -- unary/binary disambiguation via the optional-second-argument arity check (see Version 13/14) applies unchanged, and the real CLR method is still invoked via each method's :mangled-name.")
+   30 - AssemblyToLispy.cs's GetCleanMethodName gained mappings for the 8 remaining standard C# overloadable operators previously left as raw op_Xxx names (op_Modulus -> %, op_BitwiseAnd -> &, op_BitwiseOr -> |, op_ExclusiveOr -> ^, op_LeftShift -> <<, op_RightShift -> >>, op_UnsignedRightShift -> >>>, op_OnesComplement -> ~) and C# 11's checked-operator variants, suffixed with '!' to coexist alongside their unchecked counterparts on the same type (op_CheckedAddition -> +!, op_CheckedSubtraction -> -!, op_CheckedMultiply -> *!, op_CheckedDivision -> /!, op_CheckedUnaryNegation -> -! shared with op_CheckedSubtraction the same way unchecked '-' is already shared between op_Subtraction/op_UnaryNegation, op_CheckedExplicit -> explicit-cast!). No change was needed in this file: a mapped operator's :name is already its clean Lisp symbol (not a raw op_-prefixed name) by the time non-operator-non-accessor-methods/simple-method-p/clean-method-p run their 'op_' prefix checks, so any newly-mapped operator flows through the existing clean-method/Master Wrapper pipeline exactly like the previously-mapped +/-/*//,=,etc. do today -- unary/binary disambiguation via the optional-second-argument arity check (see Version 13/14) applies unchanged, and the real CLR method is still invoked via each method's :mangled-name.
+   31 - Closed a known silent gap (tracked in PLAN.md/FEATURES.md's Unsupported Features): a static property that is writeable (read-write or write-only), and a plain mutable static field (not readonly, not const), previously matched none of the existing field/property classifiers and so generated nothing at all -- no getter, no setter, not even a comment. New predicates writeable-static-property-p (static + writeable, disjoint from constant-property-p which requires not-writeable) and mutable-static-field-p (static, neither literal nor init-only, the exact complement within static fields of literal-field-p/runtime-readonly-field-p) now catch these. Codegen mirrors the existing instance-property/instance-field shape (readable -> getter, writeable+readable -> adds a setf-expander, writeable-only -> a set-name function) but uses dotnet:static in place of dotnet:invoke and drops the obj! receiver entirely, since dotnet:static's own setf-expansion (per doc/dotnet-dotcl-interop.md) writes the type's static storage slot directly -- unlike instance property/field mutation, there is no boxed obj! receiver to alias, so no struct-boxing-mutation warning comment is emitted for either new case.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -164,6 +165,21 @@
   (and (getf prop :static)
        (getf prop :readable)
        (not (getf prop :writeable))))
+
+(defun writeable-static-property-p (prop)
+  "Checks if a property plist defines a static writeable (read-write or
+   write-only) property. Disjoint from constant-property-p, which requires
+   the property to NOT be writeable."
+  (and (getf prop :static)
+       (getf prop :writeable)))
+
+(defun mutable-static-field-p (field)
+  "Checks if a field plist defines a plain mutable static field: static,
+   but neither a compile-time literal/const (literal-field-p) nor a
+   runtime-readonly field (runtime-readonly-field-p)."
+  (and (getf field :static)
+       (not (getf field :literal))
+       (not (getf field :init-only))))
 
 (defun instance-property-p (prop)
   "Checks if a property plist defines an instance property."
@@ -1093,11 +1109,13 @@
          (pure-const-fields (remove-if-not (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
          (dynamic-const-fields (remove-if (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
          (instance-fields (remove-if-not #'public-instance-field-p fields))
+         (mutable-static-fields (remove-if-not #'mutable-static-field-p fields))
          (const-props (remove-if-not #'constant-property-p properties))
          (pure-const-props (remove-if-not (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
          (dynamic-const-props (remove-if (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
          (instance-props (remove-if-not #'instance-property-p properties))
          (instance-prop-groups (group-properties-by-name instance-props))
+         (writeable-static-props (remove-if-not #'writeable-static-property-p properties))
          (non-operator-non-accessor-methods
            (remove-if (lambda (m)
                         (or (uiop:string-prefix-p "op_" (getf m :name))
@@ -1144,10 +1162,24 @@
     ;; properties only export a plain setf-able name when :writeable.
     (dolist (f instance-fields)
       (push (map-member-name (getf f :name)) exports))
+    ;; Plain mutable static fields: always both readable and writeable, so
+    ;; the getter/setf-able name is always exported (no set-name variant,
+    ;; matching how instance fields never need one either).
+    (dolist (f mutable-static-fields)
+      (push (map-member-name (getf f :name)) exports))
     (dolist (p pure-const-props)
       (push (format nil "+~A+" (camel-to-kebab (getf p :name))) exports))
     (dolist (p dynamic-const-props)
       (push (map-member-name (getf p :name)) exports))
+    ;; Writeable static properties: mirrors the instance-property-group
+    ;; export logic below (plain name if readable, set-name if write-only),
+    ;; but static properties are never indexers so no grouping is needed.
+    (dolist (p writeable-static-props)
+      (let* ((pname (map-member-name (getf p :name)))
+             (readable (getf p :readable)))
+        (if readable
+            (push pname exports)
+            (push (format nil "set-~A" pname) exports))))
     (dolist (group instance-prop-groups)
       (let ((props (cdr group)))
         ;; A group with more than one property plist is an overloaded
@@ -1230,11 +1262,13 @@
            (pure-const-fields (remove-if-not (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
            (dynamic-const-fields (remove-if (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
            (instance-fields (remove-if-not #'public-instance-field-p fields))
+           (mutable-static-fields (remove-if-not #'mutable-static-field-p fields))
            (const-props (remove-if-not #'constant-property-p properties))
            (pure-const-props (remove-if-not (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
            (dynamic-const-props (remove-if (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
            (instance-props (remove-if-not #'instance-property-p properties))
            (instance-prop-groups (group-properties-by-name instance-props))
+           (writeable-static-props (remove-if-not #'writeable-static-property-p properties))
            ;; Group methods by name for overload-aware generation
            (non-operator-non-accessor-methods
              (remove-if (lambda (m)
@@ -1386,7 +1420,33 @@
             (if (> (length doc-str) 0)
                 (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
                 (format stream "~%"))))
-        
+
+        ;; Writeable Static Properties (read-write or write-only): unlike
+        ;; instance properties, there is no obj! receiver to alias, so no
+        ;; struct-boxing-mutation warning is needed here -- setf reassigns
+        ;; the type's own static storage slot directly.
+        (dolist (p writeable-static-props)
+          (let* ((pname (map-member-name (getf p :name)))
+                 (readable (getf p :readable))
+                 (p-doc (getf (getf p :documentation) :summary))
+                 (doc-str (if p-doc (escape-lisp-string p-doc) "")))
+            (when readable
+              (format stream "(cl:defun ~A ()~%" pname)
+              (when (> (length doc-str) 0)
+                (format stream "  \"~A\"~%" doc-str))
+              (format stream "  (dotnet:static <type-str> \"~A\"))~%~%" (getf p :name)))
+            (if readable
+                (progn
+                  (format stream "(cl:defun (cl:setf ~A) (new-value)~%" pname)
+                  (when (> (length doc-str) 0)
+                    (format stream "  \"~A\"~%" doc-str))
+                  (format stream "  (cl:setf (dotnet:static <type-str> \"~A\") new-value))~%~%" (getf p :name)))
+                (progn
+                  (format stream "(cl:defun set-~A (new-value)~%" pname)
+                  (when (> (length doc-str) 0)
+                    (format stream "  \"~A\"~%" doc-str))
+                  (format stream "  (cl:setf (dotnet:static <type-str> \"~A\") new-value))~%~%" (getf p :name))))))
+
         ;; Instance Properties (including indexers, i.e. C#'s this[...],
         ;; which carry their own index :parameters just like a method does)
         (dolist (group instance-prop-groups)
@@ -1473,6 +1533,23 @@
               (when (> (length doc-str) 0)
                 (format stream "  \"~A\"~%" doc-str))
               (format stream "  (cl:setf (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\") new-value))~%~%" fq-name (getf f :name)))))
+
+        ;; Plain Mutable Static Fields (not readonly, not const): mirrors
+        ;; the writeable-static-property shape above, since a static field
+        ;; has no obj! receiver either -- dotnet:static's setf-expansion
+        ;; writes the type's own static storage slot directly.
+        (dolist (f mutable-static-fields)
+          (let* ((fname (map-member-name (getf f :name)))
+                 (f-doc (getf (getf f :documentation) :summary))
+                 (doc-str (if f-doc (escape-lisp-string f-doc) "")))
+            (format stream "(cl:defun ~A ()~%" fname)
+            (when (> (length doc-str) 0)
+              (format stream "  \"~A\"~%" doc-str))
+            (format stream "  (dotnet:static <type-str> \"~A\"))~%~%" (getf f :name))
+            (format stream "(cl:defun (cl:setf ~A) (new-value)~%" fname)
+            (when (> (length doc-str) 0)
+              (format stream "  \"~A\"~%" doc-str))
+            (format stream "  (cl:setf (dotnet:static <type-str> \"~A\") new-value))~%~%" (getf f :name))))
 
         ;; Methods - Generated from method groups with overload handling
         (dolist (group method-groups)

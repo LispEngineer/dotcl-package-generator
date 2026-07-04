@@ -40,9 +40,14 @@ test: build
 	# syntactically well-formed (balanced parentheses) before trusting it.
 	# This catches code-emission regressions that unit tests miss, since
 	# the generator produces its output via textual templating.
+	# 
+	# Some of these things are also in System.Runtime:
+	# System.AppDomain System.Diagnostics.Debug System.Environment System.Globalization.CultureInfo
 	rm -rf $(GEN_TEST_DIR)
 	mkdir -p $(GEN_TEST_DIR)
 	$(EXECUTABLE) --out-dir $(GEN_TEST_DIR) \
+   	    --assembly $(REF_DIR)System.Console.dll \
+	      --class System.Console \
 	    --assembly $(REF_DIR)System.Runtime.dll \
 	      --class System.TimeSpan --constant-properties "*" \
 	      --class System.Object \
@@ -68,12 +73,23 @@ test: build
 	      --class 'System.Collections.Generic.Dictionary`2' \
 	      --class 'System.Collections.Generic.Dictionary`2+KeyCollection' \
 	      --class 'System.Collections.Generic.Dictionary`2+ValueCollection' \
-				--class 'System.Collections.Generic.List`1' \
-				--class 'System.Collections.Generic.SortedList`2' \
-			--assembly $(REF_DIR)System.Numerics.Vectors.dll \
-			  --class 'System.Numerics.Vector2' --constant-properties "*" \
-			  --class 'System.Numerics.Vector3' --constant-properties "*" \
-			  --class 'System.Numerics.Vector4' --constant-properties "*"
+	      --class 'System.Collections.Generic.List`1' \
+	      --class 'System.Collections.Generic.SortedList`2' \
+	    --assembly $(REF_DIR)System.Numerics.Vectors.dll \
+	      --class 'System.Numerics.Vector2' --constant-properties "*" \
+	      --class 'System.Numerics.Vector3' --constant-properties "*" \
+	      --class 'System.Numerics.Vector4' --constant-properties "*" \
+	    --assembly $(REF_DIR)System.Diagnostics.Debug.dll \
+	      --class System.Diagnostics.Debug \
+	    --assembly $(REF_DIR)System.Globalization.dll \
+	      --class System.Globalization.CultureInfo \
+	    --assembly $(REF_DIR)System.Net.ServicePoint.dll \
+	      --class System.Net.ServicePointManager \
+	    --assembly $(REF_DIR)System.Runtime.Extensions.dll \
+	      --class System.Environment \
+	      --class System.AppDomain \
+	    --assembly $(REF_DIR)System.Threading.Thread.dll \
+	      --class System.Threading.Thread
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo;
 	# System.Collections.Generic.List, SortedList; System.Text.StringBuilder;
 	# System.Drawing.Point/F; Size/F

@@ -96,7 +96,34 @@
         (when ro-field
           (assert-true (getf ro-field :public) "ReadOnlyField should be public")
           (assert-equal nil (getf ro-field :static) "ReadOnlyField should not be static")
-          (assert-true (getf ro-field :init-only) "ReadOnlyField should be init-only (it's C# readonly)")))))
+          (assert-true (getf ro-field :init-only) "ReadOnlyField should be init-only (it's C# readonly)")))
+
+      ;; Test a plain mutable static field: static, but neither literal
+      ;; (const) nor init-only (readonly) -- previously fell through every
+      ;; classifier and generated nothing at all.
+      (let ((mut-field (find-if (lambda (f) (string= (getf f :name) "MutableStaticField")) (getf strc :fields))))
+        (assert-not-null mut-field "Should find MutableStaticField")
+        (when mut-field
+          (assert-true (getf mut-field :static) "MutableStaticField should be static")
+          (assert-equal nil (getf mut-field :literal) "MutableStaticField should not be literal/const")
+          (assert-equal nil (getf mut-field :init-only) "MutableStaticField should not be init-only")))
+
+      ;; Test a static read-write property and a static write-only
+      ;; property: both are :static and :writeable, previously falling
+      ;; through every classifier (constant-property-p requires NOT
+      ;; writeable) and generating nothing at all.
+      (let ((rw-prop (find-if (lambda (p) (string= (getf p :name) "StaticReadWriteProperty")) (getf strc :properties))))
+        (assert-not-null rw-prop "Should find StaticReadWriteProperty")
+        (when rw-prop
+          (assert-true (getf rw-prop :static) "StaticReadWriteProperty should be static")
+          (assert-true (getf rw-prop :readable) "StaticReadWriteProperty should be readable")
+          (assert-true (getf rw-prop :writeable) "StaticReadWriteProperty should be writeable")))
+      (let ((wo-prop (find-if (lambda (p) (string= (getf p :name) "StaticWriteOnlyProperty")) (getf strc :properties))))
+        (assert-not-null wo-prop "Should find StaticWriteOnlyProperty")
+        (when wo-prop
+          (assert-true (getf wo-prop :static) "StaticWriteOnlyProperty should be static")
+          (assert-equal nil (getf wo-prop :readable) "StaticWriteOnlyProperty should not be readable")
+          (assert-true (getf wo-prop :writeable) "StaticWriteOnlyProperty should be writeable")))))
 
   ;; Test Extensions
   (let ((ext (find-if (lambda (cls) (string= (getf cls :name) "Extensions")) *metadata*)))

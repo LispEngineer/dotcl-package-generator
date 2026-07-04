@@ -253,9 +253,39 @@ whether some *other* referenced type actually has settable instance members. See
 follow-up work (a safe way to *clone* a boxed struct, which would actually solve this
 rather than just warn about it).
 
-**Not handled — see Unsupported Features:** any static property or field that is
-*writeable* (settable) generates nothing at all, regardless of whether it's also
-readable.
+### Writeable Static Properties and Mutable Static Fields
+
+**Summary:** a static property that is writeable (read-write or write-only) becomes a
+plain accessor function, a `setf`-expander (if also readable), or a `set-name` function
+(if write-only) — the same shape as an instance property, but targeting `dotnet:static`
+directly with no receiver parameter. A plain mutable static field (not `readonly`, not
+`const`) becomes a getter plus a `setf`-expander, the same shape as a mutable instance
+field.
+
+```lisp
+(cl:defun mode ()
+  (dotnet:static <type-str> "Mode"))
+(cl:defun (cl:setf mode) (new-value)
+  (cl:setf (dotnet:static <type-str> "Mode") new-value))
+
+;; write-only property:
+(cl:defun set-sink (new-value)
+  (cl:setf (dotnet:static <type-str> "Sink") new-value))
+
+;; plain mutable static field:
+(cl:defun total ()
+  (dotnet:static <type-str> "Total"))
+(cl:defun (cl:setf total) (new-value)
+  (cl:setf (dotnet:static <type-str> "Total") new-value))
+```
+
+Unlike instance property/field mutators, no struct-boxing-aliasing warning comment is
+emitted here: that comment exists because an instance mutator's `obj!` receiver can be an
+alias of a shared boxed instance, so mutating through one alias silently mutates every
+other alias too (see "Struct Boxing Caveat" above). A static member's `setf` reassigns
+the type's own static storage slot directly — there's no receiver to alias, so the hazard
+doesn't apply. See `doc/generator-design-notes.md`'s Version 31 section for the full
+rationale.
 
 
 
@@ -374,8 +404,8 @@ has no direct field-write equivalent:
 The same corrected struct-boxing comment as instance properties (see "Struct Boxing
 Caveat" above) is emitted above the setter for value-type fields.
 
-**Not handled — see Unsupported Features:** a plain mutable *static* field (not
-`readonly`, not `const`) generates nothing at all.
+A plain mutable *static* field (not `readonly`, not `const`) is handled analogously — see
+"Writeable Static Properties and Mutable Static Fields" above.
 
 
 
@@ -515,13 +545,6 @@ function's Lisp docstring (or, for constants/symbol-macros, a `(cl:documentation
 # Unsupported Features
 
 ## C# Features
-
-* **Static settable properties/fields.** Any static property that is writeable (whether
-  read-write or write-only) generates *nothing* — no getter, no setter, no comment. The
-  same is true of a plain mutable static field (not `readonly`, not `const`). This is a
-  genuine silent gap, not merely an unimplemented-but-documented case (unlike the dirty
-  overload comment below) — it mirrors the bug public instance fields had before
-  Version 27, just not yet fixed for the static case.
 
 * **A generic type's own type parameters.** A member whose parameter or return type
   mentions the *declaring* generic type's own unresolved type parameter (e.g.

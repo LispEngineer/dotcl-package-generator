@@ -46,7 +46,7 @@ TODO
        structs whose full state isn't reconstructible via a public constructor plus
        public settable members.
 
-* Implement read/write for static properties and fields per this:
+* DONE (Version 31) - Implement read/write for static properties and fields per this:
   * any static property or field that is
     *writeable* (settable) generates nothing at all, regardless of whether it's also
     readable.

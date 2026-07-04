@@ -1182,3 +1182,66 @@ generic-type-parameter exclusion, so no test ever exercised generated operator w
 operator sharing the `-` symbol with a same-named binary operator, and `package-generator-tests.lisp`
 gained a synthetic-class-plist codegen test (mirroring its existing indexer/field-codegen tests)
 asserting the generated wrapper functions and their `:mangled-name`-based CLR invocations.
+
+## Writeable Static Properties and Mutable Static Fields (Version 31)
+
+`PLAN.md` and `FEATURES.md`'s Unsupported Features section both tracked a genuine silent gap: a
+static property that is writeable (read-write or write-only), and a plain mutable static field
+(not C# `readonly`, not `const`), matched none of the existing field/property classifiers
+(`literal-field-p`, `runtime-readonly-field-p`, `constant-property-p`) and so fell through every
+`remove-if`/`remove-if-not` pipeline in both `compute-package-exports-and-shadows` and
+`generate-class-file` untouched — no getter, no setter, not even a documentation comment. This
+mirrored the bug public instance fields had before Version 27, just never fixed for the static
+case, even though the reflected metadata (`:static t` + `:writeable t` on a property; a field with
+neither `:literal` nor `:init-only`) already captured these members correctly.
+
+**New classifiers**, added alongside the existing ones:
+
+* `writeable-static-property-p` — `(and (getf prop :static) (getf prop :writeable))`. Disjoint from
+  `constant-property-p` (which requires `(not (getf prop :writeable))`), so every static property
+  lands in exactly one of the two buckets.
+* `mutable-static-field-p` — `(and (getf field :static) (not (getf field :literal)) (not (getf
+  field :init-only)))` — the exact complement, within static fields, of `literal-field-p`/
+  `runtime-readonly-field-p`.
+
+**Codegen** mirrors the existing instance-property/instance-field shape from Version 9/27
+(readable → plain getter; writeable+readable → also a `setf`-expander; writeable-only → a
+`set-name` function instead) but targets `dotnet:static` in place of `dotnet:invoke`, with no
+`obj!` receiver parameter at all — `dotnet:static`'s own `setf`-expansion (documented in
+`doc/dotnet-dotcl-interop.md`, e.g. `(setf (dotnet:static "System.Console" "Title") "...")`)
+writes the type's own static storage slot directly:
+
+```lisp
+(cl:defun mode ()
+  (dotnet:static <type-str> "Mode"))
+(cl:defun (cl:setf mode) (new-value)
+  (cl:setf (dotnet:static <type-str> "Mode") new-value))
+
+;; write-only:
+(cl:defun set-sink (new-value)
+  (cl:setf (dotnet:static <type-str> "Sink") new-value))
+
+;; plain mutable static field -- same shape as a read-write property:
+(cl:defun total ()
+  (dotnet:static <type-str> "Total"))
+(cl:defun (cl:setf total) (new-value)
+  (cl:setf (dotnet:static <type-str> "Total") new-value))
+```
+
+**No struct-boxing-aliasing warning comment is emitted here**, unlike instance property/field
+mutators (see the Version 29 section above). That comment exists because an instance mutator's
+`obj!` receiver can be an alias of a shared boxed instance (most dangerously a
+`--constant-properties`-cached `defconstant`), so mutating through one alias silently mutates every
+other alias too. A static member's `setf` has no receiver to alias in the first place — it
+reassigns the type's own static slot directly, the same as the doc's own
+`(setf (dotnet:static "System.Console" "Title") ...)` example — so the hazard the comment warns
+about simply doesn't apply.
+
+`*generator-version*` bumped 30 → 31 since generated file *content* changes (new functions can now
+appear for members that previously produced nothing). Test coverage: `AssemblyToLispyTestTarget/
+EdgeCases.cs`'s `EdgeCaseStruct` gained a plain mutable static field (`MutableStaticField`), a
+static read-write property (`StaticReadWriteProperty`), and a static write-only property
+(`StaticWriteOnlyProperty`); `tests/synthetic-target.test.lisp` asserts their reflected metadata
+shape, and `package-generator-tests.lisp` gained a synthetic-class-plist codegen test (7.1)
+asserting the generated getter/`setf`/`set-name` functions and their exports, mirroring the
+existing instance-field codegen test's structure.

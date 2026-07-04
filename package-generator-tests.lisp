@@ -644,6 +644,65 @@
       (when (probe-file out-dir)
         (uiop:delete-directory-tree out-dir :validate t))))
 
+  ;; 7.1 Writeable static properties and plain mutable static fields:
+  ;;     generate-class-file must emit a getter/setf-expander pair for a
+  ;;     static read-write property, a set-name function only (no getter,
+  ;;     no setf) for a static write-only property, and a getter/setf-
+  ;;     expander pair for a plain mutable static field -- all three
+  ;;     previously matched no classifier and generated nothing at all
+  ;;     (see PLAN.md / FEATURES.md's Unsupported Features). Unlike the
+  ;;     instance property/field case, these use dotnet:static directly
+  ;;     (no obj! receiver).
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.StaticWriteable"
+             :kind :class
+             :fields ((:name "Total" :type "System.Int32" :static t
+                       :documentation (:summary "A plain mutable static field.")))
+             :properties ((:name "Mode" :type "System.Int32" :static t :readable t :writeable t
+                           :documentation (:summary "A static read-write property."))
+                          (:name "Sink" :type "System.Int32" :static t :writeable t
+                           :documentation (:summary "A static write-only property.")))
+             :methods nil
+             :constructors nil))
+         (out-dir (merge-pathnames "package-generator-tests-static-writeable-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-static-writeable.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun mode ()" contents))) t
+                        "generate-class-file emits a getter for a static read-write property")
+            (assert-test (not (null (search "(dotnet:static <type-str> \"Mode\"))" contents))) t
+                        "generate-class-file's static property getter reads via dotnet:static")
+            (assert-test (not (null (search "(cl:defun (cl:setf mode) (new-value)" contents))) t
+                        "generate-class-file emits a setf-expander for a static read-write property")
+            (assert-test (not (null (search "(cl:setf (dotnet:static <type-str> \"Mode\") new-value))" contents))) t
+                        "generate-class-file's static property setter uses the setf-expansion of dotnet:static")
+            (assert-test (search "(cl:defun sink ()" contents) nil
+                        "generate-class-file emits no getter for a static write-only property")
+            (assert-test (not (null (search "(cl:defun set-sink (new-value)" contents))) t
+                        "generate-class-file emits a set-name function for a static write-only property")
+            (assert-test (not (null (search "(cl:defun total ()" contents))) t
+                        "generate-class-file emits a getter for a plain mutable static field")
+            (assert-test (not (null (search "(dotnet:static <type-str> \"Total\"))" contents))) t
+                        "generate-class-file's static field getter reads via dotnet:static")
+            (assert-test (not (null (search "(cl:defun (cl:setf total) (new-value)" contents))) t
+                        "generate-class-file emits a setf-expander for a plain mutable static field")
+            (assert-test (not (null (search "(cl:setf (dotnet:static <type-str> \"Total\") new-value))" contents))) t
+                        "generate-class-file's static field setter uses the setf-expansion of dotnet:static"))
+          (multiple-value-bind (exports shadows) (assembly-package-generator::compute-package-exports-and-shadows class-plist nil)
+            (declare (ignore shadows))
+            (assert-test (and (member "mode" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports the read-write static property's plain name")
+            (assert-test (and (member "set-sink" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports the write-only static property as set-sink")
+            (assert-test (and (member "total" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports the mutable static field's plain name")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
   ;; 8. Generic method of arity 2, single (non-overloaded) signature: must
   ;;    go through generate-single-overload with two type-argument
   ;;    parameters (type-1, type-2) instead of the legacy single "type".
