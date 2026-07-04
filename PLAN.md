@@ -49,6 +49,18 @@ type list/`nil` falls through to the plain `base-name` function instead of error
 
 * Add missing operator overload handling.
 
+* Implement read/write for static properties and fields per this:
+  * any static property or field that is
+    *writeable* (settable) generates nothing at all, regardless of whether it's also
+    readable.
+
+* Handle overloaded indexers, per:
+  * C# indexer (`this[...]`) threads its index parameter(s) through
+    positionally, unless the indexer itself is overloaded, in which case it is unsupported.
+  * An **overloaded indexer** (distinct index-parameter signatures on the same name, e.g.
+    `this[int]` alongside `this[string]`) is not yet supported — no function is generated;
+    every signature is instead listed in a comment (see Unsupported Features).
+
 * See if there is some way to programmatically figure out the `--constant-properties`
   but I really think it requires looking at the source code (or disassembly).
 
