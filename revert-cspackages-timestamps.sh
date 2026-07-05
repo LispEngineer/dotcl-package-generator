@@ -55,7 +55,18 @@ while IFS= read -r -d '' file; do
       echo "Would revert (timestamp-only): $file"
     else
       echo "Reverting (timestamp-only):    $file"
-      git checkout -- "$file"
+      # .git/index.lock can be held momentarily by an editor's background git
+      # polling (e.g. VS Code's Git extension refreshing status every few
+      # seconds); retry briefly instead of aborting the whole run.
+      attempt=0
+      until git checkout -- "$file"; do
+        attempt=$((attempt + 1))
+        if [ "$attempt" -ge 10 ]; then
+          echo "error: could not check out $file after $attempt attempts (persistent lock?)" >&2
+          exit 1
+        fi
+        sleep 0.3
+      done
     fi
     reverted=$((reverted + 1))
   else
