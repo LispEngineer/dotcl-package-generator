@@ -67,8 +67,12 @@ test: build
 				--class 'System.ValueTuple`6' \
 				--class 'System.ValueTuple`7' \
 				--class 'System.ValueTuple`8' \
+				--class System.ArgumentOutOfRangeException --export-parents --export-interfaces --export-object \
+				--class System.Collections.Hashtable --export-all-parents --export-all-interfaces \
+				--class System.IO.MemoryStream --export-object \
+				--class System.IO.StreamReader \
 	    --assembly $(REF_DIR)System.Linq.dll \
-	      --class System.Linq.Enumerable \
+	      --class System.Linq.Enumerable --no-export-all-parents --no-export-all-interfaces \
 	    --assembly $(REF_DIR)System.Xml.ReaderWriter.dll \
 	      --class System.Xml.XmlReader \
 	    --assembly $(REF_DIR)System.Collections.dll \
@@ -91,7 +95,9 @@ test: build
 	      --class System.Environment \
 	      --class System.AppDomain \
 	    --assembly $(REF_DIR)System.Threading.Thread.dll \
-	      --class System.Threading.Thread
+	      --class System.Threading.Thread \
+		  --assembly $(REF_DIR)System.Collections.Specialized.dll \
+			  --class System.Collections.Specialized.NameValueCollection --export-parents --export-interfaces --export-object
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo;
 	# System.Collections.Generic.List, SortedList; System.Text.StringBuilder;
 	# System.Drawing.Point/F; Size/F

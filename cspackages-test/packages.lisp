@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
 ;;; Generator Version: 33
-;;; Creation Date: 2026-07-05T05:03:44Z
+;;; Creation Date: 2026-07-05T13:49:48Z
 
 (cl:in-package :cl-user)
 
@@ -809,6 +809,402 @@
    #:equals
    #:get-hash-code
    #:to-string
+  ))
+
+;;; Source File: system-argument-out-of-range-exception.lisp
+;;; C# Class: System.ArgumentOutOfRangeException
+;;; Constant Properties: (none)
+(cl:defpackage :system-argument-out-of-range-exception
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:actual-value
+   #:message
+   #:get-object-data
+   #:throw-if-equal
+   #:throw-if-greater-than
+   #:throw-if-greater-than-or-equal
+   #:throw-if-less-than
+   #:throw-if-less-than-or-equal
+   #:throw-if-negative
+   #:throw-if-negative-or-zero
+   #:throw-if-not-equal
+   #:throw-if-zero
+  ))
+
+;;; Source File: system-collections-hashtable.lisp
+;;; C# Class: System.Collections.Hashtable
+;;; Constant Properties: (none)
+(cl:defpackage :system-collections-hashtable
+  (:use :cl)
+  (:shadow
+   #:count
+   #:values
+   #:remove
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:comparer
+   #:count
+   #:equality-comparer
+   #:hcp
+   #:fixed-size?
+   #:read-only?
+   #:synchronized?
+   #:item
+   #:keys
+   #:sync-root
+   #:values
+   #:add
+   #:clear
+   #:clone
+   #:contains
+   #:contains-key
+   #:contains-value
+   #:copy-to
+   #:get-enumerator
+   #:get-hash
+   #:get-object-data
+   #:key-equals
+   #:on-deserialization
+   #:remove
+   #:synchronized
+  ))
+
+;;; Source File: system-io-memory-stream.lisp
+;;; C# Class: System.IO.MemoryStream
+;;; Constant Properties: (none)
+(cl:defpackage :system-io-memory-stream
+  (:use :cl)
+  (:shadow
+   #:length
+   #:position
+   #:read
+   #:read-byte
+   #:write
+   #:write-byte
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:can-read
+   #:can-seek
+   #:can-write
+   #:capacity
+   #:length
+   #:position
+   #:copy-to
+   #:copy-to-async
+   #:dispose
+   #:flush
+   #:flush-async
+   #:get-buffer
+   #:read
+   #:read-async
+   #:read-byte
+   #:seek
+   #:set-length
+   #:to-array
+   #:write
+   #:write-async
+   #:write-byte
+   #:write-to
+  ))
+
+;;; Source File: system-io-stream-reader.lisp
+;;; C# Class: System.IO.StreamReader
+;;; Constant Properties: (none)
+(cl:defpackage :system-io-stream-reader
+  (:use :cl)
+  (:shadow
+   #:null
+   #:close
+   #:read
+   #:read-line
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:null
+   #:base-stream
+   #:current-encoding
+   #:end-of-stream
+   #:close
+   #:discard-buffered-data
+   #:dispose
+   #:peek
+   #:read
+   #:read-async
+   #:read-block
+   #:read-block-async
+   #:read-line
+   #:read-line-async
+   #:read-to-end
+   #:read-to-end-async
+  ))
+
+;;; Source File: system-argument-exception.lisp
+;;; C# Class: System.ArgumentException
+;;; Constant Properties: (none)
+(cl:defpackage :system-argument-exception
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:message
+   #:param-name
+   #:get-object-data
+   #:throw-if-null-or-empty
+   #:throw-if-null-or-white-space
+  ))
+
+;;; Source File: system-runtime-serialization-i-serializable.lisp
+;;; C# Class: System.Runtime.Serialization.ISerializable
+;;; Constant Properties: (none)
+(cl:defpackage :system-runtime-serialization-i-serializable
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:get-object-data
+  ))
+
+;;; Source File: system-system-exception.lisp
+;;; C# Class: System.SystemException
+;;; Constant Properties: (none)
+(cl:defpackage :system-system-exception
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+  ))
+
+;;; Source File: system-exception.lisp
+;;; C# Class: System.Exception
+;;; Constant Properties: (none)
+(cl:defpackage :system-exception
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:data
+   #:help-link
+   #:h-result
+   #:inner-exception
+   #:message
+   #:source
+   #:stack-trace
+   #:target-site
+   #:get-base-exception
+   #:get-object-data
+   #:get-type
+   #:to-string
+   #:add-serialize-object-state
+   #:remove-serialize-object-state
+  ))
+
+;;; Source File: system-io-stream.lisp
+;;; C# Class: System.IO.Stream
+;;; Constant Properties: (none)
+(cl:defpackage :system-io-stream
+  (:use :cl)
+  (:shadow
+   #:null
+   #:length
+   #:position
+   #:close
+   #:read
+   #:read-byte
+   #:write
+   #:write-byte
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:null
+   #:can-read
+   #:can-seek
+   #:can-timeout
+   #:can-write
+   #:length
+   #:position
+   #:read-timeout
+   #:write-timeout
+   #:begin-read
+   #:begin-write
+   #:close
+   #:copy-to
+   #:copy-to-async
+   #:create-wait-handle
+   #:dispose
+   #:dispose-async
+   #:end-read
+   #:end-write
+   #:flush
+   #:flush-async
+   #:object-invariant
+   #:read
+   #:read-async
+   #:read-at-least
+   #:read-at-least-async
+   #:read-byte
+   #:read-exactly
+   #:read-exactly-async
+   #:seek
+   #:set-length
+   #:synchronized
+   #:validate-buffer-arguments
+   #:validate-copy-to-arguments
+   #:write
+   #:write-async
+   #:write-byte
+  ))
+
+;;; Source File: system-i-async-disposable.lisp
+;;; C# Class: System.IAsyncDisposable
+;;; Constant Properties: (none)
+(cl:defpackage :system-i-async-disposable
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:dispose-async
+  ))
+
+;;; Source File: system-i-disposable.lisp
+;;; C# Class: System.IDisposable
+;;; Constant Properties: (none)
+(cl:defpackage :system-i-disposable
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:dispose
+  ))
+
+;;; Source File: system-marshal-by-ref-object.lisp
+;;; C# Class: System.MarshalByRefObject
+;;; Constant Properties: (none)
+(cl:defpackage :system-marshal-by-ref-object
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:get-lifetime-service
+   #:initialize-lifetime-service
+   #:memberwise-clone
+  ))
+
+;;; Source File: system-io-text-reader.lisp
+;;; C# Class: System.IO.TextReader
+;;; Constant Properties: (none)
+(cl:defpackage :system-io-text-reader
+  (:use :cl)
+  (:shadow
+   #:null
+   #:close
+   #:read
+   #:read-line
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:null
+   #:close
+   #:dispose
+   #:peek
+   #:read
+   #:read-async
+   #:read-block
+   #:read-block-async
+   #:read-line
+   #:read-line-async
+   #:read-to-end
+   #:read-to-end-async
+   #:synchronized
+  ))
+
+;;; Source File: system-collections-i-collection.lisp
+;;; C# Class: System.Collections.ICollection
+;;; Constant Properties: (none)
+(cl:defpackage :system-collections-i-collection
+  (:use :cl)
+  (:shadow
+   #:count
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:count
+   #:synchronized?
+   #:sync-root
+   #:copy-to
+  ))
+
+;;; Source File: system-collections-i-enumerable.lisp
+;;; C# Class: System.Collections.IEnumerable
+;;; Constant Properties: (none)
+(cl:defpackage :system-collections-i-enumerable
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:get-enumerator
+  ))
+
+;;; Source File: system-runtime-serialization-i-deserialization-callback.lisp
+;;; C# Class: System.Runtime.Serialization.IDeserializationCallback
+;;; Constant Properties: (none)
+(cl:defpackage :system-runtime-serialization-i-deserialization-callback
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:on-deserialization
   ))
 
 ;;; Source File: system-linq-enumerable.lisp
@@ -1985,4 +2381,125 @@
    #:unsafe-start
    #:yield
   ))
+
+;;; Source File: system-collections-specialized-name-value-collection.lisp
+;;; C# Class: System.Collections.Specialized.NameValueCollection
+;;; Constant Properties: (none)
+(cl:defpackage :system-collections-specialized-name-value-collection
+  (:use :cl)
+  (:shadow
+   #:get
+   #:remove
+   #:set
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:all-keys
+   #:add
+   #:clear
+   #:copy-to
+   #:get
+   #:get-key
+   #:get-values
+   #:has-keys
+   #:invalidate-cached-arrays
+   #:remove
+   #:set
+  ))
+
+;;; Source File: system-collections-specialized-name-object-collection-base.lisp
+;;; C# Class: System.Collections.Specialized.NameObjectCollectionBase
+;;; Constant Properties: (none)
+(cl:defpackage :system-collections-specialized-name-object-collection-base
+  (:use :cl)
+  (:shadow
+   #:count
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:count
+   #:read-only?
+   #:keys
+   #:base-add
+   #:base-clear
+   #:base-get
+   #:base-get-all-keys
+   #:base-get-all-values
+   #:base-get-key
+   #:base-has-keys
+   #:base-remove
+   #:base-remove-at
+   #:base-set
+   #:get-enumerator
+   #:get-object-data
+   #:on-deserialization
+  ))
+
+;;; ===== Re-exports from parent/interface packages =====
+
+;;; system-argument-out-of-range-exception: re-exports inherited members from system-argument-exception, system-runtime-serialization-i-serializable, system-system-exception, system-exception, system-object
+;;; Skipped (system-argument-out-of-range-exception declares its own): message
+;;; Skipped (system-argument-out-of-range-exception declares its own): get-object-data
+;;; Skipped (ambiguous across ancestors: system-exception, system-object): get-type
+;;; Skipped (ambiguous across ancestors: system-exception, system-object): to-string
+(cl:import '(system-argument-exception::param-name system-argument-exception::throw-if-null-or-empty system-argument-exception::throw-if-null-or-white-space system-exception::data system-exception::help-link system-exception::h-result system-exception::inner-exception system-exception::source system-exception::stack-trace system-exception::target-site system-exception::get-base-exception system-exception::add-serialize-object-state system-exception::remove-serialize-object-state system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::memberwise-clone system-object::reference-equals) ':system-argument-out-of-range-exception)
+(cl:export '(system-argument-out-of-range-exception::param-name system-argument-out-of-range-exception::throw-if-null-or-empty system-argument-out-of-range-exception::throw-if-null-or-white-space system-argument-out-of-range-exception::data system-argument-out-of-range-exception::help-link system-argument-out-of-range-exception::h-result system-argument-out-of-range-exception::inner-exception system-argument-out-of-range-exception::source system-argument-out-of-range-exception::stack-trace system-argument-out-of-range-exception::target-site system-argument-out-of-range-exception::get-base-exception system-argument-out-of-range-exception::add-serialize-object-state system-argument-out-of-range-exception::remove-serialize-object-state system-argument-out-of-range-exception::equals system-argument-out-of-range-exception::equals* system-argument-out-of-range-exception::finalize system-argument-out-of-range-exception::get-hash-code system-argument-out-of-range-exception::memberwise-clone system-argument-out-of-range-exception::reference-equals) ':system-argument-out-of-range-exception)
+
+;;; system-io-memory-stream: re-exports inherited members from system-io-stream, system-i-async-disposable, system-i-disposable, system-marshal-by-ref-object, system-object
+;;; Skipped (system-io-memory-stream declares its own): can-read
+;;; Skipped (system-io-memory-stream declares its own): can-seek
+;;; Skipped (system-io-memory-stream declares its own): can-write
+;;; Skipped (system-io-memory-stream declares its own): length
+;;; Skipped (system-io-memory-stream declares its own): position
+;;; Skipped (system-io-memory-stream declares its own): copy-to
+;;; Skipped (system-io-memory-stream declares its own): copy-to-async
+;;; Skipped (system-io-memory-stream declares its own): dispose
+;;; Skipped (ambiguous across ancestors: system-io-stream, system-i-async-disposable): dispose-async
+;;; Skipped (system-io-memory-stream declares its own): flush
+;;; Skipped (system-io-memory-stream declares its own): flush-async
+;;; Skipped (system-io-memory-stream declares its own): read
+;;; Skipped (system-io-memory-stream declares its own): read-async
+;;; Skipped (system-io-memory-stream declares its own): read-byte
+;;; Skipped (system-io-memory-stream declares its own): seek
+;;; Skipped (system-io-memory-stream declares its own): set-length
+;;; Skipped (system-io-memory-stream declares its own): write
+;;; Skipped (system-io-memory-stream declares its own): write-async
+;;; Skipped (system-io-memory-stream declares its own): write-byte
+;;; Skipped (ambiguous across ancestors: system-marshal-by-ref-object, system-object): memberwise-clone
+(cl:shadowing-import '(system-io-stream::null system-io-stream::close) ':system-io-memory-stream)
+(cl:import '(system-io-stream::can-timeout system-io-stream::read-timeout system-io-stream::write-timeout system-io-stream::begin-read system-io-stream::begin-write system-io-stream::create-wait-handle system-io-stream::end-read system-io-stream::end-write system-io-stream::object-invariant system-io-stream::read-at-least system-io-stream::read-at-least-async system-io-stream::read-exactly system-io-stream::read-exactly-async system-io-stream::synchronized system-io-stream::validate-buffer-arguments system-io-stream::validate-copy-to-arguments system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::reference-equals system-object::to-string) ':system-io-memory-stream)
+(cl:export '(system-io-memory-stream::null system-io-memory-stream::can-timeout system-io-memory-stream::read-timeout system-io-memory-stream::write-timeout system-io-memory-stream::begin-read system-io-memory-stream::begin-write system-io-memory-stream::close system-io-memory-stream::create-wait-handle system-io-memory-stream::end-read system-io-memory-stream::end-write system-io-memory-stream::object-invariant system-io-memory-stream::read-at-least system-io-memory-stream::read-at-least-async system-io-memory-stream::read-exactly system-io-memory-stream::read-exactly-async system-io-memory-stream::synchronized system-io-memory-stream::validate-buffer-arguments system-io-memory-stream::validate-copy-to-arguments system-io-memory-stream::get-lifetime-service system-io-memory-stream::initialize-lifetime-service system-io-memory-stream::equals system-io-memory-stream::equals* system-io-memory-stream::finalize system-io-memory-stream::get-hash-code system-io-memory-stream::get-type system-io-memory-stream::reference-equals system-io-memory-stream::to-string) ':system-io-memory-stream)
+
+;;; system-io-stream-reader: re-exports inherited members from system-io-text-reader, system-i-disposable, system-marshal-by-ref-object
+;;; Skipped (system-io-stream-reader declares its own): null
+;;; Skipped (system-io-stream-reader declares its own): close
+;;; Skipped (system-io-stream-reader declares its own): dispose
+;;; Skipped (system-io-stream-reader declares its own): peek
+;;; Skipped (system-io-stream-reader declares its own): read
+;;; Skipped (system-io-stream-reader declares its own): read-async
+;;; Skipped (system-io-stream-reader declares its own): read-block
+;;; Skipped (system-io-stream-reader declares its own): read-block-async
+;;; Skipped (system-io-stream-reader declares its own): read-line
+;;; Skipped (system-io-stream-reader declares its own): read-line-async
+;;; Skipped (system-io-stream-reader declares its own): read-to-end
+;;; Skipped (system-io-stream-reader declares its own): read-to-end-async
+(cl:import '(system-io-text-reader::synchronized system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-marshal-by-ref-object::memberwise-clone) ':system-io-stream-reader)
+(cl:export '(system-io-stream-reader::synchronized system-io-stream-reader::get-lifetime-service system-io-stream-reader::initialize-lifetime-service system-io-stream-reader::memberwise-clone) ':system-io-stream-reader)
+
+;;; system-collections-specialized-name-value-collection: re-exports inherited members from system-collections-specialized-name-object-collection-base, system-collections-i-collection, system-collections-i-enumerable, system-runtime-serialization-i-deserialization-callback, system-runtime-serialization-i-serializable, system-object
+;;; Skipped (ambiguous across ancestors: system-collections-specialized-name-object-collection-base, system-collections-i-collection): count
+;;; Skipped (ambiguous across ancestors: system-collections-specialized-name-object-collection-base, system-collections-i-enumerable): get-enumerator
+;;; Skipped (ambiguous across ancestors: system-collections-specialized-name-object-collection-base, system-runtime-serialization-i-serializable): get-object-data
+;;; Skipped (ambiguous across ancestors: system-collections-specialized-name-object-collection-base, system-runtime-serialization-i-deserialization-callback): on-deserialization
+;;; Skipped (system-collections-specialized-name-value-collection declares its own): copy-to
+(cl:import '(system-collections-specialized-name-object-collection-base::read-only? system-collections-specialized-name-object-collection-base::keys system-collections-specialized-name-object-collection-base::base-add system-collections-specialized-name-object-collection-base::base-clear system-collections-specialized-name-object-collection-base::base-get system-collections-specialized-name-object-collection-base::base-get-all-keys system-collections-specialized-name-object-collection-base::base-get-all-values system-collections-specialized-name-object-collection-base::base-get-key system-collections-specialized-name-object-collection-base::base-has-keys system-collections-specialized-name-object-collection-base::base-remove system-collections-specialized-name-object-collection-base::base-remove-at system-collections-specialized-name-object-collection-base::base-set system-collections-i-collection::synchronized? system-collections-i-collection::sync-root system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::memberwise-clone system-object::reference-equals system-object::to-string) ':system-collections-specialized-name-value-collection)
+(cl:export '(system-collections-specialized-name-value-collection::read-only? system-collections-specialized-name-value-collection::keys system-collections-specialized-name-value-collection::base-add system-collections-specialized-name-value-collection::base-clear system-collections-specialized-name-value-collection::base-get system-collections-specialized-name-value-collection::base-get-all-keys system-collections-specialized-name-value-collection::base-get-all-values system-collections-specialized-name-value-collection::base-get-key system-collections-specialized-name-value-collection::base-has-keys system-collections-specialized-name-value-collection::base-remove system-collections-specialized-name-value-collection::base-remove-at system-collections-specialized-name-value-collection::base-set system-collections-specialized-name-value-collection::synchronized? system-collections-specialized-name-value-collection::sync-root system-collections-specialized-name-value-collection::equals system-collections-specialized-name-value-collection::equals* system-collections-specialized-name-value-collection::finalize system-collections-specialized-name-value-collection::get-hash-code system-collections-specialized-name-value-collection::get-type system-collections-specialized-name-value-collection::memberwise-clone system-collections-specialized-name-value-collection::reference-equals system-collections-specialized-name-value-collection::to-string) ':system-collections-specialized-name-value-collection)
 
