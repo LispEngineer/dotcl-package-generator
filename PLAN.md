@@ -4,13 +4,43 @@
 * Copyright 2026 Douglas P. Fields, Jr.
 
 
+# Handle Extension Methods in the Main Class
+
+Deal with extension methods. Real world example is from MonoGameGum:
+`MonoGameGum.GraphicalUiElementExtensionMethods`
+([Source Code](https://github.com/vchelaru/Gum/blob/136b2b54a58b10728e72e4bf5d34301781c00cc7/MonoGameGum/Forms/Controls/FrameworkElementExt.cs#L80))
+* Figure out a way to find all extension methods (at least in assemblies
+  given in the invocation command line) and add them to the generated
+  class.
+* Add comments/docstrings as to where the extension method came from.
+
+
 # More Parent & Ancestor stuff
+
+See [`parents-and-interfaces-plan`](doc/parents-and-interfaces-plan.md)
+for details of what was done earlier (v33).
+Add flags & default changing flags for these capabilities.
+
+* Add one-time flags for `--no-export-<whatever>` that override the default `--export-all-<whatever>`
+  for just the current class.
 
 * Export all inner classes/interfaces (recursively) as well.
 
 * Export all child classes/interfaces (recursively) as well.
 
 * Export all implementations of an interface (recursively) as well.
+
+* **Deferred from the Parents and Interfaces implementation (Phase 5 of
+  [`doc/parents-and-interfaces-plan.md`](doc/parents-and-interfaces-plan.md)): virtual/
+  override-aware shadow commentary.** The original design (see this file's "Parents and
+  Interfaces" section below, and `doc/parents-and-interfaces-plan.md`'s "Phase 5 —
+  (Deferred / optional) shadow-comment fidelity" section) wanted the generator to
+  distinguish, in its skip comment, between a child member that merely *shadows* a
+  same-named parent member (non-virtual hiding) versus one that *overrides* it — not
+  implemented in Version 33, since it only affects comment wording, not re-export
+  correctness. It needs new `AssemblyToLispy.cs` metadata
+  (`MethodInfo.IsVirtual`/`GetBaseDefinition()`, surfaced as e.g. `:virtual`/`:new-slot`
+  flags) plus a `doc/assembly-to-lispy.md` schema update.
 
 
 # Add More to Generated `.lisp` Files
