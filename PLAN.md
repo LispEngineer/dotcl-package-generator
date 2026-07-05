@@ -4,6 +4,14 @@
 * Copyright 2026 Douglas P. Fields, Jr.
 
 
+# Enhance Generics with Event Methods
+
+I noticed that the `add-click` function was not added to the list of generics
+for the `gum-forms-controls-primitives-button-base.lisp` class in my Dungeon
+Slime game. The Generics should include all Lisp function-type generated functions,
+not just the ones that might have originally been C# functions.
+
+
 # Handle Extension Methods in the Main Class
 
 Deal with extension methods. Real world example is from MonoGameGum:

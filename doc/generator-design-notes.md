@@ -1700,3 +1700,48 @@ form in `generate-batch-packages-file` from that same plist shape, differing onl
 name/flag name/doc path. `generate-batch-packages-file`/`generate-batch-asd-file`/
 `generate-assembly-packages-batch` each now take both models as independent optional arguments,
 threading them through in parallel rather than one replacing the other.
+
+## Static Variant's Collision Comment Reports Known Conflicts (Version 36)
+
+### What changed and why
+
+Version 35's static-variant collision comment (above) was a generic, purely hypothetical
+warning attached to every opted-in class regardless of whether a real conflict existed. Since
+the package generator already has full metadata for every type in every provided assembly (not
+just the ones it's asked to generate), it can do better: report *actual, known* conflicts by
+name, or say plainly that none are known.
+
+### `build-simple-name-index` and `classify-simple-name-conflicts`
+
+`build-simple-name-index` maps `dotnet-type-simple-name` to the list of every
+fully-qualified-name reducing to it, built once from `build-metadata-index`'s output (every
+type in every provided assembly's metadata — the same full index `expand-ancestors` already
+uses for parent/interface resolution, previously scoped only to Phase B of
+`generate-assembly-packages-batch` and now hoisted to that function's outer `let` so it's
+available afterward too). `classify-simple-name-conflicts` looks up one class's own simple name
+in that index and classifies every sibling (excluding itself) against a hash set of every
+fully-qualified-name actually generated as its own package in this batch (`resolved-fq-set`,
+built from `all-resolved`):
+
+* **`:actual`** — the sibling is also in `resolved-fq-set`. Its own generated `.lisp` file will
+  also call `EnsureDotNetTypeClass` at load time, so the naming race between the two is
+  guaranteed to actually happen in this run's own output.
+* **`:possible`** — the sibling is only visible in the provided assemblies' metadata, not
+  itself generated here. No guaranteed collision from this run alone, but the type exists, so
+  the simple name isn't exclusively the generated class's.
+
+Both helpers are pure functions over already-computed data structures — no new file I/O, no
+change to what gets generated for the dynamic variant (which doesn't need this at all, since
+its load-time `class-name` lookup is already immune to the collision by construction).
+
+### Wiring
+
+`generate-batch-generics-file` gained two new optional parameters,
+`simple-name-index`/`resolved-fq-set`; `generate-assembly-packages-batch` builds both once
+(the index via the now-outer-scoped `index` local plus `build-simple-name-index`; the set via a
+single pass over `all-resolved`) and passes them through. Omitting either falls back to the old
+generic hypothetical-warning wording, keeping `generate-batch-generics-file` callable
+standalone (e.g. from a test) without requiring the full batch machinery.
+
+Verified against the `Makefile` smoke test's real `System.Threading.Timer`/`System.Timers.Timer`
+collision pair: each correctly reports the other as an `ACTUAL` conflict.

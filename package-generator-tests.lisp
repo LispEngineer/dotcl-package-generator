@@ -1472,4 +1472,102 @@
         (when (probe-file out-dir)
           (uiop:delete-directory-tree out-dir :validate t)))))
 
+  ;; 12. The static --defgeneric variant's per-class comment must report
+  ;;     ACTUAL vs. POSSIBLE simple-name conflicts, computed from every
+  ;;     type visible to the package generator (build-simple-name-index,
+  ;;     over the FULL metadata, not just resolved/opted-in classes) --
+  ;;     not just a purely hypothetical warning.
+  (let ((conflict-a
+            '(:fully-qualified-name "Fixture.ConflictA.Thing" :kind :class
+              :methods ((:name "Ping" :is-static nil :parameters nil :return-type "System.Void"))
+              :properties nil :fields nil :constructors nil))
+          (conflict-b
+            '(:fully-qualified-name "Fixture.ConflictB.Thing" :kind :class
+              :methods ((:name "Ping" :is-static nil :parameters nil :return-type "System.Void"))
+              :properties nil :fields nil :constructors nil))
+          (solo
+            '(:fully-qualified-name "Fixture.Solo.Onlyone" :kind :class
+              :methods ((:name "Ping" :is-static nil :parameters nil :return-type "System.Void"))
+              :properties nil :fields nil :constructors nil))
+          (lonely
+            '(:fully-qualified-name "Fixture.Lonely.Ghostly" :kind :class
+              :methods ((:name "Ping" :is-static nil :parameters nil :return-type "System.Void"))
+              :properties nil :fields nil :constructors nil))
+          (not-requested-ghostly
+            ;; Present in the assembly's metadata (so build-simple-name-index
+            ;; sees it) but never listed in :classes below -- never resolved,
+            ;; never generated -- making LONELY's conflict with it POSSIBLE,
+            ;; not ACTUAL.
+            '(:fully-qualified-name "Fixture.NotRequested.Ghostly" :kind :class
+              :methods nil :properties nil :fields nil :constructors nil)))
+
+      ;; 11.7.1 classify-simple-name-conflicts and build-simple-name-index
+      ;;        directly, against a hand-built metadata-index (same
+      ;;        (fq-name -> (type-plist . owning-entry)) shape
+      ;;        build-metadata-index itself produces), independent of the
+      ;;        end-to-end batch below.
+      (let ((owning-entry '(:assembly-name "Fixture.dll"))
+            (metadata-index (make-hash-table :test #'equal))
+            (resolved-fq-set (make-hash-table :test #'equal)))
+        (dolist (tp (list conflict-a conflict-b solo lonely not-requested-ghostly))
+          (setf (gethash (getf tp :fully-qualified-name) metadata-index) (cons tp owning-entry)))
+        (setf (gethash "Fixture.ConflictA.Thing" resolved-fq-set) t)
+        (setf (gethash "Fixture.ConflictB.Thing" resolved-fq-set) t)
+        (setf (gethash "Fixture.Solo.Onlyone" resolved-fq-set) t)
+        (setf (gethash "Fixture.Lonely.Ghostly" resolved-fq-set) t)
+        (let ((simple-name-index (assembly-package-generator::build-simple-name-index metadata-index)))
+          (assert-test (assembly-package-generator::classify-simple-name-conflicts
+                        "Fixture.ConflictA.Thing" simple-name-index resolved-fq-set)
+                      '(("Fixture.ConflictB.Thing" . :actual))
+                      "classify-simple-name-conflicts reports an also-resolved same-simple-name type as :actual")
+          (assert-test (assembly-package-generator::classify-simple-name-conflicts
+                        "Fixture.Solo.Onlyone" simple-name-index resolved-fq-set)
+                      nil
+                      "classify-simple-name-conflicts reports no conflicts for a simple name unique in the metadata")
+          (assert-test (assembly-package-generator::classify-simple-name-conflicts
+                        "Fixture.Lonely.Ghostly" simple-name-index resolved-fq-set)
+                      '(("Fixture.NotRequested.Ghostly" . :possible))
+                      "classify-simple-name-conflicts reports an unresolved-but-metadata-visible same-simple-name type as :possible")))
+
+    ;; 12.2 End-to-end: the generated csharp-generics.lisp comment text for
+    ;;      each case, driven through the real CLI-facing entry point
+    ;;      (generate-assembly-packages-batch), not the helpers directly.
+    (let* ((fixture-metadata (list conflict-a conflict-b solo lonely not-requested-ghostly))
+           (fixture-file (merge-pathnames "package-generator-tests-conflict-comment-fixture.lispy-metadata"
+                                          (uiop:temporary-directory)))
+           (out-dir (merge-pathnames "package-generator-tests-conflict-comment-out/"
+                                     (uiop:temporary-directory))))
+      (unwind-protect
+          (progn
+            (with-open-file (s fixture-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+              (prin1 fixture-metadata s))
+            (ensure-directories-exist out-dir)
+            (assembly-package-generator:generate-assembly-packages-batch
+             (list (list :metadata-file (namestring fixture-file)
+                         :assembly-name "Fixture.dll"
+                         :classes (list (list :name "Fixture.ConflictA.Thing" :constant-properties "" :defgeneric t)
+                                        (list :name "Fixture.ConflictB.Thing" :constant-properties "" :defgeneric t)
+                                        (list :name "Fixture.Solo.Onlyone" :constant-properties "" :defgeneric t)
+                                        (list :name "Fixture.Lonely.Ghostly" :constant-properties "" :defgeneric t))))
+             (namestring out-dir)
+             "2026-07-05T00:00:00Z"
+             "9.9.9"
+             (utils:qualify-path "csharp-assembly-utils-package.template.lisp")
+             (utils:qualify-path "csharp-assembly-utils.template.lisp")
+             nil)
+            (let* ((generics-file (merge-pathnames "csharp-generics.lisp" out-dir))
+                   (contents (uiop:read-file-string generics-file)))
+              (assert-test (not (null (search "ACTUAL: Fixture.ConflictB.Thing" contents))) t
+                          "csharp-generics.lisp reports Fixture.ConflictA.Thing's conflict with ConflictB as ACTUAL")
+              (assert-test (not (null (search "ACTUAL: Fixture.ConflictA.Thing" contents))) t
+                          "csharp-generics.lisp reports Fixture.ConflictB.Thing's conflict with ConflictA as ACTUAL (both directions)")
+              (assert-test (not (null (search "POSSIBLE: Fixture.NotRequested.Ghostly" contents))) t
+                          "csharp-generics.lisp reports Fixture.Lonely.Ghostly's conflict with the unrequested type as POSSIBLE")
+              (assert-test (not (null (search "No known simple-name conflicts" contents))) t
+                          "csharp-generics.lisp states plainly when a class has no known simple-name conflict")))
+        (when (probe-file fixture-file)
+          (delete-file fixture-file))
+        (when (probe-file out-dir)
+          (uiop:delete-directory-tree out-dir :validate t)))))
+
   (format *error-output* "--- Package Generator Tests Completed ---~%"))

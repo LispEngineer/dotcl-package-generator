@@ -67,7 +67,8 @@
    32 - Added support for C# events (add_X/remove_X accessor pairs), previously invisible end-to-end: filtered out at reflection time by the same IsSpecialName check that also hides property/indexer accessors (AssemblyToLispy.cs), so the Lisp side never even knew they existed (doc/claude-suggested-improvements-20260703.md's item 4). AssemblyToLispy.cs now reflects instance events (only -- static events are excluded, since dotnet:add-event/dotnet:remove-event have no verified calling convention for a receiverless event) into a new :events metadata key (FormatEventPlist, mirroring FormatPropertyPlist); each generates an add-X/remove-X wrapper pair calling DotCL's existing dotnet:add-event/dotnet:remove-event (no DotCL runtime changes were needed -- this was purely a reflection+codegen gap in this repo). Removal is by Lisp object identity: passing a fresh (lambda ...) that merely behaves like the original handler will not remove it, since dotnet:add-event's cache is keyed on the exact Lisp function object originally passed to add-X (the generated remove-X docstring calls this out explicitly). Since add-X/remove-X are synthesized compound names rather than a 1:1 mapping of one C# identifier, they can collide with an unrelated real member (e.g. a Click event alongside an AddClick() method); event-wrapper-names resolves this via a three-tier escalation (add-click/remove-click -> add-click-event/remove-click-event -> add-click!/remove-click!, the last collision-proof by construction since C# cannot emit '!', the same guarantee obj!/quote!/function!/t!/nil! already rely on), fed by class-member-names-excluding-events -- a new helper both compute-package-exports-and-shadows and generate-class-file call with their own independently-filtered field/property/method lists, so the two functions can never disagree on an event's actual wrapper names. See doc/generator-design-notes.md's Events (Version 32) section for the full design writeup, and PLAN.md for the deferred static-event follow-up.
    33 - Added optional per-class re-export of inherited super-class/interface members (--export-parents/--export-interfaces/--export-object, plus sticky --export-all-* CLI defaults, and --skip-missing/--no-skip-missing for an unresolvable ancestor), per doc/parents-and-interfaces-plan.md. Program.cs's manifest now carries these three booleans per requested class; a new global metadata index (build-metadata-index) resolves a class's ancestor graph (expand-ancestors: :superclass walked link-by-link up to System.Object, :interfaces taken as already-transitive per .NET's Type.GetInterfaces()) across every provided assembly, not just the requesting class's own, folding newly-discovered ancestors into the working set (generated as plain packages, appended after their assembly's explicitly-requested classes -- stable, minimal reordering; an ancestor also explicitly requested keeps its own flags/constant-properties instead of a duplicate). Resolved-class data (previously a bare (class-plist . constant-properties-list) cons throughout resolve-batch-entry/generate-batch-packages-file/generate-batch-asd-file/generate-assembly-packages-batch) is now the make-resolved-class plist, adding the three export flags. Re-export itself (compute-reexports, emit-child-reexports) is a POST-PASS of cl:shadowing-import/cl:import/cl:export calls appended to packages.lisp after every cl:defpackage form -- deliberately not folded into each defpackage via :import-from, so no topological ordering of the defpackage forms is ever needed (shadowing-import/import/export only require the ancestor's symbols to already be interned, which defpackage guarantees regardless of file position; the actual function bindings arrive later, whenever each class's own .lisp file loads, which is safe as long as the whole ASDF system loads before anything is called). Per child, an ancestor-exported name is skipped (with an explanatory comment, not renamed) rather than re-exported when the child already declares it itself (child wins) or when more than one ancestor exports the same name (ambiguous -- the interface1->name-style disambiguation is intentionally deferred to a future version); the synthetic per-type symbols <type>/<type-str>/<creation>/<version>/new are never re-exported, since they identify the ancestor's own type identity, not something inherited. generate-batch-asd-file also adds each child's ancestor package files to its own :file's :depends-on.
    34 - Added optional per-class unification of instance methods and instance property/field accessors into a single shared CSHARP-GENERICS package of CLOS generic functions dispatching on C# runtime type (--defgeneric/--no-defgeneric, plus sticky --enable-defgeneric/--no-enable-defgeneric CLI defaults), per doc/make-everything-defgeneric.md. Program.cs's manifest now carries a :defgeneric boolean per requested class (make-resolved-class/resolve-batch-entry thread it through as a fourth resolved-class field, defaulting to nil for ancestor-only classes exactly like the three export-* flags). collect-class-instance-generics independently re-derives, for one class-plist, the wrapper names whose Lisp signature begins with obj! as the sole/first required argument (instance methods, instance property/field getters, instance indexer getters, and their (cl:setf ...) counterparts), reusing map-member-name/method-name-wrapper-names so the actual name computation cannot drift from compute-package-exports-and-shadows/generate-class-file; it deliberately excludes static members (no obj! receiver), generic/type-parameterized instance methods (their wrapper's lambda list puts the type argument(s) before obj!), and overloaded indexers (no generated wrapper exists to forward to). compute-defgeneric-model aggregates every :defgeneric-true class's collected names into the CSHARP-GENERICS defpackage's :export/:shadow lists (emitted by generate-batch-packages-file, right after the CSHARP-ASSEMBLY-UTILS defpackage) and a per-name specializer list; generate-batch-generics-file (a new sibling file to csharp-assembly-utils.lisp, emitted after every class file so it can depend on their packages) writes one cl:defgeneric per unified name -- (name obj! cl:&rest args), or ((cl:setf name) new-value obj! cl:&rest args) for a setter -- plus, per opted-in class, one cl:eval-when (:load-toplevel :execute) block installing that class's defmethods. Each defmethod is installed by evaluating a backquoted cl:defmethod form specializing on (cl:class-name (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\" (dotnet:resolve-type fq-name))) fetched fresh at load time, deliberately never a symbol hardcoded at generation time: DotCL names a C# type's CLOS class by its simple name only when free, or by its unique FullName when a same-simple-name type from a different namespace has already claimed it, and which type wins that race is load-order-dependent and unknowable at generation time (see Runtime.CLOS.cs's EnsureDotNetTypeClass) -- reading the class's own class-name at load time is immune to this, since it is always the exact symbol DotCL registered for that specific class. Every forwarding defmethod body is a bare cl:apply of the class's own already-generated wrapper function, accepting the small dispatch/apply overhead for a v1 implementation. generate-batch-asd-file adds the CSHARP-GENERICS :file component (depending on \"packages\", \"csharp-assembly-utils\", and every opted-in class's own package file) only when at least one class opted in.
-   35 - Version 34's implementation was judged too ugly to be the only option (its cl:eval-of-a-backquoted-defmethod mechanism, needed only because the specializer symbol is unknowable until DotCL resolves the class object at load time) -- see PLAN.md's \"Improve Turn Everything into Generic Methods\" section. That entire mechanism is renamed --defgeneric-dynamic/--no-defgeneric-dynamic (per-class) and --enable-defgeneric-dynamic/--no-enable-defgeneric-dynamic (sticky), its package/file renamed csharp-generics-dynamic (*CSHARP-GENERICS-DYNAMIC-PACKAGE-NAME*, compute-defgeneric-dynamic-model, generate-batch-generics-dynamic-file), and its manifest key renamed :defgeneric-dynamic -- purely a rename, no behavior change, still the fully collision-proof choice for when that robustness is worth the uglier generated code (doc/make-everything-defgeneric-dynamic.md). The now-freed original names (--defgeneric/--no-defgeneric, --enable-defgeneric/--no-enable-defgeneric, csharp-generics package/file, :defgeneric manifest key) are given to a NEW, independent, orthogonal implementation of the design's other original option (\"Simple + documented caveat\"): compute-defgeneric-model/generate-batch-generics-file emit a plain top-level cl:defmethod per unified name per opted-in class -- no cl:eval, no eval-when, no backquote, no runtime class-object lookup -- specializing directly on a LITERAL symbol computed at generation time, dotcl-internal::|<name>|, where <name> is the new dotnet-type-simple-name helper's exact reproduction of .NET reflection's Type.Name (distinct from the pre-existing simple-type-name, which strips the backtick generic-arity suffix for display purposes and never splits on CIL's '+' nested-type separator, so it does not match what DotCL's EnsureDotNetTypeClass, Runtime.CLOS.cs, actually calls Startup.Sym(type.Name) with). The caveat this accepts: if two --defgeneric-opted-in classes in the same batch share a simple name across different namespaces, DotCL's own class-naming collision handling means only one keeps the simple-name symbol at load time (load-order-dependent, unknowable at generation time) -- dispatch for the other, whose defmethod here still assumes the simple name, would be wrong. Documented with a comment above every class's defmethod block in the generated file, and in doc/make-everything-defgeneric.md's \"Static specializer collision caveat\" section, rather than guarded against. Both variants are fully independent and orthogonal: a class may opt into either, both, or neither, each contributing its own defpackage entry/generics file/.asd component; %compute-defgeneric-model (shared internal helper, parameterized on the :defgeneric or :defgeneric-dynamic resolved-class flag key) and emit-defgeneric-defpackage (shared defpackage-emission helper) avoid duplicating the identical aggregation/export-list logic between the two variants' public compute-defgeneric-model/compute-defgeneric-dynamic-model and packages.lisp emission. collect-class-instance-generics (which wrapper names are eligible at all) is entirely mechanism-agnostic and is reused verbatim by both.")
+   35 - Version 34's implementation was judged too ugly to be the only option (its cl:eval-of-a-backquoted-defmethod mechanism, needed only because the specializer symbol is unknowable until DotCL resolves the class object at load time) -- see PLAN.md's \"Improve Turn Everything into Generic Methods\" section. That entire mechanism is renamed --defgeneric-dynamic/--no-defgeneric-dynamic (per-class) and --enable-defgeneric-dynamic/--no-enable-defgeneric-dynamic (sticky), its package/file renamed csharp-generics-dynamic (*CSHARP-GENERICS-DYNAMIC-PACKAGE-NAME*, compute-defgeneric-dynamic-model, generate-batch-generics-dynamic-file), and its manifest key renamed :defgeneric-dynamic -- purely a rename, no behavior change, still the fully collision-proof choice for when that robustness is worth the uglier generated code (doc/make-everything-defgeneric-dynamic.md). The now-freed original names (--defgeneric/--no-defgeneric, --enable-defgeneric/--no-enable-defgeneric, csharp-generics package/file, :defgeneric manifest key) are given to a NEW, independent, orthogonal implementation of the design's other original option (\"Simple + documented caveat\"): compute-defgeneric-model/generate-batch-generics-file emit a plain top-level cl:defmethod per unified name per opted-in class -- no cl:eval, no eval-when, no backquote, no runtime class-object lookup -- specializing directly on a LITERAL symbol computed at generation time, dotcl-internal::|<name>|, where <name> is the new dotnet-type-simple-name helper's exact reproduction of .NET reflection's Type.Name (distinct from the pre-existing simple-type-name, which strips the backtick generic-arity suffix for display purposes and never splits on CIL's '+' nested-type separator, so it does not match what DotCL's EnsureDotNetTypeClass, Runtime.CLOS.cs, actually calls Startup.Sym(type.Name) with). The caveat this accepts: if two --defgeneric-opted-in classes in the same batch share a simple name across different namespaces, DotCL's own class-naming collision handling means only one keeps the simple-name symbol at load time (load-order-dependent, unknowable at generation time) -- dispatch for the other, whose defmethod here still assumes the simple name, would be wrong. Documented with a comment above every class's defmethod block in the generated file, and in doc/make-everything-defgeneric.md's \"Static specializer collision caveat\" section, rather than guarded against. Both variants are fully independent and orthogonal: a class may opt into either, both, or neither, each contributing its own defpackage entry/generics file/.asd component; %compute-defgeneric-model (shared internal helper, parameterized on the :defgeneric or :defgeneric-dynamic resolved-class flag key) and emit-defgeneric-defpackage (shared defpackage-emission helper) avoid duplicating the identical aggregation/export-list logic between the two variants' public compute-defgeneric-model/compute-defgeneric-dynamic-model and packages.lisp emission. collect-class-instance-generics (which wrapper names are eligible at all) is entirely mechanism-agnostic and is reused verbatim by both.
+   36 - The static --defgeneric variant's per-class collision comment (Version 35) now reports ACTUAL, KNOWN conflicts instead of a purely hypothetical warning. build-simple-name-index builds a DOTNET-TYPE-SIMPLE-NAME -> (fully-qualified-name...) hash table from build-metadata-index's full per-batch metadata index (every type in every provided assembly, not just requested/generated ones); classify-simple-name-conflicts, given one class's fully-qualified-name plus that index and a hash set of every fully-qualified-name actually generated as its own package in this batch (from ALL-RESOLVED), returns every other type sharing that simple name, each tagged :ACTUAL (also generated in this batch -- both types' files will call EnsureDotNetTypeClass at load time, so DotCL's naming race is guaranteed to actually happen) or :POSSIBLE (merely reflected in the provided assemblies' metadata, not itself generated here -- no guaranteed collision from this run's own output alone). generate-batch-generics-file's per-class comment block now enumerates these findings by name, or states plainly that none are known, rather than a generic \"if another class collides\" warning; generate-assembly-packages-batch builds the metadata index once (previously scoped only to Phase B's ancestor expansion) and threads it plus the resolved-fq-name set down as two new optional arguments. Empirically confirmed accurate against the Makefile smoke test's real System.Threading.Timer/System.Timers.Timer collision pair (both report each other as ACTUAL).")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -1956,6 +1957,23 @@
                   (setf (gethash fq-name index) (cons type-plist entry)))))))))
     index))
 
+(defun build-simple-name-index (metadata-index)
+  "Given METADATA-INDEX (from build-metadata-index -- every type's
+   fully-qualified-name across every provided assembly, not just
+   requested/generated ones), returns a hash table mapping each type's
+   DOTNET-TYPE-SIMPLE-NAME to the list of every fully-qualified-name in
+   METADATA-INDEX that reduces to that same simple name (usually a
+   singleton list; more than one entry means those types would collide
+   under DotCL's EnsureDotNetTypeClass simple-name CLOS class registration
+   -- see generate-batch-generics-file's per-class conflict comment and
+   doc/make-everything-defgeneric.md's collision caveat)."
+  (let ((simple-index (make-hash-table :test #'equal)))
+    (maphash (lambda (fq-name pair)
+               (declare (ignore pair))
+               (push fq-name (gethash (dotnet-type-simple-name fq-name) simple-index)))
+             metadata-index)
+    simple-index))
+
 (defun expand-ancestors (class-plist export-parents export-interfaces export-object index)
   "Given CLASS-PLIST and its per-class export flags, walks its ancestor
    graph via INDEX (from build-metadata-index) and returns (values
@@ -2431,7 +2449,36 @@
             (format stream "    ))~%~%"))))
       output-file)))
 
-(defun generate-batch-generics-file (output-dir creation-time defgeneric-model)
+(defun classify-simple-name-conflicts (fq-name simple-name-index resolved-fq-set)
+  "Returns a list of (other-fq-name . :actual/:possible) conses -- every
+   other type in SIMPLE-NAME-INDEX (see build-simple-name-index, keyed by
+   DOTNET-TYPE-SIMPLE-NAME across every type in every provided assembly's
+   metadata) that reduces to the same simple name as FQ-NAME, excluding
+   FQ-NAME itself, sorted by fully-qualified-name for deterministic
+   output:
+     :ACTUAL   -- OTHER-FQ-NAME is also present in RESOLVED-FQ-SET (a hash
+                  table of every fully-qualified-name actually generated
+                  as its own package in this batch, built from
+                  ALL-RESOLVED). Both types' generated files will call
+                  EnsureDotNetTypeClass at load time, so DotCL's
+                  simple-name/FullName naming race is guaranteed to
+                  actually happen between them in this run's own output.
+     :POSSIBLE -- OTHER-FQ-NAME is only known to exist (reflected in one
+                  of the provided assemblies' metadata) but is not itself
+                  generated in this batch. Nothing in this run's own
+                  output forces it to register with DotCL, so there is no
+                  guaranteed collision from this run alone -- but the type
+                  is there, so FQ-NAME's simple name is not guaranteed
+                  exclusive to it if something else (another tool, a
+                  future run, or the type simply being resolved some other
+                  way at runtime) causes that other type to register too."
+  (let ((siblings (remove fq-name (gethash (dotnet-type-simple-name fq-name) simple-name-index) :test #'string=)))
+    (sort (mapcar (lambda (other) (cons other (if (gethash other resolved-fq-set) :actual :possible)))
+                  siblings)
+          #'string< :key #'car)))
+
+(defun generate-batch-generics-file (output-dir creation-time defgeneric-model
+                                      &optional simple-name-index resolved-fq-set)
   "Writes *CSHARP-GENERICS-PACKAGE-NAME*.lisp into OUTPUT-DIR (one
    cl:defgeneric per DEFGENERIC-MODEL :method-names/:setter-names entry,
    plus a per-opted-in-class block of literal, ordinary top-level
@@ -2459,16 +2506,32 @@
    Startup.Sym(type.Name) with -- interned into the DOTCL-INTERNAL
    package). No cl:eval, no cl:eval-when, no backquote, no runtime class-
    object lookup -- a plain, ordinary cl:defmethod, at the cost of a caveat
-   this file documents with a comment above every class's defmethod block:
-   if another --defgeneric-opted-in class in the SAME batch has the same
-   simple name (a same-named type from a different namespace, e.g.
-   System.Threading.Timer vs. System.Timers.Timer), DotCL's
-   EnsureDotNetTypeClass gives the simple-name CLOS class to whichever type
-   registers first at load time and the unique FullName-qualified class to
-   the loser -- but this file's specializer symbol always assumes the
-   simple name, so dispatch for the loser would silently attach to the
-   wrong type. See doc/make-everything-defgeneric.md's \"Static specializer
-   collision caveat\" for the full writeup and worked example."
+   this file documents with a comment above every class's defmethod block.
+
+   SIMPLE-NAME-INDEX (see BUILD-SIMPLE-NAME-INDEX, built from every
+   provided assembly's full metadata -- not just requested/generated
+   types) and RESOLVED-FQ-SET (every fully-qualified-name actually
+   generated as its own package in this batch, from ALL-RESOLVED), if
+   both supplied, let each class's comment report CLASSIFY-SIMPLE-NAME-CONFLICTS'
+   *actual, known* findings instead of a purely hypothetical warning: any
+   other type sharing this class's simple name is listed as an ACTUAL
+   conflict (also generated in this batch, so DotCL's simple-name/FullName
+   naming race is guaranteed to happen between them) or a POSSIBLE one
+   (merely visible in the provided assemblies' metadata, not itself
+   generated here), or the comment states plainly that no conflict is
+   known at all. If either argument is omitted, the comment falls back to
+   the purely hypothetical form.
+
+   The underlying mechanism: if another type with the same simple name (a
+   same-named type from a different namespace, e.g. System.Threading.Timer
+   vs. System.Timers.Timer) is ALSO registered with DotCL, EnsureDotNetTypeClass
+   gives the simple-name CLOS class to whichever type registers first at
+   load time and the unique FullName-qualified class to the loser -- but
+   this file's specializer symbol always assumes the simple name, so
+   dispatch for the loser (and potentially the winner too, if the two
+   types' defmethods for the same generic name silently replace each
+   other) would be wrong. See doc/make-everything-defgeneric.md's \"Static
+   specializer collision caveat\" for the full writeup and worked example."
   (when defgeneric-model
     (let ((output-file (merge-pathnames (make-pathname :name *csharp-generics-package-name* :type "lisp")
                                          (pathname (concatenate 'string output-dir "/"))))
@@ -2508,21 +2571,40 @@
             (format stream "\"))~%~%")))
 
         ;; Per opted-in class: a flat block of literal cl:defmethod forms,
-        ;; specializing on that class's own simple-name symbol (see
-        ;; docstring above for the collision caveat this implies).
+        ;; specializing on that class's own simple-name symbol. The
+        ;; preceding comment reports CLASSIFY-SIMPLE-NAME-CONFLICTS' actual
+        ;; findings (when SIMPLE-NAME-INDEX/RESOLVED-FQ-SET were supplied)
+        ;; instead of a purely hypothetical warning -- see docstring above.
         (dolist (c classes)
           (let* ((pkg-name (getf c :pkg-name))
                  (fq-name (getf c :fq-name))
                  (method-names (getf c :method-names))
                  (setter-names (getf c :setter-names))
-                 (spec (format nil "dotcl-internal::|~A|" (dotnet-type-simple-name fq-name))))
+                 (spec (format nil "dotcl-internal::|~A|" (dotnet-type-simple-name fq-name)))
+                 (conflicts (and simple-name-index resolved-fq-set
+                                 (classify-simple-name-conflicts fq-name simple-name-index resolved-fq-set))))
             (format stream ";; ~A (~A)~%" fq-name pkg-name)
-            (format stream ";; NOTE: specializes on the simple-name CLOS class ~A. If another~%" spec)
-            (format stream ";; --defgeneric-opted-in class in this batch also simplifies to that~%")
-            (format stream ";; name (a same-named type from a different namespace), only one of~%")
-            (format stream ";; them keeps this symbol at load time -- dispatch for the other would~%")
-            (format stream ";; be wrong. See doc/make-everything-defgeneric.md's \"Static specializer~%")
-            (format stream ";; collision caveat\".~%")
+            (format stream ";; NOTE: specializes on the simple-name CLOS class ~A.~%" spec)
+            (cond
+              ((and simple-name-index resolved-fq-set (null conflicts))
+               (format stream ";; No known simple-name conflicts: no other type reflected across the~%")
+               (format stream ";; provided assemblies reduces to this same simple name.~%"))
+              ((and simple-name-index resolved-fq-set conflicts)
+               (format stream ";; Known simple-name conflict(s) among the types visible to the package~%")
+               (format stream ";; generator (ACTUAL = also generated in this batch, so DotCL's~%")
+               (format stream ";; simple-name/FullName naming race is guaranteed to happen; POSSIBLE =~%")
+               (format stream ";; merely seen in the provided assemblies' metadata, not generated here):~%")
+               (dolist (conflict conflicts)
+                 (format stream ";;   ~A: ~A~%"
+                         (if (eq (cdr conflict) :actual) "ACTUAL" "POSSIBLE")
+                         (car conflict))))
+              (t
+               (format stream ";; If another --defgeneric-opted-in class in this batch also simplifies~%")
+               (format stream ";; to that name (a same-named type from a different namespace), only one~%")
+               (format stream ";; of them keeps this symbol at load time -- dispatch for the other would~%")
+               (format stream ";; be wrong.~%")))
+            (format stream ";; See doc/make-everything-defgeneric.md's \"Static specializer collision~%")
+            (format stream ";; caveat\" for the full mechanism and a worked example.~%")
             (dolist (name method-names)
               (format stream "(cl:defmethod ~A ((obj! ~A) cl:&rest args)~%" name spec)
               (format stream "  (cl:apply (cl:function ~A:~A) obj! args))~%" pkg-name name))
@@ -2645,7 +2727,12 @@
    file has been written, also independently emits
    *CSHARP-GENERICS-PACKAGE-NAME*.lisp (GENERATE-BATCH-GENERICS-FILE, a
    no-op if no class opted into :defgeneric -- see
-   COMPUTE-DEFGENERIC-MODEL and doc/make-everything-defgeneric.md) and
+   COMPUTE-DEFGENERIC-MODEL and doc/make-everything-defgeneric.md; passed
+   BUILD-SIMPLE-NAME-INDEX's index over every provided assembly's full
+   metadata plus the set of every fully-qualified-name actually generated
+   in this batch, so its per-class collision comment can report actual,
+   known conflicts -- see CLASSIFY-SIMPLE-NAME-CONFLICTS -- rather than a
+   purely hypothetical warning) and
    *CSHARP-GENERICS-DYNAMIC-PACKAGE-NAME*.lisp
    (GENERATE-BATCH-GENERICS-DYNAMIC-FILE, likewise a no-op absent
    :defgeneric-dynamic -- see COMPUTE-DEFGENERIC-DYNAMIC-MODEL and
@@ -2657,7 +2744,8 @@
         (entry-resolved-table (make-hash-table :test #'eq))
         (all-not-found nil)
         (seen-fq (make-hash-table :test #'equal))
-        (child-ancestor-fqs (make-hash-table :test #'equal)))
+        (child-ancestor-fqs (make-hash-table :test #'equal))
+        (index (build-metadata-index assembly-entries)))
 
     ;; Phase A: resolve every explicitly requested class, per entry, exactly
     ;; as before (unchanged not-found contract: abort before touching
@@ -2678,8 +2766,7 @@
 
     ;; Phase B: expand parents/interfaces for every class that opted in,
     ;; across a global index of every provided assembly's metadata.
-    (let ((index (build-metadata-index assembly-entries))
-          (all-missing nil)
+    (let ((all-missing nil)
           (ancestor-additions (make-hash-table :test #'eq)))
       (dolist (entry entries-with-resolved)
         (dolist (rc (gethash entry entry-resolved-table))
@@ -2730,7 +2817,12 @@
                      entries-with-resolved))
            (all-resolved (loop for pair in entries-with-resolved-pairs append (cdr pair)))
            (defgeneric-model (compute-defgeneric-model all-resolved))
-           (defgeneric-dynamic-model (compute-defgeneric-dynamic-model all-resolved)))
+           (defgeneric-dynamic-model (compute-defgeneric-dynamic-model all-resolved))
+           (simple-name-index (build-simple-name-index index))
+           (resolved-fq-set (make-hash-table :test #'equal)))
+
+      (dolist (rc all-resolved)
+        (setf (gethash (getf (getf rc :class-plist) :fully-qualified-name) resolved-fq-set) t))
 
       (generate-batch-packages-file entries-with-resolved-pairs output-dir creation-time
                                      package-template-path child-ancestor-fqs
@@ -2743,7 +2835,8 @@
           (format *error-output* "Generating package for C# Class: ~A~%" (getf cls :fully-qualified-name))
           (generate-class-file cls output-dir cprops creation-time)))
 
-      (generate-batch-generics-file output-dir creation-time defgeneric-model)
+      (generate-batch-generics-file output-dir creation-time defgeneric-model
+                                     simple-name-index resolved-fq-set)
       (generate-batch-generics-dynamic-file output-dir creation-time defgeneric-dynamic-model)
 
       (generate-batch-asd-file entries-with-resolved-pairs output-dir creation-time cli-version

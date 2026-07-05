@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2+ValueCollection
-;;; Generator Version: 35
-;;; Creation Date: 2026-07-05T18:08:15Z
+;;; Generator Version: 36
+;;; Creation Date: 2026-07-05T18:30:04Z
 
 (cl:in-package :system-collections-generic-dictionary-2-value-collection)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2+ValueCollection"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2+ValueCollection")
-(cl:defconstant <creation> "2026-07-05T18:08:15Z")
-(cl:defconstant <version> 35)
+(cl:defconstant <creation> "2026-07-05T18:30:04Z")
+(cl:defconstant <version> 36)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

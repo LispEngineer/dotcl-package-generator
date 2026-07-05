@@ -10,6 +10,20 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.36.0 — 2026-07-05
+
+**The static `--defgeneric` variant's collision comment now reports actual, known conflicts.**
+
+* Previously, every class's collision comment in `csharp-generics.lisp` was a generic,
+  purely hypothetical warning ("if another class collides..."). It now reports real findings,
+  computed from every type visible to the package generator (every type reflected in every
+  provided assembly's metadata, not just requested/generated ones): each other type sharing
+  this class's simple name is listed as `ACTUAL` (also generated in this batch — the naming
+  race is guaranteed to happen) or `POSSIBLE` (merely known to exist in the provided
+  assemblies, not itself generated here), or the comment states plainly that none are known.
+  No CLI change — this only affects `csharp-generics.lisp`'s generated comment text. See
+  `doc/make-everything-defgeneric.md` (`*generator-version*` bumped to 36).
+
 ## 2.35.0 — 2026-07-05
 
 **Renamed the Version 34 unified-generics mechanism to `-dynamic`; added a new, simpler static

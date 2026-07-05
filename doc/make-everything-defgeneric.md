@@ -83,19 +83,51 @@ per-class `--defgeneric`/`--no-defgeneric` (bare names); sticky
   then per opted-in class a flat block of literal `cl:defmethod` forms:
 
   ```lisp
-  ;; System.Numerics.Vector4 (system-numerics-vector4)
-  ;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|Vector4|. If another
-  ;; --defgeneric-opted-in class in this batch also simplifies to that name (a same-named
-  ;; type from a different namespace), only one of them keeps this symbol at load time --
-  ;; dispatch for the other would be wrong. See "Static specializer collision caveat".
-  (cl:defmethod w ((obj! dotcl-internal::|Vector4|) cl:&rest args)
-    (cl:apply (cl:function system-numerics-vector4:w) obj! args))
+  ;; System.Threading.Timer (system-threading-timer)
+  ;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|Timer|.
+  ;; Known simple-name conflict(s) among the types visible to the package
+  ;; generator (ACTUAL = also generated in this batch, so DotCL's
+  ;; simple-name/FullName naming race is guaranteed to happen; POSSIBLE =
+  ;; merely seen in the provided assemblies' metadata, not generated here):
+  ;;   ACTUAL: System.Timers.Timer
+  ;; See doc/make-everything-defgeneric.md's "Static specializer collision
+  ;; caveat" for the full mechanism and a worked example.
+  (cl:defmethod change ((obj! dotcl-internal::|Timer|) cl:&rest args)
+    (cl:apply (cl:function system-threading-timer:change) obj! args))
   ```
 * `emit-defgeneric-defpackage` (shared helper) emits this variant's `csharp-generics`
   `cl:defpackage`, independently of the dynamic variant's.
 * `generate-batch-asd-file` adds `csharp-generics` as its own `.asd` `:file` component
   (depending on `"packages"`, `"csharp-assembly-utils"`, and every one of *this variant's*
   opted-in classes' package files), independently of the dynamic variant's component.
+
+## Reporting actual, known conflicts (Generator Version 36)
+
+The collision comment above isn't a generic, purely hypothetical warning — it reports real
+findings computed from every type the package generator can see:
+
+* `build-simple-name-index` builds a `dotnet-type-simple-name` → `(fully-qualified-name…)` hash
+  table from `build-metadata-index`'s full per-batch metadata index — **every** type reflected
+  in **every** provided assembly, not just the requested/generated ones. `generate-assembly-
+  packages-batch` builds this index once (previously it was scoped only to Phase B's ancestor
+  expansion) and threads it, plus a hash set of every fully-qualified-name actually generated
+  as its own package in this batch (`resolved-fq-set`, from `all-resolved`), down to
+  `generate-batch-generics-file`.
+* `classify-simple-name-conflicts`, given one class's fully-qualified-name plus those two
+  structures, returns every other type sharing that same simple name, each tagged:
+  * **`:actual`** — the other type is also present in `resolved-fq-set` (also generated as its
+    own package in this batch). Both types' generated files call `EnsureDotNetTypeClass` at
+    load time, so DotCL's simple-name/FullName naming race is **guaranteed** to actually
+    happen between them.
+  * **`:possible`** — the other type is only known to exist (reflected in one of the provided
+    assemblies' metadata) but is not itself generated in this batch. Nothing in this run's own
+    output forces it to register with DotCL, so there's no *guaranteed* collision from this run
+    alone — but the type is there, so the simple name isn't guaranteed exclusive to the
+    generated class either.
+* `generate-batch-generics-file`'s per-class comment lists every found conflict by name and
+  tag, or states plainly "No known simple-name conflicts" when `classify-simple-name-conflicts`
+  finds none — replacing the earlier generic "if another class collides" phrasing with an
+  actual, verifiable answer.
 
 ## Demonstrated collision
 

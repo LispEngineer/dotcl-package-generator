@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 35
-;;; Creation Date: 2026-07-05T18:08:15Z
+;;; Generator Version: 36
+;;; Creation Date: 2026-07-05T18:30:04Z
 
 (cl:in-package :csharp-generics)
 
@@ -360,12 +360,11 @@ System.Timers.Timer: (cl:setf synchronizing-object) (cl:setf (system-timers-time
 "))
 
 ;; System.String (system-string)
-;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|String|. If another
-;; --defgeneric-opted-in class in this batch also simplifies to that
-;; name (a same-named type from a different namespace), only one of
-;; them keeps this symbol at load time -- dispatch for the other would
-;; be wrong. See doc/make-everything-defgeneric.md's "Static specializer
-;; collision caveat".
+;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|String|.
+;; No known simple-name conflicts: no other type reflected across the
+;; provided assemblies reduces to this same simple name.
+;; See doc/make-everything-defgeneric.md's "Static specializer collision
+;; caveat" for the full mechanism and a worked example.
 (cl:defmethod chars ((obj! dotcl-internal::|String|) cl:&rest args)
   (cl:apply (cl:function system-string:chars) obj! args))
 (cl:defmethod length ((obj! dotcl-internal::|String|) cl:&rest args)
@@ -444,12 +443,11 @@ System.Timers.Timer: (cl:setf synchronizing-object) (cl:setf (system-timers-time
   (cl:apply (cl:function system-string:try-copy-to) obj! args))
 
 ;; System.Text.StringBuilder (system-text-string-builder)
-;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|StringBuilder|. If another
-;; --defgeneric-opted-in class in this batch also simplifies to that
-;; name (a same-named type from a different namespace), only one of
-;; them keeps this symbol at load time -- dispatch for the other would
-;; be wrong. See doc/make-everything-defgeneric.md's "Static specializer
-;; collision caveat".
+;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|StringBuilder|.
+;; No known simple-name conflicts: no other type reflected across the
+;; provided assemblies reduces to this same simple name.
+;; See doc/make-everything-defgeneric.md's "Static specializer collision
+;; caveat" for the full mechanism and a worked example.
 (cl:defmethod capacity ((obj! dotcl-internal::|StringBuilder|) cl:&rest args)
   (cl:apply (cl:function system-text-string-builder:capacity) obj! args))
 (cl:defmethod chars ((obj! dotcl-internal::|StringBuilder|) cl:&rest args)
@@ -492,12 +490,14 @@ System.Timers.Timer: (cl:setf synchronizing-object) (cl:setf (system-timers-time
   (cl:apply (cl:function (cl:setf system-text-string-builder:length)) new-value obj! args))
 
 ;; System.Threading.Timer (system-threading-timer)
-;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|Timer|. If another
-;; --defgeneric-opted-in class in this batch also simplifies to that
-;; name (a same-named type from a different namespace), only one of
-;; them keeps this symbol at load time -- dispatch for the other would
-;; be wrong. See doc/make-everything-defgeneric.md's "Static specializer
-;; collision caveat".
+;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|Timer|.
+;; Known simple-name conflict(s) among the types visible to the package
+;; generator (ACTUAL = also generated in this batch, so DotCL's
+;; simple-name/FullName naming race is guaranteed to happen; POSSIBLE =
+;; merely seen in the provided assemblies' metadata, not generated here):
+;;   ACTUAL: System.Timers.Timer
+;; See doc/make-everything-defgeneric.md's "Static specializer collision
+;; caveat" for the full mechanism and a worked example.
 (cl:defmethod change ((obj! dotcl-internal::|Timer|) cl:&rest args)
   (cl:apply (cl:function system-threading-timer:change) obj! args))
 (cl:defmethod dispose ((obj! dotcl-internal::|Timer|) cl:&rest args)
@@ -506,12 +506,14 @@ System.Timers.Timer: (cl:setf synchronizing-object) (cl:setf (system-timers-time
   (cl:apply (cl:function system-threading-timer:dispose-async) obj! args))
 
 ;; System.Timers.Timer (system-timers-timer)
-;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|Timer|. If another
-;; --defgeneric-opted-in class in this batch also simplifies to that
-;; name (a same-named type from a different namespace), only one of
-;; them keeps this symbol at load time -- dispatch for the other would
-;; be wrong. See doc/make-everything-defgeneric.md's "Static specializer
-;; collision caveat".
+;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|Timer|.
+;; Known simple-name conflict(s) among the types visible to the package
+;; generator (ACTUAL = also generated in this batch, so DotCL's
+;; simple-name/FullName naming race is guaranteed to happen; POSSIBLE =
+;; merely seen in the provided assemblies' metadata, not generated here):
+;;   ACTUAL: System.Threading.Timer
+;; See doc/make-everything-defgeneric.md's "Static specializer collision
+;; caveat" for the full mechanism and a worked example.
 (cl:defmethod auto-reset ((obj! dotcl-internal::|Timer|) cl:&rest args)
   (cl:apply (cl:function system-timers-timer:auto-reset) obj! args))
 (cl:defmethod enabled ((obj! dotcl-internal::|Timer|) cl:&rest args)
