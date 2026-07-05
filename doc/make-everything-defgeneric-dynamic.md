@@ -29,7 +29,9 @@ own wrapper.
    This robustness is the entire reason this variant exists alongside the sibling
    `--defgeneric` (static specializer) variant — see that doc for the tradeoff it accepts
    instead.
-2. **Scope = instance methods AND instance property/field accessors** (getters *and* setters).
+2. **Scope = instance methods, instance property/field accessors** (getters *and* setters),
+   **and instance events** (`add-X`/`remove-X` pairs, both folded in as plain method-names
+   entries — added in Generator Version 37 after a real-world report of a missing `add-click`).
    Excluded (documented as limitations): static methods (no receiver to dispatch on), and
    generic/type-parameterized instance methods (their wrapper puts type-args *before* `obj!`,
    so there's no stable `obj!`-first dispatch position). The `<>`-arity dispatchers are also

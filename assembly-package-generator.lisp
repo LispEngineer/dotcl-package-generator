@@ -68,7 +68,8 @@
    33 - Added optional per-class re-export of inherited super-class/interface members (--export-parents/--export-interfaces/--export-object, plus sticky --export-all-* CLI defaults, and --skip-missing/--no-skip-missing for an unresolvable ancestor), per doc/parents-and-interfaces-plan.md. Program.cs's manifest now carries these three booleans per requested class; a new global metadata index (build-metadata-index) resolves a class's ancestor graph (expand-ancestors: :superclass walked link-by-link up to System.Object, :interfaces taken as already-transitive per .NET's Type.GetInterfaces()) across every provided assembly, not just the requesting class's own, folding newly-discovered ancestors into the working set (generated as plain packages, appended after their assembly's explicitly-requested classes -- stable, minimal reordering; an ancestor also explicitly requested keeps its own flags/constant-properties instead of a duplicate). Resolved-class data (previously a bare (class-plist . constant-properties-list) cons throughout resolve-batch-entry/generate-batch-packages-file/generate-batch-asd-file/generate-assembly-packages-batch) is now the make-resolved-class plist, adding the three export flags. Re-export itself (compute-reexports, emit-child-reexports) is a POST-PASS of cl:shadowing-import/cl:import/cl:export calls appended to packages.lisp after every cl:defpackage form -- deliberately not folded into each defpackage via :import-from, so no topological ordering of the defpackage forms is ever needed (shadowing-import/import/export only require the ancestor's symbols to already be interned, which defpackage guarantees regardless of file position; the actual function bindings arrive later, whenever each class's own .lisp file loads, which is safe as long as the whole ASDF system loads before anything is called). Per child, an ancestor-exported name is skipped (with an explanatory comment, not renamed) rather than re-exported when the child already declares it itself (child wins) or when more than one ancestor exports the same name (ambiguous -- the interface1->name-style disambiguation is intentionally deferred to a future version); the synthetic per-type symbols <type>/<type-str>/<creation>/<version>/new are never re-exported, since they identify the ancestor's own type identity, not something inherited. generate-batch-asd-file also adds each child's ancestor package files to its own :file's :depends-on.
    34 - Added optional per-class unification of instance methods and instance property/field accessors into a single shared CSHARP-GENERICS package of CLOS generic functions dispatching on C# runtime type (--defgeneric/--no-defgeneric, plus sticky --enable-defgeneric/--no-enable-defgeneric CLI defaults), per doc/make-everything-defgeneric.md. Program.cs's manifest now carries a :defgeneric boolean per requested class (make-resolved-class/resolve-batch-entry thread it through as a fourth resolved-class field, defaulting to nil for ancestor-only classes exactly like the three export-* flags). collect-class-instance-generics independently re-derives, for one class-plist, the wrapper names whose Lisp signature begins with obj! as the sole/first required argument (instance methods, instance property/field getters, instance indexer getters, and their (cl:setf ...) counterparts), reusing map-member-name/method-name-wrapper-names so the actual name computation cannot drift from compute-package-exports-and-shadows/generate-class-file; it deliberately excludes static members (no obj! receiver), generic/type-parameterized instance methods (their wrapper's lambda list puts the type argument(s) before obj!), and overloaded indexers (no generated wrapper exists to forward to). compute-defgeneric-model aggregates every :defgeneric-true class's collected names into the CSHARP-GENERICS defpackage's :export/:shadow lists (emitted by generate-batch-packages-file, right after the CSHARP-ASSEMBLY-UTILS defpackage) and a per-name specializer list; generate-batch-generics-file (a new sibling file to csharp-assembly-utils.lisp, emitted after every class file so it can depend on their packages) writes one cl:defgeneric per unified name -- (name obj! cl:&rest args), or ((cl:setf name) new-value obj! cl:&rest args) for a setter -- plus, per opted-in class, one cl:eval-when (:load-toplevel :execute) block installing that class's defmethods. Each defmethod is installed by evaluating a backquoted cl:defmethod form specializing on (cl:class-name (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\" (dotnet:resolve-type fq-name))) fetched fresh at load time, deliberately never a symbol hardcoded at generation time: DotCL names a C# type's CLOS class by its simple name only when free, or by its unique FullName when a same-simple-name type from a different namespace has already claimed it, and which type wins that race is load-order-dependent and unknowable at generation time (see Runtime.CLOS.cs's EnsureDotNetTypeClass) -- reading the class's own class-name at load time is immune to this, since it is always the exact symbol DotCL registered for that specific class. Every forwarding defmethod body is a bare cl:apply of the class's own already-generated wrapper function, accepting the small dispatch/apply overhead for a v1 implementation. generate-batch-asd-file adds the CSHARP-GENERICS :file component (depending on \"packages\", \"csharp-assembly-utils\", and every opted-in class's own package file) only when at least one class opted in.
    35 - Version 34's implementation was judged too ugly to be the only option (its cl:eval-of-a-backquoted-defmethod mechanism, needed only because the specializer symbol is unknowable until DotCL resolves the class object at load time) -- see PLAN.md's \"Improve Turn Everything into Generic Methods\" section. That entire mechanism is renamed --defgeneric-dynamic/--no-defgeneric-dynamic (per-class) and --enable-defgeneric-dynamic/--no-enable-defgeneric-dynamic (sticky), its package/file renamed csharp-generics-dynamic (*CSHARP-GENERICS-DYNAMIC-PACKAGE-NAME*, compute-defgeneric-dynamic-model, generate-batch-generics-dynamic-file), and its manifest key renamed :defgeneric-dynamic -- purely a rename, no behavior change, still the fully collision-proof choice for when that robustness is worth the uglier generated code (doc/make-everything-defgeneric-dynamic.md). The now-freed original names (--defgeneric/--no-defgeneric, --enable-defgeneric/--no-enable-defgeneric, csharp-generics package/file, :defgeneric manifest key) are given to a NEW, independent, orthogonal implementation of the design's other original option (\"Simple + documented caveat\"): compute-defgeneric-model/generate-batch-generics-file emit a plain top-level cl:defmethod per unified name per opted-in class -- no cl:eval, no eval-when, no backquote, no runtime class-object lookup -- specializing directly on a LITERAL symbol computed at generation time, dotcl-internal::|<name>|, where <name> is the new dotnet-type-simple-name helper's exact reproduction of .NET reflection's Type.Name (distinct from the pre-existing simple-type-name, which strips the backtick generic-arity suffix for display purposes and never splits on CIL's '+' nested-type separator, so it does not match what DotCL's EnsureDotNetTypeClass, Runtime.CLOS.cs, actually calls Startup.Sym(type.Name) with). The caveat this accepts: if two --defgeneric-opted-in classes in the same batch share a simple name across different namespaces, DotCL's own class-naming collision handling means only one keeps the simple-name symbol at load time (load-order-dependent, unknowable at generation time) -- dispatch for the other, whose defmethod here still assumes the simple name, would be wrong. Documented with a comment above every class's defmethod block in the generated file, and in doc/make-everything-defgeneric.md's \"Static specializer collision caveat\" section, rather than guarded against. Both variants are fully independent and orthogonal: a class may opt into either, both, or neither, each contributing its own defpackage entry/generics file/.asd component; %compute-defgeneric-model (shared internal helper, parameterized on the :defgeneric or :defgeneric-dynamic resolved-class flag key) and emit-defgeneric-defpackage (shared defpackage-emission helper) avoid duplicating the identical aggregation/export-list logic between the two variants' public compute-defgeneric-model/compute-defgeneric-dynamic-model and packages.lisp emission. collect-class-instance-generics (which wrapper names are eligible at all) is entirely mechanism-agnostic and is reused verbatim by both.
-   36 - The static --defgeneric variant's per-class collision comment (Version 35) now reports ACTUAL, KNOWN conflicts instead of a purely hypothetical warning. build-simple-name-index builds a DOTNET-TYPE-SIMPLE-NAME -> (fully-qualified-name...) hash table from build-metadata-index's full per-batch metadata index (every type in every provided assembly, not just requested/generated ones); classify-simple-name-conflicts, given one class's fully-qualified-name plus that index and a hash set of every fully-qualified-name actually generated as its own package in this batch (from ALL-RESOLVED), returns every other type sharing that simple name, each tagged :ACTUAL (also generated in this batch -- both types' files will call EnsureDotNetTypeClass at load time, so DotCL's naming race is guaranteed to actually happen) or :POSSIBLE (merely reflected in the provided assemblies' metadata, not itself generated here -- no guaranteed collision from this run's own output alone). generate-batch-generics-file's per-class comment block now enumerates these findings by name, or states plainly that none are known, rather than a generic \"if another class collides\" warning; generate-assembly-packages-batch builds the metadata index once (previously scoped only to Phase B's ancestor expansion) and threads it plus the resolved-fq-name set down as two new optional arguments. Empirically confirmed accurate against the Makefile smoke test's real System.Threading.Timer/System.Timers.Timer collision pair (both report each other as ACTUAL).")
+   36 - The static --defgeneric variant's per-class collision comment (Version 35) now reports ACTUAL, KNOWN conflicts instead of a purely hypothetical warning. build-simple-name-index builds a DOTNET-TYPE-SIMPLE-NAME -> (fully-qualified-name...) hash table from build-metadata-index's full per-batch metadata index (every type in every provided assembly, not just requested/generated ones); classify-simple-name-conflicts, given one class's fully-qualified-name plus that index and a hash set of every fully-qualified-name actually generated as its own package in this batch (from ALL-RESOLVED), returns every other type sharing that simple name, each tagged :ACTUAL (also generated in this batch -- both types' files will call EnsureDotNetTypeClass at load time, so DotCL's naming race is guaranteed to actually happen) or :POSSIBLE (merely reflected in the provided assemblies' metadata, not itself generated here -- no guaranteed collision from this run's own output alone). generate-batch-generics-file's per-class comment block now enumerates these findings by name, or states plainly that none are known, rather than a generic \"if another class collides\" warning; generate-assembly-packages-batch builds the metadata index once (previously scoped only to Phase B's ancestor expansion) and threads it plus the resolved-fq-name set down as two new optional arguments. Empirically confirmed accurate against the Makefile smoke test's real System.Threading.Timer/System.Timers.Timer collision pair (both report each other as ACTUAL).
+   37 - Fixed a gap in collect-class-instance-generics (Version 34): it walked :fields/:properties/:methods but never :events, so a class's add-X/remove-X instance-event wrapper pair (added in Version 32, two versions before this collector was written) was silently missing from both the --defgeneric and --defgeneric-dynamic unified-generics packages, even though add-X/remove-X already have the exact same (name obj! ...) shape every other collected wrapper has -- reported against a real Dungeon Slime class (a MonoGameGum ButtonBase's Click event) missing its add-click. Both add-X and remove-X are now collected into method-names (never setter-names -- neither is a (cl:setf ...) counterpart of the other). Correctly resolving an event's name requires the exact same non-event taken-names set generate-class-file/compute-package-exports-and-shadows compute for event-wrapper-names' three-tier collision escalation (add-X/remove-X -> add-X-event/remove-X-event -> add-X!/remove-X!, see Version 32) -- collect-class-instance-generics now also derives constructors/literal-fields/const-fields/const-props/writeable-static-props/mutable-static-fields (mirroring compute-package-exports-and-shadows's own local bindings) purely to build that taken-names set via the existing class-member-names-excluding-events helper, so it can never choose a different escalation tier than what's actually emitted. This requires a class's constant-properties-list, which compute-package-exports-and-shadows/generate-class-file already receive but collect-class-instance-generics previously did not; it is now a required second parameter, with %compute-defgeneric-model's sole call site passing the resolved-class plist's own :constant-properties.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -1382,34 +1383,60 @@
 
     (values exports shadows)))
 
-(defun collect-class-instance-generics (class-plist)
+(defun collect-class-instance-generics (class-plist constant-properties-list)
   "Returns (values method-names setter-names) -- the wrapper names
    CLASS-PLIST's own generated package exports whose Lisp signature begins
    with obj! as the sole/first required argument, and which are therefore
    eligible to be folded into the shared CSHARP-GENERICS unification (see
    doc/make-everything-defgeneric.md and generate-batch-generics-file).
    METHOD-NAMES covers instance methods, instance property/field getters,
-   and instance indexer getters (name obj! &rest args); SETTER-NAMES covers
-   the (cl:setf name) counterpart for writeable instance
-   properties/fields/indexers. Deliberately excludes: static members (no
-   obj! receiver -- see doc/make-everything-defgeneric.md's excluded
-   categories), generic/type-parameterized instance methods (their
-   wrapper's lambda list puts the type argument(s) before obj!, so obj! is
-   not the leading argument), and overloaded indexers (already
-   unimplemented by generate-class-file itself, so no wrapper function
-   exists to forward to).
+   instance indexer getters, and instance event add-X/remove-X pairs (each
+   (name obj! &rest args)); SETTER-NAMES covers the (cl:setf name)
+   counterpart for writeable instance properties/fields/indexers.
+   Deliberately excludes: static members (no obj! receiver -- see
+   doc/make-everything-defgeneric.md's excluded categories),
+   generic/type-parameterized instance methods (their wrapper's lambda
+   list puts the type argument(s) before obj!, so obj! is not the leading
+   argument), and overloaded indexers (already unimplemented by
+   generate-class-file itself, so no wrapper function exists to forward
+   to).
    Independently filters FIELDS/PROPERTIES/METHODS the same way
    generate-class-file and compute-package-exports-and-shadows do (this
    file's existing duplication convention -- see
    class-member-names-excluding-events's docstring), but reuses
    map-member-name/method-name-wrapper-names so the actual NAME computation
-   can never drift from what those two functions emit."
+   can never drift from what those two functions emit.
+   CONSTANT-PROPERTIES-LIST (the same split constant-properties-list
+   compute-package-exports-and-shadows/generate-class-file take) is
+   required here too: resolving an event's add-X/remove-X name requires
+   the exact same non-event taken-names set those two functions compute
+   (via CLASS-MEMBER-NAMES-EXCLUDING-EVENTS) -- including the
+   constant-vs-non-constant field/property split, which depends on
+   CONSTANT-PROPERTIES-LIST -- so EVENT-WRAPPER-NAMES' three-tier collision
+   escalation (add-X/remove-X -> add-X-event/remove-X-event -> add-X!/
+   remove-X!) can never choose a different tier than what generate-class-
+   file actually emits."
   (let* ((fields (getf class-plist :fields))
          (properties (getf class-plist :properties))
          (methods (getf class-plist :methods))
+         (kind (getf class-plist :kind))
+         (raw-ctors (getf class-plist :constructors))
+         (ctors (if (and (eq kind :struct)
+                         (not (some (lambda (ctor) (null (getf ctor :parameters))) raw-ctors)))
+                    (cons '(:parameters nil :public t) raw-ctors)
+                    raw-ctors))
+         (literal-fields (remove-if-not #'literal-field-p fields))
+         (runtime-fields-all (remove-if-not #'runtime-readonly-field-p fields))
+         (pure-const-fields (remove-if-not (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
+         (dynamic-const-fields (remove-if (lambda (f) (or (member "*" constant-properties-list :test #'string=) (member (getf f :name) constant-properties-list :test #'string-equal))) runtime-fields-all))
          (instance-fields (remove-if-not #'public-instance-field-p fields))
+         (mutable-static-fields (remove-if-not #'mutable-static-field-p fields))
+         (const-props (remove-if-not #'constant-property-p properties))
+         (pure-const-props (remove-if-not (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
+         (dynamic-const-props (remove-if (lambda (p) (or (member "*" constant-properties-list :test #'string=) (member (getf p :name) constant-properties-list :test #'string-equal))) const-props))
          (instance-props (remove-if-not #'instance-property-p properties))
          (instance-prop-groups (group-properties-by-name instance-props))
+         (writeable-static-props (remove-if-not #'writeable-static-property-p properties))
          (non-operator-non-accessor-methods
            (remove-if (lambda (m)
                         (or (uiop:string-prefix-p "op_" (getf m :name))
@@ -1426,6 +1453,9 @@
              (let ((groups nil))
                (maphash (lambda (name ms) (push (cons name (nreverse ms)) groups)) table)
                (nreverse groups))))
+         (clean-ctors (remove-if-not #'clean-constructor-p ctors))
+         (clean-ctor-count (length clean-ctors))
+         (instance-events (remove-if-not #'instance-event-p (getf class-plist :events)))
          (method-names nil)
          (setter-names nil))
     ;; Public instance fields.
@@ -1458,6 +1488,33 @@
         (when non-generic-instance-clean
           (dolist (n (method-name-wrapper-names non-generic-instance-clean kebab-name))
             (push n method-names)))))
+    ;; Instance events (add-X/remove-X pairs) -- both names go into
+    ;; method-names, since neither is a (cl:setf ...) counterpart of the
+    ;; other; both are plain (name obj! handler) functions. Resolved last,
+    ;; against the full non-event taken-names set (mirroring
+    ;; generate-class-file's own "Instance Events" block and
+    ;; compute-package-exports-and-shadows), so this can never choose a
+    ;; different collision-escalation tier than what's actually emitted.
+    (let ((all-other-names
+            (class-member-names-excluding-events
+             :clean-ctor-count clean-ctor-count
+             :literal-fields literal-fields
+             :pure-const-fields pure-const-fields
+             :dynamic-const-fields dynamic-const-fields
+             :instance-fields instance-fields
+             :mutable-static-fields mutable-static-fields
+             :pure-const-props pure-const-props
+             :dynamic-const-props dynamic-const-props
+             :writeable-static-props writeable-static-props
+             :instance-prop-groups instance-prop-groups
+             :method-groups method-groups)))
+      (dolist (e instance-events)
+        (multiple-value-bind (add-name remove-name)
+            (event-wrapper-names (getf e :name) all-other-names)
+          (push add-name all-other-names)
+          (push remove-name all-other-names)
+          (push add-name method-names)
+          (push remove-name method-names))))
     (values (remove-duplicates (nreverse method-names) :test #'string= :from-end t)
             (remove-duplicates (nreverse setter-names) :test #'string= :from-end t))))
 
@@ -2198,7 +2255,8 @@
           (let* ((cls (getf rc :class-plist))
                  (fq-name (getf cls :fully-qualified-name))
                  (pkg-name (type-fq-name-to-pkg-name fq-name)))
-            (multiple-value-bind (method-names setter-names) (collect-class-instance-generics cls)
+            (multiple-value-bind (method-names setter-names)
+                (collect-class-instance-generics cls (getf rc :constant-properties))
               (push (list :pkg-name pkg-name :fq-name fq-name
                           :method-names method-names :setter-names setter-names)
                     classes)

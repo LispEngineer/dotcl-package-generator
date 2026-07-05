@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Net.ServicePointManager
-;;; Generator Version: 36
-;;; Creation Date: 2026-07-05T18:30:04Z
+;;; Generator Version: 37
+;;; Creation Date: 2026-07-05T18:46:38Z
 
 (cl:in-package :system-net-service-point-manager)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Net.ServicePointManager"))
 (cl:defconstant <type-str> "System.Net.ServicePointManager")
-(cl:defconstant <creation> "2026-07-05T18:30:04Z")
-(cl:defconstant <version> 36)
+(cl:defconstant <creation> "2026-07-05T18:46:38Z")
+(cl:defconstant <version> 37)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

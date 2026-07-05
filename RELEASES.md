@@ -10,6 +10,19 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.37.0 — 2026-07-05
+
+**Fixed a gap: instance events (`add-X`/`remove-X`) were missing from the unified generics
+packages.**
+
+* `--defgeneric` and `--defgeneric-dynamic` now fold a class's instance events into
+  `csharp-generics`/`csharp-generics-dynamic` alongside methods and property/field accessors —
+  previously they were silently omitted (reported against a real class whose `Click` event's
+  `add-click` was missing). No CLI change; only affects which names appear in the generated
+  unified-generics packages for classes that have instance events. See
+  `doc/make-everything-defgeneric.md`/`doc/make-everything-defgeneric-dynamic.md`
+  (`*generator-version*` bumped to 37).
+
 ## 2.36.0 — 2026-07-05
 
 **The static `--defgeneric` variant's collision comment now reports actual, known conflicts.**

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ArgumentOutOfRangeException
-;;; Generator Version: 36
-;;; Creation Date: 2026-07-05T18:30:04Z
+;;; Generator Version: 37
+;;; Creation Date: 2026-07-05T18:46:38Z
 
 (cl:in-package :system-argument-out-of-range-exception)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.ArgumentOutOfRangeException"))
 (cl:defconstant <type-str> "System.ArgumentOutOfRangeException")
-(cl:defconstant <creation> "2026-07-05T18:30:04Z")
-(cl:defconstant <version> 36)
+(cl:defconstant <creation> "2026-07-05T18:46:38Z")
+(cl:defconstant <version> 37)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

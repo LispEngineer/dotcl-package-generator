@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 36
-;;; Creation Date: 2026-07-05T18:30:04Z
+;;; Generator Version: 37
+;;; Creation Date: 2026-07-05T18:46:38Z
 
 (cl:in-package :csharp-generics)
 
@@ -319,6 +319,16 @@ System.Timers.Timer: start (system-timers-timer:start)
 System.Timers.Timer: stop (system-timers-timer:stop)
 "))
 
+(cl:defgeneric add-elapsed (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Timers.Timer: add-elapsed (system-timers-timer:add-elapsed)
+"))
+
+(cl:defgeneric remove-elapsed (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Timers.Timer: remove-elapsed (system-timers-timer:remove-elapsed)
+"))
+
 (cl:defgeneric (cl:setf capacity) (new-value obj! cl:&rest args)
   (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
 System.Text.StringBuilder: (cl:setf capacity) (cl:setf (system-text-string-builder:capacity ...))
@@ -536,6 +546,10 @@ System.Timers.Timer: (cl:setf synchronizing-object) (cl:setf (system-timers-time
   (cl:apply (cl:function system-timers-timer:start) obj! args))
 (cl:defmethod stop ((obj! dotcl-internal::|Timer|) cl:&rest args)
   (cl:apply (cl:function system-timers-timer:stop) obj! args))
+(cl:defmethod add-elapsed ((obj! dotcl-internal::|Timer|) cl:&rest args)
+  (cl:apply (cl:function system-timers-timer:add-elapsed) obj! args))
+(cl:defmethod remove-elapsed ((obj! dotcl-internal::|Timer|) cl:&rest args)
+  (cl:apply (cl:function system-timers-timer:remove-elapsed) obj! args))
 (cl:defmethod (cl:setf auto-reset) (new-value (obj! dotcl-internal::|Timer|) cl:&rest args)
   (cl:apply (cl:function (cl:setf system-timers-timer:auto-reset)) new-value obj! args))
 (cl:defmethod (cl:setf enabled) (new-value (obj! dotcl-internal::|Timer|) cl:&rest args)

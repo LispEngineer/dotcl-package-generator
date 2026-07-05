@@ -569,9 +569,10 @@ already-generated wrapper. A class may use either variant, both, or neither; eac
 its own package/file/`.asd` component entirely independently of the other.
 
 Both variants share the same scope and dispatch shape:
-* **Scope:** instance methods (including multi-overload Master Wrappers) and instance
-  property/field getters and setters (indexers included). **Excluded:** static members (no
-  receiver to dispatch on), generic/type-parameterized instance methods (their wrapper's
+* **Scope:** instance methods (including multi-overload Master Wrappers), instance
+  property/field getters and setters (indexers included), and instance events (`add-X`/
+  `remove-X` pairs, both folded in as plain method-names entries). **Excluded:** static members
+  (no receiver to dispatch on), generic/type-parameterized instance methods (their wrapper's
   lambda list puts the type argument(s) *before* `obj!`, so `obj!` isn't the leading
   argument — see "Generic Methods" above), and overloaded indexers (already unimplemented).
 * **Shape:** every unified name is `(name obj! cl:&rest args)`; every unified setter is

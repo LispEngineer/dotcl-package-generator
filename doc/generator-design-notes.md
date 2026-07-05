@@ -1745,3 +1745,42 @@ standalone (e.g. from a test) without requiring the full batch machinery.
 
 Verified against the `Makefile` smoke test's real `System.Threading.Timer`/`System.Timers.Timer`
 collision pair: each correctly reports the other as an `ACTUAL` conflict.
+
+## Instance Events Included in the Unified Generics Collector (Version 37)
+
+### What changed and why
+
+`collect-class-instance-generics` (the collector both `--defgeneric` and `--defgeneric-dynamic`
+rely on) walked only `:fields`/`:properties`/`:methods` — it never looked at `:events`, so a
+class's `add-X`/`remove-X` instance-event wrapper pair (added in Version 32, two versions
+before this collector was written in Version 34) was silently missing from both unified-generics
+packages, even though `add-X`/`remove-X` already have the exact same `(name obj! ...)` shape
+every other collected wrapper has. Reported against a real class from a MonoGameGum-based game
+(a `ButtonBase`'s `Click` event missing its `add-click`). The Version 34 changelog's exclusion
+list (static members, generic methods, overloaded indexers) never mentioned events — this was
+a gap from the collector never being revisited after events were added, not a deliberate
+exclusion.
+
+### The correctness-critical part: agreeing with `event-wrapper-names`' collision escalation
+
+`add-X`/`remove-X` fold in as two independent `method-names` entries (never `setter-names` —
+neither is a `(cl:setf ...)` counterpart of the other). The subtlety is naming:
+`event-wrapper-names`' three-tier collision escalation (`add-X`/`remove-X` →
+`add-X-event`/`remove-X-event` → `add-X!`/`remove-X!`) is seeded by every other name the class
+package will export, computed via `class-member-names-excluding-events` — the exact same helper
+`compute-package-exports-and-shadows`/`generate-class-file` already share so they can never
+disagree on this. To avoid ever computing a different escalation tier than what's actually
+emitted, `collect-class-instance-generics` now also derives the full non-event context those
+two functions do (constructors, literal/const fields, const/writeable static properties, mutable
+static fields — mirroring `compute-package-exports-and-shadows`'s own local bindings) purely to
+build that taken-names set, even though none of those extra categories themselves become
+unified-generics candidates. This requires a class's `constant-properties-list` (needed for the
+const-vs-non-const field/property split), which the function did not previously take;
+`collect-class-instance-generics` gained a required second parameter, and its sole caller,
+`%compute-defgeneric-model`, now passes the resolved-class plist's own `:constant-properties`.
+
+Verified with a dedicated unit test asserting `collect-class-instance-generics` and
+`compute-package-exports-and-shadows` *agree* on the escalated name for a `Click` event
+colliding with unrelated `AddClick()`/`RemoveClick()` methods, rather than asserting one
+hardcoded expected string — this is precisely the class of bug (two functions silently
+disagreeing on a name) `class-member-names-excluding-events` was built to prevent.

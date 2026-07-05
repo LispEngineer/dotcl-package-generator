@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector3
-;;; Generator Version: 36
-;;; Creation Date: 2026-07-05T18:30:04Z
+;;; Generator Version: 37
+;;; Creation Date: 2026-07-05T18:46:38Z
 
 (cl:in-package :system-numerics-vector3)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Numerics.Vector3"))
 (cl:defconstant <type-str> "System.Numerics.Vector3")
-(cl:defconstant <creation> "2026-07-05T18:30:04Z")
-(cl:defconstant <version> 36)
+(cl:defconstant <creation> "2026-07-05T18:46:38Z")
+(cl:defconstant <version> 37)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

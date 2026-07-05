@@ -38,11 +38,12 @@ first variant was renamed to `-dynamic`.
    (`doc/make-everything-defgeneric-dynamic.md`) instead when this risk matters — e.g. when a
    batch includes many classes and cannot easily audit for simple-name collisions.
 3. **Scope, package shape, and per-class opt-in are identical to the dynamic variant**: instance
-   methods + instance property/field getters/setters (indexers included), excluding static
-   members and generic/type-parameterized instance methods (whose wrapper puts a type argument
-   before `obj!`). Package name: `csharp-generics`. A class may opt into this variant
-   (`--defgeneric`/`--enable-defgeneric`), the dynamic variant, both, or neither — entirely
-   independent, orthogonal flags.
+   methods + instance property/field getters/setters (indexers included) + instance events
+   (`add-X`/`remove-X` pairs, added in Generator Version 37 after a real-world report of a
+   missing `add-click`), excluding static members and generic/type-parameterized instance
+   methods (whose wrapper puts a type argument before `obj!`). Package name: `csharp-generics`.
+   A class may opt into this variant (`--defgeneric`/`--enable-defgeneric`), the dynamic
+   variant, both, or neither — entirely independent, orthogonal flags.
 
 ## Exact `.NET` `Type.Name` reproduction: `dotnet-type-simple-name`
 
