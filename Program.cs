@@ -74,17 +74,35 @@ for (int i = 0; i < args.Length; i++) {
         } else {
             currentClass.ExportParents = true;
         }
+    } else if (args[i] == "--no-export-parents") {
+        if (currentClass == null) {
+            argErrors.Add("--no-export-parents specified before any --class.");
+        } else {
+            currentClass.ExportParents = false;
+        }
     } else if (args[i] == "--export-interfaces") {
         if (currentClass == null) {
             argErrors.Add("--export-interfaces specified before any --class.");
         } else {
             currentClass.ExportInterfaces = true;
         }
+    } else if (args[i] == "--no-export-interfaces") {
+        if (currentClass == null) {
+            argErrors.Add("--no-export-interfaces specified before any --class.");
+        } else {
+            currentClass.ExportInterfaces = false;
+        }
     } else if (args[i] == "--export-object") {
         if (currentClass == null) {
             argErrors.Add("--export-object specified before any --class.");
         } else {
             currentClass.ExportObject = true;
+        }
+    } else if (args[i] == "--no-export-object") {
+        if (currentClass == null) {
+            argErrors.Add("--no-export-object specified before any --class.");
+        } else {
+            currentClass.ExportObject = false;
         }
     } else if (args[i] == "--export-all-parents") {
         exportAllParents = true;
@@ -317,19 +335,23 @@ void PrintHelp() {
         "of re-evaluated accessors, for the most recently given",
         "--class.");
     Console.WriteLine();
-    Console.WriteLine("Parents and interfaces (per-class, attach to the most recently given --class):");
-    Opt("--export-parents", "Also generate packages for, and re-export non-",
-        "conflicting members from, every super-class of the",
-        "most recently given --class (excluding System.Object",
-        "unless --export-object is also given).");
-    Opt("--export-interfaces", "Also generate packages for, and re-export non-",
-        "conflicting members from, every interface implemented",
-        "by the most recently given --class.");
-    Opt("--export-object", "When combined with --export-parents, also generate",
-        "a package for, and re-export from, System.Object.");
+    Console.WriteLine("Parents and interfaces (per-class, attach to the most recently given --class);");
+    Console.WriteLine("each has a --no- counterpart that turns it back off for just that one class,");
+    Console.WriteLine("overriding a --export-all-* sticky default in effect (see below):");
+    Opt("--export-parents / --no-export-parents", "Also generate packages for, and re-export",
+        "non-conflicting members from, every super-class",
+        "of the most recently given --class (excluding",
+        "System.Object unless --export-object is also given).");
+    Opt("--export-interfaces / --no-export-interfaces", "Also generate packages for, and re-export",
+        "non-conflicting members from, every interface",
+        "implemented by the most recently given --class.");
+    Opt("--export-object / --no-export-object", "When combined with --export-parents, also",
+        "generate a package for, and re-export from,",
+        "System.Object.");
     Console.WriteLine();
     Console.WriteLine("Sticky defaults (change the default for the current and every subsequent --class,");
-    Console.WriteLine("in command-line order; a class's own --export-* flags above always override these):");
+    Console.WriteLine("in command-line order; a class's own --export-*/--no-export-* flags above always");
+    Console.WriteLine("override these, for that one class only):");
     Opt("--export-all-parents / --no-export-all-parents", "Default --export-parents on/off.");
     Opt("--export-all-interfaces / --no-export-all-interfaces", "Default --export-interfaces on/off.");
     Opt("--export-all-object / --no-export-all-object", "Default --export-object on/off.");

@@ -10,6 +10,22 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.33.1 — 2026-07-05
+
+**Added per-class one-time overrides for the `--export-all-*` sticky defaults.**
+
+* `--export-parents`/`--export-interfaces`/`--export-object` each gained a `--no-` counterpart
+  (`--no-export-parents`, `--no-export-interfaces`, `--no-export-object`) that turns the flag
+  back off for just the most recently given `--class`, overriding whichever
+  `--export-all-parents`/`--export-all-interfaces`/`--export-all-object` sticky default is in
+  effect at that point — without this, once a sticky default was turned on there was no way to
+  opt a single class back out of it. CLI-only change: `Program.cs` already resolved each class's
+  final three booleans before building the manifest, so no change was needed to the manifest
+  format, `assembly-package-generator.lisp`, or generated output shape (`*generator-version*`
+  stays at 33).
+* See `PLAN.md`'s "More Parent & Ancestor stuff" section and `--help`'s updated
+  "Parents and interfaces" block.
+
 ## 2.33.0 — 2026-07-05
 
 **Added optional per-class re-export of inherited super-class/interface members.**

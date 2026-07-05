@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
 ;;; Generator Version: 33
-;;; Creation Date: 2026-07-05T13:49:48Z
+;;; Creation Date: 2026-07-05T13:59:34Z
 
 (cl:in-package :cl-user)
 
@@ -2493,6 +2493,9 @@
 ;;; Skipped (system-io-stream-reader declares its own): read-to-end-async
 (cl:import '(system-io-text-reader::synchronized system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-marshal-by-ref-object::memberwise-clone) ':system-io-stream-reader)
 (cl:export '(system-io-stream-reader::synchronized system-io-stream-reader::get-lifetime-service system-io-stream-reader::initialize-lifetime-service system-io-stream-reader::memberwise-clone) ':system-io-stream-reader)
+
+;;; system-xml-xml-reader: re-exports inherited members from system-i-disposable
+;;; Skipped (system-xml-xml-reader declares its own): dispose
 
 ;;; system-collections-specialized-name-value-collection: re-exports inherited members from system-collections-specialized-name-object-collection-base, system-collections-i-collection, system-collections-i-enumerable, system-runtime-serialization-i-deserialization-callback, system-runtime-serialization-i-serializable, system-object
 ;;; Skipped (ambiguous across ancestors: system-collections-specialized-name-object-collection-base, system-collections-i-collection): count

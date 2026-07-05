@@ -23,6 +23,10 @@ Add flags & default changing flags for these capabilities.
 
 * Add one-time flags for `--no-export-<whatever>` that override the default `--export-all-<whatever>`
   for just the current class.
+  * **DONE (2026-07-05, v2.33.1)**: `--no-export-parents`/`--no-export-interfaces`/
+    `--no-export-object` added, each turning the corresponding flag back off for just the
+    most recently given `--class`. CLI-only change (`Program.cs`); no manifest, Lisp, or
+    generated-output-shape change was needed. See `RELEASES.md`'s 2.33.1 entry.
 
 * Export all inner classes/interfaces (recursively) as well.
 
@@ -41,6 +45,28 @@ Add flags & default changing flags for these capabilities.
   correctness. It needs new `AssemblyToLispy.cs` metadata
   (`MethodInfo.IsVirtual`/`GetBaseDefinition()`, surfaced as e.g. `:virtual`/`:new-slot`
   flags) plus a `doc/assembly-to-lispy.md` schema update.
+
+
+# Turn Everything into Generic Methods
+
+In addition of having every instance function exported in its own package, export them all in a
+single package (maybe `csharp-interop` or somesuch). Then use DotCL's CLOS generic method
+interoperability to unify them.
+
+Make a generic method (`defgeneric`) for every instance function used anywhere.
+* Docstring could specify which classes have specializations of the generic method,
+  and give the full package names.
+
+Have a method implementation (`defmethod`) for every single class with that name.
+* This should dispatch based on the C# type of the target class.
+* This should be a very simple dispatch that calls in to the non-generic method in
+  the original class. (Yes, this does add overhead - we could address that in a later
+  version if desired.)
+* Docstring should reference the underlying actual implementation, telling the user
+  which Lisp package, etc.
+
+The implemented generic methods could also include property and field getters and setters, as those
+have semantics that are effectively the same as C# instance methods once translated to Lisp.
 
 
 # Add More to Generated `.lisp` Files

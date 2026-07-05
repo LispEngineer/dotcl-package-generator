@@ -72,9 +72,9 @@ test: build
 				--class System.IO.MemoryStream --export-object \
 				--class System.IO.StreamReader \
 	    --assembly $(REF_DIR)System.Linq.dll \
-	      --class System.Linq.Enumerable --no-export-all-parents --no-export-all-interfaces \
+	      --class System.Linq.Enumerable --no-export-all-parents --no-export-interfaces \
 	    --assembly $(REF_DIR)System.Xml.ReaderWriter.dll \
-	      --class System.Xml.XmlReader \
+	      --class System.Xml.XmlReader --no-export-all-interfaces \
 	    --assembly $(REF_DIR)System.Collections.dll \
 	      --class 'System.Collections.Generic.Dictionary`2' \
 	      --class 'System.Collections.Generic.Dictionary`2+KeyCollection' \

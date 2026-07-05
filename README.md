@@ -57,7 +57,7 @@ MonoGame proof of concept.
 dotcl-packagegen --out-dir ./cspackages \
     --assembly path/to/Some.Assembly.dll \
       --class Some.Namespace.Type1 --constant-properties "*" \
-      --class Some.Namespace.Type2 \
+      --class Some.Namespace.Type2 --export-parents \
     --assembly path/to/Some.Other.Assembly.dll \
       --class Some.Other.Namespace.Type3
 ```
@@ -97,10 +97,14 @@ non-conflicting members from, its ancestors:
   the class implements.
 * `--export-object` — when combined with `--export-parents`, also include `System.Object`.
 
+Each of these has a `--no-` counterpart (`--no-export-parents`, `--no-export-interfaces`,
+`--no-export-object`) that turns it back off for just that one class — useful for opting a
+single class out when a `--export-all-*` sticky default (below) is otherwise on.
+
 Sticky defaults (`--export-all-parents`/`--no-export-all-parents`, and the `-interfaces`/
 `-object` equivalents) change the default for the current and every subsequent `--class`, in
-command-line order; a class's own `--export-*` flags always override the sticky default for
-that one class.
+command-line order; a class's own `--export-*`/`--no-export-*` flags always override the sticky
+default for that one class only.
 
 A re-exported member is skipped (with a comment, not silently dropped) when the class already
 declares a member of that name itself (the class's own wins), or when more than one ancestor
@@ -109,7 +113,6 @@ for now it's a comment only). By default, an ancestor that cannot be found in an
 assembly's metadata is a hard error before anything is generated; pass `--skip-missing` to
 instead warn and drop it (`--no-skip-missing` restores the default). See
 [`doc/parents-and-interfaces-plan.md`](doc/parents-and-interfaces-plan.md) for the full design.
-
 
 
 # Building & Testing
