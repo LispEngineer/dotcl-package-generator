@@ -63,7 +63,8 @@
    28 - Replaced the version-27 arity-suffixed export scheme (aggregate-arity-1, aggregate-arity-2, ...) with a two-tier dispatch mirroring the version-24 Overload Consolidation's '*' static/instance convention, so a method-name group's public surface stays at most two names: generic-arity-dispatch-mode classifies a method name's generic-arity cells (split-by-generic-arity) as :single (the common case: non-generic, or every overload shares one arity -- generates bare base-name exactly as before, byte-identical output), :split-with-plain (a non-generic overload coexists with generic ones at other arities -- generates base-name for the non-generic overload(s) and a new base-name<> dispatcher for the generic cells), or :split-all-generic (every overload is generic but at different arities, e.g. Enumerable.Aggregate's arity-1/2/3 overloads -- base-name itself becomes the dispatcher, no <> suffix needed since there is no non-generic form to disambiguate against). The base-name<>/base-name dispatcher (generate-generic-arity-dispatcher) takes the type argument(s) as its first parameter -- a single .NET type (arity 1) or a cl:list of types (arity = its length), distinguished via cl:listp since a type argument is itself never a list -- and applies the remaining arguments through to an internal, unexported per-arity function (internal-arity-fn-name, reusing the old arity-suffixed names and generate-single-overload/generate-master-wrapper bodies verbatim -- only their export status changes). In the :split-with-plain case, passing an empty list/nil as the type argument to base-name<> falls through to base-name itself rather than erroring. method-name-wrapper-names now reflects this: at most (base-name) or (base-name base-name<>), never the internal per-arity names.
    29 - Documentation-only correction, no dispatch/behavior change: the struct-boxing warning comment above instance property/field mutators previously claimed setf 'may only mutate a boxed copy, leaving the original unchanged' -- backwards. A live REPL check against dotcl-dungeonslime proved mutation actually succeeds in place, and, more importantly, that a --constant-properties-selected (or, in principle, literal/const) defconstant of a mutable struct type is a single boxed .NET object shared and re-returned on every reference for the life of the program, since defconstant's value form runs exactly once -- mutating it through any alias (e.g. a defparameter bound to it) permanently corrupts the 'constant' everywhere, silently. The mutator comment is corrected to describe this aliasing hazard accurately (emit-shared-mutable-constant-warning at the three is-value-type-p property/field-mutator sites), and a new warning comment is now emitted above every literal-fields/pure-const-fields/pure-const-props defconstant whose type is not a known-safe immutable-primitive-type-p type (numeric primitives, System.String, System.Char, System.Boolean, System.IntPtr/UIntPtr) -- a deliberately broad allowlist, since this repo has no cross-type metadata available at generation time to precisely determine some other type's mutability. See doc/generator-design-notes.md's corrected \"Instance Properties and Struct 'Boxing Mutation'\" section and its new Version 29 section for the full transcript and root-cause explanation.
    30 - AssemblyToLispy.cs's GetCleanMethodName gained mappings for the 8 remaining standard C# overloadable operators previously left as raw op_Xxx names (op_Modulus -> %, op_BitwiseAnd -> &, op_BitwiseOr -> |, op_ExclusiveOr -> ^, op_LeftShift -> <<, op_RightShift -> >>, op_UnsignedRightShift -> >>>, op_OnesComplement -> ~) and C# 11's checked-operator variants, suffixed with '!' to coexist alongside their unchecked counterparts on the same type (op_CheckedAddition -> +!, op_CheckedSubtraction -> -!, op_CheckedMultiply -> *!, op_CheckedDivision -> /!, op_CheckedUnaryNegation -> -! shared with op_CheckedSubtraction the same way unchecked '-' is already shared between op_Subtraction/op_UnaryNegation, op_CheckedExplicit -> explicit-cast!). No change was needed in this file: a mapped operator's :name is already its clean Lisp symbol (not a raw op_-prefixed name) by the time non-operator-non-accessor-methods/simple-method-p/clean-method-p run their 'op_' prefix checks, so any newly-mapped operator flows through the existing clean-method/Master Wrapper pipeline exactly like the previously-mapped +/-/*//,=,etc. do today -- unary/binary disambiguation via the optional-second-argument arity check (see Version 13/14) applies unchanged, and the real CLR method is still invoked via each method's :mangled-name.
-   31 - Closed a known silent gap (tracked in PLAN.md/FEATURES.md's Unsupported Features): a static property that is writeable (read-write or write-only), and a plain mutable static field (not readonly, not const), previously matched none of the existing field/property classifiers and so generated nothing at all -- no getter, no setter, not even a comment. New predicates writeable-static-property-p (static + writeable, disjoint from constant-property-p which requires not-writeable) and mutable-static-field-p (static, neither literal nor init-only, the exact complement within static fields of literal-field-p/runtime-readonly-field-p) now catch these. Codegen mirrors the existing instance-property/instance-field shape (readable -> getter, writeable+readable -> adds a setf-expander, writeable-only -> a set-name function) but uses dotnet:static in place of dotnet:invoke and drops the obj! receiver entirely, since dotnet:static's own setf-expansion (per doc/dotnet-dotcl-interop.md) writes the type's static storage slot directly -- unlike instance property/field mutation, there is no boxed obj! receiver to alias, so no struct-boxing-mutation warning comment is emitted for either new case.")
+   31 - Closed a known silent gap (tracked in PLAN.md/FEATURES.md's Unsupported Features): a static property that is writeable (read-write or write-only), and a plain mutable static field (not readonly, not const), previously matched none of the existing field/property classifiers and so generated nothing at all -- no getter, no setter, not even a comment. New predicates writeable-static-property-p (static + writeable, disjoint from constant-property-p which requires not-writeable) and mutable-static-field-p (static, neither literal nor init-only, the exact complement within static fields of literal-field-p/runtime-readonly-field-p) now catch these. Codegen mirrors the existing instance-property/instance-field shape (readable -> getter, writeable+readable -> adds a setf-expander, writeable-only -> a set-name function) but uses dotnet:static in place of dotnet:invoke and drops the obj! receiver entirely, since dotnet:static's own setf-expansion (per doc/dotnet-dotcl-interop.md) writes the type's static storage slot directly -- unlike instance property/field mutation, there is no boxed obj! receiver to alias, so no struct-boxing-mutation warning comment is emitted for either new case.
+   32 - Added support for C# events (add_X/remove_X accessor pairs), previously invisible end-to-end: filtered out at reflection time by the same IsSpecialName check that also hides property/indexer accessors (AssemblyToLispy.cs), so the Lisp side never even knew they existed (doc/claude-suggested-improvements-20260703.md's item 4). AssemblyToLispy.cs now reflects instance events (only -- static events are excluded, since dotnet:add-event/dotnet:remove-event have no verified calling convention for a receiverless event) into a new :events metadata key (FormatEventPlist, mirroring FormatPropertyPlist); each generates an add-X/remove-X wrapper pair calling DotCL's existing dotnet:add-event/dotnet:remove-event (no DotCL runtime changes were needed -- this was purely a reflection+codegen gap in this repo). Removal is by Lisp object identity: passing a fresh (lambda ...) that merely behaves like the original handler will not remove it, since dotnet:add-event's cache is keyed on the exact Lisp function object originally passed to add-X (the generated remove-X docstring calls this out explicitly). Since add-X/remove-X are synthesized compound names rather than a 1:1 mapping of one C# identifier, they can collide with an unrelated real member (e.g. a Click event alongside an AddClick() method); event-wrapper-names resolves this via a three-tier escalation (add-click/remove-click -> add-click-event/remove-click-event -> add-click!/remove-click!, the last collision-proof by construction since C# cannot emit '!', the same guarantee obj!/quote!/function!/t!/nil! already rely on), fed by class-member-names-excluding-events -- a new helper both compute-package-exports-and-shadows and generate-class-file call with their own independently-filtered field/property/method lists, so the two functions can never disagree on an event's actual wrapper names. See doc/generator-design-notes.md's Events (Version 32) section for the full design writeup, and PLAN.md for the deferred static-event follow-up.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -206,6 +207,13 @@
 (defun static-method-p (method)
   "Checks if a method plist defines a static method."
   (getf method :is-static))
+
+(defun instance-event-p (event)
+  "Checks if an event plist defines an instance event. Mirrors instance-property-p;
+   trivially true for every event today, since AssemblyToLispy.cs's :events collection
+   only ever reflects instance events -- static events have no verified DotCL calling
+   convention yet (see doc/generator-design-notes.md's Events (Version 32) section)."
+  (not (getf event :static)))
 
 (defun public-instance-field-p (field)
   "Checks if a field plist defines a public instance field."
@@ -1105,6 +1113,99 @@
                             collect (format-param-type-check (getf p :type) (format nil "(cl:nth ~D args)" idx)))))
           (format nil "(cl:and (cl:= (cl:length args) ~D)~{ ~A~})" arg-count checks)))))
 
+(defun class-member-names-excluding-events (&key clean-ctor-count literal-fields
+                                               pure-const-fields dynamic-const-fields
+                                               instance-fields mutable-static-fields
+                                               pure-const-props dynamic-const-props
+                                               writeable-static-props instance-prop-groups
+                                               method-groups)
+  "Returns every Lisp name a class's non-event members (constructors, fields,
+   properties, methods) would produce, given the same filtered/grouped lists
+   compute-package-exports-and-shadows and generate-class-file already
+   independently derive from a class-plist. Both functions call this with
+   their own identically-filtered local bindings so they agree on
+   event-wrapper-names' TAKEN-NAMES without either recomputing the other's
+   logic -- the two functions still derive FIELDS/PROPERTIES/METHODS
+   filtering independently (per this file's existing duplication
+   convention), but share this one step so an event's collision check can
+   never see two different answers."
+  (let ((names nil))
+    (when (> clean-ctor-count 0) (push "new" names))
+    (dolist (f literal-fields) (push (format nil "+~A+" (camel-to-kebab (getf f :name))) names))
+    (dolist (f pure-const-fields) (push (format nil "+~A+" (camel-to-kebab (getf f :name))) names))
+    (dolist (f dynamic-const-fields) (push (map-member-name (getf f :name)) names))
+    (dolist (f instance-fields) (push (map-member-name (getf f :name)) names))
+    (dolist (f mutable-static-fields) (push (map-member-name (getf f :name)) names))
+    (dolist (p pure-const-props) (push (format nil "+~A+" (camel-to-kebab (getf p :name))) names))
+    (dolist (p dynamic-const-props) (push (map-member-name (getf p :name)) names))
+    (dolist (p writeable-static-props)
+      (let* ((pname (map-member-name (getf p :name)))
+             (readable (getf p :readable)))
+        (push (if readable pname (format nil "set-~A" pname)) names)))
+    (dolist (group instance-prop-groups)
+      (let ((props (cdr group)))
+        (when (= (length props) 1)
+          (let* ((p (first props))
+                 (pname (map-member-name (getf p :name)))
+                 (readable (getf p :readable)))
+            (push (if readable pname (format nil "set-~A" pname)) names)))))
+    (dolist (group method-groups)
+      (let* ((name (car group))
+             (clean-methods (remove-if-not #'clean-method-p (cdr group)))
+             (kebab-name (map-member-name name))
+             (static-clean (remove-if-not (lambda (m) (getf m :is-static)) clean-methods))
+             (instance-clean (remove-if-not (lambda (m) (not (getf m :is-static))) clean-methods))
+             (static-count (length static-clean))
+             (instance-count (length instance-clean))
+             (mixed-mode-p (and (> static-count 0) (> instance-count 0))))
+        (cond
+          (mixed-mode-p
+           (let ((static-kebab-name (concatenate 'string kebab-name "*")))
+             (dolist (n (method-name-wrapper-names instance-clean kebab-name)) (push n names))
+             (dolist (n (method-name-wrapper-names static-clean static-kebab-name)) (push n names))))
+          ((> static-count 0)
+           (dolist (n (method-name-wrapper-names static-clean kebab-name)) (push n names)))
+          ((> instance-count 0)
+           (dolist (n (method-name-wrapper-names instance-clean kebab-name)) (push n names))))))
+    names))
+
+(defun event-wrapper-names (event-name taken-names)
+  "Returns (values add-name remove-name) for EVENT-NAME, given TAKEN-NAMES (every
+   other already-decided name in this class -- see
+   class-member-names-excluding-events -- plus any add-/remove- names already
+   assigned to earlier events in this same class). Escalates through three tiers
+   until landing on a pair that collides with nothing in TAKEN-NAMES:
+     1. add-<event>/remove-<event>                (the common case)
+     2. add-<event>-event/remove-<event>-event     (event collides with e.g. a
+                                                     same-named method, such as an
+                                                     AddClick() alongside a Click event)
+     3. add-<event>!/remove-<event>!               (guaranteed unique: C# cannot emit
+                                                     '!' in an identifier, the same
+                                                     by-construction guarantee obj! and
+                                                     quote!/function!/t!/nil! already
+                                                     rely on -- falls back to the
+                                                     shorter tier-1 base with '!' rather
+                                                     than the tier-2 '-event' name,
+                                                     since '!' alone already guarantees
+                                                     uniqueness)
+   Tier 3 is reached only if a class independently declares members named, absurdly,
+   both AddClick() and AddClickEvent() alongside a Click event -- vanishingly
+   unlikely, but unlike tier 2, tier 3 requires no such assumption: it is unique by
+   construction."
+  (let* ((base (map-member-name event-name))
+         (tier1-add (format nil "add-~A" base))
+         (tier1-remove (format nil "remove-~A" base))
+         (tier2-add (format nil "add-~A-event" base))
+         (tier2-remove (format nil "remove-~A-event" base)))
+    (cond
+      ((not (or (member tier1-add taken-names :test #'string=)
+                (member tier1-remove taken-names :test #'string=)))
+       (values tier1-add tier1-remove))
+      ((not (or (member tier2-add taken-names :test #'string=)
+                (member tier2-remove taken-names :test #'string=)))
+       (values tier2-add tier2-remove))
+      (t (values (format nil "~A!" tier1-add) (format nil "~A!" tier1-remove))))))
+
 (defun compute-package-exports-and-shadows (class-plist constant-properties-list)
   "Returns (values exports shadows) for CLASS-PLIST given
    CONSTANT-PROPERTIES-LIST, deduped, with CL-symbol conflicts detected in
@@ -1154,6 +1255,7 @@
                (nreverse groups))))
          (clean-ctors (remove-if-not #'clean-constructor-p ctors))
          (clean-ctor-count (length clean-ctors))
+         (instance-events (remove-if-not #'instance-event-p (getf class-plist :events)))
          (exports nil)
          (shadows nil))
 
@@ -1236,6 +1338,17 @@
           ((> instance-count 0)
            (dolist (n (method-name-wrapper-names instance-clean kebab-name)) (push n exports))))))
 
+    ;; Collect event exports (add-X/remove-X pairs). Processed last so
+    ;; event-wrapper-names' collision check sees every other member's
+    ;; already-decided export name; each event's chosen add-/remove- names
+    ;; are pushed into EXPORTS before the next event is resolved, so two
+    ;; colliding events in the same class also disambiguate against each
+    ;; other, not just against non-event members.
+    (dolist (e instance-events)
+      (multiple-value-bind (add-name remove-name) (event-wrapper-names (getf e :name) exports)
+        (push add-name exports)
+        (push remove-name exports)))
+
     ;; Remove duplicates from exports while preserving order
     (setf exports (remove-duplicates (nreverse exports) :test #'string= :from-end t))
 
@@ -1309,7 +1422,8 @@
            (clean-ctors (remove-if-not #'clean-constructor-p ctors))
            (dirty-ctors (remove-if-not #'dirty-constructor-p ctors))
            (clean-ctor-count (length clean-ctors))
-           (dirty-ctor-count (length dirty-ctors)))
+           (dirty-ctor-count (length dirty-ctors))
+           (instance-events (remove-if-not #'instance-event-p (getf class-plist :events))))
 
       ;; 2. Write to the Lisp output file
       (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
@@ -1521,6 +1635,46 @@
                           (when (> (length doc-str) 0)
                             (format stream "  \"~A\"~%" doc-str))
                           (format stream "  (dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~] new-value))~%~%" fq-name set-method index-param-names))))))))
+
+        ;; Instance Events: add_X/remove_X accessor pairs, previously
+        ;; invisible entirely (filtered out at reflection time alongside
+        ;; property/indexer accessors). dotnet:add-event/dotnet:remove-event
+        ;; already resolve the correct .NET delegate type from the live
+        ;; EventInfo at runtime and cache the wrapped delegate keyed by the
+        ;; Lisp HANDLER object's identity, so removal requires passing back
+        ;; the exact same HANDLER object originally given to add-X -- see
+        ;; doc/generator-design-notes.md's "Events (Version 32)" section.
+        ;; ALL-OTHER-NAMES accumulates the add-/remove- names chosen for
+        ;; each event as it's resolved, so a second colliding event in this
+        ;; same class disambiguates against the first one too, not just
+        ;; against non-event members.
+        (let ((all-other-names
+                (class-member-names-excluding-events
+                 :clean-ctor-count clean-ctor-count
+                 :literal-fields literal-fields
+                 :pure-const-fields pure-const-fields
+                 :dynamic-const-fields dynamic-const-fields
+                 :instance-fields instance-fields
+                 :mutable-static-fields mutable-static-fields
+                 :pure-const-props pure-const-props
+                 :dynamic-const-props dynamic-const-props
+                 :writeable-static-props writeable-static-props
+                 :instance-prop-groups instance-prop-groups
+                 :method-groups method-groups)))
+          (dolist (e instance-events)
+            (multiple-value-bind (add-name remove-name)
+                (event-wrapper-names (getf e :name) all-other-names)
+              (push add-name all-other-names)
+              (push remove-name all-other-names)
+              (let* ((e-doc (getf (getf e :documentation) :summary))
+                     (doc-str (if e-doc (escape-lisp-string e-doc) "")))
+                (format stream "(cl:defun ~A (obj! handler)~%" add-name)
+                (when (> (length doc-str) 0)
+                  (format stream "  \"~A\"~%" doc-str))
+                (format stream "  (dotnet:add-event (cl:the (dotnet \"~A\") obj!) \"~A\" handler))~%~%" fq-name (getf e :name))
+                (format stream "(cl:defun ~A (obj! handler)~%" remove-name)
+                (format stream "  \"Pass the exact same HANDLER object given to ~A -- removal is by identity, not by behavioral equivalence.\"~%" add-name)
+                (format stream "  (dotnet:remove-event (cl:the (dotnet \"~A\") obj!) \"~A\" handler))~%~%" fq-name (getf e :name))))))
 
         ;; Public Instance Fields: unlike properties (which have named
         ;; get_Foo/set_Foo accessor methods to invoke), a field has no

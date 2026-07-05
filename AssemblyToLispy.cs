@@ -175,6 +175,24 @@ namespace PackageGenerator {
                         .Select(f => FormatFieldPlist(f, xmlDocDict))
                         .ToList();
 
+                    // Events: add_X/remove_X accessor pairs, previously invisible entirely since
+                    // the method filter above drops IsSpecialName methods. Only instance events
+                    // are captured for now -- static events have no verified DotCL calling
+                    // convention (see doc/generator-design-notes.md's Events (Version 32) section).
+                    var events = type.GetEvents(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                        .Where(e => {
+                            var addMethod = e.AddMethod;
+                            var removeMethod = e.RemoveMethod;
+                            bool hasVisibleAccessor = addMethod != null && (addMethod.IsPublic || addMethod.IsFamily || addMethod.IsFamilyOrAssembly)
+                                                   && removeMethod != null && (removeMethod.IsPublic || removeMethod.IsFamily || removeMethod.IsFamilyOrAssembly);
+                            return hasVisibleAccessor
+                                   && !addMethod!.IsStatic
+                                   && !e.IsDefined(typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute), false);
+                        })
+                        .OrderBy(e => e.Name)
+                        .Select(e => FormatEventPlist(e, xmlDocDict))
+                        .ToList();
+
                     // Build plist dynamically to omit keys with nil values
                     var parts = new List<string>();
                     parts.Add($":name {EscapeLispString(typeName)}");
@@ -211,6 +229,9 @@ namespace PackageGenerator {
                     }
                     if (fields.Any()) {
                         parts.Add($":fields ({string.Join(" ", fields)})");
+                    }
+                    if (events.Any()) {
+                        parts.Add($":events ({string.Join(" ", events)})");
                     }
                     if (constructors.Any()) {
                         parts.Add($":constructors ({string.Join(" ", constructors)})");
@@ -443,6 +464,37 @@ namespace PackageGenerator {
 
             // Phase 2D: Retrieve property documentation (moved to end of plist)
             string docKey = GetXmlDocMemberName(prop);
+            if (xmlDoc.TryGetValue(docKey, out var memberElement)) {
+                string docPlist = FormatDocumentationPlist(memberElement);
+                if (docPlist != "nil") {
+                    parts.Add($":documentation {docPlist}");
+                }
+            }
+
+            return "(" + string.Join(" ", parts) + ")";
+        }
+
+        /// <summary>
+        ///   Formats the metadata of an event as a Common Lisp event plist string. The plist
+        ///   contains the event name, its delegate type (for documentation purposes only --
+        ///   codegen does not need it, since dotnet:add-event resolves the delegate type from
+        ///   the live EventInfo at runtime), the add_/remove_ accessor method names, and
+        ///   optional XML documentation. Only instance events reach this function -- static
+        ///   events are filtered out by the caller, since DotCL's dotnet:add-event/remove-event
+        ///   have no documented/verified calling convention for a receiverless static event.
+        /// </summary>
+        /// <param name="evt">The event reflection metadata info.</param>
+        /// <param name="xmlDoc">The dictionary of XML documentation elements mapped by member name.</param>
+        /// <returns>A plist string representation of the event.</returns>
+        private static string FormatEventPlist(EventInfo evt, Dictionary<string, XElement> xmlDoc) {
+            var parts = new List<string>();
+            parts.Add($":name {EscapeLispString(evt.Name)}");
+            parts.Add(FormatTypeField(":type", evt.EventHandlerType!));
+            parts.Add($":add-method {EscapeLispString(evt.AddMethod!.Name)}");
+            parts.Add($":remove-method {EscapeLispString(evt.RemoveMethod!.Name)}");
+
+            // Phase 2D: Retrieve event documentation (moved to end of plist)
+            string docKey = GetXmlDocMemberName(evt);
             if (xmlDoc.TryGetValue(docKey, out var memberElement)) {
                 string docPlist = FormatDocumentationPlist(memberElement);
                 if (docPlist != "nil") {
@@ -847,6 +899,9 @@ namespace PackageGenerator {
             }
             if (member is PropertyInfo p) {
                 return "P:" + GetXmlDocTypeName(p.DeclaringType!) + "." + p.Name;
+            }
+            if (member is EventInfo ev) {
+                return "E:" + GetXmlDocTypeName(ev.DeclaringType!) + "." + ev.Name;
             }
             if (member is ConstructorInfo c) {
                 string baseName = "M:" + GetXmlDocTypeName(c.DeclaringType!) + ".#ctor";

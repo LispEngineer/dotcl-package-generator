@@ -98,7 +98,23 @@ idiomatic Lisp operator symbols before any of the above naming rules ever see th
 | `op_LogicalNot`       | `not`  | `op_Increment`        | `1+`   |
 | `op_True`             | `true` | `op_Decrement`        | `1-`   |
 | `op_False`            | `false`| `op_Implicit`         | `implicit-cast` |
-| `op_Explicit`         | `explicit-cast` | | |
+| `op_Explicit`         | `explicit-cast` | `op_Modulus`     | `%`    |
+| `op_BitwiseAnd`       | `&`    | `op_BitwiseOr`        | <code>&#124;</code> |
+| `op_ExclusiveOr`      | `^`    | `op_LeftShift`        | `<<`   |
+| `op_RightShift`       | `>>`   | `op_UnsignedRightShift`| `>>>` |
+| `op_OnesComplement`   | `~`    | | |
+
+C# 11's checked-operator variants (e.g. `checked { a + b }`) are mapped to their unchecked
+counterpart's symbol with a `!` suffix, so both coexist on the same type:
+
+| C# / CIL                    | Lisp     | C# / CIL                    | Lisp     |
+|-----------------------------|----------|------------------------------|----------|
+| `op_CheckedAddition`        | `+!`     | `op_CheckedSubtraction`      | `-!`     |
+| `op_CheckedMultiply`        | `*!`     | `op_CheckedDivision`         | `/!`     |
+| `op_CheckedUnaryNegation`   | `-!`     | `op_CheckedExplicit`         | `explicit-cast!` |
+
+(`op_CheckedUnaryNegation` shares `-!` with `op_CheckedSubtraction`, the same way unchecked `-`
+is already shared between `op_Subtraction`/`op_UnaryNegation`.)
 
 These mapped names then flow through the ordinary method-overload machinery below (they
 are frequently overloaded, e.g. unary vs. binary `+`/`-`, or `+`/`-` across several
@@ -409,6 +425,55 @@ A plain mutable *static* field (not `readonly`, not `const`) is handled analogou
 
 
 
+## Events
+
+**Summary:** an instance event `Foo` (an `add_Foo`/`remove_Foo` accessor pair, e.g. C#'s
+`public event EventHandler Click`) generates an `add-foo`/`remove-foo` function pair, both
+taking `(obj! handler)`, that call DotCL's own `dotnet:add-event`/`dotnet:remove-event`:
+
+```lisp
+(cl:defun add-click (obj! handler)
+  (dotnet:add-event (cl:the (dotnet "Fq.Type") obj!) "Click" handler))
+(cl:defun remove-click (obj! handler)
+  "Pass the exact same HANDLER object given to add-click -- removal is by identity, not by behavioral equivalence."
+  (dotnet:remove-event (cl:the (dotnet "Fq.Type") obj!) "Click" handler))
+```
+
+Worked example (e.g. Gum UI's `Button.Click`):
+
+```lisp
+(defparameter *my-click-handler*
+  (lambda (sender e) (format t "clicked~%")))
+
+(add-click button *my-click-handler*)
+...
+(remove-click button *my-click-handler*)
+```
+
+**Removal is by identity, not behavior.** `dotnet:add-event`'s underlying cache is keyed on the
+exact Lisp function object originally passed to `add-click`, not on what that function does.
+Passing a *different* `(lambda ...)` to `remove-click`, even one with an identical body, will not
+remove the original handler — and an inline `(lambda ...)` passed directly to `add-click` can never
+be removed at all, since nothing kept a reference to it. Keep the handler bound to something (a
+`defparameter`, a `let`-bound variable held by the caller, etc.) if you'll ever want to remove it.
+This mirrors ordinary Lisp idiom elsewhere (e.g. Emacs Lisp's `remove-hook`), not a limitation
+specific to this generator.
+
+**Naming-collision fallback.** `add-X`/`remove-X` are synthesized names, not a 1:1 mapping of one
+C# identifier, so they can collide with an unrelated real member (e.g. a `Click` event alongside
+an unrelated `AddClick()` method). The generator escalates through three tiers until it finds a
+pair that doesn't collide with anything else in the class: `add-click`/`remove-click` →
+`add-click-event`/`remove-click-event` → `add-click!`/`remove-click!`. The last tier is
+collision-proof *by construction* (C# cannot emit a `!` in an identifier), the same guarantee
+`obj!` and the `quote!`/`function!`/`t!`/`nil!` reserved-word mappings already rely on elsewhere in
+this generator. See `doc/generator-design-notes.md`'s "Events (Version 32)" section for the full
+design writeup.
+
+Only **instance** events are supported. Static events (raised via a static `add_X`/`remove_X` pair
+with no receiver object) are not reflected at all — see "Unsupported Features" below.
+
+
+
 ## Methods and Method Overloads
 
 **Summary:** a method with no overloads (of any kind) generates a single typed function;
@@ -565,11 +630,11 @@ function's Lisp docstring (or, for constants/symbol-macros, a `(cl:documentation
   signature is documented in a comment. (Explicitly planned future work per `PLAN.md`:
   a `-ref` suffix naming convention with `out` → multiple Lisp return values.)
 
-* **Events** are not reflected at all — no `:events` key exists in the metadata schema,
-  and `AssemblyToLispy.cs` never calls `Type.GetEvents()`.
-  * The `AddHandler`/`RemoveHandler`/backing-delegate-field accessor methods of an event
-    are typically compiler-generated and filtered out at the reflection stage anyway
-    (see `doc/assembly-to-lispy.md`'s `CompilerGeneratedAttribute` filtering).
+* **Static events** (raised via a static `add_X`/`remove_X` pair with no receiver object)
+  are not reflected — `AssemblyToLispy.cs`'s `:events` collection explicitly excludes
+  them, since `dotnet:add-event`/`dotnet:remove-event` have no documented/verified
+  calling convention for a receiverless event. Instance events *are* supported — see
+  "Events" above. (Tracked as a follow-up in `PLAN.md`.)
 
 * **Generic constraints** (`where T : ...`) are not reflected — no `:generic-constraints`
   key exists yet (tracked as Phase 4 future work in `doc/assembly-to-lispy.md`).

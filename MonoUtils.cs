@@ -46,4 +46,14 @@ public static class MonoUtils {
     public static System.Reflection.ConstructorInfo[] GetTypeConstructors(Type type, int bindingFlags) {
         return type.GetConstructors((System.Reflection.BindingFlags)bindingFlags);
     }
+
+    /// <summary>
+    ///   Retrieves the events of the specified Type using the provided binding flags.
+    /// </summary>
+    /// <param name="type">The type to reflect on.</param>
+    /// <param name="bindingFlags">The integer representation of BindingFlags.</param>
+    /// <returns>An array of EventInfo objects.</returns>
+    public static System.Reflection.EventInfo[] GetTypeEvents(Type type, int bindingFlags) {
+        return type.GetEvents((System.Reflection.BindingFlags)bindingFlags);
+    }
 } // MonoUtils

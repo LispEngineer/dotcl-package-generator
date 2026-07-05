@@ -198,6 +198,25 @@ Each type entry plist contains the following entries, by key:
     for each parameter. If the method takes no parameters, this key is omitted.
   * `:documentation` (Documentation Plist or omitted): Omitted if no documentation is
     found; otherwise a plist containing method documentation.
+* `:events` (List of Event Plists or omitted): A list of plists containing details of
+  public or protected **instance** events (`add_X`/`remove_X` accessor pairs) declared
+  directly on the type. If no instance events are declared, this key is omitted. Static
+  events (raised via a static `add_X`/`remove_X` pair with no receiver object) are never
+  included here -- they are filtered out entirely at reflection time, since there is no
+  documented/verified DotCL calling convention for a receiverless event yet (see
+  `doc/generator-design-notes.md`'s "Events (Version 32)" section and `PLAN.md`). Each
+  event plist contains:
+  * `:name` (String): The name of the event.
+  * `:type` (String): The fully qualified delegate type of the event (e.g.
+    `System.EventHandler`), using simplified backtick notation for generic delegate
+    types. This is descriptive/documentation-only -- the generator does not need it,
+    since `dotnet:add-event`/`dotnet:remove-event` resolve the correct delegate type from
+    the live `EventInfo` at runtime.
+  * `:add-method` (String): The name of the compiler-generated `add_X` accessor method.
+  * `:remove-method` (String): The name of the compiler-generated `remove_X` accessor
+    method.
+  * `:documentation` (Documentation Plist or omitted): Omitted if no documentation is
+    found; otherwise a plist containing event documentation.
 
 ### Parameter Plist Details
 

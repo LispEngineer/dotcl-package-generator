@@ -373,6 +373,53 @@
                           context pname (dotnet:invoke c#type "FullName"))))))))
     valid))
 
+(defun validate-event-schema (event context c#type)
+  "Validates an event plist and queries the live C# Type using reflection
+   to verify that the event name exists."
+  (let ((valid t))
+    (if (not (plist-p event))
+        (progn
+          (setf valid nil)
+          (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Event entry is not a plist: ~S~%" context event))
+        (progn
+          (when (not (validate-plist-keys event '(:name :type :add-method :remove-method)
+                                         '(:name :type :assembly-qualified-type :add-method :remove-method :documentation)
+                                         context))
+            (setf valid nil))
+          (let ((ename (getf event :name))
+                (etype (getf event :type))
+                (e-aq (getf event :assembly-qualified-type))
+                (e-add (getf event :add-method))
+                (e-remove (getf event :remove-method))
+                (e-doc (getf event :documentation)))
+            (when (and ename (not (stringp ename)))
+              (setf valid nil)
+              (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :name must be a string, got ~S~%" context ename))
+            (when (and etype (not (stringp etype)))
+              (setf valid nil)
+              (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :type must be a string, got ~S~%" context etype))
+            (when (and e-aq (not (stringp e-aq)))
+              (setf valid nil)
+              (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :assembly-qualified-type must be a string, got ~S~%" context e-aq))
+            (when (not (stringp e-add))
+              (setf valid nil)
+              (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :add-method must be a string, got ~S~%" context e-add))
+            (when (not (stringp e-remove))
+              (setf valid nil)
+              (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :remove-method must be a string, got ~S~%" context e-remove))
+            (when (not (validate-documentation-schema e-doc context))
+              (setf valid nil))
+            (when c#type
+              (let* ((all-events (dotnet-array-to-list (dotnet:static "MonoUtils" "GetTypeEvents" c#type *binding-flags-members*)))
+                     (found (loop for e in all-events
+                                  when (string= ename (dotnet:invoke e "Name"))
+                                  return t)))
+                (when (not found)
+                  (setf valid nil)
+                  (utils:format-red *error-output* "[SEMANTIC ERROR] ~A: Event ~S does not exist on live type ~S~%"
+                          context ename (dotnet:invoke c#type "FullName"))))))))
+    valid))
+
 (defun validate-field-schema (field context c#type)
   "Validates a field plist and queries the live C# Type using reflection
    to verify that the field name exists."
@@ -449,10 +496,11 @@
                (t-fields (getf type-entry :fields))
                (t-ctors (getf type-entry :constructors))
                (t-methods (getf type-entry :methods))
+               (t-events (getf type-entry :events))
                (context (format nil "Type '~A'" (if fqname fqname (if tname tname "Unknown")))))
-          
+
           (when (not (validate-plist-keys type-entry '(:name :fully-qualified-name :kind)
-                                         '(:name :fully-qualified-name :namespace :kind :enum-underlying-type :documentation :superclass :interfaces :flags :properties :fields :constructors :methods)
+                                         '(:name :fully-qualified-name :namespace :kind :enum-underlying-type :documentation :superclass :interfaces :flags :properties :fields :constructors :methods :events)
                                          context))
             (setf valid nil))
           
@@ -505,6 +553,9 @@
           (when (and t-methods (not (listp t-methods)))
             (setf valid nil)
             (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :methods must be a list, got ~S~%" context t-methods))
+          (when (and t-events (not (listp t-events)))
+            (setf valid nil)
+            (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :events must be a list, got ~S~%" context t-events))
           
           (when (not (validate-documentation-schema t-doc context))
             (setf valid nil))
@@ -530,6 +581,10 @@
                   (when t-methods
                     (dolist (m t-methods)
                       (when (not (validate-method-schema m (format nil "~A (Method ~A)" context (getf m :name)) c#type))
+                        (setf valid nil))))
+                  (when t-events
+                    (dolist (e t-events)
+                      (when (not (validate-event-schema e (format nil "~A (Event ~A)" context (getf e :name)) c#type))
                         (setf valid nil)))))))))
     valid))
 

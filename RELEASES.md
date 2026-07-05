@@ -10,6 +10,36 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.32.0 — 2026-07-04
+
+**Added support for C# events (`add_X`/`remove_X`).**
+
+* Events were previously invisible end-to-end: filtered out at reflection time by the same
+  `IsSpecialName` check that hides property/indexer accessors, so the Lisp side never even knew
+  they existed (`doc/claude-suggested-improvements-20260703.md`'s item 4). `AssemblyToLispy.cs`
+  now reflects instance events into a new `:events` metadata key (`FormatEventPlist`, mirroring
+  `FormatPropertyPlist`) — static events (no receiver object) are explicitly excluded, since
+  DotCL's `dotnet:add-event`/`dotnet:remove-event` have no verified calling convention for one
+  (tracked as a `PLAN.md` follow-up).
+* Each instance event `Foo` generates an `add-foo`/`remove-foo` function pair, both taking
+  `(obj! handler)`, calling DotCL's existing `dotnet:add-event`/`dotnet:remove-event` — no DotCL
+  runtime changes were needed, only reflection and codegen in this repo. Removal is by Lisp
+  object identity: the same `handler` object originally passed to `add-foo` must be passed back
+  to `remove-foo`; the generated `remove-foo` docstring calls this out explicitly.
+* New naming-collision handling: since `add-X`/`remove-X` are synthesized compound names (not a
+  1:1 mapping of one C# identifier the way every other member category's name is), a class can
+  have an unrelated member that collides with a synthesized event name (e.g. a `Click` event
+  alongside an `AddClick()` method). `event-wrapper-names` escalates through three tiers
+  (`add-click`/`remove-click` → `add-click-event`/`remove-click-event` →
+  `add-click!`/`remove-click!`, the last collision-proof by construction since C# cannot emit
+  `!`), fed by a new shared helper (`class-member-names-excluding-events`) so
+  `compute-package-exports-and-shadows` and `generate-class-file` can never disagree about an
+  event's actual wrapper names.
+* See `doc/generator-design-notes.md`'s "Events (Version 32)" section for the full design
+  writeup, `doc/assembly-to-lispy.md`'s `:events` schema addition, and `FEATURES.md`'s new
+  "Events" section.
+* `*generator-version*` bumped 31 → 32.
+
 ## 2.30.0 — 2026-07-04
 
 **Completed operator overload mapping coverage.**

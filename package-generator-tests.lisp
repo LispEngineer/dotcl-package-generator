@@ -901,4 +901,79 @@
       (when (probe-file out-dir)
         (uiop:delete-directory-tree out-dir :validate t))))
 
+  ;; 13. Instance events: generate-class-file must emit an add-X/remove-X
+  ;;     wrapper pair calling dotnet:add-event/dotnet:remove-event, per
+  ;;     doc/generator-design-notes.md's Events (Version 32) section.
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.Clickable"
+             :kind :class
+             :fields nil
+             :properties nil
+             :methods nil
+             :constructors nil
+             :events ((:name "Click" :type "System.EventHandler"
+                       :add-method "add_Click" :remove-method "remove_Click"
+                       :documentation (:summary "Fires on click.")))))
+         (out-dir (merge-pathnames "package-generator-tests-events-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-clickable.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun add-click (obj! handler)" contents))) t
+                        "generate-class-file emits an add-X wrapper for an instance event")
+            (assert-test (not (null (search "(dotnet:add-event (cl:the (dotnet \"Fixture.Clickable\") obj!) \"Click\" handler))" contents))) t
+                        "generate-class-file's add-X wrapper calls dotnet:add-event")
+            (assert-test (not (null (search "(cl:defun remove-click (obj! handler)" contents))) t
+                        "generate-class-file emits a remove-X wrapper for an instance event")
+            (assert-test (not (null (search "(dotnet:remove-event (cl:the (dotnet \"Fixture.Clickable\") obj!) \"Click\" handler))" contents))) t
+                        "generate-class-file's remove-X wrapper calls dotnet:remove-event"))
+          (multiple-value-bind (exports shadows) (assembly-package-generator::compute-package-exports-and-shadows class-plist nil)
+            (declare (ignore shadows))
+            (assert-test (and (member "add-click" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports add-click")
+            (assert-test (and (member "remove-click" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows exports remove-click")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
+  ;; 13.1 Event naming-collision fallback: a Click event alongside an
+  ;;      unrelated AddClick()/RemoveClick() method pair must escalate to
+  ;;      the tier-2 -event-suffixed names, and generate-class-file /
+  ;;      compute-package-exports-and-shadows must agree on the result.
+  (let* ((class-plist
+           '(:fully-qualified-name "Fixture.CollidingClickable"
+             :kind :class
+             :fields nil
+             :properties nil
+             :methods ((:name "AddClick" :is-static nil :return-type "System.Void" :parameters nil)
+                       (:name "RemoveClick" :is-static nil :return-type "System.Void" :parameters nil))
+             :constructors nil
+             :events ((:name "Click" :type "System.EventHandler"
+                       :add-method "add_Click" :remove-method "remove_Click"))))
+         (out-dir (merge-pathnames "package-generator-tests-events-collision-out/"
+                                   (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-colliding-clickable.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun add-click-event (obj! handler)" contents))) t
+                        "generate-class-file falls back to add-click-event when add-click collides with AddClick()")
+            (assert-test (not (null (search "(cl:defun remove-click-event (obj! handler)" contents))) t
+                        "generate-class-file falls back to remove-click-event when remove-click collides with RemoveClick()")
+            (assert-test (search "(cl:defun add-click (obj! handler)" contents) nil
+                        "generate-class-file does not also emit the colliding tier-1 add-click"))
+          (multiple-value-bind (exports shadows) (assembly-package-generator::compute-package-exports-and-shadows class-plist nil)
+            (declare (ignore shadows))
+            (assert-test (and (member "add-click-event" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows agrees on the add-click-event fallback")
+            (assert-test (and (member "remove-click-event" exports :test #'string=) t) t
+                        "compute-package-exports-and-shadows agrees on the remove-click-event fallback")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t))))
+
   (format *error-output* "--- Package Generator Tests Completed ---~%"))

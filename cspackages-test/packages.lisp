@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 31
-;;; Creation Date: 2026-07-04T16:50:34Z
+;;; Generator Version: 32
+;;; Creation Date: 2026-07-05T03:30:42Z
 
 (cl:in-package :cl-user)
 
@@ -1903,6 +1903,24 @@
    #:set-thread-principal
    #:to-string
    #:unload
+   #:add-assembly-load
+   #:remove-assembly-load
+   #:add-assembly-resolve
+   #:remove-assembly-resolve
+   #:add-domain-unload
+   #:remove-domain-unload
+   #:add-first-chance-exception
+   #:remove-first-chance-exception
+   #:add-process-exit
+   #:remove-process-exit
+   #:add-reflection-only-assembly-resolve
+   #:remove-reflection-only-assembly-resolve
+   #:add-resource-resolve
+   #:remove-resource-resolve
+   #:add-type-resolve
+   #:remove-type-resolve
+   #:add-unhandled-exception
+   #:remove-unhandled-exception
   ))
 
 ;;; Source File: system-threading-thread.lisp

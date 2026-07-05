@@ -46,6 +46,59 @@ namespace AssemblyToLispyTestTarget
     }
 
     /// <summary>
+    /// A class with a plain instance EventHandler event, to test that events (previously
+    /// invisible entirely, since add_X/remove_X accessors are filtered out by the ordinary
+    /// method IsSpecialName filter) are now reflected into a new :events metadata key and
+    /// generate add-X/remove-X wrapper functions via dotnet:add-event/dotnet:remove-event.
+    /// </summary>
+    public class EventTestClass
+    {
+        /// <summary>
+        /// Fires when something interesting happens.
+        /// </summary>
+        public event EventHandler SomethingHappened;
+
+        /// <summary>
+        /// Raises SomethingHappened, so the synthetic event has a way to be exercised
+        /// end-to-end from a live-CLR test.
+        /// </summary>
+        public void RaiseSomethingHappened()
+        {
+            SomethingHappened?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>
+    /// A class with both a Click event and an unrelated method AddClick(), to test the
+    /// event-wrapper naming-collision fallback (add-click/remove-click would collide with
+    /// the mapped name of AddClick(), so this exercises the tier-2 -event-suffixed fallback).
+    /// </summary>
+    public class EventNameCollisionTestClass
+    {
+        /// <summary>
+        /// An event whose synthesized add-click/remove-click wrapper names collide with
+        /// the AddClick()/RemoveClick() methods below.
+        /// </summary>
+        public event EventHandler Click;
+
+        /// <summary>
+        /// An unrelated method that happens to map to the same Lisp name (add-click) that
+        /// the Click event above would otherwise synthesize.
+        /// </summary>
+        public void AddClick()
+        {
+        }
+
+        /// <summary>
+        /// An unrelated method that happens to map to the same Lisp name (remove-click) that
+        /// the Click event above would otherwise synthesize.
+        /// </summary>
+        public void RemoveClick()
+        {
+        }
+    }
+
+    /// <summary>
     /// An abstract base class with a protected constructor.
     /// </summary>
     public abstract class AbstractBase

@@ -1306,3 +1306,118 @@ resolve to `cl:nil`/an undefined-function error at load time, since Lisp forms i
 strictly top-to-bottom and the local `split-string` wouldn't exist yet — `uiop:split-string`
 (already used elsewhere in this file, e.g. via the sibling `uiop:string-prefix-p`) sidesteps the
 whole ordering question by not depending on anything defined later in the same file.
+
+## Events (Version 32)
+
+### What changed and why
+
+C# events (`add_X`/`remove_X` accessor pairs) were previously invisible end-to-end. The ordinary
+method filter in `AssemblyToLispy.cs` (`(m.IsPublic || m.IsFamily || m.IsFamilyOrAssembly) &&
+(!m.IsSpecialName || m.Name.StartsWith("op_")) && ...`) exists to drop the *compiler-generated*
+`get_Foo`/`set_Foo` accessor methods that every property already produces (so they don't also show
+up as ordinary, separately-callable methods) — but `add_Click`/`remove_Click` are `IsSpecialName`
+too, and don't start with `op_`, so the exact same filter silently swallowed them as well. There
+was no separate reflection path for events at all: no `Type.GetEvents()` call anywhere in
+`AssemblyToLispy.cs`, and no `:events` key in the metadata schema. This was flagged as gap #4 in
+`doc/claude-suggested-improvements-20260703.md` ("Events... filtered out before metadata is even
+emitted"), rated High priority precisely because events are ubiquitous in UI/notification-style
+APIs (the motivating case: Gum UI's `ButtonBase.Click`/`Push`, both plain `EventHandler` events) and
+the failure mode was total silence, not a documented skip.
+
+### New metadata shape
+
+Each type plist gains a `:events` key (list of event plists, present only when the type declares
+at least one qualifying event — see `doc/assembly-to-lispy.md`'s "Entity Entry Details"). An event
+plist has `:name`, `:type` (the delegate type, e.g. `System.EventHandler`), `:add-method`,
+`:remove-method`, and optional `:documentation`. `:type` is captured for documentation purposes
+only — codegen doesn't need it, because `dotnet:add-event` resolves the correct delegate type from
+the live `EventInfo` at runtime (unlike, say, `dotnet:make-delegate`, which needs an explicit type
+string up front since it has no `EventInfo` to inspect).
+
+Only **instance** events are captured. `AssemblyToLispy.cs`'s new `:events` collection explicitly
+filters out any event whose `AddMethod` is static, and this is by design, not an oversight — see
+"Static events are explicitly out of scope" below.
+
+### Why this needed no DotCL runtime changes
+
+`dotnet:add-event`/`dotnet:remove-event` already existed in DotCL and are documented in
+`doc/dotnet-dotcl-interop.md` (the `(dotnet:add-event btn "Click" (lambda (sender e) ...))`
+example): the runtime already knows how to compile a Lisp closure into the event's actual delegate
+type, register it via the event's `add_X` method, and cache the compiled delegate (keyed by the
+Lisp handler object, via a weak table) so `remove-event` can look it up again by the same handler.
+This was purely a reflection + codegen gap in this repo — nothing on the DotCL interop side needed
+to change at all.
+
+### The add-X/remove-X naming convention and identity-based removal
+
+Each instance event `Foo` generates a pair, `add-foo`/`remove-foo`, both taking `(obj! handler)`.
+For example, `ButtonBase.Click`:
+
+```lisp
+(defparameter *my-click-handler*
+  (lambda (sender e) (format t "clicked~%")))
+
+(add-click button *my-click-handler*)
+...
+(remove-click button *my-click-handler*)
+```
+
+The critical, non-obvious gotcha: removal is by Lisp object **identity**, not behavioral
+equivalence, because `dotnet:add-event`'s underlying cache is keyed on the exact Lisp function
+object originally passed to `add-click` — not on what that function does. Two separately-created
+lambdas with identical bodies are two different objects and will never match. Concretely:
+
+```lisp
+(add-click button (lambda (sender e) (format t "clicked~%")))
+;; There is now no way to remove this handler -- the lambda object was never
+;; bound to anything, so nothing can be passed to remove-click to find it again.
+```
+
+This mirrors ordinary Lisp idiom elsewhere (e.g. Emacs Lisp's `remove-hook`, or CLOS's
+`remove-method`) — it is not a limitation specific to this generator, but it is unfamiliar enough
+to first-time callers that the generated `remove-X` docstring calls it out explicitly:
+`"Pass the exact same HANDLER object given to add-X -- removal is by identity, not by behavioral
+equivalence."`
+
+### The naming-collision policy
+
+Every other exported name in this generator is derived 1:1 from a single C# member name via
+`map-member-name` — two members can only collide if C# itself gave them colliding names after
+case-folding (already handled: static/instance same-name method collisions get a `*` suffix per
+Version 24; CL-reserved-word collisions get `!` suffixes per Version 15). Events are different:
+`add-X`/`remove-X` are *synthesized* compound names, not a 1:1 mapping of one existing C#
+identifier, so a class can trivially have a genuine, unrelated member that collides with a
+synthesized event name — e.g. a `Click` event alongside an unrelated `AddClick()` method, both of
+which `map-member-name`-style mapping would turn into `add-click`.
+
+`event-wrapper-names` resolves this with a three-tier escalation, checked against every other
+already-decided name in the class (via the new `class-member-names-excluding-events` helper, used
+identically by both `compute-package-exports-and-shadows` and `generate-class-file` so the two
+functions can never disagree about what a given event's actual wrapper names are) plus any
+add-/remove- names already claimed by an earlier event in the same class:
+
+1. `add-click`/`remove-click` — the common case.
+2. `add-click-event`/`remove-click-event` — used only if tier 1 collides with something else in
+   the class (e.g. the `AddClick()` example above).
+3. `add-click!`/`remove-click!` — used only if tier 2 *also* collides (e.g. a class absurdly
+   declaring both `AddClick()` and `AddClickEvent()` alongside a `Click` event). This tier falls
+   back to the shorter tier-1 base with `!` appended, rather than the tier-2 `-event` name, since
+   `!` alone is already sufficient to guarantee uniqueness. Critically, tier 3 is collision-proof
+   *by construction*, not just empirically unlikely: the C# compiler's identifier grammar cannot
+   produce a `!` character, so no real C# member can ever also produce `add-click!` — the exact
+   same by-construction guarantee this generator already relies on for `obj!` (Version 25) and the
+   `quote!`/`function!`/`t!`/`nil!` reserved-word mappings (Version 15).
+
+### Static events are explicitly out of scope
+
+Only instance events are supported as of Version 32. Static events (raised via a static
+`add_X`/`remove_X` pair with no receiver object) are filtered out entirely at the
+`AssemblyToLispy.cs` reflection stage — they never even reach the `:events` metadata key — because
+`dotnet:add-event`/`dotnet:remove-event` have no documented or verified calling convention for a
+receiverless event: every existing example in `doc/dotnet-dotcl-interop.md` operates on a live
+instance. Extending support to static events would need an asymmetric design (there is no receiver
+object to key an identity-cache off of the way `dotnet:add-event` does for instances): `add-X`
+would need to construct and return a raw `.NET` delegate object (via `dotnet:make-delegate` plus a
+direct `dotnet:static` call to the static `add_X` method) for the caller to hold onto and pass back
+verbatim to `remove-X`, which is a meaningfully different calling convention from the instance
+case above. This is tracked as a follow-up in `PLAN.md` rather than attempted here.

@@ -550,3 +550,44 @@ is a really foundational change that will help a lot in the future.
 * **DONE** Change `/=` to `not=` in the Lispy style
 * **DONE** Register classes/types with DotCL's CLOS dispatch system
 
+# Static Events (2026-07-04)
+
+Version 32 added support for **instance** C# events (`add_X`/`remove_X` accessor pairs, e.g.
+`public event EventHandler Click`), generating `add-X`/`remove-X` wrapper pairs that call DotCL's
+existing `dotnet:add-event`/`dotnet:remove-event`. See `doc/generator-design-notes.md`'s "Events
+(Version 32)" section and `RELEASES.md`'s 2.32.0 entry for the full design.
+
+**Static events (raised via a static `add_X`/`remove_X` pair with no receiver object) are
+explicitly out of scope for Version 32** and are filtered out entirely at the
+`AssemblyToLispy.cs` reflection stage — they never reach the `:events` metadata key at all. There
+is no documented or verified DotCL calling convention for a receiverless event:
+`dotnet:add-event`/`dotnet:remove-event`'s only documented examples (`doc/dotnet-dotcl-interop.md`)
+operate on a live instance, and it's unverified whether they'd work at all with a `nil`/type-name
+receiver instead.
+
+A sketched design, not yet implemented or verified against the real DotCL runtime: since there is
+no receiver object to key an identity-cache off of the way `dotnet:add-event` does for instances,
+`add-X` would need a different, asymmetric shape — construct the delegate explicitly via
+`dotnet:make-delegate` (using the event's `:type` metadata, which Version 32 already captures but
+doesn't currently need for the instance case) and invoke the static `add_X` method directly via
+`dotnet:static`, e.g.:
+
+```lisp
+(cl:defun add-some-static-event (handler)
+  "Returns the .NET delegate object -- pass this same object to remove-some-static-event to unregister."
+  (cl:let ((delegate (dotnet:make-delegate "<delegate-type>" handler)))
+    (dotnet:static <type-str> "add_SomeStaticEvent" delegate)
+    delegate))
+
+(cl:defun remove-some-static-event (delegate)
+  (dotnet:static <type-str> "remove_SomeStaticEvent" delegate))
+```
+
+Note the caller-visible asymmetry versus the instance case: `add-X` returns a delegate object (not
+the handler) that must be passed to `remove-X` verbatim, since there is no cache keyed on the
+Lisp handler function the way `dotnet:add-event` provides for instances. Before implementing this,
+verify against a real static event (not yet tested) that `dotnet:static`'s method-invocation path
+actually accepts a `System.Delegate`-typed argument to a void-returning `add_X`/`remove_X` method,
+and that `dotnet:make-delegate`'s delegate-type string format matches what an event's `:type`
+metadata field already produces.
+
