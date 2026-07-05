@@ -128,6 +128,10 @@ obj!)` form instead, deprecating Option A's per-type codegen.
 
 # Miscellaneous
 
+* Optionally create the packages for all super-classes and interfaces,
+  and re-export non-conflicting methods (etc.) from those packages, for
+  ease of use.
+
 * Handle overloaded indexers, per:
   * C# indexer (`this[...]`) threads its index parameter(s) through
     positionally, unless the indexer itself is overloaded, in which case it is unsupported.
