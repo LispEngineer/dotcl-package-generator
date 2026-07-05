@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
 ;;; Generator Version: 33
-;;; Creation Date: 2026-07-05T13:59:34Z
+;;; Creation Date: 2026-07-05T14:23:41Z
 
 (cl:in-package :cl-user)
 
@@ -955,6 +955,63 @@
    #:read-line-async
    #:read-to-end
    #:read-to-end-async
+  ))
+
+;;; Source File: system-collections-i-structural-comparable.lisp
+;;; C# Class: System.Collections.IStructuralComparable
+;;; Constant Properties: (none)
+(cl:defpackage :system-collections-i-structural-comparable
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:compare-to
+  ))
+
+;;; Source File: system-collections-i-structural-equatable.lisp
+;;; C# Class: System.Collections.IStructuralEquatable
+;;; Constant Properties: (none)
+(cl:defpackage :system-collections-i-structural-equatable
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:equals
+   #:get-hash-code
+  ))
+
+;;; Source File: system-i-comparable.lisp
+;;; C# Class: System.IComparable
+;;; Constant Properties: (none)
+(cl:defpackage :system-i-comparable
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:compare-to
+  ))
+
+;;; Source File: system-runtime-compiler-services-i-tuple.lisp
+;;; C# Class: System.Runtime.CompilerServices.ITuple
+;;; Constant Properties: (none)
+(cl:defpackage :system-runtime-compiler-services-i-tuple
+  (:use :cl)
+  (:shadow
+   #:length
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:item
+   #:length
   ))
 
 ;;; Source File: system-argument-exception.lisp
@@ -2444,6 +2501,14 @@
   ))
 
 ;;; ===== Re-exports from parent/interface packages =====
+
+;;; system-value-tuple-2: re-exports inherited members from system-collections-i-structural-comparable, system-collections-i-structural-equatable, system-i-comparable, system-runtime-compiler-services-i-tuple
+;;; Skipped (system-value-tuple-2 declares its own): compare-to
+;;; Skipped (system-value-tuple-2 declares its own): equals
+;;; Skipped (system-value-tuple-2 declares its own): get-hash-code
+(cl:shadowing-import '(system-runtime-compiler-services-i-tuple::length) ':system-value-tuple-2)
+(cl:import '(system-runtime-compiler-services-i-tuple::item) ':system-value-tuple-2)
+(cl:export '(system-value-tuple-2::item system-value-tuple-2::length) ':system-value-tuple-2)
 
 ;;; system-argument-out-of-range-exception: re-exports inherited members from system-argument-exception, system-runtime-serialization-i-serializable, system-system-exception, system-exception, system-object
 ;;; Skipped (system-argument-out-of-range-exception declares its own): message

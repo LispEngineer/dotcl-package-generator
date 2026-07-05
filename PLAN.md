@@ -52,6 +52,9 @@ Add flags & default changing flags for these capabilities.
 In addition of having every instance function exported in its own package, export them all in a
 single package (maybe `csharp-interop` or somesuch). Then use DotCL's CLOS generic method
 interoperability to unify them.
+* This could be enabled with `--enable-defgeneric` for all the subsequent classes
+* Then disabled again with `--no-enable-defgeneric`
+* Or one-time enabled or disabled with `--defgeneric` and `--no-defgeneric`
 
 Make a generic method (`defgeneric`) for every instance function used anywhere.
 * Docstring could specify which classes have specializations of the generic method,
