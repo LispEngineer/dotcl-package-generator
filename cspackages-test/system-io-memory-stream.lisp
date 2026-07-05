@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.MemoryStream
-;;; Generator Version: 33
-;;; Creation Date: 2026-07-05T13:49:48Z
+;;; Generator Version: 34
+;;; Creation Date: 2026-07-05T17:20:43Z
 
 (cl:in-package :system-io-memory-stream)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.IO.MemoryStream"))
 (cl:defconstant <type-str> "System.IO.MemoryStream")
-(cl:defconstant <creation> "2026-07-05T13:49:48Z")
-(cl:defconstant <version> 33)
+(cl:defconstant <creation> "2026-07-05T17:20:43Z")
+(cl:defconstant <version> 34)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

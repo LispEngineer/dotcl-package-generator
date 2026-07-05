@@ -65,7 +65,8 @@
    30 - AssemblyToLispy.cs's GetCleanMethodName gained mappings for the 8 remaining standard C# overloadable operators previously left as raw op_Xxx names (op_Modulus -> %, op_BitwiseAnd -> &, op_BitwiseOr -> |, op_ExclusiveOr -> ^, op_LeftShift -> <<, op_RightShift -> >>, op_UnsignedRightShift -> >>>, op_OnesComplement -> ~) and C# 11's checked-operator variants, suffixed with '!' to coexist alongside their unchecked counterparts on the same type (op_CheckedAddition -> +!, op_CheckedSubtraction -> -!, op_CheckedMultiply -> *!, op_CheckedDivision -> /!, op_CheckedUnaryNegation -> -! shared with op_CheckedSubtraction the same way unchecked '-' is already shared between op_Subtraction/op_UnaryNegation, op_CheckedExplicit -> explicit-cast!). No change was needed in this file: a mapped operator's :name is already its clean Lisp symbol (not a raw op_-prefixed name) by the time non-operator-non-accessor-methods/simple-method-p/clean-method-p run their 'op_' prefix checks, so any newly-mapped operator flows through the existing clean-method/Master Wrapper pipeline exactly like the previously-mapped +/-/*//,=,etc. do today -- unary/binary disambiguation via the optional-second-argument arity check (see Version 13/14) applies unchanged, and the real CLR method is still invoked via each method's :mangled-name.
    31 - Closed a known silent gap (tracked in PLAN.md/FEATURES.md's Unsupported Features): a static property that is writeable (read-write or write-only), and a plain mutable static field (not readonly, not const), previously matched none of the existing field/property classifiers and so generated nothing at all -- no getter, no setter, not even a comment. New predicates writeable-static-property-p (static + writeable, disjoint from constant-property-p which requires not-writeable) and mutable-static-field-p (static, neither literal nor init-only, the exact complement within static fields of literal-field-p/runtime-readonly-field-p) now catch these. Codegen mirrors the existing instance-property/instance-field shape (readable -> getter, writeable+readable -> adds a setf-expander, writeable-only -> a set-name function) but uses dotnet:static in place of dotnet:invoke and drops the obj! receiver entirely, since dotnet:static's own setf-expansion (per doc/dotnet-dotcl-interop.md) writes the type's static storage slot directly -- unlike instance property/field mutation, there is no boxed obj! receiver to alias, so no struct-boxing-mutation warning comment is emitted for either new case.
    32 - Added support for C# events (add_X/remove_X accessor pairs), previously invisible end-to-end: filtered out at reflection time by the same IsSpecialName check that also hides property/indexer accessors (AssemblyToLispy.cs), so the Lisp side never even knew they existed (doc/claude-suggested-improvements-20260703.md's item 4). AssemblyToLispy.cs now reflects instance events (only -- static events are excluded, since dotnet:add-event/dotnet:remove-event have no verified calling convention for a receiverless event) into a new :events metadata key (FormatEventPlist, mirroring FormatPropertyPlist); each generates an add-X/remove-X wrapper pair calling DotCL's existing dotnet:add-event/dotnet:remove-event (no DotCL runtime changes were needed -- this was purely a reflection+codegen gap in this repo). Removal is by Lisp object identity: passing a fresh (lambda ...) that merely behaves like the original handler will not remove it, since dotnet:add-event's cache is keyed on the exact Lisp function object originally passed to add-X (the generated remove-X docstring calls this out explicitly). Since add-X/remove-X are synthesized compound names rather than a 1:1 mapping of one C# identifier, they can collide with an unrelated real member (e.g. a Click event alongside an AddClick() method); event-wrapper-names resolves this via a three-tier escalation (add-click/remove-click -> add-click-event/remove-click-event -> add-click!/remove-click!, the last collision-proof by construction since C# cannot emit '!', the same guarantee obj!/quote!/function!/t!/nil! already rely on), fed by class-member-names-excluding-events -- a new helper both compute-package-exports-and-shadows and generate-class-file call with their own independently-filtered field/property/method lists, so the two functions can never disagree on an event's actual wrapper names. See doc/generator-design-notes.md's Events (Version 32) section for the full design writeup, and PLAN.md for the deferred static-event follow-up.
-   33 - Added optional per-class re-export of inherited super-class/interface members (--export-parents/--export-interfaces/--export-object, plus sticky --export-all-* CLI defaults, and --skip-missing/--no-skip-missing for an unresolvable ancestor), per doc/parents-and-interfaces-plan.md. Program.cs's manifest now carries these three booleans per requested class; a new global metadata index (build-metadata-index) resolves a class's ancestor graph (expand-ancestors: :superclass walked link-by-link up to System.Object, :interfaces taken as already-transitive per .NET's Type.GetInterfaces()) across every provided assembly, not just the requesting class's own, folding newly-discovered ancestors into the working set (generated as plain packages, appended after their assembly's explicitly-requested classes -- stable, minimal reordering; an ancestor also explicitly requested keeps its own flags/constant-properties instead of a duplicate). Resolved-class data (previously a bare (class-plist . constant-properties-list) cons throughout resolve-batch-entry/generate-batch-packages-file/generate-batch-asd-file/generate-assembly-packages-batch) is now the make-resolved-class plist, adding the three export flags. Re-export itself (compute-reexports, emit-child-reexports) is a POST-PASS of cl:shadowing-import/cl:import/cl:export calls appended to packages.lisp after every cl:defpackage form -- deliberately not folded into each defpackage via :import-from, so no topological ordering of the defpackage forms is ever needed (shadowing-import/import/export only require the ancestor's symbols to already be interned, which defpackage guarantees regardless of file position; the actual function bindings arrive later, whenever each class's own .lisp file loads, which is safe as long as the whole ASDF system loads before anything is called). Per child, an ancestor-exported name is skipped (with an explanatory comment, not renamed) rather than re-exported when the child already declares it itself (child wins) or when more than one ancestor exports the same name (ambiguous -- the interface1->name-style disambiguation is intentionally deferred to a future version); the synthetic per-type symbols <type>/<type-str>/<creation>/<version>/new are never re-exported, since they identify the ancestor's own type identity, not something inherited. generate-batch-asd-file also adds each child's ancestor package files to its own :file's :depends-on.")
+   33 - Added optional per-class re-export of inherited super-class/interface members (--export-parents/--export-interfaces/--export-object, plus sticky --export-all-* CLI defaults, and --skip-missing/--no-skip-missing for an unresolvable ancestor), per doc/parents-and-interfaces-plan.md. Program.cs's manifest now carries these three booleans per requested class; a new global metadata index (build-metadata-index) resolves a class's ancestor graph (expand-ancestors: :superclass walked link-by-link up to System.Object, :interfaces taken as already-transitive per .NET's Type.GetInterfaces()) across every provided assembly, not just the requesting class's own, folding newly-discovered ancestors into the working set (generated as plain packages, appended after their assembly's explicitly-requested classes -- stable, minimal reordering; an ancestor also explicitly requested keeps its own flags/constant-properties instead of a duplicate). Resolved-class data (previously a bare (class-plist . constant-properties-list) cons throughout resolve-batch-entry/generate-batch-packages-file/generate-batch-asd-file/generate-assembly-packages-batch) is now the make-resolved-class plist, adding the three export flags. Re-export itself (compute-reexports, emit-child-reexports) is a POST-PASS of cl:shadowing-import/cl:import/cl:export calls appended to packages.lisp after every cl:defpackage form -- deliberately not folded into each defpackage via :import-from, so no topological ordering of the defpackage forms is ever needed (shadowing-import/import/export only require the ancestor's symbols to already be interned, which defpackage guarantees regardless of file position; the actual function bindings arrive later, whenever each class's own .lisp file loads, which is safe as long as the whole ASDF system loads before anything is called). Per child, an ancestor-exported name is skipped (with an explanatory comment, not renamed) rather than re-exported when the child already declares it itself (child wins) or when more than one ancestor exports the same name (ambiguous -- the interface1->name-style disambiguation is intentionally deferred to a future version); the synthetic per-type symbols <type>/<type-str>/<creation>/<version>/new are never re-exported, since they identify the ancestor's own type identity, not something inherited. generate-batch-asd-file also adds each child's ancestor package files to its own :file's :depends-on.
+   34 - Added optional per-class unification of instance methods and instance property/field accessors into a single shared CSHARP-GENERICS package of CLOS generic functions dispatching on C# runtime type (--defgeneric/--no-defgeneric, plus sticky --enable-defgeneric/--no-enable-defgeneric CLI defaults), per doc/make-everything-defgeneric.md. Program.cs's manifest now carries a :defgeneric boolean per requested class (make-resolved-class/resolve-batch-entry thread it through as a fourth resolved-class field, defaulting to nil for ancestor-only classes exactly like the three export-* flags). collect-class-instance-generics independently re-derives, for one class-plist, the wrapper names whose Lisp signature begins with obj! as the sole/first required argument (instance methods, instance property/field getters, instance indexer getters, and their (cl:setf ...) counterparts), reusing map-member-name/method-name-wrapper-names so the actual name computation cannot drift from compute-package-exports-and-shadows/generate-class-file; it deliberately excludes static members (no obj! receiver), generic/type-parameterized instance methods (their wrapper's lambda list puts the type argument(s) before obj!), and overloaded indexers (no generated wrapper exists to forward to). compute-defgeneric-model aggregates every :defgeneric-true class's collected names into the CSHARP-GENERICS defpackage's :export/:shadow lists (emitted by generate-batch-packages-file, right after the CSHARP-ASSEMBLY-UTILS defpackage) and a per-name specializer list; generate-batch-generics-file (a new sibling file to csharp-assembly-utils.lisp, emitted after every class file so it can depend on their packages) writes one cl:defgeneric per unified name -- (name obj! cl:&rest args), or ((cl:setf name) new-value obj! cl:&rest args) for a setter -- plus, per opted-in class, one cl:eval-when (:load-toplevel :execute) block installing that class's defmethods. Each defmethod is installed by evaluating a backquoted cl:defmethod form specializing on (cl:class-name (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\" (dotnet:resolve-type fq-name))) fetched fresh at load time, deliberately never a symbol hardcoded at generation time: DotCL names a C# type's CLOS class by its simple name only when free, or by its unique FullName when a same-simple-name type from a different namespace has already claimed it, and which type wins that race is load-order-dependent and unknowable at generation time (see Runtime.CLOS.cs's EnsureDotNetTypeClass) -- reading the class's own class-name at load time is immune to this, since it is always the exact symbol DotCL registered for that specific class. Every forwarding defmethod body is a bare cl:apply of the class's own already-generated wrapper function, accepting the small dispatch/apply overhead for a v1 implementation. generate-batch-asd-file adds the CSHARP-GENERICS :file component (depending on \"packages\", \"csharp-assembly-utils\", and every opted-in class's own package file) only when at least one class opted in.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -1363,6 +1364,85 @@
 
     (values exports shadows)))
 
+(defun collect-class-instance-generics (class-plist)
+  "Returns (values method-names setter-names) -- the wrapper names
+   CLASS-PLIST's own generated package exports whose Lisp signature begins
+   with obj! as the sole/first required argument, and which are therefore
+   eligible to be folded into the shared CSHARP-GENERICS unification (see
+   doc/make-everything-defgeneric.md and generate-batch-generics-file).
+   METHOD-NAMES covers instance methods, instance property/field getters,
+   and instance indexer getters (name obj! &rest args); SETTER-NAMES covers
+   the (cl:setf name) counterpart for writeable instance
+   properties/fields/indexers. Deliberately excludes: static members (no
+   obj! receiver -- see doc/make-everything-defgeneric.md's excluded
+   categories), generic/type-parameterized instance methods (their
+   wrapper's lambda list puts the type argument(s) before obj!, so obj! is
+   not the leading argument), and overloaded indexers (already
+   unimplemented by generate-class-file itself, so no wrapper function
+   exists to forward to).
+   Independently filters FIELDS/PROPERTIES/METHODS the same way
+   generate-class-file and compute-package-exports-and-shadows do (this
+   file's existing duplication convention -- see
+   class-member-names-excluding-events's docstring), but reuses
+   map-member-name/method-name-wrapper-names so the actual NAME computation
+   can never drift from what those two functions emit."
+  (let* ((fields (getf class-plist :fields))
+         (properties (getf class-plist :properties))
+         (methods (getf class-plist :methods))
+         (instance-fields (remove-if-not #'public-instance-field-p fields))
+         (instance-props (remove-if-not #'instance-property-p properties))
+         (instance-prop-groups (group-properties-by-name instance-props))
+         (non-operator-non-accessor-methods
+           (remove-if (lambda (m)
+                        (or (uiop:string-prefix-p "op_" (getf m :name))
+                            (uiop:string-prefix-p "get_" (getf m :name))
+                            (uiop:string-prefix-p "set_" (getf m :name))
+                            (generic-type-p (getf m :return-type))
+                            (some (lambda (p) (generic-type-p (getf p :type)))
+                                  (getf m :parameters))))
+                      methods))
+         (method-groups
+           (let ((table (make-hash-table :test #'equal)))
+             (dolist (m non-operator-non-accessor-methods)
+               (push m (gethash (getf m :name) table)))
+             (let ((groups nil))
+               (maphash (lambda (name ms) (push (cons name (nreverse ms)) groups)) table)
+               (nreverse groups))))
+         (method-names nil)
+         (setter-names nil))
+    ;; Public instance fields.
+    (dolist (f instance-fields)
+      (let ((fname (map-member-name (getf f :name))))
+        (push fname method-names)
+        (unless (getf f :init-only)
+          (push fname setter-names))))
+    ;; Instance properties/indexers -- single-signature groups only
+    ;; (an overloaded indexer has no generated wrapper to forward to).
+    (dolist (group instance-prop-groups)
+      (let ((props (cdr group)))
+        (when (= (length props) 1)
+          (let* ((p (first props))
+                 (pname (map-member-name (getf p :name)))
+                 (readable (getf p :readable))
+                 (writeable (getf p :writeable)))
+            (when readable (push pname method-names))
+            (when writeable (push pname setter-names))))))
+    ;; Instance methods -- only the non-generic overloads of each method
+    ;; name, since a generic method's wrapper puts its type argument(s)
+    ;; before obj!, disqualifying it from the uniform (name obj! &rest
+    ;; args) shape every generic method here relies on.
+    (dolist (group method-groups)
+      (let* ((name (car group))
+             (clean-methods (remove-if-not #'clean-method-p (cdr group)))
+             (instance-clean (remove-if-not (lambda (m) (not (getf m :is-static))) clean-methods))
+             (non-generic-instance-clean (remove-if (lambda (m) (getf m :is-generic)) instance-clean))
+             (kebab-name (map-member-name name)))
+        (when non-generic-instance-clean
+          (dolist (n (method-name-wrapper-names non-generic-instance-clean kebab-name))
+            (push n method-names)))))
+    (values (remove-duplicates (nreverse method-names) :test #'string= :from-end t)
+            (remove-duplicates (nreverse setter-names) :test #'string= :from-end t))))
+
 (defun generate-class-file (class-plist output-dir &optional constant-properties-list creation-time)
   "Generates the Lisp source file for a single class plist.
    CREATION-TIME, if supplied, is used verbatim as the file's creation-date
@@ -1780,7 +1860,7 @@
   ) ;; close defun generate-class-file
 
 (defun make-resolved-class (class-plist constant-properties
-                             &optional export-parents export-interfaces export-object)
+                             &optional export-parents export-interfaces export-object defgeneric)
   "Builds a resolved-class plist: the unit of work generate-class-file,
    generate-batch-packages-file, generate-batch-asd-file, and the
    parents/interfaces re-export machinery all operate on. CLASS-PLIST is
@@ -1788,12 +1868,16 @@
    constant-properties-list (or nil); the three export-* booleans (all nil
    for a class pulled in only as an ancestor -- see expand-ancestors /
    generate-assembly-packages-batch) mirror the manifest's per-class
-   :export-parents/:export-interfaces/:export-object flags."
+   :export-parents/:export-interfaces/:export-object flags. DEFGENERIC (nil
+   for an ancestor-only class, same as the export-* flags) mirrors the
+   manifest's per-class :defgeneric flag -- see
+   doc/make-everything-defgeneric.md."
   (list :class-plist class-plist
         :constant-properties constant-properties
         :export-parents export-parents
         :export-interfaces export-interfaces
-        :export-object export-object))
+        :export-object export-object
+        :defgeneric defgeneric))
 
 (defun resolve-batch-entry (entry)
   "Loads ENTRY's :metadata-file and resolves each of its :classes by
@@ -1818,7 +1902,8 @@
               (push (make-resolved-class cls cprops
                                           (getf class-entry :export-parents)
                                           (getf class-entry :export-interfaces)
-                                          (getf class-entry :export-object))
+                                          (getf class-entry :export-object)
+                                          (getf class-entry :defgeneric))
                     resolved)
               (push cname not-found))))
       (values (nreverse resolved) (nreverse not-found)))))
@@ -2008,8 +2093,63 @@
                       child-pkg)))
           (format stream "~%"))))))
 
+(defparameter *csharp-generics-package-name* "csharp-generics"
+  "Name of the shared package holding every unified CLOS generic function
+   (see doc/make-everything-defgeneric.md). Sits alongside the existing
+   csharp-assembly-utils shared package.")
+
+(defun compute-defgeneric-model (all-resolved)
+  "Given ALL-RESOLVED (every resolved-class plist in this batch --
+   generate-assembly-packages-batch's own flat list), returns a plist
+   describing the *CSHARP-GENERICS-PACKAGE-NAME* unification for every
+   class with :defgeneric true (see doc/make-everything-defgeneric.md), or
+   nil if no class opted in (the whole feature is then a no-op: no package,
+   no file, no .asd component):
+     :classes       -- one entry per opted-in class, in ALL-RESOLVED order:
+                       (:pkg-name .. :fq-name .. :method-names (...)
+                        :setter-names (...)) -- see
+                        collect-class-instance-generics.
+     :method-names  -- the deduped union of every opted-in class's
+                       method-names, in first-seen order.
+     :setter-names  -- likewise for setter-names.
+     :exports       -- the deduped union of :method-names and
+                       :setter-names (a setter's exported symbol name is
+                       the same as its getter's, so this is one list, not
+                       two) -- the CSHARP-GENERICS defpackage's :export
+                       list.
+     :shadows       -- the subset of :exports colliding with a
+                       :common-lisp external symbol, mirroring
+                       compute-package-exports-and-shadows."
+  (let ((opted-in (remove-if-not (lambda (rc) (getf rc :defgeneric)) all-resolved)))
+    (when opted-in
+      (let ((classes nil)
+            (all-methods nil)
+            (all-setters nil))
+        (dolist (rc opted-in)
+          (let* ((cls (getf rc :class-plist))
+                 (fq-name (getf cls :fully-qualified-name))
+                 (pkg-name (type-fq-name-to-pkg-name fq-name)))
+            (multiple-value-bind (method-names setter-names) (collect-class-instance-generics cls)
+              (push (list :pkg-name pkg-name :fq-name fq-name
+                          :method-names method-names :setter-names setter-names)
+                    classes)
+              (dolist (n method-names) (push n all-methods))
+              (dolist (n setter-names) (push n all-setters)))))
+        (setf classes (nreverse classes))
+        (setf all-methods (remove-duplicates (nreverse all-methods) :test #'string= :from-end t))
+        (setf all-setters (remove-duplicates (nreverse all-setters) :test #'string= :from-end t))
+        (let ((exports (remove-duplicates (append all-methods all-setters) :test #'string= :from-end t))
+              (shadows nil))
+          (dolist (exp exports)
+            (multiple-value-bind (sym status) (find-symbol (string-upcase exp) :common-lisp)
+              (when (and sym (eq status :external))
+                (push exp shadows))))
+          (setf shadows (remove-duplicates (nreverse shadows) :test #'string= :from-end t))
+          (list :classes classes :method-names all-methods :setter-names all-setters
+                :exports exports :shadows shadows))))))
+
 (defun generate-batch-packages-file (entries-with-resolved output-dir creation-time package-template-path
-                                      child-ancestor-fqs)
+                                      child-ancestor-fqs &optional defgeneric-model)
   "Writes packages.lisp into OUTPUT-DIR: first the CSHARP-ASSEMBLY-UTILS
    defpackage form, copied verbatim from PACKAGE-TEMPLATE-PATH (a real,
    standalone-loadable .lisp file -- see csharp-assembly-utils-package.template.lisp),
@@ -2027,7 +2167,13 @@
    any entries, a re-export post-pass follows (see EMIT-CHILD-REEXPORTS):
    one block per child with a non-empty ancestor list, importing and
    re-exporting each ancestor's non-conflicting members. See
-   doc/parents-and-interfaces-plan.md."
+   doc/parents-and-interfaces-plan.md.
+
+   DEFGENERIC-MODEL, if non-nil (see COMPUTE-DEFGENERIC-MODEL), also emits
+   the shared *CSHARP-GENERICS-PACKAGE-NAME* defpackage (its :export/:shadow
+   lists coming straight from the model), right after the
+   CSHARP-ASSEMBLY-UTILS defpackage and before any per-class one -- see
+   doc/make-everything-defgeneric.md."
   (let ((output-file (merge-pathnames (make-pathname :name "packages" :type "lisp")
                                        (pathname (concatenate 'string output-dir "/"))))
         (fq->resolved (make-hash-table :test #'equal)))
@@ -2042,6 +2188,22 @@
       (format stream ";;; Source File: csharp-assembly-utils.lisp~%")
       (format stream ";;; Purpose: shared runtime support for generated packages~%")
       (format stream "~A~%" (uiop:read-file-string package-template-path))
+      (when defgeneric-model
+        (format stream ";;; Source File: ~A.lisp~%" *csharp-generics-package-name*)
+        (format stream ";;; Purpose: unified CLOS generic functions dispatching on C# runtime~%")
+        (format stream ";;; type, across every --defgeneric-opted-in class in this batch~%")
+        (format stream ";;; (see doc/make-everything-defgeneric.md)~%")
+        (format stream "(cl:defpackage :~A~%" *csharp-generics-package-name*)
+        (format stream "  (:use :cl)~%")
+        (when (getf defgeneric-model :shadows)
+          (format stream "  (:shadow~%")
+          (dolist (shad (getf defgeneric-model :shadows))
+            (format stream "   #:~A~%" shad))
+          (format stream "  )~%"))
+        (format stream "  (:export~%")
+        (dolist (exp (getf defgeneric-model :exports))
+          (format stream "   #:~A~%" exp))
+        (format stream "  ))~%~%"))
       (dolist (pair entries-with-resolved)
         (dolist (rc (cdr pair))
           (let* ((cls (getf rc :class-plist))
@@ -2096,7 +2258,96 @@
       (format stream "~A~%" (uiop:read-file-string utils-template-path)))
     output-file))
 
-(defun generate-batch-asd-file (entries-with-resolved output-dir creation-time cli-version child-ancestor-fqs)
+(defun generate-batch-generics-file (output-dir creation-time defgeneric-model)
+  "Writes *CSHARP-GENERICS-PACKAGE-NAME*.lisp into OUTPUT-DIR (one
+   cl:defgeneric per DEFGENERIC-MODEL :method-names/:setter-names entry,
+   plus a per-opted-in-class load-time defmethod install block), or does
+   nothing (returns nil) if DEFGENERIC-MODEL is nil -- see
+   COMPUTE-DEFGENERIC-MODEL and doc/make-everything-defgeneric.md. Must run
+   after GENERATE-BATCH-PACKAGES-FILE (needs the package already defined in
+   packages.lisp) and after every opted-in class's own .lisp file (each
+   defmethod forwards to, and each install block's obj!-receiver class
+   registration mirrors, that class's own file).
+
+   Every instance-method/getter generic is (name obj! cl:&rest args); every
+   setter generic is ((cl:setf name) new-value obj! cl:&rest args) --
+   see collect-class-instance-generics. Each opted-in class contributes one
+   defmethod per generic it participates in, forwarding via cl:apply to
+   that class's own already-generated wrapper function.
+
+   Each defmethod is installed AT LOAD TIME (cl:eval-when
+   (:load-toplevel :execute), then cl:eval of a backquoted cl:defmethod
+   form) against the class's own actual runtime CLOS class object, fetched
+   fresh via (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\" ...)
+   and specialized on that object's own (cl:class-name ...) symbol --
+   deliberately NOT a symbol hardcoded at generation time. DotCL names a
+   C# type's CLOS class by its simple name only when free, or by its unique
+   FullName when a same-simple-name type from a different namespace has
+   already claimed it (Runtime.CLOS.cs's EnsureDotNetTypeClass); which type
+   wins that race is load-order-dependent and unknowable at generation
+   time, so a statically-emitted specializer symbol could silently attach
+   to the wrong type. Reading the class's own (cl:class-name ...) at load
+   time is immune to this: it is always the exact symbol DotCL registered
+   for that specific class, whichever one it turned out to be."
+  (when defgeneric-model
+    (let ((output-file (merge-pathnames (make-pathname :name *csharp-generics-package-name* :type "lisp")
+                                         (pathname (concatenate 'string output-dir "/"))))
+          (classes (getf defgeneric-model :classes)))
+      (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+        (format stream ";;; Generated automatically. Do not edit.~%")
+        (format stream ";;; Generator Version: ~D~%" *generator-version*)
+        (format stream ";;; Creation Date: ~A~%~%" creation-time)
+        (format stream "(cl:in-package :~A)~%~%" *csharp-generics-package-name*)
+        (format stream ";;; Unified CLOS generic functions dispatching on C# runtime type.~%")
+        (format stream ";;; See doc/make-everything-defgeneric.md.~%~%")
+
+        ;; One cl:defgeneric per unified method/getter name, documenting
+        ;; which classes' own packages specialize it.
+        (dolist (name (getf defgeneric-model :method-names))
+          (let ((specializers (remove-if-not
+                                (lambda (c) (member name (getf c :method-names) :test #'string=))
+                                classes)))
+            (format stream "(cl:defgeneric ~A (obj! cl:&rest args)~%" name)
+            (format stream "  (:documentation \"Dispatches on the C# runtime type of OBJ!. Specialized by:~%")
+            (dolist (c specializers)
+              (format stream "~A: ~A (~A:~A)~%" (getf c :fq-name) name (getf c :pkg-name) name))
+            (format stream "\"))~%~%")))
+
+        ;; One cl:defgeneric per unified setter name.
+        (dolist (name (getf defgeneric-model :setter-names))
+          (let ((specializers (remove-if-not
+                                (lambda (c) (member name (getf c :setter-names) :test #'string=))
+                                classes)))
+            (format stream "(cl:defgeneric (cl:setf ~A) (new-value obj! cl:&rest args)~%" name)
+            (format stream "  (:documentation \"Dispatches on the C# runtime type of OBJ!. Specialized by:~%")
+            (dolist (c specializers)
+              (format stream "~A: (cl:setf ~A) (cl:setf (~A:~A ...))~%" (getf c :fq-name) name (getf c :pkg-name) name))
+            (format stream "\"))~%~%")))
+
+        ;; Per opted-in class: one load-time install block, robust against
+        ;; DotCL's simple-name/FullName class-naming race (see docstring
+        ;; above).
+        (dolist (c classes)
+          (let ((pkg-name (getf c :pkg-name))
+                (fq-name (getf c :fq-name))
+                (method-names (getf c :method-names))
+                (setter-names (getf c :setter-names)))
+            (format stream ";; ~A (~A)~%" fq-name pkg-name)
+            (format stream "(cl:eval-when (:load-toplevel :execute)~%")
+            (format stream "  (cl:let* ((cls (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\"~%")
+            (format stream "                  (dotnet:resolve-type \"~A\")))~%" fq-name)
+            (format stream "            (spec (cl:class-name cls)))~%")
+            (dolist (name method-names)
+              (format stream "    (cl:eval `(cl:defmethod ~A ((obj! ,spec) cl:&rest args)~%" name)
+              (format stream "                (cl:apply (cl:function ~A:~A) obj! args)))~%" pkg-name name))
+            (dolist (name setter-names)
+              (format stream "    (cl:eval `(cl:defmethod (cl:setf ~A) (new-value (obj! ,spec) cl:&rest args)~%" name)
+              (format stream "                (cl:apply (cl:function (cl:setf ~A:~A)) new-value obj! args)))~%" pkg-name name))
+            (format stream "    ))~%~%"))))
+      output-file)))
+
+(defun generate-batch-asd-file (entries-with-resolved output-dir creation-time cli-version child-ancestor-fqs
+                                 &optional defgeneric-model)
   "Writes csharp-assembly-packages.asd into OUTPUT-DIR, listing every
    generated class package (from ENTRIES-WITH-RESOLVED, a list of
    (entry . resolved) pairs as accumulated by
@@ -2115,7 +2366,11 @@
    loaded -- see doc/parents-and-interfaces-plan.md).
    CLI-VERSION is the dotcl-packagegen tool's own version string (e.g.
    \"2.20.0\"), used only in the long description; the system's own
-   :version is the short generator format version (*GENERATOR-VERSION*)."
+   :version is the short generator format version (*GENERATOR-VERSION*).
+   DEFGENERIC-MODEL, if non-nil (see COMPUTE-DEFGENERIC-MODEL), also adds
+   the shared *CSHARP-GENERICS-PACKAGE-NAME* :file component, depending on
+   \"packages\", \"csharp-assembly-utils\", and every opted-in class's own
+   package file (it must load last -- see doc/make-everything-defgeneric.md)."
   (let ((output-file (merge-pathnames (make-pathname :name "csharp-assembly-packages" :type "asd")
                                        (pathname (concatenate 'string output-dir "/")))))
     (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
@@ -2157,6 +2412,10 @@
                                               (gethash fq-name child-ancestor-fqs))))
             (format stream "   (:file \"~A\" :depends-on (\"packages\" \"csharp-assembly-utils\"~{ \"~A\"~}))~%"
                     pkg-name ancestor-pkg-names))))
+      (when defgeneric-model
+        (format stream "   (:file \"~A\" :depends-on (\"packages\" \"csharp-assembly-utils\"~{ \"~A\"~}))~%"
+                *csharp-generics-package-name*
+                (mapcar (lambda (c) (getf c :pkg-name)) (getf defgeneric-model :classes))))
       (format stream "  ))~%"))
     output-file))
 
@@ -2189,9 +2448,13 @@
    of (and independent of) the per-class files that assume their package is
    already defined. Then emits csharp-assembly-utils.lisp
    (GENERATE-BATCH-UTILS-FILE, using UTILS-TEMPLATE-PATH). Once every class
-   file has been written, also emits a csharp-assembly-packages.asd tying
-   them all together; CLI-VERSION (the dotcl-packagegen tool's own semver,
-   e.g. \"2.20.0\") is used in that file's long description."
+   file has been written, also emits *CSHARP-GENERICS-PACKAGE-NAME*.lisp
+   (GENERATE-BATCH-GENERICS-FILE, a no-op if no class opted into
+   :defgeneric -- see COMPUTE-DEFGENERIC-MODEL and
+   doc/make-everything-defgeneric.md) and finally a
+   csharp-assembly-packages.asd tying them all together; CLI-VERSION (the
+   dotcl-packagegen tool's own semver, e.g. \"2.20.0\") is used in that
+   file's long description."
   (let ((entries-with-resolved nil)
         (entry-resolved-table (make-hash-table :test #'eq))
         (all-not-found nil)
@@ -2265,10 +2528,11 @@
     (let* ((entries-with-resolved-pairs
              (mapcar (lambda (entry) (cons entry (gethash entry entry-resolved-table)))
                      entries-with-resolved))
-           (all-resolved (loop for pair in entries-with-resolved-pairs append (cdr pair))))
+           (all-resolved (loop for pair in entries-with-resolved-pairs append (cdr pair)))
+           (defgeneric-model (compute-defgeneric-model all-resolved)))
 
       (generate-batch-packages-file entries-with-resolved-pairs output-dir creation-time
-                                     package-template-path child-ancestor-fqs)
+                                     package-template-path child-ancestor-fqs defgeneric-model)
       (generate-batch-utils-file output-dir creation-time utils-template-path)
 
       (dolist (rc all-resolved)
@@ -2277,7 +2541,10 @@
           (format *error-output* "Generating package for C# Class: ~A~%" (getf cls :fully-qualified-name))
           (generate-class-file cls output-dir cprops creation-time)))
 
-      (generate-batch-asd-file entries-with-resolved-pairs output-dir creation-time cli-version child-ancestor-fqs))
+      (generate-batch-generics-file output-dir creation-time defgeneric-model)
+
+      (generate-batch-asd-file entries-with-resolved-pairs output-dir creation-time cli-version
+                                child-ancestor-fqs defgeneric-model))
 
     t))
 
@@ -2290,7 +2557,12 @@
      ((:metadata-file \"...\" :assembly-name \"...\"
        :classes ((:name \"...\" :constant-properties \"...\"
                   :export-parents t/nil :export-interfaces t/nil
-                  :export-object t/nil) ...)) ...)
+                  :export-object t/nil :defgeneric t/nil) ...)) ...)
+   :defgeneric (per-class, resolved from Program.cs's --defgeneric/
+   --enable-defgeneric flags) opts a class's instance methods and instance
+   property/field accessors into the shared *CSHARP-GENERICS-PACKAGE-NAME*
+   package of unified CLOS generic functions -- see
+   COMPUTE-DEFGENERIC-MODEL and doc/make-everything-defgeneric.md.
    PACKAGE-TEMPLATE-PATH/UTILS-TEMPLATE-PATH point at
    csharp-assembly-utils-package.template.lisp /
    csharp-assembly-utils.template.lisp, copied next to the executable.

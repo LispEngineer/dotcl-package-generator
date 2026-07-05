@@ -47,30 +47,35 @@ Add flags & default changing flags for these capabilities.
   flags) plus a `doc/assembly-to-lispy.md` schema update.
 
 
-# Turn Everything into Generic Methods
+# Improve Turn Everything into Generic Methods
 
-In addition of having every instance function exported in its own package, export them all in a
-single package (maybe `csharp-interop` or somesuch). Then use DotCL's CLOS generic method
-interoperability to unify them.
-* This could be enabled with `--enable-defgeneric` for all the subsequent classes
-* Then disabled again with `--no-enable-defgeneric`
-* Or one-time enabled or disabled with `--defgeneric` and `--no-defgeneric`
+The current implementation is *really super ugly*. Viz:
 
-Make a generic method (`defgeneric`) for every instance function used anywhere.
-* Docstring could specify which classes have specializations of the generic method,
-  and give the full package names.
+```lisp
+;; System.Numerics.Vector4 (system-numerics-vector4)
+(cl:eval-when (:load-toplevel :execute)
+  (cl:let* ((cls (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                  (dotnet:resolve-type "System.Numerics.Vector4")))
+            (spec (cl:class-name cls)))
+    (cl:eval `(cl:defmethod w ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:w) obj! args)))
+```
 
-Have a method implementation (`defmethod`) for every single class with that name.
-* This should dispatch based on the C# type of the target class.
-* This should be a very simple dispatch that calls in to the non-generic method in
-  the original class. (Yes, this does add overhead - we could address that in a later
-  version if desired.)
-* Docstring should reference the underlying actual implementation, telling the user
-  which Lisp package, etc.
+I really dislike the use of `cl:eval`. I'm going to ask Claude to move this
+to csharp-generics-dynamic and then create the other version as csharp-generics.
+That will have naming collisions - which will be commented.
 
-The implemented generic methods could also include property and field getters and setters, as those
-have semantics that are effectively the same as C# instance methods once translated to Lisp.
+## Next Version
 
+* Change the existing commands to `--enable-defgeneric-dynamic` and the
+  corresponding `--no` version.
+* Change the package from `csharp-generics` to `csharp-generics-dynamic`
+  for the existing version.
+* Use the original `--` commands for the new generator, and the original
+  package name for the new generator.
+* The new generator should implement the other choice we didn't take:
+  "How should the emitted `defmethod` specializer handle the cross-namespace simple-name
+  collision risk?" New answer: "Simple + documented caveat (Recommended)"
 
 # Add More to Generated `.lisp` Files
 
@@ -275,6 +280,43 @@ obj!)` form instead, deprecating Option A's per-type codegen.
 
 
 ---
+
+# Turn Everything into Generic Methods
+
+In addition of having every instance function exported in its own package, export them all in a
+single package (maybe `csharp-interop` or somesuch). Then use DotCL's CLOS generic method
+interoperability to unify them.
+* This could be enabled with `--enable-defgeneric` for all the subsequent classes
+* Then disabled again with `--no-enable-defgeneric`
+* Or one-time enabled or disabled with `--defgeneric` and `--no-defgeneric`
+
+Make a generic method (`defgeneric`) for every instance function used anywhere.
+* Docstring could specify which classes have specializations of the generic method,
+  and give the full package names.
+
+Have a method implementation (`defmethod`) for every single class with that name.
+* This should dispatch based on the C# type of the target class.
+* This should be a very simple dispatch that calls in to the non-generic method in
+  the original class. (Yes, this does add overhead - we could address that in a later
+  version if desired.)
+* Docstring should reference the underlying actual implementation, telling the user
+  which Lisp package, etc.
+
+The implemented generic methods could also include property and field getters and setters, as those
+have semantics that are effectively the same as C# instance methods once translated to Lisp.
+
+**DONE (Version 34, 2026-07-05).** Implemented as designed above, including the property/field
+accessor extension. Full design: `doc/make-everything-defgeneric.md`. Package named
+`csharp-generics` (not `csharp-interop`). Each `defmethod` is installed at load time against the
+class's own actual runtime CLOS class object (via `EnsureDotNetTypeClass`/`cl:class-name`) rather
+than a generation-time-hardcoded specializer symbol, since DotCL's simple-name/FullName class
+naming is load-order-dependent and unknowable at generation time — see
+`doc/generator-design-notes.md`'s "Unified Generic Methods (Version 34)" section for the full
+rationale. Excludes static members and generic/type-parameterized instance methods (a generic
+method's wrapper puts its type argument(s) before the receiver, breaking the uniform dispatch
+shape every other instance wrapper shares). See `FEATURES.md`'s "Unified Generic Methods" section
+and `RELEASES.md`'s 2.34.0 entry.
+
 
 # Parents and Interfaces
 

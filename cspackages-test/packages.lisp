@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 33
-;;; Creation Date: 2026-07-05T14:23:41Z
+;;; Generator Version: 34
+;;; Creation Date: 2026-07-05T17:20:43Z
 
 (cl:in-package :cl-user)
 
@@ -22,6 +22,109 @@
            #:csharp-overload-class-name
            #:csharp-overload-method-name
            #:csharp-overload-supplied-args))
+
+;;; Source File: csharp-generics.lisp
+;;; Purpose: unified CLOS generic functions dispatching on C# runtime
+;;; type, across every --defgeneric-opted-in class in this batch
+;;; (see doc/make-everything-defgeneric.md)
+(cl:defpackage :csharp-generics
+  (:use :cl)
+  (:shadow
+   #:length
+   #:remove
+   #:replace
+   #:append
+   #:count
+   #:values
+  )
+  (:export
+   #:equals
+   #:finalize
+   #:get-hash-code
+   #:get-type
+   #:memberwise-clone
+   #:to-string
+   #:chars
+   #:length
+   #:clone
+   #:compare-to
+   #:contains
+   #:copy-to
+   #:ends-with
+   #:enumerate-runes
+   #:get-enumerator
+   #:get-pinnable-reference
+   #:get-type-code
+   #:index-of
+   #:index-of-any
+   #:insert
+   #:normalized?
+   #:last-index-of
+   #:last-index-of-any
+   #:normalize
+   #:pad-left
+   #:pad-right
+   #:remove
+   #:replace
+   #:replace-line-endings
+   #:split
+   #:starts-with
+   #:substring
+   #:to-char-array
+   #:to-lower
+   #:to-lower-invariant
+   #:to-upper
+   #:to-upper-invariant
+   #:trim
+   #:trim-end
+   #:trim-start
+   #:try-copy-to
+   #:fixed-size?
+   #:read-only?
+   #:synchronized?
+   #:long-length
+   #:rank
+   #:sync-root
+   #:get-length
+   #:get-long-length
+   #:get-lower-bound
+   #:get-upper-bound
+   #:get-value
+   #:initialize
+   #:set-value
+   #:capacity
+   #:max-capacity
+   #:append
+   #:append-format
+   #:append-join
+   #:append-line
+   #:clear
+   #:ensure-capacity
+   #:get-chunks
+   #:comparer
+   #:count
+   #:item
+   #:keys
+   #:values
+   #:add
+   #:contains-key
+   #:contains-value
+   #:get-object-data
+   #:on-deserialization
+   #:trim-excess
+   #:try-add
+   #:get-key-at-index
+   #:get-value-at-index
+   #:index-of-key
+   #:index-of-value
+   #:remove-at
+   #:set-value-at-index
+   #:x
+   #:y
+   #:z
+   #:length-squared
+   #:w
+  ))
 
 ;;; Source File: system-console.lisp
 ;;; C# Class: System.Console

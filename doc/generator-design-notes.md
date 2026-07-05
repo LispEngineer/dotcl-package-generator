@@ -1522,3 +1522,110 @@ a parent's from an *overriding* one — this needs new `AssemblyToLispy.cs` meta
 (`MethodInfo.IsVirtual`/`GetBaseDefinition()`) not added in Version 33, since it only affects
 comment wording, not re-export correctness. Tracked as a future-version follow-up in
 `doc/parents-and-interfaces-plan.md`'s Phase 5.
+
+## Unified Generic Methods (Version 34)
+
+### What changed and why
+
+`PLAN.md`'s "Turn Everything into Generic Methods" section asked for every generated instance
+member to also be reachable through one shared package of CLOS generic functions dispatching on
+the C# runtime type — so, e.g., a caller holding some `#<DOTNET ...>` instance of unknown-to-them
+type can call `(csharp-generics:length x)` without knowing which per-class package `x`'s type
+lives in. Version 34 adds this as opt-in: `--defgeneric`/`--no-defgeneric` (per-class, mirroring
+`--export-parents`) plus sticky `--enable-defgeneric`/`--no-enable-defgeneric` (mirroring
+`--export-all-parents`). Full design writeup, locked decisions, and the questions/answers that
+led to them: `doc/make-everything-defgeneric.md` (this section summarizes the as-built
+implementation).
+
+### Collecting which members qualify: `collect-class-instance-generics`
+
+Every instance wrapper this generator emits takes its receiver first, as a plain positional
+`obj!` — an instance method's Master Wrapper, an instance property/field getter (`(name obj!
+...)`), and an instance property/field setter (`(cl:defun (cl:setf name) (new-value obj! ...))`,
+receiver as the *second* required argument). That uniformity is what makes one dispatch shape,
+`(name obj! cl:&rest args)` (or `((cl:setf name) new-value obj! cl:&rest args)` for a setter),
+cover every opted-in class's wildly different real arities via a bare `cl:apply`.
+
+`collect-class-instance-generics` independently re-derives, for one class-plist, exactly which
+wrapper names have this shape — reusing `map-member-name`/`method-name-wrapper-names` so the name
+computation itself can never drift from `compute-package-exports-and-shadows`/
+`generate-class-file` (the same independent-re-derivation convention `class-member-names-
+excluding-events` established for events in Version 32). Three categories are deliberately
+excluded, all for the same reason — the resulting wrapper's lambda list does not begin with
+`obj!`, or has no wrapper at all:
+
+* **Static members** — no `obj!` receiver to dispatch on at all.
+* **Generic/type-parameterized instance methods** — a generic method's wrapper puts its type
+  argument(s) *before* `obj!` (see "Generic Methods" above), so `obj!` is not the leading
+  argument. `collect-class-instance-generics` filters a method-name group's instance-clean
+  overloads down to the ones with `:is-generic` nil before calling `method-name-wrapper-names`
+  on that subset — which, called on a purely-non-generic subset, always returns exactly
+  `(list base-name)` (the `:single`-mode case), so the *shared* generic can only ever be the
+  plain, non-generic-dispatching function, never a `<>` dispatcher whose first argument is a
+  type.
+* **Overloaded indexers** — `generate-class-file` itself already declines to generate any wrapper
+  for these (multiple index-parameter signatures on one name), so there is nothing to forward to.
+
+### Why load-time install, not a generation-time `defmethod` specializer
+
+The obvious-looking design — emit `(cl:defmethod name ((obj! |Vector2|) ...) ...)` directly, with
+a symbol computed at generation time from the C# type's simple name — is unsound. DotCL's
+`EnsureDotNetTypeClass` (`Runtime.CLOS.cs`) names a type's CLOS class by its *simple* name only
+when that name is free; if a same-simple-name type from a *different* namespace has already
+claimed it (e.g. `System.Threading.Timer` vs. `System.Timers.Timer`), the second one is instead
+registered under its unique `FullName` symbol. Which type wins that race depends on load
+order — genuinely unknowable at generation time, since it depends on what else is loaded and in
+what sequence at runtime. A generation-time-hardcoded specializer symbol would attach to
+whichever type happened to win the simple-name race, silently misdirecting dispatch for the loser
+in any batch where two opted-in classes share a simple name.
+
+Version 34 sidesteps this by installing every `defmethod` **at load time**, against the class's
+own *actual* registered class object, fetched fresh via `EnsureDotNetTypeClass` (idempotent — a
+harmless no-op re-registration when the class's own `.lisp` file already registered it, which it
+always will have by the time `csharp-generics.lisp` loads last) and specialized on that object's
+own `(cl:class-name ...)`:
+
+```lisp
+(cl:eval-when (:load-toplevel :execute)
+  (cl:let* ((cls (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                   (dotnet:resolve-type "System.String")))
+            (spec (cl:class-name cls)))
+    (cl:eval `(cl:defmethod length ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-string:length) obj! args)))
+    ...))
+```
+
+`(cl:class-name cls)` is always the exact symbol DotCL registered for *that specific class*,
+whichever one it turned out to be — immune to the naming race by construction, since it asks the
+already-resolved class object rather than predicting its name. The `cl:eval` of a backquoted
+`cl:defmethod` form (rather than a literal `cl:defmethod` in the source) is required precisely
+*because* the specializer symbol (`spec`) is a runtime value, not something `cl:defmethod`'s own
+macro-expansion (which needs a literal specializer at compile time) could see.
+
+### Emission and load order
+
+`compute-defgeneric-model` aggregates every `:defgeneric`-true resolved class's collected names
+(across the whole batch, not per-assembly) into: the deduped union export/shadow lists for the
+`csharp-generics` `cl:defpackage` (emitted by `generate-batch-packages-file`, right after the
+`csharp-assembly-utils` defpackage — the two are structurally symmetric shared packages), and a
+per-class list of participating names for `generate-batch-generics-file` to emit against. Returns
+`nil` when no class opted in, which every downstream site (`generate-batch-packages-file`,
+`generate-batch-generics-file`, `generate-batch-asd-file`) treats as "emit nothing for this
+feature" — an unused `--defgeneric` produces byte-identical output to before Version 34.
+
+`generate-batch-generics-file` (a new sibling to `generate-batch-utils-file`) must run **after**
+every opted-in class's own `.lisp` file has been generated (its `defmethod` bodies reference
+those files' exported functions by name, and its install blocks' `EnsureDotNetTypeClass` calls
+are safe no-ops only because those files already performed the real registration).
+`generate-batch-asd-file` adds `csharp-generics` as the last `:file` component, depending on
+`"packages"`, `"csharp-assembly-utils"`, and every opted-in class's own package file, so ASDF's
+own dependency graph enforces this load order rather than relying on component-list position
+alone.
+
+### Accepted cost: per-call dispatch/apply overhead
+
+Every unified generic forwards via a bare `cl:apply` of the class's own wrapper — no attempt is
+made to avoid the extra generic-function dispatch plus `apply` overhead relative to calling the
+class's own package function directly. `PLAN.md`'s original sketch explicitly anticipated and
+accepted this for a first version ("this does add overhead — we could address that in a later
+version if desired"); Version 34 makes the same call.

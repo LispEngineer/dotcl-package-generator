@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Object
-;;; Generator Version: 33
-;;; Creation Date: 2026-07-05T05:03:44Z
+;;; Generator Version: 34
+;;; Creation Date: 2026-07-05T17:20:43Z
 
 (cl:in-package :system-object)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Object"))
 (cl:defconstant <type-str> "System.Object")
-(cl:defconstant <creation> "2026-07-05T05:03:44Z")
-(cl:defconstant <version> 33)
+(cl:defconstant <creation> "2026-07-05T17:20:43Z")
+(cl:defconstant <version> 34)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

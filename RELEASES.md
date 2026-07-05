@@ -10,6 +10,23 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.34.0 — 2026-07-05
+
+**Added optional per-class unification of instance members into shared CLOS generic functions.**
+
+* New per-class CLI flags `--defgeneric`/`--no-defgeneric` (attach to the most recently given
+  `--class`, like `--export-parents`), plus sticky `--enable-defgeneric`/`--no-enable-defgeneric`
+  (set the default for the current and every subsequent `--class` in command-line order, like
+  `--export-all-parents`). A class opting in contributes its instance methods and instance
+  property/field accessors (getters and setters) to a new shared `csharp-generics` package of
+  CLOS generic functions dispatching on the C# runtime type of the receiver — e.g.
+  `(csharp-generics:length x)` works whichever opted-in type `x` is, forwarding to that type's
+  own generated wrapper. Excluded: static members, generic/type-parameterized instance methods,
+  and overloaded indexers. A batch with no `--defgeneric` class emits no `csharp-generics.lisp`,
+  no `csharp-generics` package, and no new `.asd` component — byte-identical output to before
+  this version. See `FEATURES.md`'s "Unified Generic Methods" section and
+  `doc/make-everything-defgeneric.md` for the full design (`*generator-version*` bumped to 34).
+
 ## 2.33.1 — 2026-07-05
 
 **Added per-class one-time overrides for the `--export-all-*` sticky defaults.**

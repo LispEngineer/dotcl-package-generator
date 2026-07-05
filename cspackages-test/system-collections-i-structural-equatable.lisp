@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.IStructuralEquatable
-;;; Generator Version: 33
-;;; Creation Date: 2026-07-05T14:23:41Z
+;;; Generator Version: 34
+;;; Creation Date: 2026-07-05T17:20:43Z
 
 (cl:in-package :system-collections-i-structural-equatable)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Collections.IStructuralEquatable"))
 (cl:defconstant <type-str> "System.Collections.IStructuralEquatable")
-(cl:defconstant <creation> "2026-07-05T14:23:41Z")
-(cl:defconstant <version> 33)
+(cl:defconstant <creation> "2026-07-05T17:20:43Z")
+(cl:defconstant <version> 34)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

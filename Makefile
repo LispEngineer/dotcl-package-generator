@@ -52,13 +52,13 @@ test: build
 	      --class System.Console \
 	    --assembly $(REF_DIR)System.Runtime.dll \
 	      --class System.TimeSpan --constant-properties "*" \
-	      --class System.Object \
+	      --class System.Object --defgeneric \
 	      --class System.Type \
-	      --class System.String \
-				--class System.Array --constant-properties "MaxLength" \
+	      --class System.String --defgeneric \
+				--class System.Array --constant-properties "MaxLength" --defgeneric \
 	      --class System.TimeZoneInfo \
 				--class System.Convert \
-				--class System.Text.StringBuilder \
+				--class System.Text.StringBuilder --defgeneric \
 	      --class 'System.TimeZoneInfo+AdjustmentRule' \
 				--class 'System.ValueTuple`2' --export-interfaces --skip-missing \
 				--class 'System.ValueTuple`3' \
@@ -76,15 +76,16 @@ test: build
 	    --assembly $(REF_DIR)System.Xml.ReaderWriter.dll \
 	      --class System.Xml.XmlReader --no-export-all-interfaces \
 	    --assembly $(REF_DIR)System.Collections.dll \
-	      --class 'System.Collections.Generic.Dictionary`2' \
+	      --class 'System.Collections.Generic.Dictionary`2' --defgeneric \
 	      --class 'System.Collections.Generic.Dictionary`2+KeyCollection' \
 	      --class 'System.Collections.Generic.Dictionary`2+ValueCollection' \
 	      --class 'System.Collections.Generic.List`1' \
-	      --class 'System.Collections.Generic.SortedList`2' \
+	      --class 'System.Collections.Generic.SortedList`2' --defgeneric \
 	    --assembly $(REF_DIR)System.Numerics.Vectors.dll \
-	      --class 'System.Numerics.Vector2' --constant-properties "*" \
+	      --class 'System.Numerics.Vector2' --constant-properties "*" --enable-defgeneric \
 	      --class 'System.Numerics.Vector3' --constant-properties "*" \
 	      --class 'System.Numerics.Vector4' --constant-properties "*" \
+	      --no-enable-defgeneric \
 	    --assembly $(REF_DIR)System.Diagnostics.Debug.dll \
 	      --class System.Diagnostics.Debug \
 	    --assembly $(REF_DIR)System.Globalization.dll \

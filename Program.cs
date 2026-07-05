@@ -27,6 +27,7 @@ bool exportAllParents = false;
 bool exportAllInterfaces = false;
 bool exportAllObject = false;
 bool skipMissing = false;
+bool enableDefgeneric = false;
 
 ////////////////////////////////////////////////////////////////////////////
 // Parse arguments
@@ -57,6 +58,7 @@ for (int i = 0; i < args.Length; i++) {
                 ExportParents = exportAllParents,
                 ExportInterfaces = exportAllInterfaces,
                 ExportObject = exportAllObject,
+                DefGeneric = enableDefgeneric,
             };
             currentGroup.Classes.Add(currentClass);
         }
@@ -104,6 +106,18 @@ for (int i = 0; i < args.Length; i++) {
         } else {
             currentClass.ExportObject = false;
         }
+    } else if (args[i] == "--defgeneric") {
+        if (currentClass == null) {
+            argErrors.Add("--defgeneric specified before any --class.");
+        } else {
+            currentClass.DefGeneric = true;
+        }
+    } else if (args[i] == "--no-defgeneric") {
+        if (currentClass == null) {
+            argErrors.Add("--no-defgeneric specified before any --class.");
+        } else {
+            currentClass.DefGeneric = false;
+        }
     } else if (args[i] == "--export-all-parents") {
         exportAllParents = true;
     } else if (args[i] == "--no-export-all-parents") {
@@ -120,6 +134,10 @@ for (int i = 0; i < args.Length; i++) {
         skipMissing = true;
     } else if (args[i] == "--no-skip-missing") {
         skipMissing = false;
+    } else if (args[i] == "--enable-defgeneric") {
+        enableDefgeneric = true;
+    } else if (args[i] == "--no-enable-defgeneric") {
+        enableDefgeneric = false;
     } else if (args[i] == "--test") {
         isTestMode = true;
     }
@@ -191,6 +209,7 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
                 manifest.Append(" :export-parents ").Append(cls.ExportParents ? "t" : "nil");
                 manifest.Append(" :export-interfaces ").Append(cls.ExportInterfaces ? "t" : "nil");
                 manifest.Append(" :export-object ").Append(cls.ExportObject ? "t" : "nil");
+                manifest.Append(" :defgeneric ").Append(cls.DefGeneric ? "t" : "nil");
                 manifest.Append(')');
             }
             manifest.Append("))\n");
@@ -348,13 +367,19 @@ void PrintHelp() {
     Opt("--export-object / --no-export-object", "When combined with --export-parents, also",
         "generate a package for, and re-export from,",
         "System.Object.");
+    Opt("--defgeneric / --no-defgeneric", "Also contribute the most recently given",
+        "--class's instance methods and instance",
+        "property/field accessors to the shared",
+        "CSHARP-GENERICS package of unified CLOS generic",
+        "functions, dispatching on C# runtime type.");
     Console.WriteLine();
     Console.WriteLine("Sticky defaults (change the default for the current and every subsequent --class,");
-    Console.WriteLine("in command-line order; a class's own --export-*/--no-export-* flags above always");
-    Console.WriteLine("override these, for that one class only):");
+    Console.WriteLine("in command-line order; a class's own --export-*/--no-export-*/--defgeneric flags");
+    Console.WriteLine("above always override these, for that one class only):");
     Opt("--export-all-parents / --no-export-all-parents", "Default --export-parents on/off.");
     Opt("--export-all-interfaces / --no-export-all-interfaces", "Default --export-interfaces on/off.");
     Opt("--export-all-object / --no-export-all-object", "Default --export-object on/off.");
+    Opt("--enable-defgeneric / --no-enable-defgeneric", "Default --defgeneric on/off.");
     Console.WriteLine();
     Console.WriteLine("Global:");
     Opt("--skip-missing / --no-skip-missing", "When a requested parent/interface ancestor",
@@ -389,4 +414,5 @@ class ClassSpec {
     public bool ExportParents;
     public bool ExportInterfaces;
     public bool ExportObject;
+    public bool DefGeneric;
 }

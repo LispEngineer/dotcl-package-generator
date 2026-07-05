@@ -558,6 +558,55 @@ feature (arity-1-only → any arity → the current two-tier dispatch).
 
 
 
+## Unified Generic Methods (`--defgeneric`)
+
+**Summary:** opting a class into `--defgeneric` (or its sticky `--enable-defgeneric`
+default) also folds its instance methods and instance property/field accessors into a
+single shared `csharp-generics` package of CLOS generic functions that dispatch on the C#
+runtime type of the receiver — so, e.g., `(csharp-generics:length x)` works whichever
+opted-in type `x` happens to be, forwarding to that type's own already-generated wrapper.
+
+* **CLI:** `--defgeneric`/`--no-defgeneric` (per-class, attach to the most recently given
+  `--class`) plus sticky `--enable-defgeneric`/`--no-enable-defgeneric` (set the default for
+  the current and every subsequent `--class`), mirroring the `--export-parents`/
+  `--export-all-parents` flag families.
+* **Scope:** instance methods (including multi-overload Master Wrappers) and instance
+  property/field getters and setters (indexers included). **Excluded:** static members (no
+  receiver to dispatch on), generic/type-parameterized instance methods (their wrapper's
+  lambda list puts the type argument(s) *before* `obj!`, so `obj!` isn't the leading
+  argument — see "Generic Methods" above), and overloaded indexers (already unimplemented).
+* **Shape:** every unified name is `(name obj! cl:&rest args)`; every unified setter is
+  `((cl:setf name) new-value obj! cl:&rest args)` — the uniform `obj!`-first receiver
+  position every instance wrapper already has lets one dispatch shape cover every class's
+  wildly different arities via `cl:apply`.
+* **Dispatch installation is load-time, not a hardcoded specializer.** DotCL names a C#
+  type's CLOS class by its simple name only when that name is free, or by its unique
+  `FullName` when a same-simple-name type from a different namespace has already claimed
+  it — and which type wins that race is load-order-dependent, unknowable at generation
+  time. So each `defmethod` is installed at load time against the class's own actual
+  runtime class object (`(dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass" ...)`),
+  specializing on that object's own `(cl:class-name ...)` — always the exact symbol DotCL
+  registered for that specific class, whichever one it turned out to be:
+  ```lisp
+  (cl:eval-when (:load-toplevel :execute)
+    (cl:let* ((cls (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                     (dotnet:resolve-type "System.String")))
+              (spec (cl:class-name cls)))
+      (cl:eval `(cl:defmethod length ((obj! ,spec) cl:&rest args)
+                  (cl:apply (cl:function system-string:length) obj! args)))
+      ...))
+  ```
+* **Output:** a new `csharp-generics.lisp` (one `cl:defgeneric`/`(cl:setf ...)`
+  `cl:defgeneric` per unified name, then one load-time install block per opted-in class) and
+  a `csharp-generics` `cl:defpackage` in `packages.lisp`, loaded last (after every opted-in
+  class's own package). A batch with no `--defgeneric` class emits neither.
+
+See `doc/make-everything-defgeneric.md` for the full design rationale (why load-time
+install instead of a static specializer) and `assembly-package-generator.lisp`'s Version 34
+changelog entry.
+
+
+
 ## Type Kind (class / struct / interface / enum / delegate)
 
 **Summary:** every kind is generated through the exact same code path; `:kind` only
