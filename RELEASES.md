@@ -10,6 +10,32 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.33.0 — 2026-07-05
+
+**Added optional per-class re-export of inherited super-class/interface members.**
+
+* New per-class CLI flags `--export-parents`, `--export-interfaces`, `--export-object`
+  (attach to the most recently given `--class`, like `--constant-properties`), plus sticky
+  `--export-all-parents`/`--export-all-interfaces`/`--export-all-object` (and their `--no-`
+  counterparts) that set the default for the current and every subsequent `--class` in
+  command-line order. A class opting in also gets packages generated for its super-class
+  chain and/or implemented interfaces (across *every* assembly provided on the command
+  line, not just its own), with their non-conflicting members re-exported into its own
+  package.
+* New global `--skip-missing`/`--no-skip-missing` flag: by default, an ancestor that cannot
+  be resolved in any provided assembly's metadata is a hard error, aborting before anything
+  is generated (matching the existing missing-class behavior); `--skip-missing` downgrades
+  this to a warning and drops just that ancestor.
+* Re-export is implemented as a post-pass of `cl:shadowing-import`/`cl:import`/`cl:export`
+  calls appended to `packages.lisp` after every class's `cl:defpackage` form — no
+  topological ordering of the `defpackage` forms themselves is required. A name is skipped
+  (documented with a comment, not silently dropped) when the requesting class already
+  declares it itself, or when more than one ancestor exports the same name (ambiguous — a
+  future version may add a renamed re-export for this case).
+* See `doc/parents-and-interfaces-plan.md` for the full design, `FEATURES.md`'s new "Parents
+  and Interfaces" section, and `assembly-package-generator.lisp`'s `*generator-version*`
+  docstring (Version 33) for the implementation-level changelog.
+
 ## 2.32.0 — 2026-07-04
 
 **Added support for C# events (`add_X`/`remove_X`).**

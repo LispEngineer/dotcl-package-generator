@@ -6,6 +6,15 @@
 
 # Parents and Interfaces
 
+* **DONE (2026-07-05, generator v2.33.0)**: Phases 1-4 of
+  [`doc/parents-and-interfaces-plan.md`](doc/parents-and-interfaces-plan.md) are implemented —
+  `--export-parents`/`--export-interfaces`/`--export-object` (per-class) plus sticky
+  `--export-all-*` CLI defaults and `--skip-missing`/`--no-skip-missing`; re-export via a
+  post-pass of `cl:shadowing-import`/`cl:import`/`cl:export` calls in `packages.lisp` (no
+  topological sort); interface name-collisions handled skip-with-comment (the
+  `interface->name` rename idea below remains a deferred follow-up, as does Phase 5's
+  virtual/override-aware shadow commentary). See `RELEASES.md`'s 2.33.0 entry and
+  `doc/generator-design-notes.md`'s "Parents and Interfaces (Version 33)" section.
 * **Detailed implementation plan:** see [`doc/parents-and-interfaces-plan.md`](doc/parents-and-interfaces-plan.md)
   (approved; re-export via a post-pass of `import`/`export` calls, no topological
   sort; interface name-collisions handled skip-with-comment first).

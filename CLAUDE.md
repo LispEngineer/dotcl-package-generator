@@ -117,6 +117,14 @@ read-only properties to be emitted as `defconstant` instead of `define-symbol-ma
 only when the property genuinely never changes at runtime (e.g. `Vector2.Zero`), since
 reflection alone can't tell constants from properties that vary.
 
+A class can also opt into generating packages for, and re-exporting non-conflicting members
+from, its ancestors: `--export-parents`/`--export-interfaces`/`--export-object` (per-class,
+like `--constant-properties`), plus sticky `--export-all-parents`/`--export-all-interfaces`/
+`--export-all-object` (and `--no-` variants) that set the default for the current and every
+subsequent `--class`. `--skip-missing`/`--no-skip-missing` (global) governs whether an
+ancestor unresolvable in any provided assembly is a hard error (default) or a dropped warning.
+See `doc/parents-and-interfaces-plan.md` and `FEATURES.md`'s "Parents and Interfaces" section.
+
 `--version`/`--help` and `--test` boot the DotCL host (`DotclHost.Initialize()`); the
 metadata-reflection portion of a `--out-dir` invocation intentionally does not, since it's pure
 reflection and runs before DotCL boots.
@@ -150,7 +158,11 @@ reflection and runs before DotCL boots.
 * **`assembly-package-generator.lisp`** — the code generator proper. Entry points
   `run-assembly-package-generator-batch` → `generate-assembly-packages-batch` (which resolves
   and validates every requested class against its assembly's metadata *before* generating
-  anything, via `resolve-batch-entry`) → `generate-class-file` (~1000 lines; the bulk of the
+  anything, via `resolve-batch-entry`; then, for any class with `--export-parents`/
+  `--export-interfaces` set, resolves its ancestor graph across *every* provided assembly's
+  metadata via a global index (`build-metadata-index`/`expand-ancestors`), folding newly-found
+  ancestors into the same working set before anything is generated — see
+  `doc/parents-and-interfaces-plan.md`) → `generate-class-file` (~1000 lines; the bulk of the
   file). Bump `*generator-version*` (top of file) whenever generation *behavior* (the shape of
   emitted `.lisp` files) changes, and add a changelog line in its docstring —
   `doc/generator-design-notes.md`'s "Generator Version History" section has the detailed

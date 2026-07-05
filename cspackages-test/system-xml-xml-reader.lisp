@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Xml.XmlReader
-;;; Generator Version: 32
-;;; Creation Date: 2026-07-05T03:30:42Z
+;;; Generator Version: 33
+;;; Creation Date: 2026-07-05T05:03:44Z
 
 (cl:in-package :system-xml-xml-reader)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Xml.XmlReader"))
 (cl:defconstant <type-str> "System.Xml.XmlReader")
-(cl:defconstant <creation> "2026-07-05T03:30:42Z")
-(cl:defconstant <version> 32)
+(cl:defconstant <creation> "2026-07-05T05:03:44Z")
+(cl:defconstant <version> 33)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

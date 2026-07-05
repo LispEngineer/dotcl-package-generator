@@ -578,6 +578,41 @@ receiver is treated as a value type for the boxing-mutation warning comment.
 
 
 
+## Parents and Interfaces
+
+**Summary:** since every class only reflects its own *declared* members, a class's
+generated package normally has no way to reach anything it inherits. `--export-parents`/
+`--export-interfaces`/`--export-object` (per-class flags, plus sticky `--export-all-*` CLI
+defaults) opt a class into also generating packages for its super-classes and/or
+implemented interfaces, and re-exporting their non-conflicting members into the requesting
+class's own package.
+
+Re-export is a **post-pass** of `cl:shadowing-import`/`cl:import`/`cl:export` calls appended
+to `packages.lisp`, after every class's `cl:defpackage` form (each `defpackage` stays exactly
+as self-contained as before — no `:import-from` is ever added to one). A candidate name is
+skipped, with a comment (never silently dropped), when:
+
+* the requesting class already declares a member of that name itself (its own wins — this is
+  also why `--export-interfaces` is often a no-op: a class implementing an interface
+  virtually always already declares the interface's own members), or
+* more than one ancestor exports the same name (ambiguous; a future version may add a
+  renamed re-export here, e.g. `interface-name->method`, but for now it's comment-only).
+
+The synthetic per-type symbols (`<type>`, `<type-str>`, `<creation>`, `<version>`, `new`) are
+never candidates — they identify the *ancestor's* own type/version/construction, not
+something inherited. A re-exported name that collides with a standard Common Lisp symbol
+(e.g. `count`, `remove`) uses `cl:shadowing-import` instead of `cl:import`, mirroring how the
+ancestor's own package had to `:shadow` it in the first place.
+
+By default, an ancestor that cannot be found in any of the assemblies passed on the command
+line aborts generation entirely (before anything is written) — `--skip-missing` downgrades
+this to a warning and drops just that ancestor. See
+[`doc/parents-and-interfaces-plan.md`](doc/parents-and-interfaces-plan.md) for the full
+design and rationale (including why no topological sort of the `defpackage` forms is
+needed).
+
+
+
 ## Nested and Generic Types
 
 **Summary:** a nested type's `+`-separated name and an open generic type's backtick

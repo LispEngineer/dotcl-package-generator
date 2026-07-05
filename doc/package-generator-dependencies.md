@@ -44,3 +44,11 @@ remaining genuinely custom piece of runtime logic now ships as its own generated
     is copied into that batch's `packages.lisp` instead, per this tool's own "every `defpackage`
     lives in `packages.lisp`" convention): raised as a condition in the fallback branch of a
     master-overload `cond` block when no C# overload signature matches the supplied arguments.
+*   **`cl:import` / `cl:shadowing-import` / `cl:export`** (standard Common Lisp, no dependency at
+    all): as of Generator Version 33, a batch's `packages.lisp` may also contain a post-pass of
+    these calls after every `defpackage` form, re-exporting a class's non-conflicting
+    parent/interface members (`--export-parents`/`--export-interfaces`) into its own package.
+    Noted here only because it's a new *shape* of generated output, not a new dependency — see
+    `doc/parents-and-interfaces-plan.md` and `doc/generator-design-notes.md`'s "Parents and
+    Interfaces (Version 33)" section for why this needs no topological ordering of the
+    `defpackage` forms themselves.

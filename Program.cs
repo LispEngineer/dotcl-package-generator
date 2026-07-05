@@ -23,6 +23,10 @@ var groups = new List<AssemblyGroup>();
 AssemblyGroup? currentGroup = null;
 ClassSpec? currentClass = null;
 var argErrors = new List<string>();
+bool exportAllParents = false;
+bool exportAllInterfaces = false;
+bool exportAllObject = false;
+bool skipMissing = false;
 
 ////////////////////////////////////////////////////////////////////////////
 // Parse arguments
@@ -48,7 +52,12 @@ for (int i = 0; i < args.Length; i++) {
         if (currentGroup == null) {
             argErrors.Add("--class specified before any --assembly.");
         } else {
-            currentClass = new ClassSpec { Name = args[i + 1] };
+            currentClass = new ClassSpec {
+                Name = args[i + 1],
+                ExportParents = exportAllParents,
+                ExportInterfaces = exportAllInterfaces,
+                ExportObject = exportAllObject,
+            };
             currentGroup.Classes.Add(currentClass);
         }
         i++;
@@ -59,6 +68,40 @@ for (int i = 0; i < args.Length; i++) {
             currentClass.ConstantProperties = args[i + 1];
         }
         i++;
+    } else if (args[i] == "--export-parents") {
+        if (currentClass == null) {
+            argErrors.Add("--export-parents specified before any --class.");
+        } else {
+            currentClass.ExportParents = true;
+        }
+    } else if (args[i] == "--export-interfaces") {
+        if (currentClass == null) {
+            argErrors.Add("--export-interfaces specified before any --class.");
+        } else {
+            currentClass.ExportInterfaces = true;
+        }
+    } else if (args[i] == "--export-object") {
+        if (currentClass == null) {
+            argErrors.Add("--export-object specified before any --class.");
+        } else {
+            currentClass.ExportObject = true;
+        }
+    } else if (args[i] == "--export-all-parents") {
+        exportAllParents = true;
+    } else if (args[i] == "--no-export-all-parents") {
+        exportAllParents = false;
+    } else if (args[i] == "--export-all-interfaces") {
+        exportAllInterfaces = true;
+    } else if (args[i] == "--no-export-all-interfaces") {
+        exportAllInterfaces = false;
+    } else if (args[i] == "--export-all-object") {
+        exportAllObject = true;
+    } else if (args[i] == "--no-export-all-object") {
+        exportAllObject = false;
+    } else if (args[i] == "--skip-missing") {
+        skipMissing = true;
+    } else if (args[i] == "--no-skip-missing") {
+        skipMissing = false;
     } else if (args[i] == "--test") {
         isTestMode = true;
     }
@@ -126,7 +169,11 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
             manifest.Append(" :classes (");
             foreach (var cls in group.Classes) {
                 manifest.Append("(:name \"").Append(EscapeLispString(cls.Name)).Append('"');
-                manifest.Append(" :constant-properties \"").Append(EscapeLispString(cls.ConstantProperties)).Append("\")");
+                manifest.Append(" :constant-properties \"").Append(EscapeLispString(cls.ConstantProperties)).Append('"');
+                manifest.Append(" :export-parents ").Append(cls.ExportParents ? "t" : "nil");
+                manifest.Append(" :export-interfaces ").Append(cls.ExportInterfaces ? "t" : "nil");
+                manifest.Append(" :export-object ").Append(cls.ExportObject ? "t" : "nil");
+                manifest.Append(')');
             }
             manifest.Append("))\n");
         }
@@ -154,7 +201,7 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
         Console.WriteLine("[Program.cs] Running assembly package generator...");
         try {
             DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH", manifestFile, outDir, creationTime, cliVersion,
-                            utilsPackageTemplatePath, utilsTemplatePath);
+                            utilsPackageTemplatePath, utilsTemplatePath, skipMissing);
         } catch (Exception ex) {
             Console.Error.WriteLine($"[Program.cs] Error in assembly package generator: {ex.Message}");
             Console.Error.WriteLine(ex.StackTrace);
@@ -270,6 +317,29 @@ void PrintHelp() {
         "of re-evaluated accessors, for the most recently given",
         "--class.");
     Console.WriteLine();
+    Console.WriteLine("Parents and interfaces (per-class, attach to the most recently given --class):");
+    Opt("--export-parents", "Also generate packages for, and re-export non-",
+        "conflicting members from, every super-class of the",
+        "most recently given --class (excluding System.Object",
+        "unless --export-object is also given).");
+    Opt("--export-interfaces", "Also generate packages for, and re-export non-",
+        "conflicting members from, every interface implemented",
+        "by the most recently given --class.");
+    Opt("--export-object", "When combined with --export-parents, also generate",
+        "a package for, and re-export from, System.Object.");
+    Console.WriteLine();
+    Console.WriteLine("Sticky defaults (change the default for the current and every subsequent --class,");
+    Console.WriteLine("in command-line order; a class's own --export-* flags above always override these):");
+    Opt("--export-all-parents / --no-export-all-parents", "Default --export-parents on/off.");
+    Opt("--export-all-interfaces / --no-export-all-interfaces", "Default --export-interfaces on/off.");
+    Opt("--export-all-object / --no-export-all-object", "Default --export-object on/off.");
+    Console.WriteLine();
+    Console.WriteLine("Global:");
+    Opt("--skip-missing / --no-skip-missing", "When a requested parent/interface ancestor",
+        "cannot be found in any provided assembly, warn",
+        "and drop it (--skip-missing) instead of the",
+        "default: stop with an error (--no-skip-missing).");
+    Console.WriteLine();
     Console.WriteLine("Other:");
     Opt("--test", "Run the generator's own Lisp unit tests plus the",
         "AssemblyToLispy metadata test suite.");
@@ -294,4 +364,7 @@ class AssemblyGroup {
 class ClassSpec {
     public required string Name;
     public string ConstantProperties = "";
+    public bool ExportParents;
+    public bool ExportInterfaces;
+    public bool ExportObject;
 }

@@ -1421,3 +1421,104 @@ would need to construct and return a raw `.NET` delegate object (via `dotnet:mak
 direct `dotnet:static` call to the static `add_X` method) for the caller to hold onto and pass back
 verbatim to `remove-X`, which is a meaningfully different calling convention from the instance
 case above. This is tracked as a follow-up in `PLAN.md` rather than attempted here.
+
+## Parents and Interfaces (Version 33)
+
+### What changed and why
+
+Every class package previously reflected only its own *declared* members
+(`BindingFlags.DeclaredOnly` in every `AssemblyToLispy.cs` member query), so a generated package
+had no way to reach anything inherited from a super-class or implemented interface — a user had
+to separately know about, request, and reach into the ancestor's own package. Version 33 adds
+opt-in re-export: `--export-parents`/`--export-interfaces`/`--export-object` (per-class flags,
+plus sticky `--export-all-*` CLI defaults) pull in a class's ancestors and re-export their
+non-conflicting members into its own package. Full design writeup and rationale:
+`doc/parents-and-interfaces-plan.md` (this section summarizes the as-built implementation).
+
+### Ancestor resolution is cross-assembly, via a global index
+
+`build-metadata-index` loads every manifest entry's metadata file once (even if two entries
+happen to share one) into a single `fully-qualified-name -> (type-plist . owning-entry)` hash
+table. `expand-ancestors` then walks a requested class's ancestor graph against this index, not
+just its own assembly's metadata — an ancestor is resolved wherever it lives among every
+`--assembly` given on the command line. `:superclass` is walked link-by-link up to
+`System.Object` (excluded unless `--export-object`); `:interfaces` is taken as already fully
+transitive, since .NET's `Type.GetInterfaces()` includes interfaces implemented via any base
+type. An ancestor absent from the index (assembly not provided, or an unresolvable open-generic
+base) is collected as *missing*: by default this aborts generation entirely, matching the
+existing missing-*requested*-class behavior, before anything is written; `--skip-missing` (a
+plain boolean passed as an extra scalar to `RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH`, not folded
+into the manifest, since it is one global flag) downgrades this to a warning and drops just that
+ancestor.
+
+Newly-discovered ancestors are folded into the existing per-entry/per-class working set
+(`resolved-class` plists, from the new `make-resolved-class` — replacing the old bare
+`(class-plist . constant-properties-list)` cons `resolve-batch-entry`/
+`generate-batch-packages-file`/`generate-batch-asd-file`/`generate-assembly-packages-batch` all
+used to pass around) as **plain packages** (no export flags of their own — they don't recursively
+re-export *their* ancestors unless separately, explicitly requested), appended after their owning
+assembly's explicitly-requested classes: a stable, minimal reordering of the user's own
+command-line order, with no topological sort anywhere in this feature (see below for why the
+re-export mechanism itself needs none either). A class both explicitly requested and pulled in as
+someone else's ancestor keeps its own explicit flags/constant-properties; no duplicate entry is
+generated.
+
+### Re-export is a post-pass, not `:import-from` — deliberately no topological sort
+
+The natural-looking design — each child's own `defpackage` gaining an `:import-from` clause for
+every ancestor symbol it draws from — would require the `defpackage` forms themselves to be
+topologically ordered (an ancestor's package must be *defined* before a descendant's
+`:import-from` clause can reference its symbols). Version 33 avoids this entirely: every
+`defpackage` form in `packages.lisp` stays exactly as self-contained as before (own symbols
+only), and a separate block of `cl:shadowing-import`/`cl:import`/`cl:export` calls
+(`emit-child-reexports`) is appended *after every `defpackage` form in the file*. Since
+`shadowing-import`/`import`/`export` only require the ancestor's symbols to already be interned
+— which `defpackage` guarantees the moment it runs, regardless of where in the file it sits,
+independent of whether the ancestor's actual function *bodies* have loaded yet — the whole
+`packages.lisp` file can emit its `defpackage` forms in plain command-line-derived order with no
+sort pass at all. The actual function binding for a re-exported symbol arrives later, whenever
+the ancestor's own class `.lisp` file loads (any time before the whole ASDF system finishes
+loading, which is always before generated code is actually called); `generate-batch-asd-file`
+also adds each child's ancestor package files to its own `:file`'s `:depends-on`, making that true
+dependency explicit in the system definition even though it isn't strictly required for
+correctness once the whole system loads.
+
+### Deciding what to re-export: `compute-reexports`
+
+For a child class, `compute-reexports` is handed the child's own export list (from the existing
+`compute-package-exports-and-shadows` — reused, not reimplemented, for both the child and every
+ancestor) plus each ancestor's own `(pkg-name exports shadows)` triple, and decides, per
+candidate name:
+
+* **Excluded outright**: the four synthetic per-type symbols (`<type>`, `<type-str>`,
+  `<creation>`, `<version>`) plus `new` are never re-export candidates at all — they identify the
+  *ancestor's own* type/version/construction, not something a descendant logically inherits.
+* **Skipped, tagged `:own`**: the child already declares a member of that name itself. This
+  covers the common `--export-interfaces` case where a class already implements the interface
+  method it would otherwise re-export — verified live against `System.Array`
+  (`--export-interfaces`, real `System.Runtime.dll` metadata): `System.Array`'s own
+  `synchronized?`/`sync-root`/`copy-to`/`get-enumerator`/`fixed-size?`/`read-only?`/`clear`/
+  `index-of`/`clone` are all correctly skipped as `:own`, while genuinely-inherited-only members
+  (`item`, `add`, `contains`, `insert`, `remove-at`, `compare-to`, `equals`, `get-hash-code`, plus
+  `count`/`remove` needing `cl:shadowing-import` since those two collide with real CL symbols) are
+  re-exported.
+* **Skipped, tagged `(:ambiguous pkg-name-list)`**: more than one ancestor exports the same name.
+  Locked design decision (see `doc/parents-and-interfaces-plan.md`): this is comment-only for now,
+  not a renamed re-export (e.g. `interface-name->method`) — that disambiguation is deferred to a
+  future version.
+* **Re-exported**, via `cl:shadowing-import` if the name collides with a standard CL symbol (per
+  that ancestor's own `shadows` list — the same detection `compute-package-exports-and-shadows`
+  already performs for the ancestor's own `defpackage :shadow` clause), or plain `cl:import`
+  otherwise.
+
+Every skip is documented with a `;;; Skipped (...)` comment in `packages.lisp`, mirroring this
+codebase's existing convention of documenting unsupported/skipped cases (dirty overloads,
+unsupported indexers) rather than silently dropping them.
+
+### Deferred: virtual/override-aware shadow commentary
+
+`PLAN.md`'s original sketch also wanted a comment distinguishing a *non-virtual* member shadowing
+a parent's from an *overriding* one — this needs new `AssemblyToLispy.cs` metadata
+(`MethodInfo.IsVirtual`/`GetBaseDefinition()`) not added in Version 33, since it only affects
+comment wording, not re-export correctness. Tracked as a future-version follow-up in
+`doc/parents-and-interfaces-plan.md`'s Phase 5.

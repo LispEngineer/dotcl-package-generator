@@ -64,7 +64,8 @@
    29 - Documentation-only correction, no dispatch/behavior change: the struct-boxing warning comment above instance property/field mutators previously claimed setf 'may only mutate a boxed copy, leaving the original unchanged' -- backwards. A live REPL check against dotcl-dungeonslime proved mutation actually succeeds in place, and, more importantly, that a --constant-properties-selected (or, in principle, literal/const) defconstant of a mutable struct type is a single boxed .NET object shared and re-returned on every reference for the life of the program, since defconstant's value form runs exactly once -- mutating it through any alias (e.g. a defparameter bound to it) permanently corrupts the 'constant' everywhere, silently. The mutator comment is corrected to describe this aliasing hazard accurately (emit-shared-mutable-constant-warning at the three is-value-type-p property/field-mutator sites), and a new warning comment is now emitted above every literal-fields/pure-const-fields/pure-const-props defconstant whose type is not a known-safe immutable-primitive-type-p type (numeric primitives, System.String, System.Char, System.Boolean, System.IntPtr/UIntPtr) -- a deliberately broad allowlist, since this repo has no cross-type metadata available at generation time to precisely determine some other type's mutability. See doc/generator-design-notes.md's corrected \"Instance Properties and Struct 'Boxing Mutation'\" section and its new Version 29 section for the full transcript and root-cause explanation.
    30 - AssemblyToLispy.cs's GetCleanMethodName gained mappings for the 8 remaining standard C# overloadable operators previously left as raw op_Xxx names (op_Modulus -> %, op_BitwiseAnd -> &, op_BitwiseOr -> |, op_ExclusiveOr -> ^, op_LeftShift -> <<, op_RightShift -> >>, op_UnsignedRightShift -> >>>, op_OnesComplement -> ~) and C# 11's checked-operator variants, suffixed with '!' to coexist alongside their unchecked counterparts on the same type (op_CheckedAddition -> +!, op_CheckedSubtraction -> -!, op_CheckedMultiply -> *!, op_CheckedDivision -> /!, op_CheckedUnaryNegation -> -! shared with op_CheckedSubtraction the same way unchecked '-' is already shared between op_Subtraction/op_UnaryNegation, op_CheckedExplicit -> explicit-cast!). No change was needed in this file: a mapped operator's :name is already its clean Lisp symbol (not a raw op_-prefixed name) by the time non-operator-non-accessor-methods/simple-method-p/clean-method-p run their 'op_' prefix checks, so any newly-mapped operator flows through the existing clean-method/Master Wrapper pipeline exactly like the previously-mapped +/-/*//,=,etc. do today -- unary/binary disambiguation via the optional-second-argument arity check (see Version 13/14) applies unchanged, and the real CLR method is still invoked via each method's :mangled-name.
    31 - Closed a known silent gap (tracked in PLAN.md/FEATURES.md's Unsupported Features): a static property that is writeable (read-write or write-only), and a plain mutable static field (not readonly, not const), previously matched none of the existing field/property classifiers and so generated nothing at all -- no getter, no setter, not even a comment. New predicates writeable-static-property-p (static + writeable, disjoint from constant-property-p which requires not-writeable) and mutable-static-field-p (static, neither literal nor init-only, the exact complement within static fields of literal-field-p/runtime-readonly-field-p) now catch these. Codegen mirrors the existing instance-property/instance-field shape (readable -> getter, writeable+readable -> adds a setf-expander, writeable-only -> a set-name function) but uses dotnet:static in place of dotnet:invoke and drops the obj! receiver entirely, since dotnet:static's own setf-expansion (per doc/dotnet-dotcl-interop.md) writes the type's static storage slot directly -- unlike instance property/field mutation, there is no boxed obj! receiver to alias, so no struct-boxing-mutation warning comment is emitted for either new case.
-   32 - Added support for C# events (add_X/remove_X accessor pairs), previously invisible end-to-end: filtered out at reflection time by the same IsSpecialName check that also hides property/indexer accessors (AssemblyToLispy.cs), so the Lisp side never even knew they existed (doc/claude-suggested-improvements-20260703.md's item 4). AssemblyToLispy.cs now reflects instance events (only -- static events are excluded, since dotnet:add-event/dotnet:remove-event have no verified calling convention for a receiverless event) into a new :events metadata key (FormatEventPlist, mirroring FormatPropertyPlist); each generates an add-X/remove-X wrapper pair calling DotCL's existing dotnet:add-event/dotnet:remove-event (no DotCL runtime changes were needed -- this was purely a reflection+codegen gap in this repo). Removal is by Lisp object identity: passing a fresh (lambda ...) that merely behaves like the original handler will not remove it, since dotnet:add-event's cache is keyed on the exact Lisp function object originally passed to add-X (the generated remove-X docstring calls this out explicitly). Since add-X/remove-X are synthesized compound names rather than a 1:1 mapping of one C# identifier, they can collide with an unrelated real member (e.g. a Click event alongside an AddClick() method); event-wrapper-names resolves this via a three-tier escalation (add-click/remove-click -> add-click-event/remove-click-event -> add-click!/remove-click!, the last collision-proof by construction since C# cannot emit '!', the same guarantee obj!/quote!/function!/t!/nil! already rely on), fed by class-member-names-excluding-events -- a new helper both compute-package-exports-and-shadows and generate-class-file call with their own independently-filtered field/property/method lists, so the two functions can never disagree on an event's actual wrapper names. See doc/generator-design-notes.md's Events (Version 32) section for the full design writeup, and PLAN.md for the deferred static-event follow-up.")
+   32 - Added support for C# events (add_X/remove_X accessor pairs), previously invisible end-to-end: filtered out at reflection time by the same IsSpecialName check that also hides property/indexer accessors (AssemblyToLispy.cs), so the Lisp side never even knew they existed (doc/claude-suggested-improvements-20260703.md's item 4). AssemblyToLispy.cs now reflects instance events (only -- static events are excluded, since dotnet:add-event/dotnet:remove-event have no verified calling convention for a receiverless event) into a new :events metadata key (FormatEventPlist, mirroring FormatPropertyPlist); each generates an add-X/remove-X wrapper pair calling DotCL's existing dotnet:add-event/dotnet:remove-event (no DotCL runtime changes were needed -- this was purely a reflection+codegen gap in this repo). Removal is by Lisp object identity: passing a fresh (lambda ...) that merely behaves like the original handler will not remove it, since dotnet:add-event's cache is keyed on the exact Lisp function object originally passed to add-X (the generated remove-X docstring calls this out explicitly). Since add-X/remove-X are synthesized compound names rather than a 1:1 mapping of one C# identifier, they can collide with an unrelated real member (e.g. a Click event alongside an AddClick() method); event-wrapper-names resolves this via a three-tier escalation (add-click/remove-click -> add-click-event/remove-click-event -> add-click!/remove-click!, the last collision-proof by construction since C# cannot emit '!', the same guarantee obj!/quote!/function!/t!/nil! already rely on), fed by class-member-names-excluding-events -- a new helper both compute-package-exports-and-shadows and generate-class-file call with their own independently-filtered field/property/method lists, so the two functions can never disagree on an event's actual wrapper names. See doc/generator-design-notes.md's Events (Version 32) section for the full design writeup, and PLAN.md for the deferred static-event follow-up.
+   33 - Added optional per-class re-export of inherited super-class/interface members (--export-parents/--export-interfaces/--export-object, plus sticky --export-all-* CLI defaults, and --skip-missing/--no-skip-missing for an unresolvable ancestor), per doc/parents-and-interfaces-plan.md. Program.cs's manifest now carries these three booleans per requested class; a new global metadata index (build-metadata-index) resolves a class's ancestor graph (expand-ancestors: :superclass walked link-by-link up to System.Object, :interfaces taken as already-transitive per .NET's Type.GetInterfaces()) across every provided assembly, not just the requesting class's own, folding newly-discovered ancestors into the working set (generated as plain packages, appended after their assembly's explicitly-requested classes -- stable, minimal reordering; an ancestor also explicitly requested keeps its own flags/constant-properties instead of a duplicate). Resolved-class data (previously a bare (class-plist . constant-properties-list) cons throughout resolve-batch-entry/generate-batch-packages-file/generate-batch-asd-file/generate-assembly-packages-batch) is now the make-resolved-class plist, adding the three export flags. Re-export itself (compute-reexports, emit-child-reexports) is a POST-PASS of cl:shadowing-import/cl:import/cl:export calls appended to packages.lisp after every cl:defpackage form -- deliberately not folded into each defpackage via :import-from, so no topological ordering of the defpackage forms is ever needed (shadowing-import/import/export only require the ancestor's symbols to already be interned, which defpackage guarantees regardless of file position; the actual function bindings arrive later, whenever each class's own .lisp file loads, which is safe as long as the whole ASDF system loads before anything is called). Per child, an ancestor-exported name is skipped (with an explanatory comment, not renamed) rather than re-exported when the child already declares it itself (child wins) or when more than one ancestor exports the same name (ambiguous -- the interface1->name-style disambiguation is intentionally deferred to a future version); the synthetic per-type symbols <type>/<type-str>/<creation>/<version>/new are never re-exported, since they identify the ancestor's own type identity, not something inherited. generate-batch-asd-file also adds each child's ancestor package files to its own :file's :depends-on.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -1778,10 +1779,26 @@
     ) ;; close outer let*
   ) ;; close defun generate-class-file
 
+(defun make-resolved-class (class-plist constant-properties
+                             &optional export-parents export-interfaces export-object)
+  "Builds a resolved-class plist: the unit of work generate-class-file,
+   generate-batch-packages-file, generate-batch-asd-file, and the
+   parents/interfaces re-export machinery all operate on. CLASS-PLIST is
+   the type's metadata plist; CONSTANT-PROPERTIES is the split
+   constant-properties-list (or nil); the three export-* booleans (all nil
+   for a class pulled in only as an ancestor -- see expand-ancestors /
+   generate-assembly-packages-batch) mirror the manifest's per-class
+   :export-parents/:export-interfaces/:export-object flags."
+  (list :class-plist class-plist
+        :constant-properties constant-properties
+        :export-parents export-parents
+        :export-interfaces export-interfaces
+        :export-object export-object))
+
 (defun resolve-batch-entry (entry)
   "Loads ENTRY's :metadata-file and resolves each of its :classes by
    :fully-qualified-name against the loaded metadata. Returns two values:
-   a list of (class-plist . constant-properties-list) pairs ready for
+   a list of resolved-class plists (see make-resolved-class) ready for
    generate-class-file, and a list of class names from :classes that could
    not be found in the metadata (empty if all resolved, or if :classes was
    empty, which is a valid metadata-only request)."
@@ -1798,11 +1815,201 @@
                (cprops (and cprops-str (> (length cprops-str) 0) (split-string cprops-str #\,)))
                (cls (find cname metadata :key (lambda (c) (getf c :fully-qualified-name)) :test #'string=)))
           (if cls
-              (push (cons cls cprops) resolved)
+              (push (make-resolved-class cls cprops
+                                          (getf class-entry :export-parents)
+                                          (getf class-entry :export-interfaces)
+                                          (getf class-entry :export-object))
+                    resolved)
               (push cname not-found))))
       (values (nreverse resolved) (nreverse not-found)))))
 
-(defun generate-batch-packages-file (entries-with-resolved output-dir creation-time package-template-path)
+(defun build-metadata-index (assembly-entries)
+  "Loads every entry's :metadata-file once (even when shared by more than
+   one entry) and returns a hash table mapping each type's
+   :fully-qualified-name (string) to (cons type-plist owning-entry), where
+   OWNING-ENTRY is the ASSEMBLY-ENTRIES element whose metadata file the type
+   was read from. Used by expand-ancestors to resolve a class's
+   superclasses/interfaces across every assembly provided on the command
+   line, not just the one the requesting class belongs to."
+  (let ((index (make-hash-table :test #'equal))
+        (loaded (make-hash-table :test #'equal)))
+    (dolist (entry assembly-entries)
+      (let ((metadata-file (getf entry :metadata-file)))
+        (unless (gethash metadata-file loaded)
+          (setf (gethash metadata-file loaded) t)
+          (unless (probe-file metadata-file)
+            (error "Metadata file not found: ~A" metadata-file))
+          (let ((metadata (utils:safe-read-form-from-file metadata-file)))
+            (dolist (type-plist metadata)
+              (let ((fq-name (getf type-plist :fully-qualified-name)))
+                (unless (gethash fq-name index)
+                  (setf (gethash fq-name index) (cons type-plist entry)))))))))
+    index))
+
+(defun expand-ancestors (class-plist export-parents export-interfaces export-object index)
+  "Given CLASS-PLIST and its per-class export flags, walks its ancestor
+   graph via INDEX (from build-metadata-index) and returns (values
+   ancestors missing):
+
+   ANCESTORS is a list of (type-plist . owning-entry) conses -- one per
+   distinct ancestor to also generate a package for and consider
+   re-exporting from -- in first-seen (breadth-first) order, excluding
+   CLASS-PLIST itself, and excluding System.Object unless EXPORT-OBJECT is
+   true.
+
+   MISSING is a list of fully-qualified-name strings for ancestors that
+   could not be resolved via INDEX (e.g. defined in an assembly not passed
+   on the command line, or an unresolvable open-generic base type).
+
+   EXPORT-PARENTS walks the :superclass chain link-by-link up to
+   System.Object (a nil :superclass ends that branch). EXPORT-INTERFACES
+   walks :interfaces -- already fully transitive per type, since .NET's
+   Type.GetInterfaces() includes interfaces implemented by any base type.
+   Each newly-found ancestor's own :superclass/:interfaces are queued too,
+   under the same flags, so a grandparent's members can also reach the
+   original class; given :interfaces is already transitive this mostly
+   re-discovers types already queued (harmless -- VISITED dedupes), but
+   keeps this correct even where that invariant doesn't hold."
+  (let ((visited (make-hash-table :test #'equal))
+        (queue nil)
+        (ancestors nil)
+        (missing nil))
+    (setf (gethash (getf class-plist :fully-qualified-name) visited) t)
+    (flet ((enqueue (fq)
+             (unless (gethash fq visited)
+               (setf (gethash fq visited) t)
+               (setf queue (nconc queue (list fq))))))
+      (when export-parents
+        (let ((super (getf class-plist :superclass)))
+          (when super (enqueue super))))
+      (when export-interfaces
+        (dolist (iface (getf class-plist :interfaces))
+          (enqueue iface)))
+      (loop while queue
+            do (let ((fq (pop queue)))
+                 (unless (and (string= fq "System.Object") (not export-object))
+                   (let ((found (gethash fq index)))
+                     (if (null found)
+                         (push fq missing)
+                         (let ((ancestor-plist (car found)))
+                           (push found ancestors)
+                           (when export-parents
+                             (let ((super (getf ancestor-plist :superclass)))
+                               (when super (enqueue super))))
+                           (when export-interfaces
+                             (dolist (iface (getf ancestor-plist :interfaces))
+                               (enqueue iface))))))))))
+    (values (nreverse ancestors) (nreverse missing))))
+
+(defparameter *reexport-excluded-symbols*
+  '("<type>" "<type-str>" "<creation>" "<version>" "new")
+  "Synthetic per-type symbols compute-package-exports-and-shadows always
+   exports that must never be re-exported from an ancestor into a child
+   package: they identify the ANCESTOR's own type/creation-timestamp/
+   generator-version or construct an instance of the ANCESTOR itself, none
+   of which a child logically inherits.")
+
+(defun compute-reexports (child-exports ancestor-specs)
+  "CHILD-EXPORTS is the child's own export list (strings, from
+   compute-package-exports-and-shadows). ANCESTOR-SPECS is a list of
+   (pkg-name exports shadows) lists, one per ancestor package the child may
+   draw re-exports from, in ancestor-discovery order; EXPORTS/SHADOWS are
+   that ancestor's own compute-package-exports-and-shadows results.
+
+   Returns (values reexports skipped):
+   REEXPORTS is a list of (pkg-name symbol-name needs-shadowing-import-p)
+   lists to import (or shadowing-import) and export into the child, in
+   first-seen order across ANCESTOR-SPECS.
+   SKIPPED is a list of (symbol-name reason) pairs for comment generation,
+   where REASON is :own (the child already declares this name -- child
+   wins) or (:ambiguous pkg-name-list) (more than one ancestor exports this
+   name, so none of them is re-exported; see doc/parents-and-interfaces-plan.md
+   for why this is deliberately deferred to a comment rather than a renamed
+   re-export)."
+  (let ((order nil)
+        (tally (make-hash-table :test #'equal))
+        (shadow-flag (make-hash-table :test #'equal))
+        (reexports nil)
+        (skipped nil))
+    (dolist (spec ancestor-specs)
+      (destructuring-bind (pkg-name exports shadows) spec
+        (dolist (sym exports)
+          (unless (member sym *reexport-excluded-symbols* :test #'string=)
+            (unless (gethash sym tally)
+              (push sym order))
+            (push pkg-name (gethash sym tally))
+            (when (member sym shadows :test #'string=)
+              (setf (gethash sym shadow-flag) t))))))
+    (dolist (sym (nreverse order))
+      (let ((pkgs (nreverse (gethash sym tally))))
+        (cond
+          ((member sym child-exports :test #'string=)
+           (push (list sym :own) skipped))
+          ((> (length pkgs) 1)
+           (push (list sym (list :ambiguous pkgs)) skipped))
+          (t
+           (push (list (first pkgs) sym (gethash sym shadow-flag)) reexports)))))
+    (values (nreverse reexports) (nreverse skipped))))
+
+(defun emit-child-reexports (stream child-plist child-cprops ancestor-fqs fq->resolved)
+  "Computes and writes CHILD-PLIST's re-export post-pass block to STREAM:
+   the cl:shadowing-import/cl:import/cl:export calls drawing non-conflicting
+   members from ANCESTOR-FQS (CHILD-PLIST's already-resolved ancestor
+   fully-qualified-name list, from expand-ancestors via
+   GENERATE-ASSEMBLY-PACKAGES-BATCH's child-ancestor-fqs table), plus
+   comments documenting any skipped (conflicting/ambiguous) names.
+   FQ->RESOLVED maps every resolved class's fully-qualified-name back to its
+   resolved-class plist, so each ancestor's own :constant-properties is used
+   when computing its exports (an ancestor pulled in only for this purpose
+   has none, but an ancestor that was ALSO explicitly requested keeps its
+   own).
+   See doc/parents-and-interfaces-plan.md: this whole block runs after every
+   defpackage form in the file, so no topological ordering of those forms is
+   required -- shadowing-import/import/export only need the ancestor
+   packages and their exported symbols to already be interned (done at
+   defpackage time), not their function bodies (loaded later, from each
+   class's own .lisp file)."
+  (let* ((child-fq (getf child-plist :fully-qualified-name))
+         (child-pkg (type-fq-name-to-pkg-name child-fq)))
+    (multiple-value-bind (child-exports child-shadows) (compute-package-exports-and-shadows child-plist child-cprops)
+      (declare (ignore child-shadows))
+      (let ((ancestor-specs
+              (mapcar (lambda (anc-fq)
+                        (let* ((anc-rc (gethash anc-fq fq->resolved))
+                               (anc-plist (getf anc-rc :class-plist))
+                               (anc-cprops (getf anc-rc :constant-properties))
+                               (anc-pkg (type-fq-name-to-pkg-name anc-fq)))
+                          (multiple-value-bind (anc-exports anc-shadows)
+                              (compute-package-exports-and-shadows anc-plist anc-cprops)
+                            (list anc-pkg anc-exports anc-shadows))))
+                      ancestor-fqs)))
+        (multiple-value-bind (reexports skipped) (compute-reexports child-exports ancestor-specs)
+          (format stream ";;; ~A: re-exports inherited members from ~{~A~^, ~}~%"
+                  child-pkg (remove-duplicates (mapcar #'first ancestor-specs) :test #'string= :from-end t))
+          (dolist (skip skipped)
+            (destructuring-bind (sym reason) skip
+              (if (eq reason :own)
+                  (format stream ";;; Skipped (~A declares its own): ~A~%" child-pkg sym)
+                  (format stream ";;; Skipped (ambiguous across ancestors: ~{~A~^, ~}): ~A~%"
+                          (second reason) sym))))
+          (let ((shadowing-syms (remove-if-not #'third reexports))
+                (plain-syms (remove-if #'third reexports)))
+            (when shadowing-syms
+              (format stream "(cl:shadowing-import '(~{~A~^ ~}) ':~A)~%"
+                      (mapcar (lambda (r) (format nil "~A::~A" (first r) (second r))) shadowing-syms)
+                      child-pkg))
+            (when plain-syms
+              (format stream "(cl:import '(~{~A~^ ~}) ':~A)~%"
+                      (mapcar (lambda (r) (format nil "~A::~A" (first r) (second r))) plain-syms)
+                      child-pkg))
+            (when reexports
+              (format stream "(cl:export '(~{~A~^ ~}) ':~A)~%"
+                      (mapcar (lambda (r) (format nil "~A::~A" child-pkg (second r))) reexports)
+                      child-pkg)))
+          (format stream "~%"))))))
+
+(defun generate-batch-packages-file (entries-with-resolved output-dir creation-time package-template-path
+                                      child-ancestor-fqs)
   "Writes packages.lisp into OUTPUT-DIR: first the CSHARP-ASSEMBLY-UTILS
    defpackage form, copied verbatim from PACKAGE-TEMPLATE-PATH (a real,
    standalone-loadable .lisp file -- see csharp-assembly-utils-package.template.lisp),
@@ -1812,9 +2019,21 @@
    and its constant properties. Individual class .lisp files no longer emit
    their own defpackage (see COMPUTE-PACKAGE-EXPORTS-AND-SHADOWS /
    GENERATE-CLASS-FILE); this file must be loaded before any of them, as
-   well as before csharp-assembly-utils.lisp (GENERATE-BATCH-UTILS-FILE)."
+   well as before csharp-assembly-utils.lisp (GENERATE-BATCH-UTILS-FILE).
+
+   After every defpackage form, if CHILD-ANCESTOR-FQS (a hash table mapping
+   a child's fully-qualified-name to its expand-ancestors-resolved ancestor
+   fully-qualified-name list, built by GENERATE-ASSEMBLY-PACKAGES-BATCH) has
+   any entries, a re-export post-pass follows (see EMIT-CHILD-REEXPORTS):
+   one block per child with a non-empty ancestor list, importing and
+   re-exporting each ancestor's non-conflicting members. See
+   doc/parents-and-interfaces-plan.md."
   (let ((output-file (merge-pathnames (make-pathname :name "packages" :type "lisp")
-                                       (pathname (concatenate 'string output-dir "/")))))
+                                       (pathname (concatenate 'string output-dir "/"))))
+        (fq->resolved (make-hash-table :test #'equal)))
+    (dolist (pair entries-with-resolved)
+      (dolist (rc (cdr pair))
+        (setf (gethash (getf (getf rc :class-plist) :fully-qualified-name) fq->resolved) rc)))
     (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
       (format stream ";;; Generated automatically. Do not edit.~%")
       (format stream ";;; Generator Version: ~D~%" *generator-version*)
@@ -1824,9 +2043,9 @@
       (format stream ";;; Purpose: shared runtime support for generated packages~%")
       (format stream "~A~%" (uiop:read-file-string package-template-path))
       (dolist (pair entries-with-resolved)
-        (dolist (cls-pair (cdr pair))
-          (let* ((cls (car cls-pair))
-                 (cprops (cdr cls-pair))
+        (dolist (rc (cdr pair))
+          (let* ((cls (getf rc :class-plist))
+                 (cprops (getf rc :constant-properties))
                  (fq-name (getf cls :fully-qualified-name))
                  (pkg-name (type-fq-name-to-pkg-name fq-name)))
             (multiple-value-bind (exports shadows) (compute-package-exports-and-shadows cls cprops)
@@ -1843,7 +2062,22 @@
               (format stream "  (:export~%")
               (dolist (exp exports)
                 (format stream "   #:~A~%" exp))
-              (format stream "  ))~%~%"))))))
+              (format stream "  ))~%~%")))))
+
+      (when (some (lambda (pair)
+                    (some (lambda (rc)
+                            (gethash (getf (getf rc :class-plist) :fully-qualified-name) child-ancestor-fqs))
+                          (cdr pair)))
+                  entries-with-resolved)
+        (format stream ";;; ===== Re-exports from parent/interface packages =====~%~%")
+        (dolist (pair entries-with-resolved)
+          (dolist (rc (cdr pair))
+            (let* ((cls (getf rc :class-plist))
+                   (child-fq (getf cls :fully-qualified-name))
+                   (ancestor-fqs (gethash child-fq child-ancestor-fqs)))
+              (when ancestor-fqs
+                (emit-child-reexports stream cls (getf rc :constant-properties)
+                                       ancestor-fqs fq->resolved)))))))
     output-file))
 
 (defun generate-batch-utils-file (output-dir creation-time utils-template-path)
@@ -1862,17 +2096,23 @@
       (format stream "~A~%" (uiop:read-file-string utils-template-path)))
     output-file))
 
-(defun generate-batch-asd-file (entries-with-resolved output-dir creation-time cli-version)
+(defun generate-batch-asd-file (entries-with-resolved output-dir creation-time cli-version child-ancestor-fqs)
   "Writes csharp-assembly-packages.asd into OUTPUT-DIR, listing every
    generated class package (from ENTRIES-WITH-RESOLVED, a list of
    (entry . resolved) pairs as accumulated by
    GENERATE-ASSEMBLY-PACKAGES-BATCH, where ENTRY is a manifest entry with
-   :assembly-name and RESOLVED is RESOLVE-BATCH-ENTRY's list of
-   (class-plist . constant-properties-list) pairs) as a :file component, in
-   the same order the classes were requested on the command line. The
-   packages.lisp file written by GENERATE-BATCH-PACKAGES-FILE is listed
-   first, with every class :file depending on it via :depends-on, since
-   defpackage forms live there rather than in the class files.
+   :assembly-name and RESOLVED is a list of resolved-class plists -- see
+   MAKE-RESOLVED-CLASS) as a :file component, in the same order the classes
+   were requested on the command line (with any pulled-in ancestor classes
+   appended after their assembly's explicitly-requested ones -- see
+   GENERATE-ASSEMBLY-PACKAGES-BATCH). The packages.lisp file written by
+   GENERATE-BATCH-PACKAGES-FILE is listed first, with every class :file
+   depending on it via :depends-on, since defpackage forms live there
+   rather than in the class files. A child with a non-empty
+   CHILD-ANCESTOR-FQS entry also depends on each of its ancestor packages,
+   so ASDF's own dependency graph reflects the true generation dependency
+   (though not strictly required for correctness once the whole system is
+   loaded -- see doc/parents-and-interfaces-plan.md).
    CLI-VERSION is the dotcl-packagegen tool's own version string (e.g.
    \"2.20.0\"), used only in the long description; the system's own
    :version is the short generator format version (*GENERATOR-VERSION*)."
@@ -1898,9 +2138,9 @@
                    (let ((entry (car pair))
                          (resolved (cdr pair)))
                      (format desc "  ~A~%" (getf entry :assembly-name))
-                     (dolist (cls-pair resolved)
-                       (let* ((cls (car cls-pair))
-                              (cprops (cdr cls-pair))
+                     (dolist (rc resolved)
+                       (let* ((cls (getf rc :class-plist))
+                              (cprops (getf rc :constant-properties))
                               (fq-name (getf cls :fully-qualified-name))
                               (pkg-name (type-fq-name-to-pkg-name fq-name)))
                          (format desc "    ~A => ~A~%" fq-name pkg-name)
@@ -1910,37 +2150,63 @@
       (format stream "   (:file \"packages\")~%")
       (format stream "   (:file \"csharp-assembly-utils\" :depends-on (\"packages\"))~%")
       (dolist (pair entries-with-resolved)
-        (dolist (cls-pair (cdr pair))
-          (let* ((fq-name (getf (car cls-pair) :fully-qualified-name))
-                 (pkg-name (type-fq-name-to-pkg-name fq-name)))
-            (format stream "   (:file \"~A\" :depends-on (\"packages\" \"csharp-assembly-utils\"))~%" pkg-name))))
+        (dolist (rc (cdr pair))
+          (let* ((fq-name (getf (getf rc :class-plist) :fully-qualified-name))
+                 (pkg-name (type-fq-name-to-pkg-name fq-name))
+                 (ancestor-pkg-names (mapcar #'type-fq-name-to-pkg-name
+                                              (gethash fq-name child-ancestor-fqs))))
+            (format stream "   (:file \"~A\" :depends-on (\"packages\" \"csharp-assembly-utils\"~{ \"~A\"~}))~%"
+                    pkg-name ancestor-pkg-names))))
       (format stream "  ))~%"))
     output-file))
 
 (defun generate-assembly-packages-batch (assembly-entries output-dir creation-time cli-version
-                                          package-template-path utils-template-path)
+                                          package-template-path utils-template-path
+                                          &optional skip-missing)
   "Loads each entry's metadata file, resolves all requested classes across
    all entries, and only then generates the .lisp package files, so a
    class name that cannot be found aborts the whole run before anything is
    written. An entry with an empty :classes list is not an error -- it
    means only that entry's metadata file (already written by C#) was
-   requested. Before any class file is written, emits packages.lisp
+   requested.
+
+   For every resolved class with :export-parents and/or :export-interfaces
+   set, EXPAND-ANCESTORS walks its ancestor graph across every provided
+   assembly's metadata (BUILD-METADATA-INDEX) and the result is folded into
+   the working set: a newly-discovered ancestor is generated as a plain
+   package (no export flags of its own, unless it was ALSO explicitly
+   requested, in which case the explicit request's flags/constant-properties
+   win and no duplicate entry is added), appended after its owning
+   assembly's explicitly-requested classes (stable, minimal reordering --
+   see doc/parents-and-interfaces-plan.md). An ancestor that cannot be
+   resolved anywhere is a hard error unless SKIP-MISSING is true, in which
+   case it is dropped with a warning instead.
+
+   Before any class file is written, emits packages.lisp
    (GENERATE-BATCH-PACKAGES-FILE, using PACKAGE-TEMPLATE-PATH for the
    CSHARP-ASSEMBLY-UTILS defpackage form) holding every class's defpackage
-   form, so it exists ahead of (and independent of) the per-class files
-   that assume their package is already defined. Then emits
-   csharp-assembly-utils.lisp (GENERATE-BATCH-UTILS-FILE, using
-   UTILS-TEMPLATE-PATH). Once every class file has been written, also
-   emits a csharp-assembly-packages.asd tying them all together;
-   CLI-VERSION (the dotcl-packagegen tool's own semver, e.g. \"2.20.0\") is
-   used in that file's long description."
-  (let ((all-resolved nil)
+   form plus the parents/interfaces re-export post-pass, so it exists ahead
+   of (and independent of) the per-class files that assume their package is
+   already defined. Then emits csharp-assembly-utils.lisp
+   (GENERATE-BATCH-UTILS-FILE, using UTILS-TEMPLATE-PATH). Once every class
+   file has been written, also emits a csharp-assembly-packages.asd tying
+   them all together; CLI-VERSION (the dotcl-packagegen tool's own semver,
+   e.g. \"2.20.0\") is used in that file's long description."
+  (let ((entries-with-resolved nil)
+        (entry-resolved-table (make-hash-table :test #'eq))
         (all-not-found nil)
-        (entries-with-resolved nil))
+        (seen-fq (make-hash-table :test #'equal))
+        (child-ancestor-fqs (make-hash-table :test #'equal)))
+
+    ;; Phase A: resolve every explicitly requested class, per entry, exactly
+    ;; as before (unchanged not-found contract: abort before touching
+    ;; ancestors or generating anything if any requested class is missing).
     (dolist (entry assembly-entries)
       (multiple-value-bind (resolved not-found) (resolve-batch-entry entry)
-        (push (cons entry resolved) entries-with-resolved)
-        (setf all-resolved (append all-resolved resolved))
+        (setf (gethash entry entry-resolved-table) resolved)
+        (push entry entries-with-resolved)
+        (dolist (rc resolved)
+          (setf (gethash (getf (getf rc :class-plist) :fully-qualified-name) seen-fq) t))
         (setf all-not-found (append all-not-found not-found))))
     (setf entries-with-resolved (nreverse entries-with-resolved))
 
@@ -1949,29 +2215,90 @@
         (utils:format-red *error-output* "Error: Class not found in assembly metadata: ~A~%" cname))
       (error "One or more requested classes were not found: ~{~A~^, ~}" all-not-found))
 
-    (generate-batch-packages-file entries-with-resolved output-dir creation-time package-template-path)
-    (generate-batch-utils-file output-dir creation-time utils-template-path)
+    ;; Phase B: expand parents/interfaces for every class that opted in,
+    ;; across a global index of every provided assembly's metadata.
+    (let ((index (build-metadata-index assembly-entries))
+          (all-missing nil)
+          (ancestor-additions (make-hash-table :test #'eq)))
+      (dolist (entry entries-with-resolved)
+        (dolist (rc (gethash entry entry-resolved-table))
+          (when (or (getf rc :export-parents) (getf rc :export-interfaces))
+            (let ((child-fq (getf (getf rc :class-plist) :fully-qualified-name))
+                  (ancestor-fqs nil))
+              (multiple-value-bind (ancestors missing)
+                  (expand-ancestors (getf rc :class-plist)
+                                     (getf rc :export-parents)
+                                     (getf rc :export-interfaces)
+                                     (getf rc :export-object)
+                                     index)
+                (setf all-missing (append all-missing missing))
+                (dolist (anc ancestors)
+                  (let* ((anc-plist (car anc))
+                         (owning-entry (cdr anc))
+                         (anc-fq (getf anc-plist :fully-qualified-name)))
+                    (push anc-fq ancestor-fqs)
+                    (unless (gethash anc-fq seen-fq)
+                      (setf (gethash anc-fq seen-fq) t)
+                      (push (make-resolved-class anc-plist nil)
+                            (gethash owning-entry ancestor-additions)))))
+                (setf (gethash child-fq child-ancestor-fqs) (nreverse ancestor-fqs)))))))
 
-    (dolist (pair all-resolved)
-      (let ((cls (car pair))
-            (cprops (cdr pair)))
-        (format *error-output* "Generating package for C# Class: ~A~%" (getf cls :fully-qualified-name))
-        (generate-class-file cls output-dir cprops creation-time)))
+      (when all-missing
+        (if skip-missing
+            (dolist (fq all-missing)
+              (format *error-output* "Warning: Ancestor class not found in any provided assembly metadata (skipped): ~A~%" fq))
+            (progn
+              (dolist (fq all-missing)
+                (utils:format-red *error-output* "Error: Ancestor class not found in any provided assembly metadata: ~A~%" fq))
+              (error "One or more required ancestor classes were not found (pass --skip-missing to ignore): ~{~A~^, ~}"
+                     all-missing))))
 
-    (generate-batch-asd-file entries-with-resolved output-dir creation-time cli-version)
+      ;; Merge: each entry's final resolved list is its explicit classes
+      ;; (already in request order) followed by any newly-discovered
+      ;; ancestors, in first-discovered order.
+      (dolist (entry entries-with-resolved)
+        (let ((additions (nreverse (gethash entry ancestor-additions))))
+          (when additions
+            (setf (gethash entry entry-resolved-table)
+                  (append (gethash entry entry-resolved-table) additions))))))
+
+    (let* ((entries-with-resolved-pairs
+             (mapcar (lambda (entry) (cons entry (gethash entry entry-resolved-table)))
+                     entries-with-resolved))
+           (all-resolved (loop for pair in entries-with-resolved-pairs append (cdr pair))))
+
+      (generate-batch-packages-file entries-with-resolved-pairs output-dir creation-time
+                                     package-template-path child-ancestor-fqs)
+      (generate-batch-utils-file output-dir creation-time utils-template-path)
+
+      (dolist (rc all-resolved)
+        (let ((cls (getf rc :class-plist))
+              (cprops (getf rc :constant-properties)))
+          (format *error-output* "Generating package for C# Class: ~A~%" (getf cls :fully-qualified-name))
+          (generate-class-file cls output-dir cprops creation-time)))
+
+      (generate-batch-asd-file entries-with-resolved-pairs output-dir creation-time cli-version child-ancestor-fqs))
 
     t))
 
 (defun run-assembly-package-generator-batch (manifest-file output-dir creation-time cli-version
-                                              package-template-path utils-template-path)
+                                              package-template-path utils-template-path
+                                              &optional skip-missing)
   "CLI entry point called by DotclHost.Call for the single-pass generator.
    MANIFEST-FILE is a Lisp-reader-compatible list of plists, one per
    assembly:
      ((:metadata-file \"...\" :assembly-name \"...\"
-       :classes ((:name \"...\" :constant-properties \"...\") ...)) ...)
+       :classes ((:name \"...\" :constant-properties \"...\"
+                  :export-parents t/nil :export-interfaces t/nil
+                  :export-object t/nil) ...)) ...)
    PACKAGE-TEMPLATE-PATH/UTILS-TEMPLATE-PATH point at
    csharp-assembly-utils-package.template.lisp /
    csharp-assembly-utils.template.lisp, copied next to the executable.
+   SKIP-MISSING (a Lisp boolean, passed as a plain scalar rather than
+   folded into the manifest since it is a single global flag) governs
+   whether an unresolvable parent/interface ancestor is a hard error
+   (default/NIL) or a dropped-with-a-warning (T) -- see
+   GENERATE-ASSEMBLY-PACKAGES-BATCH / EXPAND-ANCESTORS.
    Maps string parameters safely and reports errors in red."
   (handler-case
       (let ((mfile (and manifest-file (> (length manifest-file) 0) manifest-file))
@@ -1988,7 +2315,7 @@
           (error "csharp-assembly-utils template not found: ~A" utils-template-path))
         (let ((assembly-entries (utils:safe-read-form-from-file mfile)))
           (generate-assembly-packages-batch assembly-entries odir creation-time cli-version
-                                             package-template-path utils-template-path)))
+                                             package-template-path utils-template-path skip-missing)))
     (error (c)
       (utils:format-red *error-output* "Error in assembly-package-generator: ~A~%" c)
       (error c))))

@@ -84,6 +84,32 @@ standard error. `--version`/`--help` and `--test` boot the DotCL host
 (`DotclHost.Initialize()`); the metadata-reflection portion of a `--out-dir` invocation
 intentionally does not, since it's pure reflection and runs before DotCL boots.
 
+## Parents and Interfaces
+
+A class's package normally contains only the members it declares itself, not anything
+inherited. Per-class flags (attach to the most recently given `--class`, like
+`--constant-properties`) opt a class into also generating packages for, and re-exporting
+non-conflicting members from, its ancestors:
+
+* `--export-parents` — also generate a package for, and re-export from, every super-class
+  (excluding `System.Object` unless `--export-object` is also given).
+* `--export-interfaces` — also generate a package for, and re-export from, every interface
+  the class implements.
+* `--export-object` — when combined with `--export-parents`, also include `System.Object`.
+
+Sticky defaults (`--export-all-parents`/`--no-export-all-parents`, and the `-interfaces`/
+`-object` equivalents) change the default for the current and every subsequent `--class`, in
+command-line order; a class's own `--export-*` flags always override the sticky default for
+that one class.
+
+A re-exported member is skipped (with a comment, not silently dropped) when the class already
+declares a member of that name itself (the class's own wins), or when more than one ancestor
+exports the same name (ambiguous — a future version may add a renamed re-export for this case;
+for now it's a comment only). By default, an ancestor that cannot be found in any provided
+assembly's metadata is a hard error before anything is generated; pass `--skip-missing` to
+instead warn and drop it (`--no-skip-missing` restores the default). See
+[`doc/parents-and-interfaces-plan.md`](doc/parents-and-interfaces-plan.md) for the full design.
+
 
 
 # Building & Testing
