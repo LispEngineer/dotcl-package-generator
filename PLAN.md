@@ -4,7 +4,6 @@
 * Copyright 2026 Douglas P. Fields, Jr.
 
 
-
 # Add More to Generated `.lisp` Files
 
 TODO
@@ -15,43 +14,119 @@ TODO
 * Add the Assembly to the per-package comment in `packages.lisp`
 
 
+# Clone a Boxed Struct
+
+**HIGH PRIORITY**: Provide a safe way to **clone/copy a boxed struct instance** (e.g.
+one obtained from a `--constant-properties` constant, a `define-symbol-macro` constant,
+or an ordinary property/method return) so users can get an independent, freely-mutable
+copy without corrupting shared state.
+* Motivation: a struct obtained from Lisp is a `#<DOTNET ...>` reference to a boxed CLR
+  object, not a value-copied Lisp datum. `dotnet:invoke`'s `setf`-expansion mutates
+  that exact boxed object in place. For a `--constant-properties`-cached `defconstant`
+  (whose value form runs exactly once and is reused forever), this means mutating the
+  "constant" through *any* alias corrupts it permanently, program-wide — confirmed via
+  a live REPL session where mutating a `color:r`-aliased local (`x`, bound via
+  `(defparameter x color:+white+)`) also permanently mutated `color:+white+` itself.
+  See `doc/generator-design-notes.md`'s Version 29 section and `FEATURES.md`'s "Static
+  Constants and Symbol Macros" / "Struct Boxing Caveat" sections for the full incident
+  writeup — this item is that investigation's tracked follow-up fix, not yet
+  implemented (Version 29 was documentation-only, by explicit decision, to avoid the
+  performance cost of abandoning `defconstant` caching for hot constants like
+  `Vector2.Zero`).
+* No clone/copy-struct primitive is currently documented in
+  `doc/dotnet-dotcl-interop.md`. Two possible directions:
+  1. A new DotCL-side primitive (e.g. unbox-then-rebox a value type, or a generic
+      `MemberwiseClone`-style call DotCL exposes to Lisp) — would need to originate in
+      DotCL itself, a separate project.
+  2. A generator-emitted per-type helper built from the struct's own
+      constructor/settable-property-and-field values (e.g. a generated `clone-vector2`
+      that reads every settable property/field off the source instance and passes them
+      to `new`) — implementable entirely in this repo, though it needs to handle
+      structs whose full state isn't reconstructible via a public constructor plus
+      public settable members.
+
+## Implementation Options
+
+**2026-07-04 research pass — options below, decision deferred.** Two research passes
+(one into this repo's own generator code, one into the sibling `../dotcl` (DotCL 0.1.16)
+runtime source) fleshed out the two directions above into concrete, evidence-backed
+options. No implementation decision has been made yet — this is intentionally left
+unresolved for a future session, not forgotten.
+
+**Option A — Generator-emitted `clone-<type>` helper (self-contained, no upstream dependency).** 
+For each `:struct` class (`is-value-type-p` at
+`assembly-package-generator.lisp:1272`), emit a `clone-<type>` function:
+1. Gather all readable instance properties/fields, excluding overloaded indexers
+    (same exclusion the existing getter/setter codegen already applies via
+    `instance-prop-groups`, single-signature groups only) — see
+    `instance-property-p`/`:writeable`/`:readable` and `public-instance-field-p`/
+    `:init-only` at lines 202-213, and the getter/setter emission at lines 1468-1553
+    which already computes each member's mapped Lisp name (`map-member-name`) and its
+    get/setf form.
+2. **Full-coverage case**: if every readable member is also writeable, emit
+    `clone-<type>` as `(let ((copy (new))) (setf (member-1 copy) (member-1 obj!)) ...
+    copy)`, reusing the parameterless struct constructor structs already get
+    synthesized for them when missing (`assembly-package-generator.lisp:1266-1271`,
+    Version 11).
+3. **Constructor-match case**: if not fully settable, look for a clean constructor
+    (`clean-constructor-p`/`constructor-signature-str`, lines 543-578; Master Wrapper
+    at line 905) whose parameter list corresponds 1:1 (by count and, ideally, mapped
+    name) to the full readable-member set — call it with values read from `obj!`
+    instead.
+4. **Unsupported case**: neither applies — skip generation, emit a comment listing the
+    type as not clone-supported, matching the existing "dirty overload"/"unsupported
+    indexer" documentation convention (would need a new
+    `doc/generator-design-notes.md` "Unsupported Features" entry).
+* Pros: ships now, entirely within this repo's release cadence, reuses well-tested
+  existing helpers, consistent with the codebase's "document what can't be safely
+  generated" convention.
+* Cons: shallow/partial fidelity for structs whose full state isn't reconstructible
+  via public settable members or a matching constructor (left undocumented/unsupported
+  for those types); per-type generated code rather than one generic mechanism.
+
+**Option B — Native `dotnet:clone` primitive in DotCL.** Confirmed via
+`../dotcl/runtime/Runtime.DotNet.cs` and `Startup.cs`:
+* Boxed CLR values are wrapped in `LispDotNetObject`/`LispDotNetBoxed`
+  (`Runtime.DotNet.cs:6-35`), holding a plain `object Value` reference — no
+  clone/copy semantics anywhere in the runtime today, and no `MemberwiseClone`/
+  `ICloneable`/generic clone helper exists anywhere in it either.
+* `dotnet:box` does **not** help: `LispToDotNet` (`Runtime.DotNet.cs:601-621`) returns
+  the *same* reference when the target type is assignable from the source's
+  hint/runtime type — it only produces a genuinely different object via
+  `Convert.ChangeType` when the types actually differ. Re-boxing an existing
+  same-typed struct via `dotnet:box` does not solve the aliasing bug.
+* Adding a new `dotnet:clone` builtin is straightforward and well-precedented: every
+  `dotnet:*` primitive is a plain `LispObject Fn(LispObject[] args)` method in
+  `Runtime.DotNet.cs`, wired up via one `RegisterDotNet(DotNetPkg, "NAME", new
+  LispFunction(...), "docstring")` call in `Startup.cs`'s registration block
+  (~1990-2093; `BOX` at 2045-2046, `CAST` at 2038-2039). The codebase already uses
+  `BindingFlags.NonPublic`/`skipVisibility: true` dynamic methods elsewhere
+  (`DotNetCallBase`, `Runtime.DotNet.cs:2196-2251`), so reflectively invoking the
+  protected `Object.MemberwiseClone()`, or a manual field-by-field re-box via
+  `Activator.CreateInstance` + `FieldInfo`, is a well-precedented pattern here.
+* The package generator would then emit a single, uniform `(dotnet:clone obj!)` call
+  for every struct clone, or expose it via `csharp-assembly-utils.lisp` as
+  `csharp-assembly-utils:clone`.
+* Pros: one generic mechanism, full-fidelity (covers private/non-settable state too),
+  no per-type codegen or "unsupported" carve-outs.
+* Cons: requires changing/releasing a separate project (`../dotcl`) and taking a new
+  DotCL dependency version in this repo before it's usable — not shippable purely
+  from this repo, slower, and outside this repo's own versioning/release control.
+
+**Option C — Both, staged.** Ship Option A now for immediate, self-contained coverage
+of the common case (simple math/value types like `Vector2`, `TimeSpan`, etc. — exactly
+the motivating `Vector2.Zero`-style example), and separately write up a `dotnet:clone`
+proposal in `doc/dotnet-dotcl-interop.md`'s existing "Missing Interoperability
+Capabilities & Proposed Enhancements" section (which already documents exactly this
+kind of gap for other features, e.g. `Span<T>`, extension-method resolution) so it can
+be pursued upstream later without blocking on it. If/when Option B ships in a future
+DotCL version, the generator could switch to emitting the simpler `(dotnet:clone
+obj!)` form instead, deprecating Option A's per-type codegen.
+
+**Option D** - TBD
+
+
 # Miscellaneous
-
-* **HIGH PRIORITY**: Provide a safe way to **clone/copy a boxed struct instance** (e.g.
-  one obtained from a `--constant-properties` constant, a `define-symbol-macro` constant,
-  or an ordinary property/method return) so users can get an independent, freely-mutable
-  copy without corrupting shared state.
-  * Motivation: a struct obtained from Lisp is a `#<DOTNET ...>` reference to a boxed CLR
-    object, not a value-copied Lisp datum. `dotnet:invoke`'s `setf`-expansion mutates
-    that exact boxed object in place. For a `--constant-properties`-cached `defconstant`
-    (whose value form runs exactly once and is reused forever), this means mutating the
-    "constant" through *any* alias corrupts it permanently, program-wide — confirmed via
-    a live REPL session where mutating a `color:r`-aliased local (`x`, bound via
-    `(defparameter x color:+white+)`) also permanently mutated `color:+white+` itself.
-    See `doc/generator-design-notes.md`'s Version 29 section and `FEATURES.md`'s "Static
-    Constants and Symbol Macros" / "Struct Boxing Caveat" sections for the full incident
-    writeup — this item is that investigation's tracked follow-up fix, not yet
-    implemented (Version 29 was documentation-only, by explicit decision, to avoid the
-    performance cost of abandoning `defconstant` caching for hot constants like
-    `Vector2.Zero`).
-  * No clone/copy-struct primitive is currently documented in
-    `doc/dotnet-dotcl-interop.md`. Two possible directions:
-    1. A new DotCL-side primitive (e.g. unbox-then-rebox a value type, or a generic
-       `MemberwiseClone`-style call DotCL exposes to Lisp) — would need to originate in
-       DotCL itself, a separate project.
-    2. A generator-emitted per-type helper built from the struct's own
-       constructor/settable-property-and-field values (e.g. a generated `clone-vector2`
-       that reads every settable property/field off the source instance and passes them
-       to `new`) — implementable entirely in this repo, though it needs to handle
-       structs whose full state isn't reconstructible via a public constructor plus
-       public settable members.
-
-* DONE (Version 31) - Implement read/write for static properties and fields per this:
-  * any static property or field that is
-    *writeable* (settable) generates nothing at all, regardless of whether it's also
-    readable.
-  * **Not handled — see Unsupported Features:** a plain mutable *static* field (not
-    `readonly`, not `const`) generates nothing at all.
 
 * Handle overloaded indexers, per:
   * C# indexer (`this[...]`) threads its index parameter(s) through
@@ -371,6 +446,13 @@ is a really foundational change that will help a lot in the future.
 
 
 # DONE
+
+* DONE (Version 31) - Implement read/write for static properties and fields per this:
+  * any static property or field that is
+    *writeable* (settable) generates nothing at all, regardless of whether it's also
+    readable.
+  * **Not handled — see Unsupported Features:** a plain mutable *static* field (not
+    `readonly`, not `const`) generates nothing at all.
 
 * Add missing operator overload handling.
   * DONE (2026-07-04): `AssemblyToLispy.cs`'s `GetCleanMethodName` now maps the 8 remaining
