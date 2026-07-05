@@ -11,10 +11,25 @@ of specified classes,
 and re-export non-conflicting methods (etc.) from those packages, for
 ease of use.
 
+* Identifying and adding the parents to the list of classes to implement
+  "should" be straight forward, but may require an additional pass
+  at the beginning, and also de-duplication.
+  * This also assumes that the parents exist in the assemblies referenced.
+  * Parent check should search all mentioned assemblies.
+  * Any parents that could not be found should emit an error and stop the
+    generation.
+    * Unless `--skip-missing` is included.
+    * It shoudl be possible to turn off too: `--no-skip-missing`.
+
 * This may (will?) require a topological sort of all the classes so that the
   packages can be defined in appropriate order in `packages.lisp`.
+  * If a topological sort is necessary, it should be a stable sort and a minimal
+    sort, so as to change the order specified by the user minimally.
+  * Internal implemetnation may make sense to change the metadata to a list of
+    tuples of (assembly, class, flags) instead of the current
+    (assembly, list of (class, flags)) - roughly speaking.
 
-* Have this be indicated by flags after the class (like `--constant-properties`)
+* Have these options be indicated by flags after the class (like `--constant-properties`)
   * `--export-parents` - generates packages for and
     re-exports the super class methods and all
     other ancestor classes *except* `System.Object`
@@ -25,8 +40,18 @@ ease of use.
 * Ensure that any conflicting names in parents/interfaces are not re-exported.
   However, if the conflicting name is not virtual / overridden, put a comment into
   the generated package.
+  * This is because a non-virtual method shadows the parent's method.
 
-* Have flags that can change the default for the current and subsequent classes:
+* Figure out how to handle methods that exist in multiple interfaces with the same name.
+  * This might be an issue already. The CIL can differentiate them though, using identifiers that
+    are legal in CIL but not C#.
+  * One possibility is to re-export things with a different name, like the base name of the
+    interface and some otherwise-impossible connector like `interface1->method` and
+    `interface2->method` (or even use unicode like →).
+  * TODO: Investigate other possibilities.
+
+* Have flags that can change the default for the current (if any) and subsequent classes,
+  as listed in command-line order:
   * `--export-all-parents`, `--export-all-interfaces`, `--export-all-object`
   * To disable, use `no-` prefix, e.g., `--no-export-all-parents`
 
