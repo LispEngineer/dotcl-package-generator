@@ -6,6 +6,10 @@
 
 # Parents and Interfaces
 
+* **Detailed implementation plan:** see [`doc/parents-and-interfaces-plan.md`](doc/parents-and-interfaces-plan.md)
+  (approved; re-export via a post-pass of `import`/`export` calls, no topological
+  sort; interface name-collisions handled skip-with-comment first).
+
 Optionally create the packages for all super-classes and interfaces
 of specified classes,
 and re-export non-conflicting methods (etc.) from those packages, for
