@@ -47,35 +47,44 @@ Add flags & default changing flags for these capabilities.
   flags) plus a `doc/assembly-to-lispy.md` schema update.
 
 
-# Improve Turn Everything into Generic Methods
+# Fix Unescaped `|` Operator Export (Pre-existing, Found 2026-07-05)
 
-The current implementation is *really super ugly*. Viz:
+**Found while verifying the Version 35 static `--defgeneric` collision caveat**
+(`doc/make-everything-defgeneric.md`), not introduced by that work.
 
-```lisp
-;; System.Numerics.Vector4 (system-numerics-vector4)
-(cl:eval-when (:load-toplevel :execute)
-  (cl:let* ((cls (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                  (dotnet:resolve-type "System.Numerics.Vector4")))
-            (spec (cl:class-name cls)))
-    (cl:eval `(cl:defmethod w ((obj! ,spec) cl:&rest args)
-                (cl:apply (cl:function system-numerics-vector4:w) obj! args)))
-```
+`packages.lisp` exports C#'s bitwise-OR operator (mapped to the Lisp symbol name `|`, per
+Version 30's `op_BitwiseOr` → `|` mapping) as a bare, unescaped `#:|` token. This is invalid
+Lisp syntax — a symbol literally named `|` needs proper multiple-escape syntax (e.g. `#:\|` or
+an equivalent), not a bare `|` immediately followed by a newline, which a real Lisp reader
+parses as beginning an unterminated `|...|` escape and fails with "Unterminated escape in
+token." Confirmed via a real DotCL REPL load of a full generated batch containing
+`System.Numerics.Vector2`/`Vector3`/`Vector4` (which export this operator).
 
-I really dislike the use of `cl:eval`. I'm going to ask Claude to move this
-to csharp-generics-dynamic and then create the other version as csharp-generics.
-That will have naming collisions - which will be commented.
+This has apparently been present since Version 30 and was never caught because
+`check_parens.py` (the only automated syntax check on generated output, run by `make test`)
+validates only paren-balance, not full Lisp readability — nothing in the existing test suite
+actually loads generated `.lisp` output through a real Lisp reader. Likely affects every other
+mapped operator whose Lisp name is itself a reader macro character needing escaping (check `*`,
+`&`, `^`, `~`, etc. from Version 30's mapping table — some may already be fine unescaped, e.g.
+`+`/`-`/`=` are not reader macro characters, but `|` definitely needs escaping and others may
+need auditing too).
 
-## Next Version
+Fix location: wherever `#:~A` (or equivalent bare-symbol-name `format` directives) are used to
+emit an exported/shadowed operator name in `generate-batch-packages-file`/
+`emit-defgeneric-defpackage` and the per-class `defpackage`/`defun` emission in
+`generate-class-file` — these need to escape reader-macro-character symbol names correctly
+(e.g. via a helper that wraps a name needing escaping in `|...|` with internal `|`/`\`
+backslash-escaped, or emits `\|` for the single-character case) rather than assuming every
+mapped operator name is reader-safe as a bare token.
 
-* Change the existing commands to `--enable-defgeneric-dynamic` and the
-  corresponding `--no` version.
-* Change the package from `csharp-generics` to `csharp-generics-dynamic`
-  for the existing version.
-* Use the original `--` commands for the new generator, and the original
-  package name for the new generator.
-* The new generator should implement the other choice we didn't take:
-  "How should the emitted `defmethod` specializer handle the cross-namespace simple-name
-  collision risk?" New answer: "Simple + documented caveat (Recommended)"
+## Use a Different Operator
+
+Since `|` is a special character for the Lisp reader, (and so presumably too is `||`),
+let's use a different character for
+the logical and bitwise OR for the Lisp implementation.
+
+Perhaps use `or` and `bitwise-or` for the operator overloads.
+
 
 # Add More to Generated `.lisp` Files
 
@@ -281,7 +290,53 @@ obj!)` form instead, deprecating Option A's per-type codegen.
 
 ---
 
-# Turn Everything into Generic Methods
+
+# Improve Turn Everything into Generic Methods (Version 2)
+
+The current implementation is *really super ugly*. Viz:
+
+```lisp
+;; System.Numerics.Vector4 (system-numerics-vector4)
+(cl:eval-when (:load-toplevel :execute)
+  (cl:let* ((cls (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                  (dotnet:resolve-type "System.Numerics.Vector4")))
+            (spec (cl:class-name cls)))
+    (cl:eval `(cl:defmethod w ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:w) obj! args)))
+```
+
+I really dislike the use of `cl:eval`. I'm going to ask Claude to move this
+to csharp-generics-dynamic and then create the other version as csharp-generics.
+That will have naming collisions - which will be commented.
+
+## Next Version
+
+* Change the existing commands to `--enable-defgeneric-dynamic` and the
+  corresponding `--no` version.
+* Change the package from `csharp-generics` to `csharp-generics-dynamic`
+  for the existing version.
+* Use the original `--` commands for the new generator, and the original
+  package name for the new generator.
+* The new generator should implement the other choice we didn't take:
+  "How should the emitted `defmethod` specializer handle the cross-namespace simple-name
+  collision risk?" New answer: "Simple + documented caveat (Recommended)"
+
+**DONE (Version 35, 2026-07-05).** Implemented as designed above. `--defgeneric`/
+`--no-defgeneric`/`--enable-defgeneric`/`--no-enable-defgeneric` and the `csharp-generics`
+package renamed to `-dynamic` throughout (`--defgeneric-dynamic` etc., `csharp-generics-dynamic`
+package) with no behavior change. The freed original names now drive a new, independent,
+orthogonal implementation: a literal, ordinary top-level `cl:defmethod` per unified name per
+opted-in class (no `cl:eval`, no `eval-when`, no backquote), specializing on
+`dotcl-internal::|SimpleName|` computed at generation time via a new `dotnet-type-simple-name`
+helper (needed because the pre-existing `simple-type-name` strips backtick generic-arity
+suffixes and doesn't split on `+`, so it doesn't match .NET's actual `Type.Name`). The
+documented collision caveat (two same-simple-name classes in one batch) is demonstrated, not
+just asserted, via the `Makefile` smoke test's real-world `System.Threading.Timer`/
+`System.Timers.Timer` pair. See `doc/make-everything-defgeneric.md` (new static variant) and
+`doc/make-everything-defgeneric-dynamic.md` (renamed dynamic variant, formerly
+`doc/make-everything-defgeneric.md`).
+
+# Turn Everything into Generic Methods (Version 1)
 
 In addition of having every instance function exported in its own package, export them all in a
 single package (maybe `csharp-interop` or somesuch). Then use DotCL's CLOS generic method
@@ -769,4 +824,5 @@ verify against a real static event (not yet tested) that `dotnet:static`'s metho
 actually accepts a `System.Delegate`-typed argument to a void-returning `add_X`/`remove_X` method,
 and that `dotnet:make-delegate`'s delegate-type string format matches what an event's `:type`
 metadata field already produces.
+
 

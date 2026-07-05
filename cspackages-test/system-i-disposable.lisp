@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IDisposable
-;;; Generator Version: 34
-;;; Creation Date: 2026-07-05T17:20:43Z
+;;; Generator Version: 35
+;;; Creation Date: 2026-07-05T18:08:15Z
 
 (cl:in-package :system-i-disposable)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.IDisposable"))
 (cl:defconstant <type-str> "System.IDisposable")
-(cl:defconstant <creation> "2026-07-05T17:20:43Z")
-(cl:defconstant <version> 34)
+(cl:defconstant <creation> "2026-07-05T18:08:15Z")
+(cl:defconstant <version> 35)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

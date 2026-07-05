@@ -558,18 +558,17 @@ feature (arity-1-only → any arity → the current two-tier dispatch).
 
 
 
-## Unified Generic Methods (`--defgeneric`)
+## Unified Generic Methods
 
-**Summary:** opting a class into `--defgeneric` (or its sticky `--enable-defgeneric`
-default) also folds its instance methods and instance property/field accessors into a
-single shared `csharp-generics` package of CLOS generic functions that dispatch on the C#
-runtime type of the receiver — so, e.g., `(csharp-generics:length x)` works whichever
-opted-in type `x` happens to be, forwarding to that type's own already-generated wrapper.
+**Summary:** opting a class into either of two independent, orthogonal mechanisms also folds
+its instance methods and instance property/field accessors into a shared package of CLOS
+generic functions that dispatch on the C# runtime type of the receiver — so, e.g.,
+`(csharp-generics:length x)` (static variant) or `(csharp-generics-dynamic:length x)` (dynamic
+variant) works whichever opted-in type `x` happens to be, forwarding to that type's own
+already-generated wrapper. A class may use either variant, both, or neither; each contributes
+its own package/file/`.asd` component entirely independently of the other.
 
-* **CLI:** `--defgeneric`/`--no-defgeneric` (per-class, attach to the most recently given
-  `--class`) plus sticky `--enable-defgeneric`/`--no-enable-defgeneric` (set the default for
-  the current and every subsequent `--class`), mirroring the `--export-parents`/
-  `--export-all-parents` flag families.
+Both variants share the same scope and dispatch shape:
 * **Scope:** instance methods (including multi-overload Master Wrappers) and instance
   property/field getters and setters (indexers included). **Excluded:** static members (no
   receiver to dispatch on), generic/type-parameterized instance methods (their wrapper's
@@ -579,14 +578,42 @@ opted-in type `x` happens to be, forwarding to that type's own already-generated
   `((cl:setf name) new-value obj! cl:&rest args)` — the uniform `obj!`-first receiver
   position every instance wrapper already has lets one dispatch shape cover every class's
   wildly different arities via `cl:apply`.
-* **Dispatch installation is load-time, not a hardcoded specializer.** DotCL names a C#
-  type's CLOS class by its simple name only when that name is free, or by its unique
-  `FullName` when a same-simple-name type from a different namespace has already claimed
-  it — and which type wins that race is load-order-dependent, unknowable at generation
-  time. So each `defmethod` is installed at load time against the class's own actual
-  runtime class object (`(dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass" ...)`),
-  specializing on that object's own `(cl:class-name ...)` — always the exact symbol DotCL
-  registered for that specific class, whichever one it turned out to be:
+
+They differ only in *how* each `defmethod` is installed, and therefore in what each accepts as
+a tradeoff:
+
+### Static variant (`--defgeneric`)
+
+* **CLI:** `--defgeneric`/`--no-defgeneric` (per-class) plus sticky
+  `--enable-defgeneric`/`--no-enable-defgeneric`, mirroring the `--export-parents`/
+  `--export-all-parents` flag families.
+* **Dispatch installation is a literal specializer computed at generation time** — an ordinary
+  top-level `cl:defmethod`, no `cl:eval`/`eval-when`/backquote:
+  ```lisp
+  (cl:defmethod length ((obj! dotcl-internal::|String|) cl:&rest args)
+    (cl:apply (cl:function system-string:length) obj! args))
+  ```
+* **Accepted caveat:** the specializer symbol assumes the C# type's *simple* name. If two
+  `--defgeneric`-opted-in classes in the same batch share a simple name across different
+  namespaces (e.g. `System.Threading.Timer` vs. `System.Timers.Timer`), DotCL's own
+  class-naming resolution gives the simple-name CLOS class to whichever registers first at
+  load time (unknowable at generation time) — dispatch for the other is silently wrong. Simple,
+  readable generated code, at the cost of this narrow, documented risk.
+* **Output:** `csharp-generics.lisp` and a `csharp-generics` `cl:defpackage` in `packages.lisp`.
+
+See `doc/make-everything-defgeneric.md` for the full design rationale, the collision caveat's
+worked example (demonstrated, not just asserted, via the `Makefile` smoke test's real-world
+`Timer` pair), and `assembly-package-generator.lisp`'s Version 35 changelog entry.
+
+### Dynamic variant (`--defgeneric-dynamic`)
+
+* **CLI:** `--defgeneric-dynamic`/`--no-defgeneric-dynamic` (per-class) plus sticky
+  `--enable-defgeneric-dynamic`/`--no-enable-defgeneric-dynamic`.
+* **Dispatch installation is load-time**, immune to the static variant's collision risk: each
+  `defmethod` is installed against the class's own actual runtime CLOS class object, fetched
+  fresh via `EnsureDotNetTypeClass` and specialized on that object's own `(cl:class-name ...)`
+  — always the exact symbol DotCL registered for that specific class, whichever one it turned
+  out to be:
   ```lisp
   (cl:eval-when (:load-toplevel :execute)
     (cl:let* ((cls (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
@@ -596,14 +623,13 @@ opted-in type `x` happens to be, forwarding to that type's own already-generated
                   (cl:apply (cl:function system-string:length) obj! args)))
       ...))
   ```
-* **Output:** a new `csharp-generics.lisp` (one `cl:defgeneric`/`(cl:setf ...)`
-  `cl:defgeneric` per unified name, then one load-time install block per opted-in class) and
-  a `csharp-generics` `cl:defpackage` in `packages.lisp`, loaded last (after every opted-in
-  class's own package). A batch with no `--defgeneric` class emits neither.
+* **Tradeoff:** fully robust, at the cost of uglier, `cl:eval`-heavy generated code.
+* **Output:** `csharp-generics-dynamic.lisp` and a `csharp-generics-dynamic` `cl:defpackage` in
+  `packages.lisp`.
 
-See `doc/make-everything-defgeneric.md` for the full design rationale (why load-time
-install instead of a static specializer) and `assembly-package-generator.lisp`'s Version 34
-changelog entry.
+See `doc/make-everything-defgeneric-dynamic.md` for the full design rationale and
+`assembly-package-generator.lisp`'s Version 34 changelog entry (renamed to `-dynamic` in
+Version 35, without any behavior change).
 
 
 

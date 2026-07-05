@@ -1040,8 +1040,8 @@
         (assert-test (mapcar (lambda (a) (getf (car a) :fully-qualified-name)) ancestors)
                     '("Fixture.Mid")
                     "expand-ancestors resolves as much of the chain as it can before hitting a gap")
-        (assert-test missing '("Fixture.Base")
-                    "expand-ancestors reports an ancestor absent from the index as missing"))))
+        (assert-test missing '(("Fixture.Base" . "Fixture.Mid"))
+                    "expand-ancestors reports an ancestor absent from the index as missing, along with the class that required it"))))
 
   ;; 8. compute-reexports decides which ancestor-exported names to re-export
   ;;    into a child package: skip a name the child already declares itself
@@ -1226,14 +1226,12 @@
       (when (probe-file out-dir)
         (uiop:delete-directory-tree out-dir :validate t))))
 
-  ;; 11. Unified Generic Methods (--defgeneric / csharp-generics, Version 34):
-  ;;     collect-class-instance-generics must exclude static members and
-  ;;     generic/type-parameterized instance methods (their wrapper's
-  ;;     lambda list puts the type argument(s) before obj!, disqualifying
-  ;;     them), and generate-assembly-packages-batch must only fold
-  ;;     :defgeneric-true classes' names into csharp-generics.lisp/
-  ;;     packages.lisp/the .asd -- and emit none of the three when no class
-  ;;     opts in, for byte-identical-to-before-Version-34 output.
+  ;; 11. Unified Generic Methods (Version 34/35): collect-class-instance-generics
+  ;;     must exclude static members and generic/type-parameterized instance
+  ;;     methods (their wrapper's lambda list puts the type argument(s)
+  ;;     before obj!, disqualifying them) -- this collector is shared,
+  ;;     mechanism-agnostic, between both the --defgeneric (static
+  ;;     specializer) and --defgeneric-dynamic (load-time install) variants.
   (let ((class-a
           '(:fully-qualified-name "Fixture.GenA" :kind :class
             :methods ((:name "Common" :is-static nil :parameters nil :return-type "System.Void")
@@ -1264,8 +1262,82 @@
       (assert-test (member "generic" method-names :test #'string=) nil
                   "collect-class-instance-generics excludes a generic instance method (type argument precedes obj!)"))
 
-    ;; 11.2 End-to-end: only Fixture.GenA opts into :defgeneric; Fixture.GenB
-    ;;      does not, so its "common" wrapper must not become a specializer.
+    ;; 11.2 dotnet-type-simple-name must reproduce .NET's Type.Name exactly
+    ;;      (backtick generic-arity kept, '+' nested-type separator split),
+    ;;      unlike simple-type-name (display-oriented: strips the backtick,
+    ;;      never splits on '+') -- the static --defgeneric specializer
+    ;;      symbol depends on getting this exactly right.
+    (assert-test (assembly-package-generator::dotnet-type-simple-name "System.Collections.Generic.List`1") "List`1"
+                "dotnet-type-simple-name keeps the backtick generic-arity suffix")
+    (assert-test (assembly-package-generator::simple-type-name "System.Collections.Generic.List`1") "List"
+                "simple-type-name (display-oriented) strips the backtick, unlike dotnet-type-simple-name")
+    (assert-test (assembly-package-generator::dotnet-type-simple-name "System.TimeZoneInfo+AdjustmentRule") "AdjustmentRule"
+                "dotnet-type-simple-name splits on '+' (CIL's nested-type separator)")
+    (assert-test (assembly-package-generator::simple-type-name "System.TimeZoneInfo+AdjustmentRule") "TimeZoneInfo+AdjustmentRule"
+                "simple-type-name does not split on '+', unlike dotnet-type-simple-name")
+
+    ;; 11.3 End-to-end, --defgeneric-dynamic (load-time install, Version 34's
+    ;;      renamed mechanism): only Fixture.GenA opts in; Fixture.GenB does
+    ;;      not, so its "common" wrapper must not become a specializer.
+    (let* ((fixture-metadata (list class-a class-b))
+           (fixture-file (merge-pathnames "package-generator-tests-defgeneric-dynamic-fixture.lispy-metadata"
+                                          (uiop:temporary-directory)))
+           (out-dir (merge-pathnames "package-generator-tests-defgeneric-dynamic-out/"
+                                     (uiop:temporary-directory))))
+      (unwind-protect
+          (progn
+            (with-open-file (s fixture-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+              (prin1 fixture-metadata s))
+            (ensure-directories-exist out-dir)
+            (assembly-package-generator:generate-assembly-packages-batch
+             (list (list :metadata-file (namestring fixture-file)
+                         :assembly-name "Fixture.dll"
+                         :classes (list (list :name "Fixture.GenA" :constant-properties "" :defgeneric-dynamic t)
+                                        (list :name "Fixture.GenB" :constant-properties "" :defgeneric-dynamic nil))))
+             (namestring out-dir)
+             "2026-07-05T00:00:00Z"
+             "9.9.9"
+             (utils:qualify-path "csharp-assembly-utils-package.template.lisp")
+             (utils:qualify-path "csharp-assembly-utils.template.lisp")
+             nil)
+            (let* ((generics-file (merge-pathnames "csharp-generics-dynamic.lisp" out-dir))
+                   (packages-file (merge-pathnames "packages.lisp" out-dir))
+                   (asd-file (merge-pathnames "csharp-assembly-packages.asd" out-dir))
+                   (generics-contents (uiop:read-file-string generics-file))
+                   (packages-contents (uiop:read-file-string packages-file))
+                   (asd-contents (uiop:read-file-string asd-file)))
+              (assert-test (not (null (search "(cl:defgeneric common (obj! cl:&rest args)" generics-contents))) t
+                          "csharp-generics-dynamic.lisp defines a generic for the shared method name")
+              (assert-test (not (null (search "cl:eval-when (:load-toplevel :execute)" generics-contents))) t
+                          "csharp-generics-dynamic.lisp installs defmethods via a load-time eval-when block")
+              (assert-test (not (null (search "cl:eval `(cl:defmethod" generics-contents))) t
+                          "csharp-generics-dynamic.lisp installs each defmethod via cl:eval of a backquoted form")
+              (assert-test (not (null (search "fixture-gen-a:common" generics-contents))) t
+                          "csharp-generics-dynamic.lisp installs a defmethod forwarding to the opted-in class")
+              (assert-test (search "fixture-gen-b:common" generics-contents) nil
+                          "csharp-generics-dynamic.lisp installs no defmethod for the non-opted-in class")
+              (assert-test (search "static-only" generics-contents) nil
+                          "csharp-generics-dynamic.lisp never mentions the excluded static method")
+              (assert-test (search "(cl:defgeneric generic " generics-contents) nil
+                          "csharp-generics-dynamic.lisp never mentions the excluded generic instance method")
+              (assert-test (not (null (search "(cl:defgeneric (cl:setf value)" generics-contents))) t
+                          "csharp-generics-dynamic.lisp defines a (cl:setf ...) generic for a writeable property")
+              (assert-test (not (null (search "(cl:defpackage :csharp-generics-dynamic" packages-contents))) t
+                          "packages.lisp defines the csharp-generics-dynamic package")
+              (assert-test (not (null (search "\"csharp-generics-dynamic\"" asd-contents))) t
+                          "csharp-assembly-packages.asd includes the csharp-generics-dynamic component")
+              (assert-test (null (probe-file (merge-pathnames "csharp-generics.lisp" out-dir))) t
+                          "--defgeneric-dynamic alone writes no csharp-generics.lisp (the separate static variant)")))
+        (when (probe-file fixture-file)
+          (delete-file fixture-file))
+        (when (probe-file out-dir)
+          (uiop:delete-directory-tree out-dir :validate t))))
+
+    ;; 11.4 End-to-end, --defgeneric (literal specializer, Version 35's new
+    ;;      static variant): only Fixture.GenA opts in. Must contain an
+    ;;      ordinary top-level cl:defmethod (no cl:eval/eval-when/backquote)
+    ;;      specializing on dotcl-internal::|GenA| (dotnet-type-simple-name
+    ;;      of "Fixture.GenA").
     (let* ((fixture-metadata (list class-a class-b))
            (fixture-file (merge-pathnames "package-generator-tests-defgeneric-fixture.lispy-metadata"
                                           (uiop:temporary-directory)))
@@ -1295,8 +1367,14 @@
                    (asd-contents (uiop:read-file-string asd-file)))
               (assert-test (not (null (search "(cl:defgeneric common (obj! cl:&rest args)" generics-contents))) t
                           "csharp-generics.lisp defines a generic for the shared method name")
-              (assert-test (not (null (search "fixture-gen-a:common" generics-contents))) t
-                          "csharp-generics.lisp installs a defmethod forwarding to the opted-in class")
+              (assert-test (search "cl:eval" generics-contents) nil
+                          "csharp-generics.lisp contains no cl:eval anywhere -- ordinary top-level forms only")
+              (assert-test (search "eval-when" generics-contents) nil
+                          "csharp-generics.lisp contains no eval-when anywhere")
+              (assert-test (not (null (search "(cl:defmethod common ((obj! dotcl-internal::|GenA|) cl:&rest args)" generics-contents))) t
+                          "csharp-generics.lisp emits a literal defmethod specializing on dotcl-internal::|GenA|")
+              (assert-test (not (null (search "(cl:apply (cl:function fixture-gen-a:common) obj! args))" generics-contents))) t
+                          "csharp-generics.lisp's defmethod forwards via cl:apply to the opted-in class")
               (assert-test (search "fixture-gen-b:common" generics-contents) nil
                           "csharp-generics.lisp installs no defmethod for the non-opted-in class")
               (assert-test (search "static-only" generics-contents) nil
@@ -1305,17 +1383,57 @@
                           "csharp-generics.lisp never mentions the excluded generic instance method")
               (assert-test (not (null (search "(cl:defgeneric (cl:setf value)" generics-contents))) t
                           "csharp-generics.lisp defines a (cl:setf ...) generic for a writeable property")
+              (assert-test (not (null (search "(cl:defmethod (cl:setf value) (new-value (obj! dotcl-internal::|GenA|)" generics-contents))) t
+                          "csharp-generics.lisp emits a literal (cl:setf ...) defmethod for a writeable property")
               (assert-test (not (null (search "(cl:defpackage :csharp-generics" packages-contents))) t
                           "packages.lisp defines the csharp-generics package")
+              (assert-test (search "csharp-generics-dynamic" packages-contents) nil
+                          "packages.lisp defines no csharp-generics-dynamic package when only --defgeneric is used")
               (assert-test (not (null (search "\"csharp-generics\"" asd-contents))) t
-                          "csharp-assembly-packages.asd includes the csharp-generics component")))
+                          "csharp-assembly-packages.asd includes the csharp-generics component")
+              (assert-test (null (probe-file (merge-pathnames "csharp-generics-dynamic.lisp" out-dir))) t
+                          "--defgeneric alone writes no csharp-generics-dynamic.lisp (the separate dynamic variant)")))
         (when (probe-file fixture-file)
           (delete-file fixture-file))
         (when (probe-file out-dir)
           (uiop:delete-directory-tree out-dir :validate t))))
 
-    ;; 11.3 No class opts in: the whole feature is a no-op -- no
-    ;;      csharp-generics.lisp, no defpackage, no .asd component.
+    ;; 11.5 A class may opt into both --defgeneric and --defgeneric-dynamic
+    ;;      at once, independently -- both packages/files are emitted, each
+    ;;      covering the same opted-in class via its own mechanism.
+    (let* ((fixture-metadata (list class-a))
+           (fixture-file (merge-pathnames "package-generator-tests-defgeneric-both-fixture.lispy-metadata"
+                                          (uiop:temporary-directory)))
+           (out-dir (merge-pathnames "package-generator-tests-defgeneric-both-out/"
+                                     (uiop:temporary-directory))))
+      (unwind-protect
+          (progn
+            (with-open-file (s fixture-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+              (prin1 fixture-metadata s))
+            (ensure-directories-exist out-dir)
+            (assembly-package-generator:generate-assembly-packages-batch
+             (list (list :metadata-file (namestring fixture-file)
+                         :assembly-name "Fixture.dll"
+                         :classes (list (list :name "Fixture.GenA" :constant-properties ""
+                                              :defgeneric t :defgeneric-dynamic t))))
+             (namestring out-dir)
+             "2026-07-05T00:00:00Z"
+             "9.9.9"
+             (utils:qualify-path "csharp-assembly-utils-package.template.lisp")
+             (utils:qualify-path "csharp-assembly-utils.template.lisp")
+             nil)
+            (assert-test (not (null (probe-file (merge-pathnames "csharp-generics.lisp" out-dir)))) t
+                        "a class opted into both flags gets a csharp-generics.lisp")
+            (assert-test (not (null (probe-file (merge-pathnames "csharp-generics-dynamic.lisp" out-dir)))) t
+                        "a class opted into both flags also gets a csharp-generics-dynamic.lisp"))
+        (when (probe-file fixture-file)
+          (delete-file fixture-file))
+        (when (probe-file out-dir)
+          (uiop:delete-directory-tree out-dir :validate t))))
+
+    ;; 11.6 No class opts into either flag: the whole feature is a no-op --
+    ;;      no csharp-generics.lisp, no csharp-generics-dynamic.lisp, no
+    ;;      defpackage, no .asd component.
     (let* ((fixture-metadata (list class-a class-b))
            (fixture-file (merge-pathnames "package-generator-tests-no-defgeneric-fixture.lispy-metadata"
                                           (uiop:temporary-directory)))
@@ -1343,10 +1461,12 @@
                    (asd-contents (uiop:read-file-string asd-file)))
               (assert-test (null (probe-file (merge-pathnames "csharp-generics.lisp" out-dir))) t
                           "generate-assembly-packages-batch writes no csharp-generics.lisp when no class opts in")
+              (assert-test (null (probe-file (merge-pathnames "csharp-generics-dynamic.lisp" out-dir))) t
+                          "generate-assembly-packages-batch writes no csharp-generics-dynamic.lisp when no class opts in")
               (assert-test (search "csharp-generics" packages-contents) nil
-                          "packages.lisp has no csharp-generics defpackage when no class opts in")
+                          "packages.lisp has no csharp-generics(-dynamic) defpackage when no class opts in")
               (assert-test (search "csharp-generics" asd-contents) nil
-                          "csharp-assembly-packages.asd has no csharp-generics component when no class opts in")))
+                          "csharp-assembly-packages.asd has no csharp-generics(-dynamic) component when no class opts in")))
         (when (probe-file fixture-file)
           (delete-file fixture-file))
         (when (probe-file out-dir)

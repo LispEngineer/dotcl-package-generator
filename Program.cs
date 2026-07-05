@@ -27,7 +27,8 @@ bool exportAllParents = false;
 bool exportAllInterfaces = false;
 bool exportAllObject = false;
 bool skipMissing = false;
-bool enableDefgeneric = false;
+bool enableDefgenericDynamic = false;
+bool enableDefgenericStatic = false;
 
 ////////////////////////////////////////////////////////////////////////////
 // Parse arguments
@@ -58,7 +59,8 @@ for (int i = 0; i < args.Length; i++) {
                 ExportParents = exportAllParents,
                 ExportInterfaces = exportAllInterfaces,
                 ExportObject = exportAllObject,
-                DefGeneric = enableDefgeneric,
+                DefGenericDynamic = enableDefgenericDynamic,
+                DefGenericStatic = enableDefgenericStatic,
             };
             currentGroup.Classes.Add(currentClass);
         }
@@ -106,17 +108,29 @@ for (int i = 0; i < args.Length; i++) {
         } else {
             currentClass.ExportObject = false;
         }
+    } else if (args[i] == "--defgeneric-dynamic") {
+        if (currentClass == null) {
+            argErrors.Add("--defgeneric-dynamic specified before any --class.");
+        } else {
+            currentClass.DefGenericDynamic = true;
+        }
+    } else if (args[i] == "--no-defgeneric-dynamic") {
+        if (currentClass == null) {
+            argErrors.Add("--no-defgeneric-dynamic specified before any --class.");
+        } else {
+            currentClass.DefGenericDynamic = false;
+        }
     } else if (args[i] == "--defgeneric") {
         if (currentClass == null) {
             argErrors.Add("--defgeneric specified before any --class.");
         } else {
-            currentClass.DefGeneric = true;
+            currentClass.DefGenericStatic = true;
         }
     } else if (args[i] == "--no-defgeneric") {
         if (currentClass == null) {
             argErrors.Add("--no-defgeneric specified before any --class.");
         } else {
-            currentClass.DefGeneric = false;
+            currentClass.DefGenericStatic = false;
         }
     } else if (args[i] == "--export-all-parents") {
         exportAllParents = true;
@@ -134,10 +148,14 @@ for (int i = 0; i < args.Length; i++) {
         skipMissing = true;
     } else if (args[i] == "--no-skip-missing") {
         skipMissing = false;
+    } else if (args[i] == "--enable-defgeneric-dynamic") {
+        enableDefgenericDynamic = true;
+    } else if (args[i] == "--no-enable-defgeneric-dynamic") {
+        enableDefgenericDynamic = false;
     } else if (args[i] == "--enable-defgeneric") {
-        enableDefgeneric = true;
+        enableDefgenericStatic = true;
     } else if (args[i] == "--no-enable-defgeneric") {
-        enableDefgeneric = false;
+        enableDefgenericStatic = false;
     } else if (args[i] == "--test") {
         isTestMode = true;
     }
@@ -209,7 +227,8 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
                 manifest.Append(" :export-parents ").Append(cls.ExportParents ? "t" : "nil");
                 manifest.Append(" :export-interfaces ").Append(cls.ExportInterfaces ? "t" : "nil");
                 manifest.Append(" :export-object ").Append(cls.ExportObject ? "t" : "nil");
-                manifest.Append(" :defgeneric ").Append(cls.DefGeneric ? "t" : "nil");
+                manifest.Append(" :defgeneric-dynamic ").Append(cls.DefGenericDynamic ? "t" : "nil");
+                manifest.Append(" :defgeneric ").Append(cls.DefGenericStatic ? "t" : "nil");
                 manifest.Append(')');
             }
             manifest.Append("))\n");
@@ -371,15 +390,31 @@ void PrintHelp() {
         "--class's instance methods and instance",
         "property/field accessors to the shared",
         "CSHARP-GENERICS package of unified CLOS generic",
-        "functions, dispatching on C# runtime type.");
+        "functions, each specializing directly on the C#",
+        "type's simple-name CLOS class. Simple, readable",
+        "generated code -- but if another --defgeneric",
+        "class in the same batch shares that simple name",
+        "(a same-named type from a different namespace),",
+        "dispatch for whichever one loses DotCL's class-",
+        "naming race is wrong. See",
+        "doc/make-everything-defgeneric.md.");
+    Opt("--defgeneric-dynamic / --no-defgeneric-dynamic", "Like --defgeneric, but into the separate",
+        "CSHARP-GENERICS-DYNAMIC package, with each",
+        "defmethod installed at load time against the",
+        "C# type's actual runtime CLOS class object --",
+        "slower/uglier generated code (cl:eval of a",
+        "backquoted defmethod), but immune to the simple-",
+        "name collision risk above. See",
+        "doc/make-everything-defgeneric-dynamic.md.");
     Console.WriteLine();
     Console.WriteLine("Sticky defaults (change the default for the current and every subsequent --class,");
-    Console.WriteLine("in command-line order; a class's own --export-*/--no-export-*/--defgeneric flags");
-    Console.WriteLine("above always override these, for that one class only):");
+    Console.WriteLine("in command-line order; a class's own --export-*/--no-export-*/--defgeneric*");
+    Console.WriteLine("flags above always override these, for that one class only):");
     Opt("--export-all-parents / --no-export-all-parents", "Default --export-parents on/off.");
     Opt("--export-all-interfaces / --no-export-all-interfaces", "Default --export-interfaces on/off.");
     Opt("--export-all-object / --no-export-all-object", "Default --export-object on/off.");
     Opt("--enable-defgeneric / --no-enable-defgeneric", "Default --defgeneric on/off.");
+    Opt("--enable-defgeneric-dynamic / --no-enable-defgeneric-dynamic", "Default --defgeneric-dynamic on/off.");
     Console.WriteLine();
     Console.WriteLine("Global:");
     Opt("--skip-missing / --no-skip-missing", "When a requested parent/interface ancestor",
@@ -414,5 +449,6 @@ class ClassSpec {
     public bool ExportParents;
     public bool ExportInterfaces;
     public bool ExportObject;
-    public bool DefGeneric;
+    public bool DefGenericDynamic;
+    public bool DefGenericStatic;
 }

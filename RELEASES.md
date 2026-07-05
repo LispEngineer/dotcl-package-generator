@@ -10,6 +10,31 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.35.0 — 2026-07-05
+
+**Renamed the Version 34 unified-generics mechanism to `-dynamic`; added a new, simpler static
+variant under the original names.**
+
+* Version 34's `--defgeneric`/`csharp-generics` mechanism (below) is renamed, with no behavior
+  change, to `--defgeneric-dynamic`/`--no-defgeneric-dynamic` (per-class),
+  `--enable-defgeneric-dynamic`/`--no-enable-defgeneric-dynamic` (sticky), and the
+  `csharp-generics-dynamic` package/file — it was judged too ugly to be the only option (its
+  generated `defmethod`s are installed via `cl:eval` of a backquoted form at load time). See
+  `doc/make-everything-defgeneric-dynamic.md`.
+* The freed original names (`--defgeneric`/`--no-defgeneric`,
+  `--enable-defgeneric`/`--no-enable-defgeneric`, `csharp-generics` package/file) now drive a
+  **new, independent, orthogonal** implementation: each unified name gets an ordinary top-level
+  `cl:defmethod` — no `cl:eval`, no `eval-when`, no backquote — specializing directly on a
+  literal symbol computed at generation time from the C# type's simple name
+  (`dotcl-internal::|SimpleName|`). Simpler, more readable generated code, at the cost of a
+  documented caveat: if two `--defgeneric`-opted-in classes in the same batch share a simple
+  name across different namespaces, dispatch for whichever one loses DotCL's own class-naming
+  race at load time is silently wrong. A class may use either variant, both, or neither. See
+  `doc/make-everything-defgeneric.md` (including a worked, demonstrated example of the collision
+  caveat via the `Makefile` smoke test's real-world `System.Threading.Timer`/
+  `System.Timers.Timer` pair) and `FEATURES.md`'s "Unified Generic Methods" section
+  (`*generator-version*` bumped to 35).
+
 ## 2.34.0 — 2026-07-05
 
 **Added optional per-class unification of instance members into shared CLOS generic functions.**

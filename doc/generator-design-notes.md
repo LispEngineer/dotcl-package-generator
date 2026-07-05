@@ -1523,18 +1523,22 @@ a parent's from an *overriding* one — this needs new `AssemblyToLispy.cs` meta
 comment wording, not re-export correctness. Tracked as a future-version follow-up in
 `doc/parents-and-interfaces-plan.md`'s Phase 5.
 
-## Unified Generic Methods (Version 34)
+## Unified Generic Methods (Version 34, Dynamic Variant)
 
 ### What changed and why
 
 `PLAN.md`'s "Turn Everything into Generic Methods" section asked for every generated instance
 member to also be reachable through one shared package of CLOS generic functions dispatching on
 the C# runtime type — so, e.g., a caller holding some `#<DOTNET ...>` instance of unknown-to-them
-type can call `(csharp-generics:length x)` without knowing which per-class package `x`'s type
-lives in. Version 34 adds this as opt-in: `--defgeneric`/`--no-defgeneric` (per-class, mirroring
-`--export-parents`) plus sticky `--enable-defgeneric`/`--no-enable-defgeneric` (mirroring
-`--export-all-parents`). Full design writeup, locked decisions, and the questions/answers that
-led to them: `doc/make-everything-defgeneric.md` (this section summarizes the as-built
+type can call `(csharp-generics-dynamic:length x)` without knowing which per-class package `x`'s
+type lives in. Version 34 added this as opt-in: `--defgeneric`/`--no-defgeneric` (per-class,
+mirroring `--export-parents`) plus sticky `--enable-defgeneric`/`--no-enable-defgeneric`
+(mirroring `--export-all-parents`). **Version 35 renamed this entire mechanism** to
+`-dynamic`-suffixed flags/package/functions (see "Unified Generic Methods — Static Variant
+(Version 35)" below for why, and for the sibling variant that now uses the original names) —
+this section's identifiers reflect the current, post-rename names. Full design writeup, locked
+decisions, and the questions/answers that led to them:
+`doc/make-everything-defgeneric-dynamic.md` (this section summarizes the as-built
 implementation).
 
 ### Collecting which members qualify: `collect-class-instance-generics`
@@ -1582,8 +1586,8 @@ in any batch where two opted-in classes share a simple name.
 Version 34 sidesteps this by installing every `defmethod` **at load time**, against the class's
 own *actual* registered class object, fetched fresh via `EnsureDotNetTypeClass` (idempotent — a
 harmless no-op re-registration when the class's own `.lisp` file already registered it, which it
-always will have by the time `csharp-generics.lisp` loads last) and specialized on that object's
-own `(cl:class-name ...)`:
+always will have by the time `csharp-generics-dynamic.lisp` loads last) and specialized on that
+object's own `(cl:class-name ...)`:
 
 ```lisp
 (cl:eval-when (:load-toplevel :execute)
@@ -1604,23 +1608,26 @@ macro-expansion (which needs a literal specializer at compile time) could see.
 
 ### Emission and load order
 
-`compute-defgeneric-model` aggregates every `:defgeneric`-true resolved class's collected names
+`compute-defgeneric-dynamic-model` (a thin wrapper around the shared internal
+`%compute-defgeneric-model`, parameterized on the `:defgeneric-dynamic` resolved-class flag —
+see the Version 35 section below) aggregates every opted-in resolved class's collected names
 (across the whole batch, not per-assembly) into: the deduped union export/shadow lists for the
-`csharp-generics` `cl:defpackage` (emitted by `generate-batch-packages-file`, right after the
-`csharp-assembly-utils` defpackage — the two are structurally symmetric shared packages), and a
-per-class list of participating names for `generate-batch-generics-file` to emit against. Returns
-`nil` when no class opted in, which every downstream site (`generate-batch-packages-file`,
-`generate-batch-generics-file`, `generate-batch-asd-file`) treats as "emit nothing for this
-feature" — an unused `--defgeneric` produces byte-identical output to before Version 34.
+`csharp-generics-dynamic` `cl:defpackage` (emitted by `generate-batch-packages-file`, right
+after the `csharp-assembly-utils` defpackage — the two are structurally symmetric shared
+packages), and a per-class list of participating names for `generate-batch-generics-dynamic-file`
+to emit against. Returns `nil` when no class opted in, which every downstream site
+(`generate-batch-packages-file`, `generate-batch-generics-dynamic-file`,
+`generate-batch-asd-file`) treats as "emit nothing for this variant" — independently of whatever
+the sibling static variant is doing in the same batch.
 
-`generate-batch-generics-file` (a new sibling to `generate-batch-utils-file`) must run **after**
-every opted-in class's own `.lisp` file has been generated (its `defmethod` bodies reference
-those files' exported functions by name, and its install blocks' `EnsureDotNetTypeClass` calls
-are safe no-ops only because those files already performed the real registration).
-`generate-batch-asd-file` adds `csharp-generics` as the last `:file` component, depending on
-`"packages"`, `"csharp-assembly-utils"`, and every opted-in class's own package file, so ASDF's
-own dependency graph enforces this load order rather than relying on component-list position
-alone.
+`generate-batch-generics-dynamic-file` (a sibling to `generate-batch-utils-file`) must run
+**after** every opted-in class's own `.lisp` file has been generated (its `defmethod` bodies
+reference those files' exported functions by name, and its install blocks'
+`EnsureDotNetTypeClass` calls are safe no-ops only because those files already performed the
+real registration). `generate-batch-asd-file` adds `csharp-generics-dynamic` as a `:file`
+component, depending on `"packages"`, `"csharp-assembly-utils"`, and every one of this variant's
+opted-in classes' own package files, so ASDF's own dependency graph enforces this load order
+rather than relying on component-list position alone.
 
 ### Accepted cost: per-call dispatch/apply overhead
 
@@ -1628,4 +1635,68 @@ Every unified generic forwards via a bare `cl:apply` of the class's own wrapper 
 made to avoid the extra generic-function dispatch plus `apply` overhead relative to calling the
 class's own package function directly. `PLAN.md`'s original sketch explicitly anticipated and
 accepted this for a first version ("this does add overhead — we could address that in a later
-version if desired"); Version 34 makes the same call.
+version if desired"); this variant makes the same call. (The sibling static variant, Version 35,
+avoids the `cl:eval`/`cl:eval-when` overhead specifically, but still pays the same
+generic-dispatch-plus-`apply` cost — see below.)
+
+## Unified Generic Methods — Static Variant (Version 35)
+
+### What changed and why
+
+Version 34's `cl:eval`-of-a-backquoted-`defmethod` mechanism (above) was judged too ugly to be
+the only option — see `PLAN.md`'s "Improve Turn Everything into Generic Methods" section, which
+asked for the whole mechanism to be renamed out of the way as `-dynamic`, freeing the original
+`--defgeneric`/`csharp-generics` names for a new implementation of the design's other original
+option, "Simple + documented caveat": a literal, ordinary top-level `cl:defmethod`, specializing
+on a symbol computed at *generation* time rather than resolved at load time. Both variants are
+now independent, orthogonal opt-ins (a class may use either, both, or neither); see
+`doc/make-everything-defgeneric.md` (this variant) and
+`doc/make-everything-defgeneric-dynamic.md` (the renamed Version 34 mechanism) for full
+before/after naming maps.
+
+### `dotnet-type-simple-name`: why `simple-type-name` doesn't suffice
+
+The pre-existing `simple-type-name` helper computes a *display-oriented* simple name for
+docstrings/comments: it strips the backtick generic-arity suffix (`` List`1 `` → `List`) and
+never splits on CIL's `+` nested-type separator. Neither behavior matches what DotCL's
+`EnsureDotNetTypeClass` actually keys its simple-name CLOS class registration on —
+`Startup.Sym(type.Name)`, i.e. .NET reflection's own `Type.Name`, backtick and all, with nesting
+already collapsed to just the innermost segment (`../dotcl/runtime/Startup.cs`). A literal
+specializer computed from `simple-type-name`'s output would therefore be *silently wrong* for
+any generic or nested type — not a collision risk, an outright bug, since the symbol wouldn't
+match what DotCL registers at all. The new `dotnet-type-simple-name` reproduces `Type.Name`
+exactly: everything after the last `.` or `+`, keeping any trailing backtick arity. The emitted
+specializer is `dotcl-internal::|<dotnet-type-simple-name>|` — pipe-delimited to preserve exact
+case and any embedded backtick — interned into `DOTCL-INTERNAL` to match where `Startup.Sym`
+places a name not already present in `:cl`.
+
+### The accepted collision caveat
+
+Unlike the dynamic variant, this one cannot be made robust against DotCL's
+simple-name/FullName registration race (see the Version 34 section above for the mechanics):
+since the specializer symbol is fixed at generation time, it has no way to know, at generation
+time, whether some *other* opted-in class in the same batch will collide with it on simple name.
+If two `--defgeneric`-opted-in classes share a simple name across different namespaces (e.g.
+`System.Threading.Timer` and `System.Timers.Timer`), only one of them keeps the simple-name CLOS
+class at load time; the other's `defmethod`s, still specializing on that same symbol, silently
+attach to the *wrong* class. This is accepted, not guarded against — a comment is emitted above
+every class's `defmethod` block in the generated file, and the `Makefile` smoke test
+deliberately opts both real-world `Timer` types into `--defgeneric` to demonstrate the failure
+mode actually occurs, rather than leaving it as an unverified claim (see
+`doc/make-everything-defgeneric.md`'s "Demonstrated collision" section).
+
+### Sharing logic with the dynamic variant
+
+`collect-class-instance-generics` (which wrapper names are eligible at all — excludes static
+members, generic/type-parameterized instance methods, overloaded indexers) is entirely
+mechanism-agnostic and reused verbatim by both variants; only the *installation* strategy
+differs. `%compute-defgeneric-model`, a new shared internal helper parameterized on the
+resolved-class flag key (`:defgeneric` or `:defgeneric-dynamic`), replaces what would otherwise
+be near-duplicate aggregation logic between `compute-defgeneric-model` (this variant) and
+`compute-defgeneric-dynamic-model` (the dynamic variant) — both produce the identical
+`:classes`/`:method-names`/`:setter-names`/`:exports`/`:shadows` plist shape.
+`emit-defgeneric-defpackage`, a similar shared helper, emits either variant's `cl:defpackage`
+form in `generate-batch-packages-file` from that same plist shape, differing only in package
+name/flag name/doc path. `generate-batch-packages-file`/`generate-batch-asd-file`/
+`generate-assembly-packages-batch` each now take both models as independent optional arguments,
+threading them through in parallel rather than one replacing the other.

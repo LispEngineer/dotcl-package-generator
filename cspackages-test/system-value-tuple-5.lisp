@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ValueTuple`5
-;;; Generator Version: 34
-;;; Creation Date: 2026-07-05T17:20:43Z
+;;; Generator Version: 35
+;;; Creation Date: 2026-07-05T18:08:15Z
 
 (cl:in-package :system-value-tuple-5)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.ValueTuple`5"))
 (cl:defconstant <type-str> "System.ValueTuple`5")
-(cl:defconstant <creation> "2026-07-05T17:20:43Z")
-(cl:defconstant <version> 34)
+(cl:defconstant <creation> "2026-07-05T18:08:15Z")
+(cl:defconstant <version> 35)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

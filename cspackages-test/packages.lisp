@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 34
-;;; Creation Date: 2026-07-05T17:20:43Z
+;;; Generator Version: 35
+;;; Creation Date: 2026-07-05T18:08:15Z
 
 (cl:in-package :cl-user)
 
@@ -34,6 +34,81 @@
    #:remove
    #:replace
    #:append
+   #:close
+  )
+  (:export
+   #:chars
+   #:length
+   #:clone
+   #:compare-to
+   #:contains
+   #:copy-to
+   #:ends-with
+   #:enumerate-runes
+   #:equals
+   #:get-enumerator
+   #:get-hash-code
+   #:get-pinnable-reference
+   #:get-type-code
+   #:index-of
+   #:index-of-any
+   #:insert
+   #:normalized?
+   #:last-index-of
+   #:last-index-of-any
+   #:normalize
+   #:pad-left
+   #:pad-right
+   #:remove
+   #:replace
+   #:replace-line-endings
+   #:split
+   #:starts-with
+   #:substring
+   #:to-char-array
+   #:to-lower
+   #:to-lower-invariant
+   #:to-string
+   #:to-upper
+   #:to-upper-invariant
+   #:trim
+   #:trim-end
+   #:trim-start
+   #:try-copy-to
+   #:capacity
+   #:max-capacity
+   #:append
+   #:append-format
+   #:append-join
+   #:append-line
+   #:clear
+   #:ensure-capacity
+   #:get-chunks
+   #:change
+   #:dispose
+   #:dispose-async
+   #:auto-reset
+   #:enabled
+   #:interval
+   #:site
+   #:synchronizing-object
+   #:begin-init
+   #:close
+   #:end-init
+   #:start
+   #:stop
+  ))
+
+;;; Source File: csharp-generics-dynamic.lisp
+;;; Purpose: unified CLOS generic functions dispatching on C# runtime
+;;; type, across every --defgeneric-dynamic-opted-in class in this batch
+;;; (see doc/make-everything-defgeneric-dynamic.md)
+(cl:defpackage :csharp-generics-dynamic
+  (:use :cl)
+  (:shadow
+   #:length
+   #:remove
+   #:replace
    #:count
    #:values
   )
@@ -93,22 +168,16 @@
    #:initialize
    #:set-value
    #:capacity
-   #:max-capacity
-   #:append
-   #:append-format
-   #:append-join
-   #:append-line
-   #:clear
-   #:ensure-capacity
-   #:get-chunks
    #:comparer
    #:count
    #:item
    #:keys
    #:values
    #:add
+   #:clear
    #:contains-key
    #:contains-value
+   #:ensure-capacity
    #:get-object-data
    #:on-deserialization
    #:trim-excess
@@ -2240,6 +2309,52 @@
    #:truncate
    #:try-copy-to
    #:xor
+  ))
+
+;;; Source File: system-threading-timer.lisp
+;;; C# Class: System.Threading.Timer
+;;; Constant Properties: (none)
+(cl:defpackage :system-threading-timer
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:active-count
+   #:change
+   #:dispose
+   #:dispose-async
+  ))
+
+;;; Source File: system-timers-timer.lisp
+;;; C# Class: System.Timers.Timer
+;;; Constant Properties: (none)
+(cl:defpackage :system-timers-timer
+  (:use :cl)
+  (:shadow
+   #:close
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:auto-reset
+   #:enabled
+   #:interval
+   #:site
+   #:synchronizing-object
+   #:begin-init
+   #:close
+   #:dispose
+   #:end-init
+   #:start
+   #:stop
+   #:add-elapsed
+   #:remove-elapsed
   ))
 
 ;;; Source File: system-diagnostics-debug.lisp

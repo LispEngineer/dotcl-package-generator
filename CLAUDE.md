@@ -126,11 +126,18 @@ ancestor unresolvable in any provided assembly is a hard error (default) or a dr
 See `doc/parents-and-interfaces-plan.md` and `FEATURES.md`'s "Parents and Interfaces" section.
 
 A class can also opt into unifying its instance methods and instance property/field accessors
-into a shared `csharp-generics` package of CLOS generic functions dispatching on C# runtime
-type: `--defgeneric`/`--no-defgeneric` (per-class), plus sticky `--enable-defgeneric`/
-`--no-enable-defgeneric` (same current-and-subsequent-`--class` semantics as
-`--export-all-parents`). See `doc/make-everything-defgeneric.md` and `FEATURES.md`'s "Unified
-Generic Methods" section.
+into a shared package of CLOS generic functions dispatching on C# runtime type, via two
+independent, orthogonal mechanisms (a class may use either, both, or neither):
+`--defgeneric`/`--no-defgeneric` (static — a literal, generation-time specializer symbol; simple
+and readable, but has a documented same-simple-name collision caveat) into the `csharp-generics`
+package, and `--defgeneric-dynamic`/`--no-defgeneric-dynamic` (dynamic — installed at load time
+against each type's actual runtime CLOS class object; fully robust, uglier generated code) into
+the `csharp-generics-dynamic` package. Each has its own sticky
+`--enable-defgeneric`/`--no-enable-defgeneric` and
+`--enable-defgeneric-dynamic`/`--no-enable-defgeneric-dynamic` (same
+current-and-subsequent-`--class` semantics as `--export-all-parents`). See
+`doc/make-everything-defgeneric.md`, `doc/make-everything-defgeneric-dynamic.md`, and
+`FEATURES.md`'s "Unified Generic Methods" section.
 
 `--version`/`--help` and `--test` boot the DotCL host (`DotclHost.Initialize()`); the
 metadata-reflection portion of a `--out-dir` invocation intentionally does not, since it's pure
