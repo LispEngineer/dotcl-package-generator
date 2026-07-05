@@ -4,6 +4,33 @@
 * Copyright 2026 Douglas P. Fields, Jr.
 
 
+# Parents and Interfaces
+
+Optionally create the packages for all super-classes and interfaces
+of specified classes,
+and re-export non-conflicting methods (etc.) from those packages, for
+ease of use.
+
+* This may (will?) require a topological sort of all the classes so that the
+  packages can be defined in appropriate order in `packages.lisp`.
+
+* Have this be indicated by flags after the class (like `--constant-properties`)
+  * `--export-parents` - generates packages for and
+    re-exports the super class methods and all
+    other ancestor classes *except* `System.Object`
+  * `--export-interfaces` - generates packages for and re-exports all methods
+    defined on this class and any ancestor packages.
+  * `--export-object` - Also re-export `System.Object` if applicable
+
+* Ensure that any conflicting names in parents/interfaces are not re-exported.
+  However, if the conflicting name is not virtual / overridden, put a comment into
+  the generated package.
+
+* Have flags that can change the default for the current and subsequent classes:
+  * `--export-all-parents`, `--export-all-interfaces`, `--export-all-object`
+  * To disable, use `no-` prefix, e.g., `--no-export-all-parents`
+
+
 # Add More to Generated `.lisp` Files
 
 TODO
@@ -128,9 +155,13 @@ obj!)` form instead, deprecating Option A's per-type codegen.
 
 # Miscellaneous
 
-* Optionally create the packages for all super-classes and interfaces,
-  and re-export non-conflicting methods (etc.) from those packages, for
-  ease of use.
+* Deal with extension methods. Real world example is from MonoGameGum:
+  `MonoGameGum.GraphicalUiElementExtensionMethods`
+  ([Source Code](https://github.com/vchelaru/Gum/blob/136b2b54a58b10728e72e4bf5d34301781c00cc7/MonoGameGum/Forms/Controls/FrameworkElementExt.cs#L80))
+  * Figure out a way to find all extension methods (at least in assemblies
+    given in the invocation command line) and add them to the generated
+    class.
+  * Add comments/docstrings as to where the extension method came from.
 
 * Handle overloaded indexers, per:
   * C# indexer (`this[...]`) threads its index parameter(s) through
