@@ -4,23 +4,6 @@
 * Copyright 2026 Douglas P. Fields, Jr.
 
 
-# Enhance Generics with Event Methods
-
-I noticed that the `add-click` function was not added to the list of generics
-for the `gum-forms-controls-primitives-button-base.lisp` class in my Dungeon
-Slime game. The Generics should include all Lisp function-type generated functions,
-not just the ones that might have originally been C# functions.
-
-**DONE (Version 37, 2026-07-05).** `collect-class-instance-generics` now also walks
-`:events`, folding a class's `add-X`/`remove-X` instance-event wrapper pair into
-`method-names` (never `setter-names`) using the exact same `event-wrapper-names`
-collision-escalation the class's own package already uses, so the two can never disagree on
-the emitted name. Required threading `constant-properties-list` into
-`collect-class-instance-generics` (previously called with just the class-plist). See
-`doc/generator-design-notes.md`'s "Instance Events Included in the Unified Generics Collector
-(Version 37)" section and `doc/make-everything-defgeneric.md`/
-`doc/make-everything-defgeneric-dynamic.md`'s updated Scope bullets.
-
 
 # Handle Extension Methods in the Main Class
 
@@ -38,13 +21,6 @@ Deal with extension methods. Real world example is from MonoGameGum:
 See [`parents-and-interfaces-plan`](doc/parents-and-interfaces-plan.md)
 for details of what was done earlier (v33).
 Add flags & default changing flags for these capabilities.
-
-* Add one-time flags for `--no-export-<whatever>` that override the default `--export-all-<whatever>`
-  for just the current class.
-  * **DONE (2026-07-05, v2.33.1)**: `--no-export-parents`/`--no-export-interfaces`/
-    `--no-export-object` added, each turning the corresponding flag back off for just the
-    most recently given `--class`. CLI-only change (`Program.cs`); no manifest, Lisp, or
-    generated-output-shape change was needed. See `RELEASES.md`'s 2.33.1 entry.
 
 * Export all inner classes/interfaces (recursively) as well.
 
@@ -304,6 +280,23 @@ obj!)` form instead, deprecating Option A's per-type codegen.
 
 
 ---
+
+# Enhance Generics with Event Methods
+
+I noticed that the `add-click` function was not added to the list of generics
+for the `gum-forms-controls-primitives-button-base.lisp` class in my Dungeon
+Slime game. The Generics should include all Lisp function-type generated functions,
+not just the ones that might have originally been C# functions.
+
+**DONE (Version 37, 2026-07-05).** `collect-class-instance-generics` now also walks
+`:events`, folding a class's `add-X`/`remove-X` instance-event wrapper pair into
+`method-names` (never `setter-names`) using the exact same `event-wrapper-names`
+collision-escalation the class's own package already uses, so the two can never disagree on
+the emitted name. Required threading `constant-properties-list` into
+`collect-class-instance-generics` (previously called with just the class-plist). See
+`doc/generator-design-notes.md`'s "Instance Events Included in the Unified Generics Collector
+(Version 37)" section and `doc/make-everything-defgeneric.md`/
+`doc/make-everything-defgeneric-dynamic.md`'s updated Scope bullets.
 
 
 # Improve Turn Everything into Generic Methods (Version 2)
@@ -699,6 +692,13 @@ is a really foundational change that will help a lot in the future.
 
 
 # DONE
+
+* Add one-time flags for `--no-export-<whatever>` that override the default `--export-all-<whatever>`
+  for just the current class.
+  * **DONE (2026-07-05, v2.33.1)**: `--no-export-parents`/`--no-export-interfaces`/
+    `--no-export-object` added, each turning the corresponding flag back off for just the
+    most recently given `--class`. CLI-only change (`Program.cs`); no manifest, Lisp, or
+    generated-output-shape change was needed. See `RELEASES.md`'s 2.33.1 entry.
 
 * DONE (Version 31) - Implement read/write for static properties and fields per this:
   * any static property or field that is
