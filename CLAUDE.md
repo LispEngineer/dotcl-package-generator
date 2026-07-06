@@ -139,6 +139,13 @@ current-and-subsequent-`--class` semantics as `--export-all-parents`). See
 `doc/make-everything-defgeneric.md`, `doc/make-everything-defgeneric-dynamic.md`, and
 `FEATURES.md`'s "Unified Generic Methods" section.
 
+A class can also opt into having matching C# extension methods (found anywhere in the provided
+assemblies, exact concrete `this`-type match only) injected into its own package as ordinary
+`obj!`-first wrapper functions: `--extension-methods`/`--no-extension-methods` (per-class) plus
+sticky `--enable-extension-methods`/`--no-enable-extension-methods` — **ON by default**, unlike
+every other sticky flag above. See `doc/plan-v38.md`, `doc/generator-design-notes.md`'s
+"Extension Methods (Version 38)" section, and `FEATURES.md`'s "Extension Methods" section.
+
 `--version`/`--help` and `--test` boot the DotCL host (`DotclHost.Initialize()`); the
 metadata-reflection portion of a `--out-dir` invocation intentionally does not, since it's pure
 reflection and runs before DotCL boots.

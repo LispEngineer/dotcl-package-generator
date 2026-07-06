@@ -69,6 +69,66 @@ namespace AssemblyToLispyTestTarget
     }
 
     /// <summary>
+    /// Extension methods targeting EventTestClass, to test Version 38's extension-method
+    /// injection end-to-end against a real, generated package: one clean survivor
+    /// (Describe), one dirty skip (AdjustCount takes a ref parameter), two overloaded
+    /// (ambiguous) skips (Frob), and one whose name collides with EventTestClass's own
+    /// declared RaiseSomethingHappened method (the class's own member must win).
+    /// </summary>
+    public static class EventTestClassExtensions
+    {
+        /// <summary>
+        /// A clean extension method with no special parameter modifiers -- should be
+        /// injected into EventTestClass's generated package as an obj!-first wrapper.
+        /// </summary>
+        /// <param name="e">The instance being extended.</param>
+        /// <param name="prefix">A prefix to include in the description.</param>
+        public static string Describe(this EventTestClass e, string prefix)
+        {
+            return prefix;
+        }
+
+        /// <summary>
+        /// A dirty extension method (a ref parameter) -- should be skipped with a
+        /// documenting comment, not generated.
+        /// </summary>
+        /// <param name="e">The instance being extended.</param>
+        /// <param name="amount">A ref parameter, making this overload dirty.</param>
+        public static void AdjustCount(this EventTestClass e, ref int amount)
+        {
+        }
+
+        /// <summary>
+        /// Overload 1 of 2 of an ambiguous extension-method name -- both overloads should
+        /// be skipped with a documenting comment, since extension-method overload dispatch
+        /// is not yet supported.
+        /// </summary>
+        /// <param name="e">The instance being extended.</param>
+        public static void Frob(this EventTestClass e)
+        {
+        }
+
+        /// <summary>
+        /// Overload 2 of 2 of the same ambiguous extension-method name.
+        /// </summary>
+        /// <param name="e">The instance being extended.</param>
+        /// <param name="amount">An extra parameter distinguishing this overload.</param>
+        public static void Frob(this EventTestClass e, int amount)
+        {
+        }
+
+        /// <summary>
+        /// An extension method whose name collides with EventTestClass's own declared
+        /// RaiseSomethingHappened method -- the class's own member must win; this extension
+        /// should be skipped with a documenting comment.
+        /// </summary>
+        /// <param name="e">The instance being extended.</param>
+        public static void RaiseSomethingHappened(this EventTestClass e)
+        {
+        }
+    }
+
+    /// <summary>
     /// A class with both a Click event and an unrelated method AddClick(), to test the
     /// event-wrapper naming-collision fallback (add-click/remove-click would collide with
     /// the mapped name of AddClick(), so this exercises the tier-2 -event-suffixed fallback).

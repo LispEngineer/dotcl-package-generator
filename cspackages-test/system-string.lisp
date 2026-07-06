@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 37
-;;; Creation Date: 2026-07-05T18:46:38Z
+;;; Generator Version: 38
+;;; Creation Date: 2026-07-06T00:35:02Z
 
 (cl:in-package :system-string)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-05T18:46:38Z")
-(cl:defconstant <version> 37)
+(cl:defconstant <creation> "2026-07-06T00:35:02Z")
+(cl:defconstant <version> 38)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -1954,4 +1954,10 @@ Parameters:
   - destination (System.Span`1[System.Char]): The span into which to copy this string's contents.
 "
   (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TryCopyTo" destination))
+
+;; Extension methods (exact match on this == System.String):
+;;   System.StringNormalizationExtensions::IsNormalized(String) -> Boolean -- skipped (this class already declares its own member of this name)
+;;   System.StringNormalizationExtensions::IsNormalized(String, NormalizationForm) -> Boolean -- skipped (this class already declares its own member of this name)
+;;   System.StringNormalizationExtensions::Normalize(String) -> String -- skipped (this class already declares its own member of this name)
+;;   System.StringNormalizationExtensions::Normalize(String, NormalizationForm) -> String -- skipped (this class already declares its own member of this name)
 

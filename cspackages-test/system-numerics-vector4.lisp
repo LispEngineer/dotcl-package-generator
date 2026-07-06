@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector4
-;;; Generator Version: 37
-;;; Creation Date: 2026-07-05T18:46:38Z
+;;; Generator Version: 38
+;;; Creation Date: 2026-07-06T00:35:02Z
 
 (cl:in-package :system-numerics-vector4)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Numerics.Vector4"))
 (cl:defconstant <type-str> "System.Numerics.Vector4")
-(cl:defconstant <creation> "2026-07-05T18:46:38Z")
-(cl:defconstant <version> 37)
+(cl:defconstant <creation> "2026-07-06T00:35:02Z")
+(cl:defconstant <version> 38)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -1601,4 +1601,93 @@ Parameters:
   - right (System.Numerics.Vector4): The vector to exclusive-or with left.
 "
   (dotnet:static <type-str> "Xor" (cl:the (dotnet "System.Numerics.Vector4") left) (cl:the (dotnet "System.Numerics.Vector4") right)))
+
+;; Extension methods (exact match on this == System.Numerics.Vector4):
+;;   System.Numerics.Vector::StoreUnsafe(Vector4, ref Single&) -> Void -- skipped (special parameter types (ref/out/params/default) not yet supported)
+;;   System.Numerics.Vector::StoreUnsafe(Vector4, ref Single&, UIntPtr) -> Void -- skipped (special parameter types (ref/out/params/default) not yet supported)
+(cl:defun as-plane (obj!)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Reinterprets a System.Numerics.Vector4 as a new System.Numerics.Plane.
+Returns: value reinterpreted as a new System.Numerics.Plane.
+"
+  (dotnet:static "System.Numerics.Vector" "AsPlane" obj!))
+
+(cl:defun as-quaternion (obj!)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Reinterprets a System.Numerics.Vector4 as a new System.Numerics.Quaternion.
+Returns: value reinterpreted as a new System.Numerics.Quaternion.
+"
+  (dotnet:static "System.Numerics.Vector" "AsQuaternion" obj!))
+
+(cl:defun as-vector2 (obj!)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Reinterprets a System.Numerics.Vector4 as a new System.Numerics.Vector2.
+Returns: value reinterpreted as a new System.Numerics.Vector2.
+"
+  (dotnet:static "System.Numerics.Vector" "AsVector2" obj!))
+
+(cl:defun as-vector3 (obj!)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Reinterprets a System.Numerics.Vector4 as a new System.Numerics.Vector3.
+Returns: value reinterpreted as a new System.Numerics.Vector3.
+"
+  (dotnet:static "System.Numerics.Vector" "AsVector3" obj!))
+
+(cl:defun extract-most-significant-bits (obj!)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Extracts the most significant bit from each element in a vector.
+Returns: The packed most significant bits extracted from the elements in vector.
+"
+  (dotnet:static "System.Numerics.Vector" "ExtractMostSignificantBits" obj!))
+
+(cl:defun get-element (obj! index)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Gets the element at the specified index.
+Returns: The value of the element at index.
+Parameters:
+  - index (System.Int32): The index of the element to get.
+"
+  (dotnet:static "System.Numerics.Vector" "GetElement" obj! index))
+
+(cl:defun store (obj! destination)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Stores a vector at the given destination.
+Parameters:
+  - destination (System.Single*): The destination at which source will be stored.
+"
+  (dotnet:static "System.Numerics.Vector" "Store" obj! destination))
+
+(cl:defun store-aligned (obj! destination)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Stores a vector at the given 16-byte aligned destination.
+Parameters:
+  - destination (System.Single*): The aligned destination at which source will be stored.
+"
+  (dotnet:static "System.Numerics.Vector" "StoreAligned" obj! destination))
+
+(cl:defun store-aligned-non-temporal (obj! destination)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Stores a vector at the given 16-byte aligned destination.
+Parameters:
+  - destination (System.Single*): The aligned destination at which source will be stored.
+"
+  (dotnet:static "System.Numerics.Vector" "StoreAlignedNonTemporal" obj! destination))
+
+(cl:defun to-scalar (obj!)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Converts the given vector to a scalar containing the value of the first element.
+Returns: A scalar T containing the value of the first element.
+"
+  (dotnet:static "System.Numerics.Vector" "ToScalar" obj!))
+
+(cl:defun with-element (obj! index value)
+  "Extension method from System.Numerics.Vector (assembly System.Numerics.Vectors.dll).
+Summary: Creates a new with the element at the specified index set to the specified value and the remaining elements set to the same value as that in the given vector.
+Returns: A with the value of the element at index set to value and the remaining elements set to the same value as that in vector.
+Parameters:
+  - index (System.Int32): The index of the element to set.
+  - value (System.Single): The value to set the element to.
+"
+  (dotnet:static "System.Numerics.Vector" "WithElement" obj! index value))
+
 

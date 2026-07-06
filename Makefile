@@ -102,7 +102,14 @@ test: build
 	    --assembly $(REF_DIR)System.Threading.Thread.dll \
 	      --class System.Threading.Thread \
 		  --assembly $(REF_DIR)System.Collections.Specialized.dll \
-			  --class System.Collections.Specialized.NameValueCollection --export-parents --export-interfaces --export-object
+			  --class System.Collections.Specialized.NameValueCollection --export-parents --export-interfaces --export-object \
+	    --assembly $(BIN_DIR)AssemblyToLispyTestTarget.dll \
+	      --class AssemblyToLispyTestTarget.EventTestClass
+	# EventTestClass demonstrates Version 38's extension-method injection
+	# (--extension-methods, ON by default) against a real, generated package:
+	# see EventTestClassExtensions in AssemblyToLispyTestTarget/EdgeCases.cs
+	# for the one clean survivor (Describe) plus the dirty/ambiguous/own-
+	# collision skip cases.
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo;
 	# System.Collections.Generic.List, SortedList; System.Text.StringBuilder;
 	# System.Drawing.Point/F; Size/F

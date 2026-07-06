@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.ICollection
-;;; Generator Version: 37
-;;; Creation Date: 2026-07-05T18:46:38Z
+;;; Generator Version: 38
+;;; Creation Date: 2026-07-06T00:35:02Z
 
 (cl:in-package :system-collections-i-collection)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Collections.ICollection"))
 (cl:defconstant <type-str> "System.Collections.ICollection")
-(cl:defconstant <creation> "2026-07-05T18:46:38Z")
-(cl:defconstant <version> 37)
+(cl:defconstant <creation> "2026-07-06T00:35:02Z")
+(cl:defconstant <version> 38)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

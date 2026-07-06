@@ -10,6 +10,22 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.38.0 — 2026-07-05
+
+**Added optional per-class injection of C# extension methods, ON by default.**
+
+* New `--extension-methods`/`--no-extension-methods` (per-class) plus sticky
+  `--enable-extension-methods`/`--no-enable-extension-methods` CLI flags inject C# extension
+  methods (found anywhere in the provided assemblies) whose `this` parameter type is exactly
+  the requesting class into that class's own generated package, as ordinary `obj!`-first
+  wrapper functions. Unlike every other sticky flag in this tool, this one **defaults ON** —
+  a class's own applicable extension methods are injected unless explicitly disabled.
+* Matching is exact/concrete only for this version (no base-class, interface, or open-generic
+  matching); a dirty, generic, name-colliding, or ambiguously-overloaded candidate is skipped
+  with a documenting comment instead of being generated. See `doc/plan-v38.md` and
+  `doc/generator-design-notes.md`'s "Extension Methods (Version 38)" section
+  (`*generator-version*` bumped to 38).
+
 ## 2.37.0 — 2026-07-05
 
 **Fixed a gap: instance events (`add-X`/`remove-X`) were missing from the unified generics

@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 37
-;;; Creation Date: 2026-07-05T18:46:38Z
+;;; Generator Version: 38
+;;; Creation Date: 2026-07-06T00:35:02Z
 
 (cl:in-package :cl-user)
 
@@ -121,6 +121,7 @@
    #:get-type
    #:memberwise-clone
    #:to-string
+   #:dummy-extension
    #:chars
    #:length
    #:clone
@@ -194,7 +195,20 @@
    #:y
    #:z
    #:length-squared
+   #:as-vector2
+   #:as-vector4
+   #:as-vector4-unsafe
+   #:extract-most-significant-bits
+   #:get-element
+   #:store
+   #:store-aligned
+   #:store-aligned-non-temporal
+   #:to-scalar
+   #:with-element
    #:w
+   #:as-plane
+   #:as-quaternion
+   #:as-vector3
   ))
 
 ;;; Source File: system-console.lisp
@@ -377,6 +391,7 @@
    #:memberwise-clone
    #:reference-equals
    #:to-string
+   #:dummy-extension
   ))
 
 ;;; Source File: system-type.lisp
@@ -545,6 +560,15 @@
    #:not=
    #:reflection-only-get-type
    #:to-string
+   #:get-type-info
+   #:get-runtime-event
+   #:get-runtime-events
+   #:get-runtime-field
+   #:get-runtime-fields
+   #:get-runtime-method
+   #:get-runtime-methods
+   #:get-runtime-properties
+   #:get-runtime-property
   ))
 
 ;;; Source File: system-string.lisp
@@ -1979,6 +2003,17 @@
    #:truncate
    #:try-copy-to
    #:xor
+   #:as-vector3
+   #:as-vector3-unsafe
+   #:as-vector4
+   #:as-vector4-unsafe
+   #:extract-most-significant-bits
+   #:get-element
+   #:store
+   #:store-aligned
+   #:store-aligned-non-temporal
+   #:to-scalar
+   #:with-element
   ))
 
 ;;; Source File: system-numerics-vector3.lisp
@@ -2145,6 +2180,16 @@
    #:truncate
    #:try-copy-to
    #:xor
+   #:as-vector2
+   #:as-vector4
+   #:as-vector4-unsafe
+   #:extract-most-significant-bits
+   #:get-element
+   #:store
+   #:store-aligned
+   #:store-aligned-non-temporal
+   #:to-scalar
+   #:with-element
   ))
 
 ;;; Source File: system-numerics-vector4.lisp
@@ -2311,6 +2356,17 @@
    #:truncate
    #:try-copy-to
    #:xor
+   #:as-plane
+   #:as-quaternion
+   #:as-vector2
+   #:as-vector3
+   #:extract-most-significant-bits
+   #:get-element
+   #:store
+   #:store-aligned
+   #:store-aligned-non-temporal
+   #:to-scalar
+   #:with-element
   ))
 
 ;;; Source File: system-threading-timer.lisp
@@ -2720,6 +2776,26 @@
    #:on-deserialization
   ))
 
+;;; Source File: assembly-to-lispy-test-target-event-test-class.lisp
+;;; C# Class: AssemblyToLispyTestTarget.EventTestClass
+;;; Constant Properties: (none)
+(cl:defpackage :assembly-to-lispy-test-target-event-test-class
+  (:use :cl)
+  (:shadow
+   #:describe
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:raise-something-happened
+   #:add-something-happened
+   #:remove-something-happened
+   #:describe
+  ))
+
 ;;; ===== Re-exports from parent/interface packages =====
 
 ;;; system-value-tuple-2: re-exports inherited members from system-collections-i-structural-comparable, system-collections-i-structural-equatable, system-i-comparable, system-runtime-compiler-services-i-tuple
@@ -2735,8 +2811,8 @@
 ;;; Skipped (system-argument-out-of-range-exception declares its own): get-object-data
 ;;; Skipped (ambiguous across ancestors: system-exception, system-object): get-type
 ;;; Skipped (ambiguous across ancestors: system-exception, system-object): to-string
-(cl:import '(system-argument-exception::param-name system-argument-exception::throw-if-null-or-empty system-argument-exception::throw-if-null-or-white-space system-exception::data system-exception::help-link system-exception::h-result system-exception::inner-exception system-exception::source system-exception::stack-trace system-exception::target-site system-exception::get-base-exception system-exception::add-serialize-object-state system-exception::remove-serialize-object-state system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::memberwise-clone system-object::reference-equals) ':system-argument-out-of-range-exception)
-(cl:export '(system-argument-out-of-range-exception::param-name system-argument-out-of-range-exception::throw-if-null-or-empty system-argument-out-of-range-exception::throw-if-null-or-white-space system-argument-out-of-range-exception::data system-argument-out-of-range-exception::help-link system-argument-out-of-range-exception::h-result system-argument-out-of-range-exception::inner-exception system-argument-out-of-range-exception::source system-argument-out-of-range-exception::stack-trace system-argument-out-of-range-exception::target-site system-argument-out-of-range-exception::get-base-exception system-argument-out-of-range-exception::add-serialize-object-state system-argument-out-of-range-exception::remove-serialize-object-state system-argument-out-of-range-exception::equals system-argument-out-of-range-exception::equals* system-argument-out-of-range-exception::finalize system-argument-out-of-range-exception::get-hash-code system-argument-out-of-range-exception::memberwise-clone system-argument-out-of-range-exception::reference-equals) ':system-argument-out-of-range-exception)
+(cl:import '(system-argument-exception::param-name system-argument-exception::throw-if-null-or-empty system-argument-exception::throw-if-null-or-white-space system-exception::data system-exception::help-link system-exception::h-result system-exception::inner-exception system-exception::source system-exception::stack-trace system-exception::target-site system-exception::get-base-exception system-exception::add-serialize-object-state system-exception::remove-serialize-object-state system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::memberwise-clone system-object::reference-equals system-object::dummy-extension) ':system-argument-out-of-range-exception)
+(cl:export '(system-argument-out-of-range-exception::param-name system-argument-out-of-range-exception::throw-if-null-or-empty system-argument-out-of-range-exception::throw-if-null-or-white-space system-argument-out-of-range-exception::data system-argument-out-of-range-exception::help-link system-argument-out-of-range-exception::h-result system-argument-out-of-range-exception::inner-exception system-argument-out-of-range-exception::source system-argument-out-of-range-exception::stack-trace system-argument-out-of-range-exception::target-site system-argument-out-of-range-exception::get-base-exception system-argument-out-of-range-exception::add-serialize-object-state system-argument-out-of-range-exception::remove-serialize-object-state system-argument-out-of-range-exception::equals system-argument-out-of-range-exception::equals* system-argument-out-of-range-exception::finalize system-argument-out-of-range-exception::get-hash-code system-argument-out-of-range-exception::memberwise-clone system-argument-out-of-range-exception::reference-equals system-argument-out-of-range-exception::dummy-extension) ':system-argument-out-of-range-exception)
 
 ;;; system-io-memory-stream: re-exports inherited members from system-io-stream, system-i-async-disposable, system-i-disposable, system-marshal-by-ref-object, system-object
 ;;; Skipped (system-io-memory-stream declares its own): can-read
@@ -2760,8 +2836,8 @@
 ;;; Skipped (system-io-memory-stream declares its own): write-byte
 ;;; Skipped (ambiguous across ancestors: system-marshal-by-ref-object, system-object): memberwise-clone
 (cl:shadowing-import '(system-io-stream::null system-io-stream::close) ':system-io-memory-stream)
-(cl:import '(system-io-stream::can-timeout system-io-stream::read-timeout system-io-stream::write-timeout system-io-stream::begin-read system-io-stream::begin-write system-io-stream::create-wait-handle system-io-stream::end-read system-io-stream::end-write system-io-stream::object-invariant system-io-stream::read-at-least system-io-stream::read-at-least-async system-io-stream::read-exactly system-io-stream::read-exactly-async system-io-stream::synchronized system-io-stream::validate-buffer-arguments system-io-stream::validate-copy-to-arguments system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::reference-equals system-object::to-string) ':system-io-memory-stream)
-(cl:export '(system-io-memory-stream::null system-io-memory-stream::can-timeout system-io-memory-stream::read-timeout system-io-memory-stream::write-timeout system-io-memory-stream::begin-read system-io-memory-stream::begin-write system-io-memory-stream::close system-io-memory-stream::create-wait-handle system-io-memory-stream::end-read system-io-memory-stream::end-write system-io-memory-stream::object-invariant system-io-memory-stream::read-at-least system-io-memory-stream::read-at-least-async system-io-memory-stream::read-exactly system-io-memory-stream::read-exactly-async system-io-memory-stream::synchronized system-io-memory-stream::validate-buffer-arguments system-io-memory-stream::validate-copy-to-arguments system-io-memory-stream::get-lifetime-service system-io-memory-stream::initialize-lifetime-service system-io-memory-stream::equals system-io-memory-stream::equals* system-io-memory-stream::finalize system-io-memory-stream::get-hash-code system-io-memory-stream::get-type system-io-memory-stream::reference-equals system-io-memory-stream::to-string) ':system-io-memory-stream)
+(cl:import '(system-io-stream::can-timeout system-io-stream::read-timeout system-io-stream::write-timeout system-io-stream::begin-read system-io-stream::begin-write system-io-stream::create-wait-handle system-io-stream::end-read system-io-stream::end-write system-io-stream::object-invariant system-io-stream::read-at-least system-io-stream::read-at-least-async system-io-stream::read-exactly system-io-stream::read-exactly-async system-io-stream::synchronized system-io-stream::validate-buffer-arguments system-io-stream::validate-copy-to-arguments system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::reference-equals system-object::to-string system-object::dummy-extension) ':system-io-memory-stream)
+(cl:export '(system-io-memory-stream::null system-io-memory-stream::can-timeout system-io-memory-stream::read-timeout system-io-memory-stream::write-timeout system-io-memory-stream::begin-read system-io-memory-stream::begin-write system-io-memory-stream::close system-io-memory-stream::create-wait-handle system-io-memory-stream::end-read system-io-memory-stream::end-write system-io-memory-stream::object-invariant system-io-memory-stream::read-at-least system-io-memory-stream::read-at-least-async system-io-memory-stream::read-exactly system-io-memory-stream::read-exactly-async system-io-memory-stream::synchronized system-io-memory-stream::validate-buffer-arguments system-io-memory-stream::validate-copy-to-arguments system-io-memory-stream::get-lifetime-service system-io-memory-stream::initialize-lifetime-service system-io-memory-stream::equals system-io-memory-stream::equals* system-io-memory-stream::finalize system-io-memory-stream::get-hash-code system-io-memory-stream::get-type system-io-memory-stream::reference-equals system-io-memory-stream::to-string system-io-memory-stream::dummy-extension) ':system-io-memory-stream)
 
 ;;; system-io-stream-reader: re-exports inherited members from system-io-text-reader, system-i-disposable, system-marshal-by-ref-object
 ;;; Skipped (system-io-stream-reader declares its own): null
@@ -2788,6 +2864,6 @@
 ;;; Skipped (ambiguous across ancestors: system-collections-specialized-name-object-collection-base, system-runtime-serialization-i-serializable): get-object-data
 ;;; Skipped (ambiguous across ancestors: system-collections-specialized-name-object-collection-base, system-runtime-serialization-i-deserialization-callback): on-deserialization
 ;;; Skipped (system-collections-specialized-name-value-collection declares its own): copy-to
-(cl:import '(system-collections-specialized-name-object-collection-base::read-only? system-collections-specialized-name-object-collection-base::keys system-collections-specialized-name-object-collection-base::base-add system-collections-specialized-name-object-collection-base::base-clear system-collections-specialized-name-object-collection-base::base-get system-collections-specialized-name-object-collection-base::base-get-all-keys system-collections-specialized-name-object-collection-base::base-get-all-values system-collections-specialized-name-object-collection-base::base-get-key system-collections-specialized-name-object-collection-base::base-has-keys system-collections-specialized-name-object-collection-base::base-remove system-collections-specialized-name-object-collection-base::base-remove-at system-collections-specialized-name-object-collection-base::base-set system-collections-i-collection::synchronized? system-collections-i-collection::sync-root system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::memberwise-clone system-object::reference-equals system-object::to-string) ':system-collections-specialized-name-value-collection)
-(cl:export '(system-collections-specialized-name-value-collection::read-only? system-collections-specialized-name-value-collection::keys system-collections-specialized-name-value-collection::base-add system-collections-specialized-name-value-collection::base-clear system-collections-specialized-name-value-collection::base-get system-collections-specialized-name-value-collection::base-get-all-keys system-collections-specialized-name-value-collection::base-get-all-values system-collections-specialized-name-value-collection::base-get-key system-collections-specialized-name-value-collection::base-has-keys system-collections-specialized-name-value-collection::base-remove system-collections-specialized-name-value-collection::base-remove-at system-collections-specialized-name-value-collection::base-set system-collections-specialized-name-value-collection::synchronized? system-collections-specialized-name-value-collection::sync-root system-collections-specialized-name-value-collection::equals system-collections-specialized-name-value-collection::equals* system-collections-specialized-name-value-collection::finalize system-collections-specialized-name-value-collection::get-hash-code system-collections-specialized-name-value-collection::get-type system-collections-specialized-name-value-collection::memberwise-clone system-collections-specialized-name-value-collection::reference-equals system-collections-specialized-name-value-collection::to-string) ':system-collections-specialized-name-value-collection)
+(cl:import '(system-collections-specialized-name-object-collection-base::read-only? system-collections-specialized-name-object-collection-base::keys system-collections-specialized-name-object-collection-base::base-add system-collections-specialized-name-object-collection-base::base-clear system-collections-specialized-name-object-collection-base::base-get system-collections-specialized-name-object-collection-base::base-get-all-keys system-collections-specialized-name-object-collection-base::base-get-all-values system-collections-specialized-name-object-collection-base::base-get-key system-collections-specialized-name-object-collection-base::base-has-keys system-collections-specialized-name-object-collection-base::base-remove system-collections-specialized-name-object-collection-base::base-remove-at system-collections-specialized-name-object-collection-base::base-set system-collections-i-collection::synchronized? system-collections-i-collection::sync-root system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::memberwise-clone system-object::reference-equals system-object::to-string system-object::dummy-extension) ':system-collections-specialized-name-value-collection)
+(cl:export '(system-collections-specialized-name-value-collection::read-only? system-collections-specialized-name-value-collection::keys system-collections-specialized-name-value-collection::base-add system-collections-specialized-name-value-collection::base-clear system-collections-specialized-name-value-collection::base-get system-collections-specialized-name-value-collection::base-get-all-keys system-collections-specialized-name-value-collection::base-get-all-values system-collections-specialized-name-value-collection::base-get-key system-collections-specialized-name-value-collection::base-has-keys system-collections-specialized-name-value-collection::base-remove system-collections-specialized-name-value-collection::base-remove-at system-collections-specialized-name-value-collection::base-set system-collections-specialized-name-value-collection::synchronized? system-collections-specialized-name-value-collection::sync-root system-collections-specialized-name-value-collection::equals system-collections-specialized-name-value-collection::equals* system-collections-specialized-name-value-collection::finalize system-collections-specialized-name-value-collection::get-hash-code system-collections-specialized-name-value-collection::get-type system-collections-specialized-name-value-collection::memberwise-clone system-collections-specialized-name-value-collection::reference-equals system-collections-specialized-name-value-collection::to-string system-collections-specialized-name-value-collection::dummy-extension) ':system-collections-specialized-name-value-collection)
 

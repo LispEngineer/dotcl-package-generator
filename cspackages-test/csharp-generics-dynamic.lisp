@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 37
-;;; Creation Date: 2026-07-05T18:46:38Z
+;;; Generator Version: 38
+;;; Creation Date: 2026-07-06T00:35:02Z
 
 (cl:in-package :csharp-generics-dynamic)
 
@@ -45,6 +45,11 @@ System.Object: to-string (system-object:to-string)
 System.String: to-string (system-string:to-string)
 System.Numerics.Vector3: to-string (system-numerics-vector3:to-string)
 System.Numerics.Vector4: to-string (system-numerics-vector4:to-string)
+"))
+
+(cl:defgeneric dummy-extension (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Object: dummy-extension (system-object:dummy-extension)
 "))
 
 (cl:defgeneric chars (obj! cl:&rest args)
@@ -443,9 +448,82 @@ System.Numerics.Vector3: length-squared (system-numerics-vector3:length-squared)
 System.Numerics.Vector4: length-squared (system-numerics-vector4:length-squared)
 "))
 
+(cl:defgeneric as-vector2 (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: as-vector2 (system-numerics-vector3:as-vector2)
+System.Numerics.Vector4: as-vector2 (system-numerics-vector4:as-vector2)
+"))
+
+(cl:defgeneric as-vector4 (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: as-vector4 (system-numerics-vector3:as-vector4)
+"))
+
+(cl:defgeneric as-vector4-unsafe (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: as-vector4-unsafe (system-numerics-vector3:as-vector4-unsafe)
+"))
+
+(cl:defgeneric extract-most-significant-bits (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: extract-most-significant-bits (system-numerics-vector3:extract-most-significant-bits)
+System.Numerics.Vector4: extract-most-significant-bits (system-numerics-vector4:extract-most-significant-bits)
+"))
+
+(cl:defgeneric get-element (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: get-element (system-numerics-vector3:get-element)
+System.Numerics.Vector4: get-element (system-numerics-vector4:get-element)
+"))
+
+(cl:defgeneric store (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: store (system-numerics-vector3:store)
+System.Numerics.Vector4: store (system-numerics-vector4:store)
+"))
+
+(cl:defgeneric store-aligned (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: store-aligned (system-numerics-vector3:store-aligned)
+System.Numerics.Vector4: store-aligned (system-numerics-vector4:store-aligned)
+"))
+
+(cl:defgeneric store-aligned-non-temporal (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: store-aligned-non-temporal (system-numerics-vector3:store-aligned-non-temporal)
+System.Numerics.Vector4: store-aligned-non-temporal (system-numerics-vector4:store-aligned-non-temporal)
+"))
+
+(cl:defgeneric to-scalar (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: to-scalar (system-numerics-vector3:to-scalar)
+System.Numerics.Vector4: to-scalar (system-numerics-vector4:to-scalar)
+"))
+
+(cl:defgeneric with-element (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector3: with-element (system-numerics-vector3:with-element)
+System.Numerics.Vector4: with-element (system-numerics-vector4:with-element)
+"))
+
 (cl:defgeneric w (obj! cl:&rest args)
   (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
 System.Numerics.Vector4: w (system-numerics-vector4:w)
+"))
+
+(cl:defgeneric as-plane (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector4: as-plane (system-numerics-vector4:as-plane)
+"))
+
+(cl:defgeneric as-quaternion (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector4: as-quaternion (system-numerics-vector4:as-quaternion)
+"))
+
+(cl:defgeneric as-vector3 (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+System.Numerics.Vector4: as-vector3 (system-numerics-vector4:as-vector3)
 "))
 
 (cl:defgeneric (cl:setf item) (new-value obj! cl:&rest args)
@@ -501,6 +579,8 @@ System.Numerics.Vector4: (cl:setf w) (cl:setf (system-numerics-vector4:w ...))
                 (cl:apply (cl:function system-object:memberwise-clone) obj! args)))
     (cl:eval `(cl:defmethod to-string ((obj! ,spec) cl:&rest args)
                 (cl:apply (cl:function system-object:to-string) obj! args)))
+    (cl:eval `(cl:defmethod dummy-extension ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-object:dummy-extension) obj! args)))
     ))
 
 ;; System.String (system-string)
@@ -746,6 +826,26 @@ System.Numerics.Vector4: (cl:setf w) (cl:setf (system-numerics-vector4:w ...))
                 (cl:apply (cl:function system-numerics-vector3:to-string) obj! args)))
     (cl:eval `(cl:defmethod try-copy-to ((obj! ,spec) cl:&rest args)
                 (cl:apply (cl:function system-numerics-vector3:try-copy-to) obj! args)))
+    (cl:eval `(cl:defmethod as-vector2 ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:as-vector2) obj! args)))
+    (cl:eval `(cl:defmethod as-vector4 ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:as-vector4) obj! args)))
+    (cl:eval `(cl:defmethod as-vector4-unsafe ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:as-vector4-unsafe) obj! args)))
+    (cl:eval `(cl:defmethod extract-most-significant-bits ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:extract-most-significant-bits) obj! args)))
+    (cl:eval `(cl:defmethod get-element ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:get-element) obj! args)))
+    (cl:eval `(cl:defmethod store ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:store) obj! args)))
+    (cl:eval `(cl:defmethod store-aligned ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:store-aligned) obj! args)))
+    (cl:eval `(cl:defmethod store-aligned-non-temporal ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:store-aligned-non-temporal) obj! args)))
+    (cl:eval `(cl:defmethod to-scalar ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:to-scalar) obj! args)))
+    (cl:eval `(cl:defmethod with-element ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector3:with-element) obj! args)))
     (cl:eval `(cl:defmethod (cl:setf x) (new-value (obj! ,spec) cl:&rest args)
                 (cl:apply (cl:function (cl:setf system-numerics-vector3:x)) new-value obj! args)))
     (cl:eval `(cl:defmethod (cl:setf y) (new-value (obj! ,spec) cl:&rest args)
@@ -785,6 +885,28 @@ System.Numerics.Vector4: (cl:setf w) (cl:setf (system-numerics-vector4:w ...))
                 (cl:apply (cl:function system-numerics-vector4:to-string) obj! args)))
     (cl:eval `(cl:defmethod try-copy-to ((obj! ,spec) cl:&rest args)
                 (cl:apply (cl:function system-numerics-vector4:try-copy-to) obj! args)))
+    (cl:eval `(cl:defmethod as-plane ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:as-plane) obj! args)))
+    (cl:eval `(cl:defmethod as-quaternion ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:as-quaternion) obj! args)))
+    (cl:eval `(cl:defmethod as-vector2 ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:as-vector2) obj! args)))
+    (cl:eval `(cl:defmethod as-vector3 ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:as-vector3) obj! args)))
+    (cl:eval `(cl:defmethod extract-most-significant-bits ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:extract-most-significant-bits) obj! args)))
+    (cl:eval `(cl:defmethod get-element ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:get-element) obj! args)))
+    (cl:eval `(cl:defmethod store ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:store) obj! args)))
+    (cl:eval `(cl:defmethod store-aligned ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:store-aligned) obj! args)))
+    (cl:eval `(cl:defmethod store-aligned-non-temporal ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:store-aligned-non-temporal) obj! args)))
+    (cl:eval `(cl:defmethod to-scalar ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:to-scalar) obj! args)))
+    (cl:eval `(cl:defmethod with-element ((obj! ,spec) cl:&rest args)
+                (cl:apply (cl:function system-numerics-vector4:with-element) obj! args)))
     (cl:eval `(cl:defmethod (cl:setf w) (new-value (obj! ,spec) cl:&rest args)
                 (cl:apply (cl:function (cl:setf system-numerics-vector4:w)) new-value obj! args)))
     (cl:eval `(cl:defmethod (cl:setf x) (new-value (obj! ,spec) cl:&rest args)

@@ -1784,3 +1784,97 @@ Verified with a dedicated unit test asserting `collect-class-instance-generics` 
 colliding with unrelated `AddClick()`/`RemoveClick()` methods, rather than asserting one
 hardcoded expected string — this is precisely the class of bug (two functions silently
 disagreeing on a name) `class-member-names-excluding-events` was built to prevent.
+
+## Extension Methods (Version 38)
+
+See `doc/plan-v38.md` for the full design document this implements (the "Part A" section).
+
+### What changed and why
+
+A C# extension method — a `static` method on a `static` holder class whose first parameter
+carries the `this` modifier — was previously invisible to a generated package: reflection
+already captured it (`AssemblyToLispy.cs`'s `:extension-method`/`:extension-this` flags, added
+in Phase 2E, long before this version), but nothing in the generator ever read those flags. A
+real-world motivating case is MonoGameGum's `GraphicalUiElementExtensionMethods`, a static class
+of extension methods meant to be called as if they were instance methods on
+`GraphicalUiElement`. Version 38 injects matching extension methods directly into the extended
+class's own package, as ordinary `obj!`-first wrapper functions indistinguishable in calling
+convention from a real instance method.
+
+### Matching is v1/exact-concrete-only, by design
+
+`build-extension-method-index` (a new global index over every provided assembly's metadata,
+mirroring `build-metadata-index`/`build-simple-name-index`'s "scan everything once, bucket by
+key" shape) maps each extension method's `this`-parameter type's exact `:fully-qualified-name`
+string to a list of `(method-plist holder-plist holder-assembly-name)` entries. A class is only
+offered the extension methods bucketed under its own exact FQ name — no base-class, interface,
+or open-generic (`this IEnumerable<T>`) matching. This was a locked design decision, not an
+oversight: base-class/interface/generic matching is real future work (see `doc/plan-v38.md`'s
+"Deferred / Future" section) but was judged too large and too risky to bundle with the first cut.
+An open-generic `this` type (e.g. LINQ's `` IEnumerable`1[TSource] ``) is additionally guarded via
+`generic-type-p` when building the index, though in practice this is belt-and-suspenders: such a
+type string never naturally equals any real type's own `:fully-qualified-name` anyway (a real
+open generic type definition's FQ name has no bracketed arguments at all, e.g.
+`` System.Collections.Generic.List`1 ``).
+
+### Enabled by default — the one deliberate inconsistency with every other sticky flag
+
+Every other per-class/sticky-default flag pair in this file (`--export-parents`/
+`--export-all-parents`, `--defgeneric`/`--enable-defgeneric`, etc.) defaults OFF. Extension-method
+injection is the one exception: `--extension-methods`/`--enable-extension-methods` default ON
+(`Program.cs`'s `enableExtensionMethods = true`). This was an explicit requirements decision:
+injecting a class's own genuinely-applicable extension methods was judged to be the common case a
+user would want without having to ask for it, unlike the other opt-ins (which each have real
+downsides — larger generated surface, ancestor-graph expansion, CLOS collision risk — that
+justify defaulting off). `--no-extension-methods`/`--no-enable-extension-methods` opt back out.
+
+### Three skip passes, in a specific order
+
+`compute-matched-extensions-for-class` applies exactly the precedence `doc/plan-v38.md` specifies,
+and no other: (1) a candidate that is dirty (any non-`this` parameter is `ref`/`out`/`params`/has
+a default) or generic (the method's own type argument(s), or — a rarer edge case — a non-generic
+extension method on a *generic holder class* referencing that class's own open type parameter in
+a non-`this` parameter or return type) is skipped individually, before any name-collision
+reasoning; (2) of what remains, a candidate whose Lisp name (`map-member-name` of its clean
+C# name) collides with the class's own already-declared export set
+(`compute-package-exports-and-shadows`, called with no `matched-extensions` of its own — the
+question here is only "does the class already have a real member of this name," not "do two
+extension methods collide with each other") is skipped, since the class's own member always wins;
+(3) of what remains after that, candidates are grouped by Lisp name, and any group of more than
+one entry is skipped *in full*, as ambiguous — extension-method overload dispatch (generalizing
+the Master Wrapper to dispatch across different holders) is deferred, exactly like a genuinely
+dirty overload is today. Each skip is documented with a reason-specific comment in the generated
+class file, following this codebase's established "document what can't be safely generated"
+convention (dirty overloads, unsupported indexers).
+
+`extension-method-dirty-or-generic-reason` deliberately does not reuse `dirty-method-p`/
+`clean-method-p` directly: both operate on a method's *full* `:parameters` list, which for an
+extension method includes the `this` parameter at index 0 — a parameter that is never itself
+dirty or generic in any real C# extension method, but stripping it correctly before applying the
+same checks needed its own small function rather than a call-site hack.
+
+### Wiring: a third slot needing three-way agreement, same shape as Version 32's events
+
+Like Version 32's events (`class-member-names-excluding-events`) and Version 37's fix
+(`collect-class-instance-generics` gaining `constant-properties-list`), injecting new exported
+names/function bodies requires the same three functions to agree on them:
+`compute-package-exports-and-shadows` (defpackage's `:export` list),  `generate-class-file` (the
+actual `cl:defun` bodies), and `collect-class-instance-generics` (unified-generics eligibility,
+per the Version 37 principle that unification should cover every generated `obj!`-first wrapper,
+not just the ones that happen to have started life as a real C# instance method). All three
+gained an `&optional matched-extensions` parameter. `generate-assembly-packages-batch` computes
+each opted-in resolved-class's `:matched-extensions`/`:skipped-extensions` once, via the new
+`compute-matched-extensions-for-class`, and stores both directly onto the resolved-class plist
+(mutating the existing `nil`-initialized slots `make-resolved-class` reserves for them) *before*
+`packages.lisp`/class-file/generics-file generation runs — all of which read those two slots back
+off the plist rather than recomputing anything, so there is exactly one source of truth per class
+for "which extension methods actually got injected."
+
+A surviving extension method is emitted calling `dotnet:static` on the *holder* type's FQ name
+(a literal string baked into the generated code, e.g. `"MonoGameGum.GraphicalUiElementExtensionMethods"`)
+— never `<type-str>`, which names the class *being extended*, not the class that declares the
+static method — with `obj!` threaded through as the method's first positional argument, mirroring
+exactly how C#'s own extension-method call sugar desugars. The docstring names the holder's FQ
+name and owning assembly, so a user reading generated code (or `describe`-ing the function at a
+REPL) can tell at a glance that a given function is not really native to the class whose package
+it lives in.

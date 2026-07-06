@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Type
-;;; Generator Version: 37
-;;; Creation Date: 2026-07-05T18:46:38Z
+;;; Generator Version: 38
+;;; Creation Date: 2026-07-06T00:35:02Z
 
 (cl:in-package :system-type)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Type"))
 (cl:defconstant <type-str> "System.Type")
-(cl:defconstant <creation> "2026-07-05T18:46:38Z")
-(cl:defconstant <version> 37)
+(cl:defconstant <creation> "2026-07-06T00:35:02Z")
+(cl:defconstant <version> 38)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -1582,4 +1582,78 @@ Parameters:
 Returns: A System.String representing the name of the current System.Type.
 "
   (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "ToString"))
+
+;; Extension methods (exact match on this == System.Type):
+(cl:defun get-type-info (obj!)
+  "Extension method from System.Reflection.IntrospectionExtensions (assembly System.Runtime.dll).
+Summary: Returns the System.Reflection.TypeInfo representation of the specified type.
+Returns: The converted object.
+"
+  (dotnet:static "System.Reflection.IntrospectionExtensions" "GetTypeInfo" obj!))
+
+(cl:defun get-runtime-event (obj! name)
+  "Extension method from System.Reflection.RuntimeReflectionExtensions (assembly System.Runtime.dll).
+Summary: Retrieves an object that represents the specified event.
+Returns: An object that represents the specified event, or if the event is not found.
+Parameters:
+  - name (System.String): The name of the event.
+"
+  (dotnet:static "System.Reflection.RuntimeReflectionExtensions" "GetRuntimeEvent" obj! name))
+
+(cl:defun get-runtime-events (obj!)
+  "Extension method from System.Reflection.RuntimeReflectionExtensions (assembly System.Runtime.dll).
+Summary: Retrieves a collection that represents all the events defined on a specified type.
+Returns: A collection of events for the specified type.
+"
+  (dotnet:static "System.Reflection.RuntimeReflectionExtensions" "GetRuntimeEvents" obj!))
+
+(cl:defun get-runtime-field (obj! name)
+  "Extension method from System.Reflection.RuntimeReflectionExtensions (assembly System.Runtime.dll).
+Summary: Retrieves an object that represents a specified field.
+Returns: An object that represents the specified field, or if the field is not found.
+Parameters:
+  - name (System.String): The name of the field.
+"
+  (dotnet:static "System.Reflection.RuntimeReflectionExtensions" "GetRuntimeField" obj! name))
+
+(cl:defun get-runtime-fields (obj!)
+  "Extension method from System.Reflection.RuntimeReflectionExtensions (assembly System.Runtime.dll).
+Summary: Retrieves a collection that represents all the fields defined on a specified type.
+Returns: A collection of fields for the specified type.
+"
+  (dotnet:static "System.Reflection.RuntimeReflectionExtensions" "GetRuntimeFields" obj!))
+
+(cl:defun get-runtime-method (obj! name parameters)
+  "Extension method from System.Reflection.RuntimeReflectionExtensions (assembly System.Runtime.dll).
+Summary: Retrieves an object that represents a specified method.
+Returns: An object that represents the specified method, or if the method is not found.
+Parameters:
+  - name (System.String): The name of the method.
+  - parameters (System.Type[]): An array that contains the method's parameters.
+"
+  (dotnet:static "System.Reflection.RuntimeReflectionExtensions" "GetRuntimeMethod" obj! name parameters))
+
+(cl:defun get-runtime-methods (obj!)
+  "Extension method from System.Reflection.RuntimeReflectionExtensions (assembly System.Runtime.dll).
+Summary: Retrieves a collection that represents all methods defined on a specified type.
+Returns: A collection of methods for the specified type.
+"
+  (dotnet:static "System.Reflection.RuntimeReflectionExtensions" "GetRuntimeMethods" obj!))
+
+(cl:defun get-runtime-properties (obj!)
+  "Extension method from System.Reflection.RuntimeReflectionExtensions (assembly System.Runtime.dll).
+Summary: Retrieves a collection that represents all the properties defined on a specified type.
+Returns: A collection of properties for the specified type.
+"
+  (dotnet:static "System.Reflection.RuntimeReflectionExtensions" "GetRuntimeProperties" obj!))
+
+(cl:defun get-runtime-property (obj! name)
+  "Extension method from System.Reflection.RuntimeReflectionExtensions (assembly System.Runtime.dll).
+Summary: Retrieves an object that represents a specified property.
+Returns: An object that represents the specified property, or if the property is not found.
+Parameters:
+  - name (System.String): The name of the property.
+"
+  (dotnet:static "System.Reflection.RuntimeReflectionExtensions" "GetRuntimeProperty" obj! name))
+
 

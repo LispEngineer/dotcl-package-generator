@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Object
-;;; Generator Version: 37
-;;; Creation Date: 2026-07-05T18:46:38Z
+;;; Generator Version: 38
+;;; Creation Date: 2026-07-06T00:35:02Z
 
 (cl:in-package :system-object)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Object"))
 (cl:defconstant <type-str> "System.Object")
-(cl:defconstant <creation> "2026-07-05T18:46:38Z")
-(cl:defconstant <version> 37)
+(cl:defconstant <creation> "2026-07-06T00:35:02Z")
+(cl:defconstant <version> 38)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -74,4 +74,10 @@ Parameters:
 Returns: A string that represents the current object.
 "
   (dotnet:invoke (cl:the (dotnet "System.Object") obj!) "ToString"))
+
+;; Extension methods (exact match on this == System.Object):
+(cl:defun dummy-extension (obj! value)
+  "Extension method from AssemblyToLispyTestTarget.Extensions (assembly AssemblyToLispyTestTarget.dll)."
+  (dotnet:static "AssemblyToLispyTestTarget.Extensions" "DummyExtension" obj! value))
+
 

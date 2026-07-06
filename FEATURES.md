@@ -689,6 +689,40 @@ needed).
 
 
 
+## Extension Methods
+
+**Summary:** `--extension-methods`/`--no-extension-methods` (per-class, plus sticky
+`--enable-extension-methods`/`--no-enable-extension-methods` CLI defaults — **ON by
+default**, unlike every other sticky flag in this tool) injects matching C# extension
+methods, found anywhere in the provided assemblies, into a class's own generated package
+as ordinary `obj!`-first wrapper functions, callable exactly like a real instance method.
+
+Matching is **exact and concrete only**: an extension method (a `static` method on a
+`static` holder class whose first parameter is the `this` parameter) is offered to a class
+only when its `this` parameter's type is precisely that class's fully-qualified name — no
+base-class, interface, or open-generic (`this IEnumerable<T>`) matching is attempted. A
+candidate is skipped, with a documenting comment, when:
+
+* it is **dirty** (a non-`this` parameter has `ref`/`out`/`params`/a default) or **generic**
+  (the method's own type argument(s), or a non-generic method on a generic holder class
+  referencing that class's own open type parameter),
+* its Lisp name **collides with a member the class already declares** (the class's own
+  member always wins), or
+* its Lisp name is **shared by more than one surviving candidate** (ambiguous —
+  extension-method overload dispatch is deferred, like a genuinely dirty method overload).
+
+A surviving extension method is emitted calling `dotnet:static` on the *holder* type (not
+the class being extended), with `obj!` threaded through as the first argument — mirroring
+exactly how C#'s own extension-method call syntax desugars — and a docstring naming the
+holder's fully-qualified name and owning assembly. It also participates in
+`--defgeneric`/`--defgeneric-dynamic` unification like any other `obj!`-first wrapper.
+
+See `doc/plan-v38.md` and `doc/generator-design-notes.md`'s "Extension Methods (Version 38)"
+section for the full design, including the deferred base-class/interface/generic-matching
+and overload-dispatch follow-ups.
+
+
+
 ## Nested and Generic Types
 
 **Summary:** a nested type's `+`-separated name and an open generic type's backtick

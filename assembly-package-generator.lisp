@@ -69,7 +69,8 @@
    34 - Added optional per-class unification of instance methods and instance property/field accessors into a single shared CSHARP-GENERICS package of CLOS generic functions dispatching on C# runtime type (--defgeneric/--no-defgeneric, plus sticky --enable-defgeneric/--no-enable-defgeneric CLI defaults), per doc/make-everything-defgeneric.md. Program.cs's manifest now carries a :defgeneric boolean per requested class (make-resolved-class/resolve-batch-entry thread it through as a fourth resolved-class field, defaulting to nil for ancestor-only classes exactly like the three export-* flags). collect-class-instance-generics independently re-derives, for one class-plist, the wrapper names whose Lisp signature begins with obj! as the sole/first required argument (instance methods, instance property/field getters, instance indexer getters, and their (cl:setf ...) counterparts), reusing map-member-name/method-name-wrapper-names so the actual name computation cannot drift from compute-package-exports-and-shadows/generate-class-file; it deliberately excludes static members (no obj! receiver), generic/type-parameterized instance methods (their wrapper's lambda list puts the type argument(s) before obj!), and overloaded indexers (no generated wrapper exists to forward to). compute-defgeneric-model aggregates every :defgeneric-true class's collected names into the CSHARP-GENERICS defpackage's :export/:shadow lists (emitted by generate-batch-packages-file, right after the CSHARP-ASSEMBLY-UTILS defpackage) and a per-name specializer list; generate-batch-generics-file (a new sibling file to csharp-assembly-utils.lisp, emitted after every class file so it can depend on their packages) writes one cl:defgeneric per unified name -- (name obj! cl:&rest args), or ((cl:setf name) new-value obj! cl:&rest args) for a setter -- plus, per opted-in class, one cl:eval-when (:load-toplevel :execute) block installing that class's defmethods. Each defmethod is installed by evaluating a backquoted cl:defmethod form specializing on (cl:class-name (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\" (dotnet:resolve-type fq-name))) fetched fresh at load time, deliberately never a symbol hardcoded at generation time: DotCL names a C# type's CLOS class by its simple name only when free, or by its unique FullName when a same-simple-name type from a different namespace has already claimed it, and which type wins that race is load-order-dependent and unknowable at generation time (see Runtime.CLOS.cs's EnsureDotNetTypeClass) -- reading the class's own class-name at load time is immune to this, since it is always the exact symbol DotCL registered for that specific class. Every forwarding defmethod body is a bare cl:apply of the class's own already-generated wrapper function, accepting the small dispatch/apply overhead for a v1 implementation. generate-batch-asd-file adds the CSHARP-GENERICS :file component (depending on \"packages\", \"csharp-assembly-utils\", and every opted-in class's own package file) only when at least one class opted in.
    35 - Version 34's implementation was judged too ugly to be the only option (its cl:eval-of-a-backquoted-defmethod mechanism, needed only because the specializer symbol is unknowable until DotCL resolves the class object at load time) -- see PLAN.md's \"Improve Turn Everything into Generic Methods\" section. That entire mechanism is renamed --defgeneric-dynamic/--no-defgeneric-dynamic (per-class) and --enable-defgeneric-dynamic/--no-enable-defgeneric-dynamic (sticky), its package/file renamed csharp-generics-dynamic (*CSHARP-GENERICS-DYNAMIC-PACKAGE-NAME*, compute-defgeneric-dynamic-model, generate-batch-generics-dynamic-file), and its manifest key renamed :defgeneric-dynamic -- purely a rename, no behavior change, still the fully collision-proof choice for when that robustness is worth the uglier generated code (doc/make-everything-defgeneric-dynamic.md). The now-freed original names (--defgeneric/--no-defgeneric, --enable-defgeneric/--no-enable-defgeneric, csharp-generics package/file, :defgeneric manifest key) are given to a NEW, independent, orthogonal implementation of the design's other original option (\"Simple + documented caveat\"): compute-defgeneric-model/generate-batch-generics-file emit a plain top-level cl:defmethod per unified name per opted-in class -- no cl:eval, no eval-when, no backquote, no runtime class-object lookup -- specializing directly on a LITERAL symbol computed at generation time, dotcl-internal::|<name>|, where <name> is the new dotnet-type-simple-name helper's exact reproduction of .NET reflection's Type.Name (distinct from the pre-existing simple-type-name, which strips the backtick generic-arity suffix for display purposes and never splits on CIL's '+' nested-type separator, so it does not match what DotCL's EnsureDotNetTypeClass, Runtime.CLOS.cs, actually calls Startup.Sym(type.Name) with). The caveat this accepts: if two --defgeneric-opted-in classes in the same batch share a simple name across different namespaces, DotCL's own class-naming collision handling means only one keeps the simple-name symbol at load time (load-order-dependent, unknowable at generation time) -- dispatch for the other, whose defmethod here still assumes the simple name, would be wrong. Documented with a comment above every class's defmethod block in the generated file, and in doc/make-everything-defgeneric.md's \"Static specializer collision caveat\" section, rather than guarded against. Both variants are fully independent and orthogonal: a class may opt into either, both, or neither, each contributing its own defpackage entry/generics file/.asd component; %compute-defgeneric-model (shared internal helper, parameterized on the :defgeneric or :defgeneric-dynamic resolved-class flag key) and emit-defgeneric-defpackage (shared defpackage-emission helper) avoid duplicating the identical aggregation/export-list logic between the two variants' public compute-defgeneric-model/compute-defgeneric-dynamic-model and packages.lisp emission. collect-class-instance-generics (which wrapper names are eligible at all) is entirely mechanism-agnostic and is reused verbatim by both.
    36 - The static --defgeneric variant's per-class collision comment (Version 35) now reports ACTUAL, KNOWN conflicts instead of a purely hypothetical warning. build-simple-name-index builds a DOTNET-TYPE-SIMPLE-NAME -> (fully-qualified-name...) hash table from build-metadata-index's full per-batch metadata index (every type in every provided assembly, not just requested/generated ones); classify-simple-name-conflicts, given one class's fully-qualified-name plus that index and a hash set of every fully-qualified-name actually generated as its own package in this batch (from ALL-RESOLVED), returns every other type sharing that simple name, each tagged :ACTUAL (also generated in this batch -- both types' files will call EnsureDotNetTypeClass at load time, so DotCL's naming race is guaranteed to actually happen) or :POSSIBLE (merely reflected in the provided assemblies' metadata, not itself generated here -- no guaranteed collision from this run's own output alone). generate-batch-generics-file's per-class comment block now enumerates these findings by name, or states plainly that none are known, rather than a generic \"if another class collides\" warning; generate-assembly-packages-batch builds the metadata index once (previously scoped only to Phase B's ancestor expansion) and threads it plus the resolved-fq-name set down as two new optional arguments. Empirically confirmed accurate against the Makefile smoke test's real System.Threading.Timer/System.Timers.Timer collision pair (both report each other as ACTUAL).
-   37 - Fixed a gap in collect-class-instance-generics (Version 34): it walked :fields/:properties/:methods but never :events, so a class's add-X/remove-X instance-event wrapper pair (added in Version 32, two versions before this collector was written) was silently missing from both the --defgeneric and --defgeneric-dynamic unified-generics packages, even though add-X/remove-X already have the exact same (name obj! ...) shape every other collected wrapper has -- reported against a real Dungeon Slime class (a MonoGameGum ButtonBase's Click event) missing its add-click. Both add-X and remove-X are now collected into method-names (never setter-names -- neither is a (cl:setf ...) counterpart of the other). Correctly resolving an event's name requires the exact same non-event taken-names set generate-class-file/compute-package-exports-and-shadows compute for event-wrapper-names' three-tier collision escalation (add-X/remove-X -> add-X-event/remove-X-event -> add-X!/remove-X!, see Version 32) -- collect-class-instance-generics now also derives constructors/literal-fields/const-fields/const-props/writeable-static-props/mutable-static-fields (mirroring compute-package-exports-and-shadows's own local bindings) purely to build that taken-names set via the existing class-member-names-excluding-events helper, so it can never choose a different escalation tier than what's actually emitted. This requires a class's constant-properties-list, which compute-package-exports-and-shadows/generate-class-file already receive but collect-class-instance-generics previously did not; it is now a required second parameter, with %compute-defgeneric-model's sole call site passing the resolved-class plist's own :constant-properties.")
+   37 - Fixed a gap in collect-class-instance-generics (Version 34): it walked :fields/:properties/:methods but never :events, so a class's add-X/remove-X instance-event wrapper pair (added in Version 32, two versions before this collector was written) was silently missing from both the --defgeneric and --defgeneric-dynamic unified-generics packages, even though add-X/remove-X already have the exact same (name obj! ...) shape every other collected wrapper has -- reported against a real Dungeon Slime class (a MonoGameGum ButtonBase's Click event) missing its add-click. Both add-X and remove-X are now collected into method-names (never setter-names -- neither is a (cl:setf ...) counterpart of the other). Correctly resolving an event's name requires the exact same non-event taken-names set generate-class-file/compute-package-exports-and-shadows compute for event-wrapper-names' three-tier collision escalation (add-X/remove-X -> add-X-event/remove-X-event -> add-X!/remove-X!, see Version 32) -- collect-class-instance-generics now also derives constructors/literal-fields/const-fields/const-props/writeable-static-props/mutable-static-fields (mirroring compute-package-exports-and-shadows's own local bindings) purely to build that taken-names set via the existing class-member-names-excluding-events helper, so it can never choose a different escalation tier than what's actually emitted. This requires a class's constant-properties-list, which compute-package-exports-and-shadows/generate-class-file already receive but collect-class-instance-generics previously did not; it is now a required second parameter, with %compute-defgeneric-model's sole call site passing the resolved-class plist's own :constant-properties.
+   38 - Added optional per-class injection of C# extension methods (--extension-methods/--no-extension-methods, plus sticky --enable-extension-methods/--no-enable-extension-methods CLI defaults -- ON by default, unlike every other sticky flag in this file, since injecting a class's own applicable extension methods is expected to be the common case), per doc/plan-v38.md. Matching is v1/exact-concrete-only: an extension method (a static method on a static holder type whose first parameter carries :extension-this t, already reflected by AssemblyToLispy.cs since Phase 2E -- no new metadata was needed) is a candidate for a class only when its 'this' parameter's :type is string= to the class's own :fully-qualified-name; an open-generic 'this' type (e.g. LINQ's IEnumerable`1[TSource]) never naturally matches a concrete class's FQ name and is additionally guarded via generic-type-p in build-extension-method-index (a new global index over every provided assembly's metadata, mirroring build-metadata-index/build-simple-name-index). compute-matched-extensions-for-class applies three skip passes per class -- dirty (ref/out/params/default) or generic (the method's own type argument(s), or a non-generic method on a generic holder referencing the holder's own open type parameter) candidates are skipped individually; of what remains, a Lisp name colliding with the class's own declared export set is skipped (the class's real member wins); of what remains after that, a Lisp name shared by more than one surviving candidate is skipped in full as ambiguous (extension-method overload dispatch is deferred) -- each skip documented with a comment, mirroring the existing dirty-overload/unsupported-indexer convention. A surviving extension method is emitted as an ordinary obj!-first wrapper forwarding to dotnet:static on the HOLDER type (not <type-str>, which names the class being extended, not the class declaring the method), with a docstring naming the holder's fully-qualified name and owning assembly. compute-package-exports-and-shadows, generate-class-file, and collect-class-instance-generics (so an injected extension wrapper is also eligible for --defgeneric/--defgeneric-dynamic unification, per the Version 37 principle that unification should cover every generated obj!-first wrapper) each gained an &optional matched-extensions parameter so the three can never disagree on a class's actual export list; generate-assembly-packages-batch computes and stores each opted-in resolved-class's :matched-extensions/:skipped-extensions (via the new compute-matched-extensions-for-class) into the resolved-class plist itself, before packages.lisp/class-file/generics-file generation -- all of which now read those two slots back off the plist -- runs.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -1227,14 +1228,19 @@
        (values tier2-add tier2-remove))
       (t (values (format nil "~A!" tier1-add) (format nil "~A!" tier1-remove))))))
 
-(defun compute-package-exports-and-shadows (class-plist constant-properties-list)
+(defun compute-package-exports-and-shadows (class-plist constant-properties-list &optional matched-extensions)
   "Returns (values exports shadows) for CLASS-PLIST given
    CONSTANT-PROPERTIES-LIST, deduped, with CL-symbol conflicts detected in
    SHADOWS. This mirrors the field/property/method-group walk
    generate-class-file performs for its own body generation, but exists
    separately so packages.lisp (via generate-batch-packages-file) can build
    each class's defpackage form without generate-class-file emitting one
-   itself."
+   itself. MATCHED-EXTENSIONS (see compute-matched-extensions-for-class,
+   nil unless this class opted into --extension-methods -- Version 38,
+   doc/plan-v38.md), when supplied, contributes each surviving injected
+   extension wrapper's own Lisp name to EXPORTS, exactly as generate-
+   class-file emits it, so the two can never disagree on a class's actual
+   export list."
   (let* ((fields (getf class-plist :fields))
          (properties (getf class-plist :properties))
          (methods (getf class-plist :methods))
@@ -1370,6 +1376,13 @@
         (push add-name exports)
         (push remove-name exports)))
 
+    ;; Collect injected extension-method wrapper exports (Version 38). These
+    ;; already survived compute-matched-extensions-for-class's own-member
+    ;; collision check (against this exact export set, sans extensions), so
+    ;; no further collision handling is needed here -- just export them.
+    (dolist (ext matched-extensions)
+      (push (map-member-name (getf (first ext) :name)) exports))
+
     ;; Remove duplicates from exports while preserving order
     (setf exports (remove-duplicates (nreverse exports) :test #'string= :from-end t))
 
@@ -1383,16 +1396,18 @@
 
     (values exports shadows)))
 
-(defun collect-class-instance-generics (class-plist constant-properties-list)
+(defun collect-class-instance-generics (class-plist constant-properties-list &optional matched-extensions)
   "Returns (values method-names setter-names) -- the wrapper names
    CLASS-PLIST's own generated package exports whose Lisp signature begins
    with obj! as the sole/first required argument, and which are therefore
    eligible to be folded into the shared CSHARP-GENERICS unification (see
    doc/make-everything-defgeneric.md and generate-batch-generics-file).
    METHOD-NAMES covers instance methods, instance property/field getters,
-   instance indexer getters, and instance event add-X/remove-X pairs (each
-   (name obj! &rest args)); SETTER-NAMES covers the (cl:setf name)
-   counterpart for writeable instance properties/fields/indexers.
+   instance indexer getters, instance event add-X/remove-X pairs (each
+   (name obj! &rest args)), and injected extension-method wrappers (also
+   (name obj! &rest args) -- see MATCHED-EXTENSIONS below); SETTER-NAMES
+   covers the (cl:setf name) counterpart for writeable instance
+   properties/fields/indexers.
    Deliberately excludes: static members (no obj! receiver -- see
    doc/make-everything-defgeneric.md's excluded categories),
    generic/type-parameterized instance methods (their wrapper's lambda
@@ -1415,7 +1430,11 @@
    CONSTANT-PROPERTIES-LIST -- so EVENT-WRAPPER-NAMES' three-tier collision
    escalation (add-X/remove-X -> add-X-event/remove-X-event -> add-X!/
    remove-X!) can never choose a different tier than what generate-class-
-   file actually emits."
+   file actually emits. MATCHED-EXTENSIONS (from
+   compute-matched-extensions-for-class, nil unless this class opted into
+   --extension-methods -- Version 38, doc/plan-v38.md) is folded into
+   method-names verbatim (never setter-names -- an injected extension
+   wrapper is never a (cl:setf ...) counterpart of anything)."
   (let* ((fields (getf class-plist :fields))
          (properties (getf class-plist :properties))
          (methods (getf class-plist :methods))
@@ -1515,14 +1534,25 @@
           (push remove-name all-other-names)
           (push add-name method-names)
           (push remove-name method-names))))
+    ;; Injected extension-method wrappers (Version 38) -- always obj!-first
+    ;; instance-style, so always eligible.
+    (dolist (ext matched-extensions)
+      (push (map-member-name (getf (first ext) :name)) method-names))
     (values (remove-duplicates (nreverse method-names) :test #'string= :from-end t)
             (remove-duplicates (nreverse setter-names) :test #'string= :from-end t))))
 
-(defun generate-class-file (class-plist output-dir &optional constant-properties-list creation-time)
+(defun generate-class-file (class-plist output-dir &optional constant-properties-list creation-time
+                                                       matched-extensions skipped-extensions)
   "Generates the Lisp source file for a single class plist.
    CREATION-TIME, if supplied, is used verbatim as the file's creation-date
    stamp (so a batch of files generated in one run can share a single
-   timestamp); otherwise a fresh timestamp is computed."
+   timestamp); otherwise a fresh timestamp is computed. MATCHED-EXTENSIONS
+   and SKIPPED-EXTENSIONS (both from compute-matched-extensions-for-class,
+   nil unless this class opted into --extension-methods -- Version 38,
+   doc/plan-v38.md) are, respectively, the surviving (method-plist
+   holder-plist holder-assembly-name) entries to emit as obj!-first
+   wrappers, and the (method-plist holder-plist reason) entries to instead
+   document with a skip comment."
   (let* ((fq-name (getf class-plist :fully-qualified-name))
          (pkg-name (type-fq-name-to-pkg-name fq-name))
          (output-file (merge-pathnames (make-pathname :name pkg-name :type "lisp")
@@ -1929,6 +1959,51 @@
                  (dolist (dm dirty-methods)
                    (format stream ";;   ~A~%" (method-signature-str dm)))
                  (format stream "~%"))))))
+
+        ;; Extension methods injected from other assemblies (Version 38 --
+        ;; see doc/plan-v38.md). MATCHED-EXTENSIONS/SKIPPED-EXTENSIONS are
+        ;; both nil unless this class opted into --extension-methods.
+        (when (or matched-extensions skipped-extensions)
+          (format stream ";; Extension methods (exact match on this == ~A):~%" fq-name)
+          (dolist (skip skipped-extensions)
+            (destructuring-bind (m holder-plist reason) skip
+              (let ((reason-str
+                      (cond
+                        ((eq reason :dirty)
+                         "special parameter types (ref/out/params/default) not yet supported")
+                        ((eq reason :generic)
+                         "generic type arguments/parameters not yet supported")
+                        ((eq reason :own)
+                         "this class already declares its own member of this name")
+                        ((and (consp reason) (eq (first reason) :ambiguous))
+                         (format nil "ambiguous -- more than one extension method maps to Lisp name ~A"
+                                 (second reason)))
+                        (t "not supported"))))
+                (format stream ";;   ~A::~A -- skipped (~A)~%"
+                        (getf holder-plist :fully-qualified-name) (method-signature-str m) reason-str))))
+          (dolist (surv matched-extensions)
+            (destructuring-bind (m holder-plist holder-assembly) surv
+              (let* ((holder-fq (getf holder-plist :fully-qualified-name))
+                     (mname (map-member-name (getf m :name)))
+                     (dotnet-method-name (or (getf m :mangled-name) (getf m :name)))
+                     (params (rest (getf m :parameters)))
+                     (param-names (mapcar (lambda (p) (map-param-name (getf p :name))) params))
+                     (m-doc (getf m :documentation))
+                     (summary (getf m-doc :summary))
+                     (returns (getf m-doc :returns))
+                     (docstring (with-output-to-string (out)
+                                  (format out "Extension method from ~A (assembly ~A)."
+                                          holder-fq (or holder-assembly "?"))
+                                  (let ((body (build-docstring summary returns params m-doc)))
+                                    (when (> (length body) 0)
+                                      (format out "~%~A" body)))))
+                     (escaped-docstring (escape-lisp-string docstring)))
+                (format stream "(cl:defun ~A (obj!~@[ ~{~A~^ ~}~])~%" mname param-names)
+                (when (> (length escaped-docstring) 0)
+                  (format stream "  \"~A\"~%" escaped-docstring))
+                (format stream "  (dotnet:static \"~A\" \"~A\" obj!~@[ ~{~A~^ ~}~]))~%~%"
+                        holder-fq dotnet-method-name param-names))))
+          (format stream "~%"))
         ) ;; close with-open-file
       ) ;; close inner analysis let*
     ) ;; close outer let*
@@ -1936,7 +2011,7 @@
 
 (defun make-resolved-class (class-plist constant-properties
                              &optional export-parents export-interfaces export-object
-                               defgeneric defgeneric-dynamic)
+                               defgeneric defgeneric-dynamic extension-methods)
   "Builds a resolved-class plist: the unit of work generate-class-file,
    generate-batch-packages-file, generate-batch-asd-file, and the
    parents/interfaces re-export machinery all operate on. CLASS-PLIST is
@@ -1952,14 +2027,26 @@
    doc/make-everything-defgeneric.md) and the load-time-install
    CSHARP-GENERICS-DYNAMIC package (see
    doc/make-everything-defgeneric-dynamic.md), respectively. A class may
-   opt into either, both, or neither."
+   opt into either, both, or neither. EXTENSION-METHODS (nil for an
+   ancestor-only class, same as the other flags; defaults to t at the CLI
+   level -- see Program.cs's enableExtensionMethods) mirrors the manifest's
+   per-class :extension-methods flag (Version 38, doc/plan-v38.md) --
+   whether this class's package should have matching C# extension methods
+   injected as obj!-first wrappers. The stored :matched-extensions/
+   :skipped-extensions slots (initially nil) are filled in separately by
+   GENERATE-ASSEMBLY-PACKAGES-BATCH once the whole working set and the
+   extension-method index are available -- see
+   COMPUTE-MATCHED-EXTENSIONS-FOR-CLASS."
   (list :class-plist class-plist
         :constant-properties constant-properties
         :export-parents export-parents
         :export-interfaces export-interfaces
         :export-object export-object
         :defgeneric defgeneric
-        :defgeneric-dynamic defgeneric-dynamic))
+        :defgeneric-dynamic defgeneric-dynamic
+        :extension-methods extension-methods
+        :matched-extensions nil
+        :skipped-extensions nil))
 
 (defun resolve-batch-entry (entry)
   "Loads ENTRY's :metadata-file and resolves each of its :classes by
@@ -1986,7 +2073,8 @@
                                           (getf class-entry :export-interfaces)
                                           (getf class-entry :export-object)
                                           (getf class-entry :defgeneric)
-                                          (getf class-entry :defgeneric-dynamic))
+                                          (getf class-entry :defgeneric-dynamic)
+                                          (getf class-entry :extension-methods))
                     resolved)
               (push cname not-found))))
       (values (nreverse resolved) (nreverse not-found)))))
@@ -2013,6 +2101,143 @@
                 (unless (gethash fq-name index)
                   (setf (gethash fq-name index) (cons type-plist entry)))))))))
     index))
+
+(defun build-extension-method-index (metadata-index)
+  "Given METADATA-INDEX (from build-metadata-index -- every distinct type
+   across every provided assembly), returns a hash table mapping each
+   extension method's exact, concrete 'this'-type fully-qualified-name
+   (string) to a list of (method-plist holder-plist holder-assembly-name)
+   entries, in first-seen order -- one entry per C# extension method (a
+   static method, on a static holder type, whose first parameter carries
+   :extension-this t) found anywhere in the provided assemblies.
+
+   Version 38's matching rule is v1/exact-concrete-only (see PLAN.md and
+   doc/plan-v38.md): a method whose :extension-this parameter's :type is an
+   open generic (checked defensively via GENERIC-TYPE-P, though in practice
+   the '!' marker it looks for never appears in this repo's real metadata)
+   is excluded here so it can never coincidentally string= a concrete
+   class's :fully-qualified-name; an open-generic 'this' type's formatted
+   string (e.g. \"System.Collections.Generic.IEnumerable`1[TSource]\") also
+   never naturally matches any real type's own :fully-qualified-name (which
+   for an open generic type definition has no bracketed arguments at all,
+   e.g. \"System.Collections.Generic.List`1\"), so this guard is belt-and-
+   suspenders documentation of intent rather than the sole safeguard.
+   Base-class/interface 'this'-type matching is out of scope for Version 38
+   -- see doc/plan-v38.md's \"Deferred / Future\" section."
+  (let ((index (make-hash-table :test #'equal)))
+    (maphash (lambda (fq-name pair)
+               (declare (ignore fq-name))
+               (let* ((holder-plist (car pair))
+                      (owning-entry (cdr pair))
+                      (assembly-name (getf owning-entry :assembly-name)))
+                 (dolist (m (getf holder-plist :methods))
+                   (when (getf m :extension-method)
+                     (let* ((params (getf m :parameters))
+                            (this-param (first params)))
+                       (when (and this-param (getf this-param :extension-this))
+                         (let ((this-type (getf this-param :type)))
+                           (unless (generic-type-p this-type)
+                             (setf (gethash this-type index)
+                                   (nconc (gethash this-type index)
+                                          (list (list m holder-plist assembly-name))))))))))))
+             metadata-index)
+    index))
+
+(defun extension-method-dirty-or-generic-reason (method-plist)
+  "Returns :dirty, :generic, or nil for METHOD-PLIST (an extension-method
+   candidate from build-extension-method-index), checking only its non-
+   'this' parameters -- the first parameter (:extension-this t) is the
+   receiver being matched against a class's :fully-qualified-name and is
+   never itself dirty/generic in practice, so it is deliberately excluded
+   from these checks. Mirrors dirty-method-p's parameter-modifier checks
+   and clean-method-p's generic-type-p checks, but is not defined in terms
+   of either since both operate on a method's full :parameters list
+   including the 'this' parameter this function must skip. :generic covers
+   both the method's own generic type argument(s) (:is-generic t -- its
+   wrapper would need type-argument parameter(s) before obj!, breaking the
+   uniform obj!-first instance-style shape every other injected wrapper
+   shares) and the rarer case of a non-generic extension method on a
+   generic holder class referencing that class's own open type parameter in
+   a non-'this' parameter or the return type."
+  (let ((params (rest (getf method-plist :parameters))))
+    (cond
+      ((getf method-plist :is-generic) :generic)
+      ((some (lambda (p) (or (getf p :has-default) (getf p :out)
+                              (getf p :ref) (getf p :ref-readonly) (getf p :params)))
+             params)
+       :dirty)
+      ((or (generic-type-p (getf method-plist :return-type))
+           (some (lambda (p) (generic-type-p (getf p :type))) params))
+       :generic)
+      (t nil))))
+
+(defun compute-matched-extensions-for-class (class-plist constant-properties-list extension-index)
+  "Given CLASS-PLIST, its CONSTANT-PROPERTIES-LIST, and EXTENSION-INDEX
+   (from build-extension-method-index), returns (values survivors skipped)
+   for this class's exact-concrete-match extension-method candidates (see
+   doc/plan-v38.md's \"Per-candidate skip rules\"):
+
+   SURVIVORS is a list of (method-plist holder-plist holder-assembly-name)
+   entries (build-extension-method-index's own element shape) to actually
+   generate obj!-first wrappers for, in first-seen order.
+
+   SKIPPED is a list of (method-plist holder-plist reason) entries for
+   comment generation, where REASON is :dirty, :generic, :own (the class
+   already declares a member mapping to the same Lisp name -- the class's
+   own member wins), or (:ambiguous lisp-name) (more than one surviving
+   candidate maps to the same Lisp name -- extension-method overload
+   dispatch is deferred, see doc/plan-v38.md's \"Deferred / Future\").
+
+   Applied in three passes, matching the plan's stated precedence: (1)
+   dirty/generic candidates are skipped individually and never considered
+   for the later passes; (2) of what remains, any whose Lisp name collides
+   with CLASS-PLIST's own declared export set (compute-package-exports-and-
+   shadows, called here with no matched-extensions of its own -- an
+   extension wrapper never collides with another extension wrapper's own
+   existence, only with a declared member) is skipped; (3) of what remains
+   after that, candidates are grouped by Lisp name and any group of more
+   than one entry is skipped in full as ambiguous."
+  (let ((candidates (gethash (getf class-plist :fully-qualified-name) extension-index)))
+    (if (null candidates)
+        (values nil nil)
+        (multiple-value-bind (own-exports own-shadows)
+            (compute-package-exports-and-shadows class-plist constant-properties-list)
+          (declare (ignore own-shadows))
+          (let ((skipped nil)
+                (ok-candidates nil))
+            ;; Pass 1: dirty/generic exclusion.
+            (dolist (c candidates)
+              (let* ((method-plist (first c))
+                     (reason (extension-method-dirty-or-generic-reason method-plist)))
+                (if reason
+                    (push (list method-plist (second c) reason) skipped)
+                    (push c ok-candidates))))
+            (setf ok-candidates (nreverse ok-candidates))
+            ;; Pass 2: name collision with the class's own declared members.
+            (let ((remaining nil))
+              (dolist (c ok-candidates)
+                (let* ((method-plist (first c))
+                       (lisp-name (map-member-name (getf method-plist :name))))
+                  (if (member lisp-name own-exports :test #'string=)
+                      (push (list method-plist (second c) :own) skipped)
+                      (push (cons lisp-name c) remaining))))
+              (setf remaining (nreverse remaining))
+              ;; Pass 3: group by Lisp name; a group of exactly one survives,
+              ;; a group of more than one is ambiguous and fully skipped.
+              (let ((tally (make-hash-table :test #'equal))
+                    (order nil)
+                    (survivors nil))
+                (dolist (r remaining)
+                  (let ((lisp-name (car r)))
+                    (unless (gethash lisp-name tally) (push lisp-name order))
+                    (push (cdr r) (gethash lisp-name tally))))
+                (dolist (lisp-name (nreverse order))
+                  (let ((group (nreverse (gethash lisp-name tally))))
+                    (if (> (length group) 1)
+                        (dolist (c group)
+                          (push (list (first c) (second c) (list :ambiguous lisp-name)) skipped))
+                        (push (first group) survivors))))
+                (values (nreverse survivors) (nreverse skipped)))))))))
 
 (defun build-simple-name-index (metadata-index)
   "Given METADATA-INDEX (from build-metadata-index -- every type's
@@ -2143,7 +2368,7 @@
            (push (list (first pkgs) sym (gethash sym shadow-flag)) reexports)))))
     (values (nreverse reexports) (nreverse skipped))))
 
-(defun emit-child-reexports (stream child-plist child-cprops ancestor-fqs fq->resolved)
+(defun emit-child-reexports (stream child-plist child-cprops child-matched-extensions ancestor-fqs fq->resolved)
   "Computes and writes CHILD-PLIST's re-export post-pass block to STREAM:
    the cl:shadowing-import/cl:import/cl:export calls drawing non-conflicting
    members from ANCESTOR-FQS (CHILD-PLIST's already-resolved ancestor
@@ -2151,10 +2376,15 @@
    GENERATE-ASSEMBLY-PACKAGES-BATCH's child-ancestor-fqs table), plus
    comments documenting any skipped (conflicting/ambiguous) names.
    FQ->RESOLVED maps every resolved class's fully-qualified-name back to its
-   resolved-class plist, so each ancestor's own :constant-properties is used
-   when computing its exports (an ancestor pulled in only for this purpose
-   has none, but an ancestor that was ALSO explicitly requested keeps its
-   own).
+   resolved-class plist, so each ancestor's own :constant-properties and
+   :matched-extensions are used when computing its exports (an ancestor
+   pulled in only for this purpose has neither, but an ancestor that was
+   ALSO explicitly requested keeps its own -- see doc/plan-v38.md).
+   CHILD-MATCHED-EXTENSIONS is CHILD-PLIST's own survivors (nil unless the
+   child opted into --extension-methods), needed so an injected extension
+   wrapper's name is correctly counted among the child's own exports (and
+   therefore never re-exported a second time from an ancestor under the
+   same name).
    See doc/parents-and-interfaces-plan.md: this whole block runs after every
    defpackage form in the file, so no topological ordering of those forms is
    required -- shadowing-import/import/export only need the ancestor
@@ -2163,16 +2393,18 @@
    class's own .lisp file)."
   (let* ((child-fq (getf child-plist :fully-qualified-name))
          (child-pkg (type-fq-name-to-pkg-name child-fq)))
-    (multiple-value-bind (child-exports child-shadows) (compute-package-exports-and-shadows child-plist child-cprops)
+    (multiple-value-bind (child-exports child-shadows)
+        (compute-package-exports-and-shadows child-plist child-cprops child-matched-extensions)
       (declare (ignore child-shadows))
       (let ((ancestor-specs
               (mapcar (lambda (anc-fq)
                         (let* ((anc-rc (gethash anc-fq fq->resolved))
                                (anc-plist (getf anc-rc :class-plist))
                                (anc-cprops (getf anc-rc :constant-properties))
+                               (anc-matched-extensions (getf anc-rc :matched-extensions))
                                (anc-pkg (type-fq-name-to-pkg-name anc-fq)))
                           (multiple-value-bind (anc-exports anc-shadows)
-                              (compute-package-exports-and-shadows anc-plist anc-cprops)
+                              (compute-package-exports-and-shadows anc-plist anc-cprops anc-matched-extensions)
                             (list anc-pkg anc-exports anc-shadows))))
                       ancestor-fqs)))
         (multiple-value-bind (reexports skipped) (compute-reexports child-exports ancestor-specs)
@@ -2256,7 +2488,8 @@
                  (fq-name (getf cls :fully-qualified-name))
                  (pkg-name (type-fq-name-to-pkg-name fq-name)))
             (multiple-value-bind (method-names setter-names)
-                (collect-class-instance-generics cls (getf rc :constant-properties))
+                (collect-class-instance-generics cls (getf rc :constant-properties)
+                                                  (getf rc :matched-extensions))
               (push (list :pkg-name pkg-name :fq-name fq-name
                           :method-names method-names :setter-names setter-names)
                     classes)
@@ -2364,7 +2597,8 @@
                  (cprops (getf rc :constant-properties))
                  (fq-name (getf cls :fully-qualified-name))
                  (pkg-name (type-fq-name-to-pkg-name fq-name)))
-            (multiple-value-bind (exports shadows) (compute-package-exports-and-shadows cls cprops)
+            (multiple-value-bind (exports shadows)
+                (compute-package-exports-and-shadows cls cprops (getf rc :matched-extensions))
               (format stream ";;; Source File: ~A.lisp~%" pkg-name)
               (format stream ";;; C# Class: ~A~%" fq-name)
               (format stream ";;; Constant Properties: ~:[(none)~;~:*~{~A~^, ~}~]~%" cprops)
@@ -2393,6 +2627,7 @@
                    (ancestor-fqs (gethash child-fq child-ancestor-fqs)))
               (when ancestor-fqs
                 (emit-child-reexports stream cls (getf rc :constant-properties)
+                                       (getf rc :matched-extensions)
                                        ancestor-fqs fq->resolved)))))))
     output-file))
 
@@ -2874,31 +3109,50 @@
              (mapcar (lambda (entry) (cons entry (gethash entry entry-resolved-table)))
                      entries-with-resolved))
            (all-resolved (loop for pair in entries-with-resolved-pairs append (cdr pair)))
-           (defgeneric-model (compute-defgeneric-model all-resolved))
-           (defgeneric-dynamic-model (compute-defgeneric-dynamic-model all-resolved))
-           (simple-name-index (build-simple-name-index index))
-           (resolved-fq-set (make-hash-table :test #'equal)))
+           (extension-index (build-extension-method-index index)))
 
+      ;; Phase C: for every resolved class that opted into :extension-methods,
+      ;; compute and store its matched/skipped extension-method wrappers
+      ;; (Version 38, doc/plan-v38.md) -- done before defgeneric-model/
+      ;; packages.lisp/class-file generation below, all of which need to see
+      ;; a class's :matched-extensions to stay in sync (compute-package-
+      ;; exports-and-shadows/collect-class-instance-generics/generate-class-
+      ;; file all take it as an argument read from the resolved-class plist).
       (dolist (rc all-resolved)
-        (setf (gethash (getf (getf rc :class-plist) :fully-qualified-name) resolved-fq-set) t))
+        (when (getf rc :extension-methods)
+          (multiple-value-bind (survivors skipped)
+              (compute-matched-extensions-for-class (getf rc :class-plist)
+                                                     (getf rc :constant-properties)
+                                                     extension-index)
+            (setf (getf rc :matched-extensions) survivors)
+            (setf (getf rc :skipped-extensions) skipped))))
 
-      (generate-batch-packages-file entries-with-resolved-pairs output-dir creation-time
-                                     package-template-path child-ancestor-fqs
-                                     defgeneric-model defgeneric-dynamic-model)
-      (generate-batch-utils-file output-dir creation-time utils-template-path)
+      (let* ((defgeneric-model (compute-defgeneric-model all-resolved))
+             (defgeneric-dynamic-model (compute-defgeneric-dynamic-model all-resolved))
+             (simple-name-index (build-simple-name-index index))
+             (resolved-fq-set (make-hash-table :test #'equal)))
 
-      (dolist (rc all-resolved)
-        (let ((cls (getf rc :class-plist))
-              (cprops (getf rc :constant-properties)))
-          (format *error-output* "Generating package for C# Class: ~A~%" (getf cls :fully-qualified-name))
-          (generate-class-file cls output-dir cprops creation-time)))
+        (dolist (rc all-resolved)
+          (setf (gethash (getf (getf rc :class-plist) :fully-qualified-name) resolved-fq-set) t))
 
-      (generate-batch-generics-file output-dir creation-time defgeneric-model
-                                     simple-name-index resolved-fq-set)
-      (generate-batch-generics-dynamic-file output-dir creation-time defgeneric-dynamic-model)
+        (generate-batch-packages-file entries-with-resolved-pairs output-dir creation-time
+                                       package-template-path child-ancestor-fqs
+                                       defgeneric-model defgeneric-dynamic-model)
+        (generate-batch-utils-file output-dir creation-time utils-template-path)
 
-      (generate-batch-asd-file entries-with-resolved-pairs output-dir creation-time cli-version
-                                child-ancestor-fqs defgeneric-model defgeneric-dynamic-model))
+        (dolist (rc all-resolved)
+          (let ((cls (getf rc :class-plist))
+                (cprops (getf rc :constant-properties)))
+            (format *error-output* "Generating package for C# Class: ~A~%" (getf cls :fully-qualified-name))
+            (generate-class-file cls output-dir cprops creation-time
+                                  (getf rc :matched-extensions) (getf rc :skipped-extensions))))
+
+        (generate-batch-generics-file output-dir creation-time defgeneric-model
+                                       simple-name-index resolved-fq-set)
+        (generate-batch-generics-dynamic-file output-dir creation-time defgeneric-dynamic-model)
+
+        (generate-batch-asd-file entries-with-resolved-pairs output-dir creation-time cli-version
+                                  child-ancestor-fqs defgeneric-model defgeneric-dynamic-model)))
 
     t))
 
@@ -2912,7 +3166,8 @@
        :classes ((:name \"...\" :constant-properties \"...\"
                   :export-parents t/nil :export-interfaces t/nil
                   :export-object t/nil :defgeneric t/nil
-                  :defgeneric-dynamic t/nil) ...)) ...)
+                  :defgeneric-dynamic t/nil
+                  :extension-methods t/nil) ...)) ...)
    :defgeneric and :defgeneric-dynamic (per-class, independent/orthogonal,
    resolved from Program.cs's --defgeneric/--enable-defgeneric and
    --defgeneric-dynamic/--enable-defgeneric-dynamic flags respectively) opt
@@ -2923,6 +3178,11 @@
    functions -- see COMPUTE-DEFGENERIC-MODEL/COMPUTE-DEFGENERIC-DYNAMIC-MODEL
    and doc/make-everything-defgeneric.md /
    doc/make-everything-defgeneric-dynamic.md.
+   :extension-methods (per-class, resolved from Program.cs's
+   --extension-methods/--enable-extension-methods, ON by default) opts a
+   class into having matching C# extension methods (exact concrete
+   'this'-type match only) injected as obj!-first wrappers -- see
+   COMPUTE-MATCHED-EXTENSIONS-FOR-CLASS and doc/plan-v38.md.
    PACKAGE-TEMPLATE-PATH/UTILS-TEMPLATE-PATH point at
    csharp-assembly-utils-package.template.lisp /
    csharp-assembly-utils.template.lisp, copied next to the executable.

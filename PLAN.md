@@ -15,6 +15,21 @@ Deal with extension methods. Real world example is from MonoGameGum:
   class.
 * Add comments/docstrings as to where the extension method came from.
 
+**DONE (Version 38, 2026-07-05).** Implemented per the detailed plan in
+[`doc/plan-v38.md`](doc/plan-v38.md)'s "Part A" section:
+`--extension-methods`/`--no-extension-methods` (per-class) plus sticky
+`--enable-extension-methods`/`--no-enable-extension-methods` (ON by default,
+unlike every other sticky flag in this tool) inject C# extension methods, found
+anywhere in the provided assemblies, into a class's own generated package as
+ordinary `obj!`-first wrapper functions calling `dotnet:static` on the holder
+type, with a docstring naming the holder's fully-qualified name and owning
+assembly. Matching is v1/exact-concrete-only (no base-class/interface/
+open-generic matching -- see `doc/plan-v38.md`'s "Deferred / Future" section for
+that follow-up); dirty, generic, name-colliding, and ambiguously-overloaded
+candidates are skipped with a documenting comment. See
+`doc/generator-design-notes.md`'s "Extension Methods (Version 38)" section and
+`RELEASES.md`'s 2.38.0 entry.
+
 
 # More Parent & Ancestor stuff
 

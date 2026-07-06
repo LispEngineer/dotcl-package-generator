@@ -29,6 +29,7 @@ bool exportAllObject = false;
 bool skipMissing = false;
 bool enableDefgenericDynamic = false;
 bool enableDefgenericStatic = false;
+bool enableExtensionMethods = true;
 
 ////////////////////////////////////////////////////////////////////////////
 // Parse arguments
@@ -61,6 +62,7 @@ for (int i = 0; i < args.Length; i++) {
                 ExportObject = exportAllObject,
                 DefGenericDynamic = enableDefgenericDynamic,
                 DefGenericStatic = enableDefgenericStatic,
+                ExtensionMethods = enableExtensionMethods,
             };
             currentGroup.Classes.Add(currentClass);
         }
@@ -132,6 +134,18 @@ for (int i = 0; i < args.Length; i++) {
         } else {
             currentClass.DefGenericStatic = false;
         }
+    } else if (args[i] == "--extension-methods") {
+        if (currentClass == null) {
+            argErrors.Add("--extension-methods specified before any --class.");
+        } else {
+            currentClass.ExtensionMethods = true;
+        }
+    } else if (args[i] == "--no-extension-methods") {
+        if (currentClass == null) {
+            argErrors.Add("--no-extension-methods specified before any --class.");
+        } else {
+            currentClass.ExtensionMethods = false;
+        }
     } else if (args[i] == "--export-all-parents") {
         exportAllParents = true;
     } else if (args[i] == "--no-export-all-parents") {
@@ -156,6 +170,10 @@ for (int i = 0; i < args.Length; i++) {
         enableDefgenericStatic = true;
     } else if (args[i] == "--no-enable-defgeneric") {
         enableDefgenericStatic = false;
+    } else if (args[i] == "--enable-extension-methods") {
+        enableExtensionMethods = true;
+    } else if (args[i] == "--no-enable-extension-methods") {
+        enableExtensionMethods = false;
     } else if (args[i] == "--test") {
         isTestMode = true;
     }
@@ -229,6 +247,7 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
                 manifest.Append(" :export-object ").Append(cls.ExportObject ? "t" : "nil");
                 manifest.Append(" :defgeneric-dynamic ").Append(cls.DefGenericDynamic ? "t" : "nil");
                 manifest.Append(" :defgeneric ").Append(cls.DefGenericStatic ? "t" : "nil");
+                manifest.Append(" :extension-methods ").Append(cls.ExtensionMethods ? "t" : "nil");
                 manifest.Append(')');
             }
             manifest.Append("))\n");
@@ -406,6 +425,16 @@ void PrintHelp() {
         "backquoted defmethod), but immune to the simple-",
         "name collision risk above. See",
         "doc/make-everything-defgeneric-dynamic.md.");
+    Opt("--extension-methods / --no-extension-methods", "Inject C# extension methods (found anywhere in",
+        "the provided assemblies) whose 'this' parameter",
+        "type is exactly the most recently given --class",
+        "into that class's own package, as ordinary obj!-",
+        "first instance-style wrappers. Only an exact,",
+        "concrete 'this' type match is supported (no base-",
+        "class/interface/open-generic matching); an",
+        "overloaded, dirty (ref/out/params/default), or",
+        "generic extension method is skipped with a",
+        "comment instead. ON by default.");
     Console.WriteLine();
     Console.WriteLine("Sticky defaults (change the default for the current and every subsequent --class,");
     Console.WriteLine("in command-line order; a class's own --export-*/--no-export-*/--defgeneric*");
@@ -415,6 +444,10 @@ void PrintHelp() {
     Opt("--export-all-object / --no-export-all-object", "Default --export-object on/off.");
     Opt("--enable-defgeneric / --no-enable-defgeneric", "Default --defgeneric on/off.");
     Opt("--enable-defgeneric-dynamic / --no-enable-defgeneric-dynamic", "Default --defgeneric-dynamic on/off.");
+    Opt("--enable-extension-methods / --no-enable-extension-methods", "Default --extension-methods on/off.",
+        "Defaults to ON (unlike the other sticky flags",
+        "above), so extension-method injection happens",
+        "for every --class unless disabled.");
     Console.WriteLine();
     Console.WriteLine("Global:");
     Opt("--skip-missing / --no-skip-missing", "When a requested parent/interface ancestor",
@@ -451,4 +484,5 @@ class ClassSpec {
     public bool ExportObject;
     public bool DefGenericDynamic;
     public bool DefGenericStatic;
+    public bool ExtensionMethods;
 }
