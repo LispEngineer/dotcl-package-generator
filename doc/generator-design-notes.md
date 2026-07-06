@@ -1878,3 +1878,93 @@ exactly how C#'s own extension-method call sugar desugars. The docstring names t
 name and owning assembly, so a user reading generated code (or `describe`-ing the function at a
 REPL) can tell at a glance that a given function is not really native to the class whose package
 it lives in.
+
+## Recursive Related-Class Discovery (Version 39)
+
+See `doc/plan-v38.md`'s Part B for the full design document this implements.
+
+### What changed and why
+
+Version 33 gave a class two ways to reach *upward* — `--export-parents`/`--export-interfaces`
+discover a class's ancestors and re-export their non-conflicting members into the requesting
+class's own package. Version 39 adds three ways to discover *outward*: `--output-nested`
+(types nested inside a class), `--output-children` (subclasses of a class), and
+`--output-implementations` (implementers of an interface). All three are deliberately
+**generate-only** — a discovered type becomes its own independent package, and the class that
+discovered it is never modified. This was a locked requirements decision, not an oversight: an
+early draft of this plan proposed also re-exporting a subclass's members up into its base
+class's package, but that is semantically backwards (a base class's package re-exporting its own
+subclasses' members would make `base:derived-only-method` resolve for every instance of `base`,
+including ones that are not actually a `derived`) — the corrected design treats the anchor purely
+as a *discovery seed*.
+
+### Flag propagation: the significant behavior change
+
+The other half of Version 39, and the part that actually changes existing generated output for a
+class that already used `--export-parents`/`--export-interfaces`: **every discovered class now
+carries its discoverer's entire per-class flag set**, not just the two ancestor flags in isolation
+and not a flag-less plain package the way a Version 33 ancestor was. Concretely: if `Derived` is
+requested with `--export-parents --output-children`, its discovered parent `Base` now *also*
+carries `--export-parents` (so `Base` independently re-exports *its own* ancestors into itself)
+and `--output-children` (so `Base`'s own subclasses — which may include types other than
+`Derived` — are also discovered and added as their own packages). This was an explicit
+requirements decision (see `PLAN.md`'s "More Parent & Ancestor stuff" section): "All the
+discovered classes should carry the classes from the anchor — so recursive, yes." The only
+exception is `--constant-properties`, which names properties specific to one concrete class and
+is never propagated; a discovered class's constant-properties is always empty unless it was also
+explicitly requested (in which case the explicit request's own flags and constant-properties win
+outright, and no duplicate resolved-class entry is created — the pre-existing Version 33 dedup
+rule, unchanged).
+
+### Why the ancestor-chain walk stays a single, self-contained call (and why the downward walk doesn't)
+
+The most subtle correctness point in this version: `expand-related` (replacing `expand-ancestors`)
+still resolves a single class's *entire* upward ancestor chain in **one self-contained internal
+multi-hop call**, exactly reproducing what `expand-ancestors` did before this version — it does
+**not** rely on the outer discovery queue for multi-level completeness the way the three new
+downward directions do. This is not an arbitrary implementation choice; it is required for
+correctness. A class's re-export block (`emit-child-reexports`) is computed **once, statically, at
+generation time**, from a flat list of that class's own immediate-plus-transitive ancestors —
+each ancestor's *own* exports are read directly off its class metadata plist
+(`compute-package-exports-and-shadows`), not off whatever that ancestor's *own* re-export block
+might add to it at load time (a `cl:import`/`cl:export` side effect, invisible to the static
+generation-time computation of another class's re-export list). If `expand-related` only returned
+one hop per call and relied on the outer queue to reach the grandparent — the same way it safely
+does for `--output-children` — the child's re-export block would only ever see its immediate
+parent's *own* declared members, silently losing every level above that, even though the parent
+itself (now also carrying `--export-parents` via propagation) *would* re-export the grandparent's
+members into *itself* at load time. The three downward directions have no equivalent correctness
+hazard: a discovered nested type/subclass/implementer is only ever its own independent package,
+never something whose declared-member list a static computation needs to flatten into someone
+else's package, so relying on the outer queue's own recursion (re-invoking `expand-related` on
+each newly-discovered class using its now-propagated flags) is completely safe for them, and
+avoids duplicating multi-hop logic for three different reverse-index shapes.
+
+### Reverse indexes and the nested-type prefix scan
+
+`build-reverse-indexes` (built once per batch, alongside `build-metadata-index`/
+`build-extension-method-index`, over the same global per-batch metadata index) produces two hash
+tables in one pass: `subclass-index` (superclass FQ name → direct subclasses only — the
+*indirect* subclasses are reached by the outer queue re-invoking `expand-related` on each direct
+subclass in turn, which inherits `--output-children` via propagation) and `implementer-index`
+(interface FQ name → every implementer, already fully transitive in one lookup, since .NET's
+`Type.GetInterfaces()` already includes every interface a type's own base classes implement).
+Nested-type discovery needs no precomputed index at all: a type's CIL-native nested-type FQ name
+always carries its enclosing type's FQ name as a literal prefix followed by `+` (e.g.
+`Outer+Inner+Innermost` starts with both `Outer+` and `Outer+Inner+`), so a single prefix scan
+over the metadata index, from the discovering class's own FQ name, already reaches every nesting
+depth in one pass — no recursion (internal or via the outer queue) is needed for this direction at
+all, though the outer queue harmlessly re-discovers already-visited nested types if a nested
+type itself also carries `--output-nested` via propagation (deduplicated the same way everything
+else is).
+
+### Fan-out safety
+
+`--output-children`/`--output-implementations` on a widely-derived base class or interface —
+especially compounded by flag propagation now recursing into each discovered subclass's *own*
+subclasses — can plausibly pull in a very large number of types from a big enough BCL or
+third-party assembly. Rather than a hard cap (which would silently produce incomplete,
+surprising output), `generate-assembly-packages-batch` counts every class discovered via the
+Phase B work queue and prints a warning to `*error-output*` if the total exceeds 200, so an
+accidental combinatorial crawl is visible to the user rather than just "the tool is taking a long
+time" — the batch itself is never truncated or refused.

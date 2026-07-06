@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IAsyncDisposable
-;;; Generator Version: 38
-;;; Creation Date: 2026-07-06T00:35:02Z
+;;; Generator Version: 39
+;;; Creation Date: 2026-07-06T00:55:09Z
 
 (cl:in-package :system-i-async-disposable)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.IAsyncDisposable"))
 (cl:defconstant <type-str> "System.IAsyncDisposable")
-(cl:defconstant <creation> "2026-07-06T00:35:02Z")
-(cl:defconstant <version> 38)
+(cl:defconstant <creation> "2026-07-06T00:55:09Z")
+(cl:defconstant <version> 39)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)
@@ -20,4 +20,15 @@
 Returns: A task that represents the asynchronous dispose operation.
 "
   (dotnet:invoke (cl:the (dotnet "System.IAsyncDisposable") obj!) "DisposeAsync"))
+
+;; Extension methods (exact match on this == System.IAsyncDisposable):
+(cl:defun configure-await (obj! continue-on-captured-context)
+  "Extension method from System.Threading.Tasks.TaskAsyncEnumerableExtensions (assembly System.Runtime.dll).
+Summary: Configures how awaits on the tasks returned from an async disposable will be performed.
+Returns: The configured async disposable.
+Parameters:
+  - continue-on-captured-context (System.Boolean): Whether to capture and marshal back to the current context.
+"
+  (dotnet:static "System.Threading.Tasks.TaskAsyncEnumerableExtensions" "ConfigureAwait" obj! continue-on-captured-context))
+
 

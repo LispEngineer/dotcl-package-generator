@@ -723,6 +723,42 @@ and overload-dispatch follow-ups.
 
 
 
+## Recursive Related-Class Discovery
+
+**Summary:** three new per-class flags let a class discover *outward* — `--output-nested`
+(types nested inside it), `--output-children` (its subclasses), and `--output-implementations`
+(implementers of it, when it is an interface) — each with a sticky `--export-all-*` CLI default
+(all OFF by default). Unlike `--export-parents`/`--export-interfaces`, these three are
+**generate-only**: a discovered type becomes its own independent package, and the class that
+discovered it is never modified.
+
+The significant behavior change is **recursive flag propagation**: every class discovered via
+*any* of the five discovery directions (the two upward ones from Version 33, plus these three new
+downward ones) now carries its discoverer's **entire** per-class flag set — all six
+`--export-*`/`--output-*` flags plus `--defgeneric`/`--defgeneric-dynamic`/`--extension-methods` — so
+discovery and re-export cascade recursively through the whole connected component a flag reaches.
+`--constant-properties` is never propagated (it names properties of one specific class); an
+explicitly-requested class that is also discovered keeps its own explicit flags and
+constant-properties.
+
+Because of this propagation, `--export-parents`/`--export-interfaces` requested on one class can
+now reach much further than before Version 39: a discovered ancestor also carries
+`--export-parents`/`--export-interfaces` (if the requesting class had them), so it independently
+re-exports *its own* ancestors into itself too — previously (Version 33), a discovered ancestor
+was always a flag-less plain package.
+
+A warning is printed (no hard cap) if the total number of classes discovered in one invocation
+exceeds 200, since `--output-children`/`--output-implementations` on a widely-derived base class
+or interface — especially compounded by recursion into each subclass's own subclasses — can pull
+in a very large number of types.
+
+See `doc/plan-v38.md`'s Part B and `doc/generator-design-notes.md`'s "Recursive Related-Class
+Discovery (Version 39)" section for the full design, including why the upward ancestor-chain walk
+must stay a single, self-contained multi-hop resolution per class (unlike the three downward
+directions, whose multi-hop transitivity comes from the discovery mechanism's own recursion).
+
+
+
 ## Nested and Generic Types
 
 **Summary:** a nested type's `+`-separated name and an open generic type's backtick

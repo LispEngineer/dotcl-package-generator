@@ -104,12 +104,20 @@ test: build
 		  --assembly $(REF_DIR)System.Collections.Specialized.dll \
 			  --class System.Collections.Specialized.NameValueCollection --export-parents --export-interfaces --export-object \
 	    --assembly $(BIN_DIR)AssemblyToLispyTestTarget.dll \
-	      --class AssemblyToLispyTestTarget.EventTestClass
+	      --class AssemblyToLispyTestTarget.EventTestClass \
+	      --class AssemblyToLispyTestTarget.NestingContainer --output-nested \
+	      --class AssemblyToLispyTestTarget.AbstractBase --output-children \
+	      --class AssemblyToLispyTestTarget.IDummyInterface --output-implementations
 	# EventTestClass demonstrates Version 38's extension-method injection
 	# (--extension-methods, ON by default) against a real, generated package:
 	# see EventTestClassExtensions in AssemblyToLispyTestTarget/EdgeCases.cs
 	# for the one clean survivor (Describe) plus the dirty/ambiguous/own-
 	# collision skip cases.
+	# NestingContainer/AbstractBase/IDummyInterface demonstrate Version 39's
+	# --output-nested/--output-children/--output-implementations: NestingContainer
+	# pulls in its own NestedLevel2/NestedLevel3 in one prefix scan; AbstractBase
+	# and IDummyInterface both independently discover GenericClass`1 (which extends
+	# the former and implements the latter) as its own package, deduplicated.
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo;
 	# System.Collections.Generic.List, SortedList; System.Text.StringBuilder;
 	# System.Drawing.Point/F; Size/F

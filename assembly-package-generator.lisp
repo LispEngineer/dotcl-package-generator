@@ -70,7 +70,8 @@
    35 - Version 34's implementation was judged too ugly to be the only option (its cl:eval-of-a-backquoted-defmethod mechanism, needed only because the specializer symbol is unknowable until DotCL resolves the class object at load time) -- see PLAN.md's \"Improve Turn Everything into Generic Methods\" section. That entire mechanism is renamed --defgeneric-dynamic/--no-defgeneric-dynamic (per-class) and --enable-defgeneric-dynamic/--no-enable-defgeneric-dynamic (sticky), its package/file renamed csharp-generics-dynamic (*CSHARP-GENERICS-DYNAMIC-PACKAGE-NAME*, compute-defgeneric-dynamic-model, generate-batch-generics-dynamic-file), and its manifest key renamed :defgeneric-dynamic -- purely a rename, no behavior change, still the fully collision-proof choice for when that robustness is worth the uglier generated code (doc/make-everything-defgeneric-dynamic.md). The now-freed original names (--defgeneric/--no-defgeneric, --enable-defgeneric/--no-enable-defgeneric, csharp-generics package/file, :defgeneric manifest key) are given to a NEW, independent, orthogonal implementation of the design's other original option (\"Simple + documented caveat\"): compute-defgeneric-model/generate-batch-generics-file emit a plain top-level cl:defmethod per unified name per opted-in class -- no cl:eval, no eval-when, no backquote, no runtime class-object lookup -- specializing directly on a LITERAL symbol computed at generation time, dotcl-internal::|<name>|, where <name> is the new dotnet-type-simple-name helper's exact reproduction of .NET reflection's Type.Name (distinct from the pre-existing simple-type-name, which strips the backtick generic-arity suffix for display purposes and never splits on CIL's '+' nested-type separator, so it does not match what DotCL's EnsureDotNetTypeClass, Runtime.CLOS.cs, actually calls Startup.Sym(type.Name) with). The caveat this accepts: if two --defgeneric-opted-in classes in the same batch share a simple name across different namespaces, DotCL's own class-naming collision handling means only one keeps the simple-name symbol at load time (load-order-dependent, unknowable at generation time) -- dispatch for the other, whose defmethod here still assumes the simple name, would be wrong. Documented with a comment above every class's defmethod block in the generated file, and in doc/make-everything-defgeneric.md's \"Static specializer collision caveat\" section, rather than guarded against. Both variants are fully independent and orthogonal: a class may opt into either, both, or neither, each contributing its own defpackage entry/generics file/.asd component; %compute-defgeneric-model (shared internal helper, parameterized on the :defgeneric or :defgeneric-dynamic resolved-class flag key) and emit-defgeneric-defpackage (shared defpackage-emission helper) avoid duplicating the identical aggregation/export-list logic between the two variants' public compute-defgeneric-model/compute-defgeneric-dynamic-model and packages.lisp emission. collect-class-instance-generics (which wrapper names are eligible at all) is entirely mechanism-agnostic and is reused verbatim by both.
    36 - The static --defgeneric variant's per-class collision comment (Version 35) now reports ACTUAL, KNOWN conflicts instead of a purely hypothetical warning. build-simple-name-index builds a DOTNET-TYPE-SIMPLE-NAME -> (fully-qualified-name...) hash table from build-metadata-index's full per-batch metadata index (every type in every provided assembly, not just requested/generated ones); classify-simple-name-conflicts, given one class's fully-qualified-name plus that index and a hash set of every fully-qualified-name actually generated as its own package in this batch (from ALL-RESOLVED), returns every other type sharing that simple name, each tagged :ACTUAL (also generated in this batch -- both types' files will call EnsureDotNetTypeClass at load time, so DotCL's naming race is guaranteed to actually happen) or :POSSIBLE (merely reflected in the provided assemblies' metadata, not itself generated here -- no guaranteed collision from this run's own output alone). generate-batch-generics-file's per-class comment block now enumerates these findings by name, or states plainly that none are known, rather than a generic \"if another class collides\" warning; generate-assembly-packages-batch builds the metadata index once (previously scoped only to Phase B's ancestor expansion) and threads it plus the resolved-fq-name set down as two new optional arguments. Empirically confirmed accurate against the Makefile smoke test's real System.Threading.Timer/System.Timers.Timer collision pair (both report each other as ACTUAL).
    37 - Fixed a gap in collect-class-instance-generics (Version 34): it walked :fields/:properties/:methods but never :events, so a class's add-X/remove-X instance-event wrapper pair (added in Version 32, two versions before this collector was written) was silently missing from both the --defgeneric and --defgeneric-dynamic unified-generics packages, even though add-X/remove-X already have the exact same (name obj! ...) shape every other collected wrapper has -- reported against a real Dungeon Slime class (a MonoGameGum ButtonBase's Click event) missing its add-click. Both add-X and remove-X are now collected into method-names (never setter-names -- neither is a (cl:setf ...) counterpart of the other). Correctly resolving an event's name requires the exact same non-event taken-names set generate-class-file/compute-package-exports-and-shadows compute for event-wrapper-names' three-tier collision escalation (add-X/remove-X -> add-X-event/remove-X-event -> add-X!/remove-X!, see Version 32) -- collect-class-instance-generics now also derives constructors/literal-fields/const-fields/const-props/writeable-static-props/mutable-static-fields (mirroring compute-package-exports-and-shadows's own local bindings) purely to build that taken-names set via the existing class-member-names-excluding-events helper, so it can never choose a different escalation tier than what's actually emitted. This requires a class's constant-properties-list, which compute-package-exports-and-shadows/generate-class-file already receive but collect-class-instance-generics previously did not; it is now a required second parameter, with %compute-defgeneric-model's sole call site passing the resolved-class plist's own :constant-properties.
-   38 - Added optional per-class injection of C# extension methods (--extension-methods/--no-extension-methods, plus sticky --enable-extension-methods/--no-enable-extension-methods CLI defaults -- ON by default, unlike every other sticky flag in this file, since injecting a class's own applicable extension methods is expected to be the common case), per doc/plan-v38.md. Matching is v1/exact-concrete-only: an extension method (a static method on a static holder type whose first parameter carries :extension-this t, already reflected by AssemblyToLispy.cs since Phase 2E -- no new metadata was needed) is a candidate for a class only when its 'this' parameter's :type is string= to the class's own :fully-qualified-name; an open-generic 'this' type (e.g. LINQ's IEnumerable`1[TSource]) never naturally matches a concrete class's FQ name and is additionally guarded via generic-type-p in build-extension-method-index (a new global index over every provided assembly's metadata, mirroring build-metadata-index/build-simple-name-index). compute-matched-extensions-for-class applies three skip passes per class -- dirty (ref/out/params/default) or generic (the method's own type argument(s), or a non-generic method on a generic holder referencing the holder's own open type parameter) candidates are skipped individually; of what remains, a Lisp name colliding with the class's own declared export set is skipped (the class's real member wins); of what remains after that, a Lisp name shared by more than one surviving candidate is skipped in full as ambiguous (extension-method overload dispatch is deferred) -- each skip documented with a comment, mirroring the existing dirty-overload/unsupported-indexer convention. A surviving extension method is emitted as an ordinary obj!-first wrapper forwarding to dotnet:static on the HOLDER type (not <type-str>, which names the class being extended, not the class declaring the method), with a docstring naming the holder's fully-qualified name and owning assembly. compute-package-exports-and-shadows, generate-class-file, and collect-class-instance-generics (so an injected extension wrapper is also eligible for --defgeneric/--defgeneric-dynamic unification, per the Version 37 principle that unification should cover every generated obj!-first wrapper) each gained an &optional matched-extensions parameter so the three can never disagree on a class's actual export list; generate-assembly-packages-batch computes and stores each opted-in resolved-class's :matched-extensions/:skipped-extensions (via the new compute-matched-extensions-for-class) into the resolved-class plist itself, before packages.lisp/class-file/generics-file generation -- all of which now read those two slots back off the plist -- runs.")
+   38 - Added optional per-class injection of C# extension methods (--extension-methods/--no-extension-methods, plus sticky --enable-extension-methods/--no-enable-extension-methods CLI defaults -- ON by default, unlike every other sticky flag in this file, since injecting a class's own applicable extension methods is expected to be the common case), per doc/plan-v38.md. Matching is v1/exact-concrete-only: an extension method (a static method on a static holder type whose first parameter carries :extension-this t, already reflected by AssemblyToLispy.cs since Phase 2E -- no new metadata was needed) is a candidate for a class only when its 'this' parameter's :type is string= to the class's own :fully-qualified-name; an open-generic 'this' type (e.g. LINQ's IEnumerable`1[TSource]) never naturally matches a concrete class's FQ name and is additionally guarded via generic-type-p in build-extension-method-index (a new global index over every provided assembly's metadata, mirroring build-metadata-index/build-simple-name-index). compute-matched-extensions-for-class applies three skip passes per class -- dirty (ref/out/params/default) or generic (the method's own type argument(s), or a non-generic method on a generic holder referencing the holder's own open type parameter) candidates are skipped individually; of what remains, a Lisp name colliding with the class's own declared export set is skipped (the class's real member wins); of what remains after that, a Lisp name shared by more than one surviving candidate is skipped in full as ambiguous (extension-method overload dispatch is deferred) -- each skip documented with a comment, mirroring the existing dirty-overload/unsupported-indexer convention. A surviving extension method is emitted as an ordinary obj!-first wrapper forwarding to dotnet:static on the HOLDER type (not <type-str>, which names the class being extended, not the class declaring the method), with a docstring naming the holder's fully-qualified name and owning assembly. compute-package-exports-and-shadows, generate-class-file, and collect-class-instance-generics (so an injected extension wrapper is also eligible for --defgeneric/--defgeneric-dynamic unification, per the Version 37 principle that unification should cover every generated obj!-first wrapper) each gained an &optional matched-extensions parameter so the three can never disagree on a class's actual export list; generate-assembly-packages-batch computes and stores each opted-in resolved-class's :matched-extensions/:skipped-extensions (via the new compute-matched-extensions-for-class) into the resolved-class plist itself, before packages.lisp/class-file/generics-file generation -- all of which now read those two slots back off the plist -- runs.
+   39 - Generalized Version 33's parents/interfaces ancestor expansion into a recursive, multi-direction, flag-propagating related-class discovery mechanism, per doc/plan-v38.md's Part B. Three new per-class flags (--output-nested/--output-children/--output-implementations, plus sticky --output-all-nested/--output-all-children/--output-all-implementations CLI defaults, all OFF by default) discover, respectively, every type nested inside a class (a prefix scan for '<fq>+', which already reaches every nesting depth in one pass since a doubly-nested type's own FQ name also carries the outer type's FQ name as a prefix), every direct-or-indirect subclass of a class (a new build-reverse-indexes subclass-index, keyed by :superclass), and every implementer of an interface (build-reverse-indexes' implementer-index, keyed by :interfaces -- already fully transitive per .NET's Type.GetInterfaces(), so one lookup reaches every level). Unlike --export-parents/--export-interfaces, these three are GENERATE-ONLY: a discovered type becomes its own independent package, never a re-export source for (and never modifying) the class that discovered it. The bigger change is flag propagation: every discovered class (via any of the now-five discovery directions) carries its discoverer's ENTIRE per-class flag set (all six export-*/output-* flags, plus --defgeneric/--defgeneric-dynamic/--extension-methods -- never --constant-properties, which names properties of one specific class) rather than the pre-Version-39 behavior of a flag-less plain package, so discovery/re-export cascades recursively through the whole connected component a flag reaches -- see PLAN.md's \"Recursive Related-Class Discovery\" section for the full requirements discussion. generate-assembly-packages-batch's Phase B is now a single outer work queue (seeded by every explicitly-requested resolved class) driving all five directions via a new expand-related (replacing expand-ancestors): critically, EXPAND-RELATED still resolves a single class's *entire* upward ancestor chain internally, in one self-contained multi-hop call (exactly reproducing expand-ancestors' old completeness guarantee) -- this is required for re-export correctness, since a child's re-export block is computed once, statically, from its own flattened ancestor list, and cannot see whatever an ancestor might separately re-export from further up its own chain at load time. The three downward directions have no such static-flattening requirement (a discovered type is only ever its own independent package), so their multi-hop transitivity is intentionally left to the OUTER queue's own recursion (re-invoking expand-related on each newly-discovered class using its now-propagated flags) rather than duplicated inside EXPAND-RELATED itself. A warning (no hard cap) is printed if the total number of classes discovered this way exceeds 200, since --output-children/--output-implementations on a widely-derived base or interface can pull in a great many types.")
 
 (defun camel-to-kebab (name)
   "Convert a PascalCase/camelCase string to Lisp kebab-case.
@@ -2011,37 +2012,49 @@
 
 (defun make-resolved-class (class-plist constant-properties
                              &optional export-parents export-interfaces export-object
-                               defgeneric defgeneric-dynamic extension-methods)
+                               defgeneric defgeneric-dynamic extension-methods
+                               output-nested output-children output-implementations)
   "Builds a resolved-class plist: the unit of work generate-class-file,
    generate-batch-packages-file, generate-batch-asd-file, and the
    parents/interfaces re-export machinery all operate on. CLASS-PLIST is
    the type's metadata plist; CONSTANT-PROPERTIES is the split
-   constant-properties-list (or nil); the three export-* booleans (all nil
-   for a class pulled in only as an ancestor -- see expand-ancestors /
-   generate-assembly-packages-batch) mirror the manifest's per-class
-   :export-parents/:export-interfaces/:export-object flags. DEFGENERIC and
-   DEFGENERIC-DYNAMIC (both nil for an ancestor-only class, same as the
-   export-* flags) are two independent, orthogonal opt-ins mirroring the
-   manifest's per-class :defgeneric/:defgeneric-dynamic flags -- the
-   literal-specializer CSHARP-GENERICS package (see
+   constant-properties-list (or nil, and always nil for a class pulled in
+   only via discovery -- see EXPAND-RELATED / GENERATE-ASSEMBLY-PACKAGES-
+   BATCH's Version 39 work-queue Phase B, doc/plan-v38.md's Part B).
+   EXPORT-PARENTS/EXPORT-INTERFACES/EXPORT-OBJECT/OUTPUT-NESTED/OUTPUT-
+   CHILDREN/OUTPUT-IMPLEMENTATIONS (all nil for a class not itself
+   requesting any discovery) mirror the manifest's per-class flags of the
+   same names; as of Version 39 a class discovered via any of them carries
+   the *entire* flag set (all six of these, plus DEFGENERIC/DEFGENERIC-
+   DYNAMIC/EXTENSION-METHODS below) of the class that discovered it,
+   propagated verbatim by GENERATE-ASSEMBLY-PACKAGES-BATCH's work queue, so
+   discovery/re-export cascades recursively through the whole connected
+   component a flag reaches -- see PLAN.md's \"Recursive Related-Class
+   Discovery\" section. DEFGENERIC and DEFGENERIC-DYNAMIC (both nil unless
+   requested or propagated) are two independent, orthogonal opt-ins
+   mirroring the manifest's per-class :defgeneric/:defgeneric-dynamic
+   flags -- the literal-specializer CSHARP-GENERICS package (see
    doc/make-everything-defgeneric.md) and the load-time-install
    CSHARP-GENERICS-DYNAMIC package (see
    doc/make-everything-defgeneric-dynamic.md), respectively. A class may
-   opt into either, both, or neither. EXTENSION-METHODS (nil for an
-   ancestor-only class, same as the other flags; defaults to t at the CLI
-   level -- see Program.cs's enableExtensionMethods) mirrors the manifest's
-   per-class :extension-methods flag (Version 38, doc/plan-v38.md) --
-   whether this class's package should have matching C# extension methods
-   injected as obj!-first wrappers. The stored :matched-extensions/
-   :skipped-extensions slots (initially nil) are filled in separately by
-   GENERATE-ASSEMBLY-PACKAGES-BATCH once the whole working set and the
-   extension-method index are available -- see
+   opt into either, both, or neither. EXTENSION-METHODS (nil unless
+   requested or propagated; defaults to t at the CLI level for an
+   explicitly-requested class -- see Program.cs's enableExtensionMethods)
+   mirrors the manifest's per-class :extension-methods flag (Version 38,
+   doc/plan-v38.md) -- whether this class's package should have matching
+   C# extension methods injected as obj!-first wrappers. The stored
+   :matched-extensions/:skipped-extensions slots (initially nil) are
+   filled in separately by GENERATE-ASSEMBLY-PACKAGES-BATCH once the whole
+   working set and the extension-method index are available -- see
    COMPUTE-MATCHED-EXTENSIONS-FOR-CLASS."
   (list :class-plist class-plist
         :constant-properties constant-properties
         :export-parents export-parents
         :export-interfaces export-interfaces
         :export-object export-object
+        :output-nested output-nested
+        :output-children output-children
+        :output-implementations output-implementations
         :defgeneric defgeneric
         :defgeneric-dynamic defgeneric-dynamic
         :extension-methods extension-methods
@@ -2074,7 +2087,10 @@
                                           (getf class-entry :export-object)
                                           (getf class-entry :defgeneric)
                                           (getf class-entry :defgeneric-dynamic)
-                                          (getf class-entry :extension-methods))
+                                          (getf class-entry :extension-methods)
+                                          (getf class-entry :output-nested)
+                                          (getf class-entry :output-children)
+                                          (getf class-entry :output-implementations))
                     resolved)
               (push cname not-found))))
       (values (nreverse resolved) (nreverse not-found)))))
@@ -2084,7 +2100,7 @@
    one entry) and returns a hash table mapping each type's
    :fully-qualified-name (string) to (cons type-plist owning-entry), where
    OWNING-ENTRY is the ASSEMBLY-ENTRIES element whose metadata file the type
-   was read from. Used by expand-ancestors to resolve a class's
+   was read from. Used by expand-related to resolve a class's
    superclasses/interfaces across every assembly provided on the command
    line, not just the one the requesting class belongs to."
   (let ((index (make-hash-table :test #'equal))
@@ -2101,6 +2117,43 @@
                 (unless (gethash fq-name index)
                   (setf (gethash fq-name index) (cons type-plist entry)))))))))
     index))
+
+(defun build-reverse-indexes (metadata-index)
+  "Given METADATA-INDEX (from build-metadata-index -- every distinct type
+   across every provided assembly), returns (values subclass-index
+   implementer-index), the two downward-discovery indexes Version 39's
+   --output-children/--output-implementations need (doc/plan-v38.md's Part
+   B): SUBCLASS-INDEX maps a superclass fully-qualified-name (string) to a
+   list of (type-plist . owning-entry) conses -- one per type whose own
+   :superclass is exactly that name (a DIRECT subclass only; transitive
+   subclasses are reached by EXPAND-RELATED re-querying this index for each
+   newly-discovered subclass in turn, the same work-queue recursion
+   EXPAND-ANCESTORS already uses for the upward directions).
+   IMPLEMENTER-INDEX maps an interface fully-qualified-name to a list of
+   (type-plist . owning-entry) conses -- one per type whose :interfaces
+   list contains that name; since .NET's Type.GetInterfaces() is already
+   transitive (an implementing subclass's own :interfaces already includes
+   every interface its base classes implement too), no further recursion
+   is needed on this side -- every direct or indirect implementer is found
+   in one pass. Both indexes are built directly from METADATA-INDEX's own
+   values, preserving first-seen order per bucket, exactly like
+   BUILD-EXTENSION-METHOD-INDEX. Nested-type discovery (--output-nested)
+   needs no precomputed index at all -- see EXPAND-RELATED's own prefix
+   scan over METADATA-INDEX's keys."
+  (let ((subclass-index (make-hash-table :test #'equal))
+        (implementer-index (make-hash-table :test #'equal)))
+    (maphash (lambda (fq-name pair)
+               (declare (ignore fq-name))
+               (let* ((type-plist (car pair))
+                      (super (getf type-plist :superclass)))
+                 (when super
+                   (setf (gethash super subclass-index)
+                         (nconc (gethash super subclass-index) (list pair))))
+                 (dolist (iface (getf type-plist :interfaces))
+                   (setf (gethash iface implementer-index)
+                         (nconc (gethash iface implementer-index) (list pair))))))
+             metadata-index)
+    (values subclass-index implementer-index)))
 
 (defun build-extension-method-index (metadata-index)
   "Given METADATA-INDEX (from build-metadata-index -- every distinct type
@@ -2256,67 +2309,118 @@
              metadata-index)
     simple-index))
 
-(defun expand-ancestors (class-plist export-parents export-interfaces export-object index)
-  "Given CLASS-PLIST and its per-class export flags, walks its ancestor
-   graph via INDEX (from build-metadata-index) and returns (values
-   ancestors missing):
+(defun expand-related (class-plist export-parents export-interfaces export-object
+                        output-nested output-children output-implementations
+                        index subclass-index implementer-index)
+  "Given CLASS-PLIST and its own carried per-class direction flags, returns
+   (values ancestor-discovered downward-discovered missing).
 
-   ANCESTORS is a list of (type-plist . owning-entry) conses -- one per
-   distinct ancestor to also generate a package for and consider
-   re-exporting from -- in first-seen (breadth-first) order, excluding
-   CLASS-PLIST itself, and excluding System.Object unless EXPORT-OBJECT is
-   true.
+   ANCESTOR-DISCOVERED is CLASS-PLIST's COMPLETE, already-flattened,
+   multi-level ancestor closure -- a list of (type-plist . owning-entry)
+   conses, in first-seen (breadth-first) order, computed via this
+   function's own SELF-CONTAINED internal work queue (mirroring exactly
+   what the pre-Version-39 EXPAND-ANCESTORS did): EXPORT-PARENTS walks the
+   :superclass chain link-by-link up to System.Object (excluded unless
+   EXPORT-OBJECT; a nil :superclass ends that branch); EXPORT-INTERFACES
+   walks :interfaces (already fully transitive per type, since .NET's
+   Type.GetInterfaces() includes every base type's own interfaces); each
+   newly-found ancestor's own :superclass/:interfaces are queued too, under
+   the same two flags, so a grandparent's members are reached in the SAME
+   single call. This completeness is required for re-export correctness:
+   CLASS-PLIST's re-export block is computed once, from ANCESTOR-DISCOVERED
+   as a flat list (see EMIT-CHILD-REEXPORTS) -- it does not itself see
+   whatever an ancestor may separately re-export from further up the chain
+   (that ancestor's own re-export block is a load-time cl:import/cl:export
+   side effect, invisible to this generation-time computation), so
+   ANCESTOR-DISCOVERED must already include every level itself, not just
+   the immediate parent. This is a per-class computation, independent of
+   any outer recursion -- unlike DOWNWARD-DISCOVERED below, whose multi-hop
+   completeness comes entirely from the caller's own outer work queue.
 
-   MISSING is a list of (fq-name . from-fq-name) conses for ancestors that
-   could not be resolved via INDEX (e.g. defined in an assembly not passed
-   on the command line, or an unresolvable open-generic base type).
-   FROM-FQ-NAME is the immediate class (CLASS-PLIST itself, or an
-   already-resolved ancestor of it) whose :superclass/:interfaces named
-   FQ-NAME, so callers can report which base class an unresolvable
-   ancestor was expected from.
+   DOWNWARD-DISCOVERED is a list of (type-plist . owning-entry) conses from
+   OUTPUT-NESTED (every type in INDEX whose fully-qualified-name has
+   CLASS-PLIST's own fully-qualified-name plus \"+\" as a prefix -- a single
+   scan already reaches every nesting depth, since a nested-of-nested
+   type's FQ name also carries the outer type's FQ name as a prefix),
+   OUTPUT-CHILDREN (SUBCLASS-INDEX's DIRECT-subclass bucket for CLASS-
+   PLIST's own fully-qualified-name ONLY -- indirect/transitive subclasses
+   are reached only when the caller's OUTER work queue later re-invokes
+   this function on each direct subclass, which inherits OUTPUT-CHILDREN
+   via flag propagation), and/or OUTPUT-IMPLEMENTATIONS (IMPLEMENTER-
+   INDEX's bucket for CLASS-PLIST's own fully-qualified-name, already fully
+   transitive per .NET's Type.GetInterfaces()). These three are always
+   GENERATE-ONLY: never a re-export source for anything (CLASS-PLIST is
+   only ever a *discovery seed* for them, never something they feed
+   members back into), so unlike ANCESTOR-DISCOVERED there is no static
+   flattening-correctness requirement -- each discovered type simply
+   becomes its own independent package, so relying on the outer queue's
+   own recursion for OUTPUT-CHILDREN's transitivity is safe. The caller
+   must never fold DOWNWARD-DISCOVERED into child-ancestor-fqs.
 
-   EXPORT-PARENTS walks the :superclass chain link-by-link up to
-   System.Object (a nil :superclass ends that branch). EXPORT-INTERFACES
-   walks :interfaces -- already fully transitive per type, since .NET's
-   Type.GetInterfaces() includes interfaces implemented by any base type.
-   Each newly-found ancestor's own :superclass/:interfaces are queued too,
-   under the same flags, so a grandparent's members can also reach the
-   original class; given :interfaces is already transitive this mostly
-   re-discovers types already queued (harmless -- VISITED dedupes), but
-   keeps this correct even where that invariant doesn't hold."
-  (let ((visited (make-hash-table :test #'equal))
-        (queue nil)
-        (ancestors nil)
-        (missing nil)
-        (self-fq (getf class-plist :fully-qualified-name)))
-    (setf (gethash self-fq visited) t)
-    (flet ((enqueue (fq from)
-             (unless (gethash fq visited)
-               (setf (gethash fq visited) t)
-               (setf queue (nconc queue (list (cons fq from)))))))
-      (when export-parents
-        (let ((super (getf class-plist :superclass)))
-          (when super (enqueue super self-fq))))
-      (when export-interfaces
-        (dolist (iface (getf class-plist :interfaces))
-          (enqueue iface self-fq)))
-      (loop while queue
-            do (let* ((entry (pop queue))
-                      (fq (car entry))
-                      (from (cdr entry)))
-                 (unless (and (string= fq "System.Object") (not export-object))
-                   (let ((found (gethash fq index)))
-                     (if (null found)
-                         (push (cons fq from) missing)
-                         (let ((ancestor-plist (car found)))
-                           (push found ancestors)
-                           (when export-parents
-                             (let ((super (getf ancestor-plist :superclass)))
-                               (when super (enqueue super fq))))
-                           (when export-interfaces
-                             (dolist (iface (getf ancestor-plist :interfaces))
-                               (enqueue iface fq))))))))))
-    (values (nreverse ancestors) (nreverse missing))))
+   MISSING is a list of (fq-name . from-fq-name) conses, exactly as the
+   pre-Version-39 EXPAND-ANCESTORS produced -- only EXPORT-PARENTS/
+   EXPORT-INTERFACES have a 'missing' concept (a named ancestor INDEX
+   cannot resolve, anywhere in the chain); the three downward directions
+   merely enumerate whatever concretely exists in INDEX/SUBCLASS-INDEX/
+   IMPLEMENTER-INDEX, so there is nothing that can be 'missing' for them.
+
+   See doc/plan-v38.md's Part B and PLAN.md's \"Recursive Related-Class
+   Discovery\" section: GENERATE-ASSEMBLY-PACKAGES-BATCH's outer work queue
+   calls this function once per class (seeded by every explicitly-requested
+   class, then again for every newly-discovered one, carrying that
+   discoverer's ENTIRE flag set verbatim), folding both return lists'
+   not-yet-seen entries into the working set -- but only ANCESTOR-DISCOVERED
+   into child-ancestor-fqs."
+  (let ((self-fq (getf class-plist :fully-qualified-name))
+        (downward-discovered nil))
+    (multiple-value-bind (ancestor-discovered missing)
+        (when (or export-parents export-interfaces)
+          (let ((local-visited (make-hash-table :test #'equal))
+                (queue nil)
+                (ancestors nil)
+                (local-missing nil))
+            (setf (gethash self-fq local-visited) t)
+            (flet ((enqueue (fq from)
+                     (unless (gethash fq local-visited)
+                       (setf (gethash fq local-visited) t)
+                       (setf queue (nconc queue (list (cons fq from)))))))
+              (when export-parents
+                (let ((super (getf class-plist :superclass)))
+                  (when super (enqueue super self-fq))))
+              (when export-interfaces
+                (dolist (iface (getf class-plist :interfaces))
+                  (enqueue iface self-fq)))
+              (loop while queue
+                    do (let* ((entry (pop queue))
+                              (fq (car entry))
+                              (from (cdr entry)))
+                         (unless (and (string= fq "System.Object") (not export-object))
+                           (let ((found (gethash fq index)))
+                             (if (null found)
+                                 (push (cons fq from) local-missing)
+                                 (let ((ancestor-plist (car found)))
+                                   (push found ancestors)
+                                   (when export-parents
+                                     (let ((super (getf ancestor-plist :superclass)))
+                                       (when super (enqueue super fq))))
+                                   (when export-interfaces
+                                     (dolist (iface (getf ancestor-plist :interfaces))
+                                       (enqueue iface fq))))))))))
+            (values (nreverse ancestors) (nreverse local-missing))))
+      (when output-nested
+        (let ((prefix (concatenate 'string self-fq "+")))
+          (maphash (lambda (fq pair)
+                     (when (and (>= (length fq) (length prefix))
+                                (string= fq prefix :end1 (length prefix)))
+                       (push pair downward-discovered)))
+                   index)))
+      (when output-children
+        (dolist (pair (gethash self-fq subclass-index))
+          (push pair downward-discovered)))
+      (when output-implementations
+        (dolist (pair (gethash self-fq implementer-index))
+          (push pair downward-discovered)))
+      (values ancestor-discovered (nreverse downward-discovered) missing))))
 
 (defparameter *reexport-excluded-symbols*
   '("<type>" "<type-str>" "<creation>" "<version>" "new")
@@ -2372,7 +2476,7 @@
   "Computes and writes CHILD-PLIST's re-export post-pass block to STREAM:
    the cl:shadowing-import/cl:import/cl:export calls drawing non-conflicting
    members from ANCESTOR-FQS (CHILD-PLIST's already-resolved ancestor
-   fully-qualified-name list, from expand-ancestors via
+   fully-qualified-name list, from expand-related via
    GENERATE-ASSEMBLY-PACKAGES-BATCH's child-ancestor-fqs table), plus
    comments documenting any skipped (conflicting/ambiguous) names.
    FQ->RESOLVED maps every resolved class's fully-qualified-name back to its
@@ -2559,7 +2663,7 @@
    well as before csharp-assembly-utils.lisp (GENERATE-BATCH-UTILS-FILE).
 
    After every defpackage form, if CHILD-ANCESTOR-FQS (a hash table mapping
-   a child's fully-qualified-name to its expand-ancestors-resolved ancestor
+   a child's fully-qualified-name to its expand-related-resolved ancestor
    fully-qualified-name list, built by GENERATE-ASSEMBLY-PACKAGES-BATCH) has
    any entries, a re-export post-pass follows (see EMIT-CHILD-REEXPORTS):
    one block per child with a non-empty ancestor list, importing and
@@ -2998,17 +3102,34 @@
    means only that entry's metadata file (already written by C#) was
    requested.
 
-   For every resolved class with :export-parents and/or :export-interfaces
-   set, EXPAND-ANCESTORS walks its ancestor graph across every provided
-   assembly's metadata (BUILD-METADATA-INDEX) and the result is folded into
-   the working set: a newly-discovered ancestor is generated as a plain
-   package (no export flags of its own, unless it was ALSO explicitly
-   requested, in which case the explicit request's flags/constant-properties
-   win and no duplicate entry is added), appended after its owning
-   assembly's explicitly-requested classes (stable, minimal reordering --
-   see doc/parents-and-interfaces-plan.md). An ancestor that cannot be
-   resolved anywhere is a hard error unless SKIP-MISSING is true, in which
-   case it is dropped with a warning instead.
+   A work queue (Version 39, doc/plan-v38.md's Part B), seeded by every
+   explicitly-requested resolved class, recursively discovers related
+   classes across all six per-class direction flags (:export-parents/
+   :export-interfaces/:export-object upward via EXPAND-RELATED's own
+   internal multi-hop ancestor-chain walk; :output-nested/:output-children/
+   :output-implementations downward, made transitive by this OUTER queue
+   re-invoking EXPAND-RELATED on each newly-discovered class in turn) and
+   folds the result into the working set: a newly-discovered class carries
+   its discoverer's ENTIRE flag set (all six direction flags plus
+   :defgeneric/:defgeneric-dynamic/:extension-methods, never its
+   :constant-properties), so discovery/re-export cascades recursively
+   through the whole connected component a flag reaches, UNLESS it was
+   ALSO explicitly requested, in which case the explicit request's own
+   flags/constant-properties win and no duplicate entry is added. Each
+   class discovered this way is appended after its owning assembly's
+   explicitly-requested classes (stable, minimal reordering -- see
+   doc/parents-and-interfaces-plan.md). Only classes discovered via
+   :export-parents/:export-interfaces become a re-export source
+   (CHILD-ANCESTOR-FQS) for the class that discovered them; the three
+   downward directions only ever add their discoveries to the working set
+   as independent packages, never modifying anything's own re-export block.
+   An ancestor (from :export-parents/:export-interfaces only -- the
+   downward directions have no 'missing' concept) that cannot be resolved
+   anywhere is a hard error unless SKIP-MISSING is true, in which case it
+   is dropped with a warning instead. A warning is also printed if the
+   total number of classes discovered this way is large, since
+   :output-children/:output-implementations on a widely-derived base can
+   pull in a great many types.
 
    Before any class file is written, emits packages.lisp
    (GENERATE-BATCH-PACKAGES-FILE, using PACKAGE-TEMPLATE-PATH for the
@@ -3057,32 +3178,72 @@
         (utils:format-red *error-output* "Error: Class not found in assembly metadata: ~A~%" cname))
       (error "One or more requested classes were not found: ~{~A~^, ~}" all-not-found))
 
-    ;; Phase B: expand parents/interfaces for every class that opted in,
-    ;; across a global index of every provided assembly's metadata.
+    ;; Phase B (Version 39, doc/plan-v38.md's Part B): a work queue, seeded
+    ;; by every explicitly-requested resolved-class, recursively discovers
+    ;; related classes across all six directions (--export-parents/
+    ;; --export-interfaces/--export-object upward; --output-nested/
+    ;; --output-children/--output-implementations downward) via
+    ;; EXPAND-RELATED. Every newly-discovered class is enqueued carrying
+    ;; its discoverer's ENTIRE per-class flag set (all six export-*/output-*
+    ;; flags plus --defgeneric/--defgeneric-dynamic/--extension-methods, but
+    ;; never its discoverer's --constant-properties, which names properties
+    ;; specific to one class), so discovery/re-export cascades recursively
+    ;; through the whole connected component a flag reaches -- see PLAN.md's
+    ;; "Recursive Related-Class Discovery" section. Only each class's own
+    ;; ANCESTOR-DISCOVERED (--export-parents/--export-interfaces) is
+    ;; recorded as a re-export source (child-ancestor-fqs); DOWNWARD-
+    ;; DISCOVERED (--output-nested/--output-children/--output-
+    ;; implementations) is added to the working set ONLY -- never a
+    ;; re-export source, and never modifies the discovering class's own
+    ;; package (see EXPAND-RELATED's docstring for why this asymmetry is
+    ;; correct).
     (let ((all-missing nil)
-          (ancestor-additions (make-hash-table :test #'eq)))
-      (dolist (entry entries-with-resolved)
-        (dolist (rc (gethash entry entry-resolved-table))
-          (when (or (getf rc :export-parents) (getf rc :export-interfaces))
-            (let ((child-fq (getf (getf rc :class-plist) :fully-qualified-name))
-                  (ancestor-fqs nil))
-              (multiple-value-bind (ancestors missing)
-                  (expand-ancestors (getf rc :class-plist)
-                                     (getf rc :export-parents)
-                                     (getf rc :export-interfaces)
-                                     (getf rc :export-object)
-                                     index)
-                (setf all-missing (append all-missing missing))
-                (dolist (anc ancestors)
-                  (let* ((anc-plist (car anc))
-                         (owning-entry (cdr anc))
-                         (anc-fq (getf anc-plist :fully-qualified-name)))
-                    (push anc-fq ancestor-fqs)
-                    (unless (gethash anc-fq seen-fq)
-                      (setf (gethash anc-fq seen-fq) t)
-                      (push (make-resolved-class anc-plist nil)
-                            (gethash owning-entry ancestor-additions)))))
-                (setf (gethash child-fq child-ancestor-fqs) (nreverse ancestor-fqs)))))))
+          (discovery-additions (make-hash-table :test #'eq))
+          (total-discovered 0)
+          (queue nil))
+      (multiple-value-bind (subclass-index implementer-index) (build-reverse-indexes index)
+        (dolist (entry entries-with-resolved)
+          (dolist (rc (gethash entry entry-resolved-table))
+            (setf queue (nconc queue (list rc)))))
+        (loop while queue
+              do (let* ((rc (pop queue))
+                        (self-fq (getf (getf rc :class-plist) :fully-qualified-name)))
+                   (multiple-value-bind (ancestor-discovered downward-discovered missing)
+                       (expand-related (getf rc :class-plist)
+                                        (getf rc :export-parents)
+                                        (getf rc :export-interfaces)
+                                        (getf rc :export-object)
+                                        (getf rc :output-nested)
+                                        (getf rc :output-children)
+                                        (getf rc :output-implementations)
+                                        index subclass-index implementer-index)
+                     (setf all-missing (append all-missing missing))
+                     (when ancestor-discovered
+                       (setf (gethash self-fq child-ancestor-fqs)
+                             (mapcar (lambda (pair) (getf (car pair) :fully-qualified-name))
+                                     ancestor-discovered)))
+                     (dolist (pair (append ancestor-discovered downward-discovered))
+                       (let* ((discovered-plist (car pair))
+                              (owning-entry (cdr pair))
+                              (discovered-fq (getf discovered-plist :fully-qualified-name)))
+                         (unless (gethash discovered-fq seen-fq)
+                           (setf (gethash discovered-fq seen-fq) t)
+                           (incf total-discovered)
+                           (let ((new-rc (make-resolved-class
+                                          discovered-plist nil
+                                          (getf rc :export-parents) (getf rc :export-interfaces)
+                                          (getf rc :export-object)
+                                          (getf rc :defgeneric) (getf rc :defgeneric-dynamic)
+                                          (getf rc :extension-methods)
+                                          (getf rc :output-nested) (getf rc :output-children)
+                                          (getf rc :output-implementations))))
+                             (push new-rc (gethash owning-entry discovery-additions))
+                             (setf queue (nconc queue (list new-rc))))))))))
+
+        (when (> total-discovered 200)
+          (format *error-output*
+                  "Warning: related-class discovery (--export-parents/--export-interfaces/--output-nested/--output-children/--output-implementations) pulled in ~D additional classes across this batch -- generation may take a while and/or produce a very large package set.~%"
+                  total-discovered)))
 
       (when all-missing
         (if skip-missing
@@ -3098,9 +3259,9 @@
 
       ;; Merge: each entry's final resolved list is its explicit classes
       ;; (already in request order) followed by any newly-discovered
-      ;; ancestors, in first-discovered order.
+      ;; classes, in first-discovered order.
       (dolist (entry entries-with-resolved)
-        (let ((additions (nreverse (gethash entry ancestor-additions))))
+        (let ((additions (nreverse (gethash entry discovery-additions))))
           (when additions
             (setf (gethash entry entry-resolved-table)
                   (append (gethash entry entry-resolved-table) additions))))))
@@ -3167,7 +3328,15 @@
                   :export-parents t/nil :export-interfaces t/nil
                   :export-object t/nil :defgeneric t/nil
                   :defgeneric-dynamic t/nil
-                  :extension-methods t/nil) ...)) ...)
+                  :extension-methods t/nil
+                  :output-nested t/nil :output-children t/nil
+                  :output-implementations t/nil) ...)) ...)
+   :output-nested/:output-children/:output-implementations (per-class,
+   Version 39, doc/plan-v38.md's Part B) discover, respectively, every type
+   nested inside a class, every direct-or-indirect subclass of a class, and
+   every implementer of a class (when it is an interface), adding each as
+   its own generated package -- see GENERATE-ASSEMBLY-PACKAGES-BATCH's work
+   queue and EXPAND-RELATED.
    :defgeneric and :defgeneric-dynamic (per-class, independent/orthogonal,
    resolved from Program.cs's --defgeneric/--enable-defgeneric and
    --defgeneric-dynamic/--enable-defgeneric-dynamic flags respectively) opt

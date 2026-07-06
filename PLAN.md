@@ -43,6 +43,26 @@ Add flags & default changing flags for these capabilities.
 
 * Export all implementations of an interface (recursively) as well.
 
+**DONE (Version 39, 2026-07-06).** Implemented per the detailed plan in
+[`doc/plan-v38.md`](doc/plan-v38.md)'s "Part B" section: `--output-nested`/
+`--output-children`/`--output-implementations` (per-class, all off by default)
+plus sticky `--output-all-nested`/`--output-all-children`/
+`--output-all-implementations` discover, respectively, nested types,
+subclasses, and interface implementers, adding each as its own generated
+package -- **generate-only**, never re-exported into (or otherwise modifying)
+the discovering class's own package, unlike `--export-parents`/
+`--export-interfaces`. Per this section's explicit requirements discussion:
+every class discovered via any of the now-five discovery directions carries
+its discoverer's *entire* per-class flag set (all six `--export-*`/`--output-*` flags plus
+`--defgeneric`/`--defgeneric-dynamic`/`--extension-methods`, never
+`--constant-properties`), so discovery/re-export cascades recursively through
+the whole connected component a flag reaches -- a behavior change for existing
+`--export-parents`/`--export-interfaces` users, since a Version 33 discovered
+ancestor was previously always a flag-less plain package. A warning (no hard
+cap) is printed if a single invocation discovers more than 200 additional
+classes. See `doc/generator-design-notes.md`'s "Recursive Related-Class
+Discovery (Version 39)" section and `RELEASES.md`'s 2.39.0 entry.
+
 * **Deferred from the Parents and Interfaces implementation (Phase 5 of
   [`doc/parents-and-interfaces-plan.md`](doc/parents-and-interfaces-plan.md)): virtual/
   override-aware shadow commentary.** The original design (see this file's "Parents and

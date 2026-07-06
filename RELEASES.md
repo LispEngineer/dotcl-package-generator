@@ -10,6 +10,26 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.39.0 — 2026-07-05
+
+**Added recursive, multi-direction related-class discovery, with flag propagation.**
+
+* New `--output-nested`/`--output-children`/`--output-implementations` (per-class, all OFF by
+  default) plus sticky `--output-all-nested`/`--output-all-children`/
+  `--output-all-implementations` CLI flags discover, respectively, types nested inside a class,
+  its subclasses, and implementers of an interface, adding each as its own generated package.
+  Unlike `--export-parents`/`--export-interfaces`, these are generate-only — nothing is
+  re-exported into (or otherwise modifies) the class that discovered them.
+* **Behavior change for existing `--export-parents`/`--export-interfaces` users:** every
+  discovered class (via any of the five discovery directions) now carries its discoverer's
+  entire per-class flag set, cascading recursively through the whole connected component a flag
+  reaches — previously (2.33.0+), a discovered ancestor was always a flag-less plain package.
+  `--constant-properties` is never propagated. See `doc/plan-v38.md`'s Part B and
+  `doc/generator-design-notes.md`'s "Recursive Related-Class Discovery (Version 39)" section
+  (`*generator-version*` bumped to 39).
+* A warning (no hard cap) is printed if a single invocation discovers more than 200 additional
+  classes this way.
+
 ## 2.38.0 — 2026-07-05
 
 **Added optional per-class injection of C# extension methods, ON by default.**

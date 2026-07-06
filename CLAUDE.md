@@ -125,6 +125,16 @@ subsequent `--class`. `--skip-missing`/`--no-skip-missing` (global) governs whet
 ancestor unresolvable in any provided assembly is a hard error (default) or a dropped warning.
 See `doc/parents-and-interfaces-plan.md` and `FEATURES.md`'s "Parents and Interfaces" section.
 
+A class can also opt into discovering, and generating (but never re-exporting) packages for,
+related classes: `--output-nested`/`--output-children`/`--output-implementations` (per-class),
+plus sticky `--output-all-nested`/`--output-all-children`/`--output-all-implementations`
+defaults — types nested inside a class, its subclasses, and implementers of an interface,
+respectively. **Every class discovered via any of these five directions (these three plus the
+two `--export-parents`/`--export-interfaces` above) carries its discoverer's entire per-class
+flag set**, cascading recursively; only `--export-parents`/`--export-interfaces` discoveries are
+re-export sources. See `doc/plan-v38.md`'s Part B, `doc/generator-design-notes.md`'s "Recursive
+Related-Class Discovery (Version 39)" section, and `FEATURES.md`'s same-named section.
+
 A class can also opt into unifying its instance methods and instance property/field accessors
 into a shared package of CLOS generic functions dispatching on C# runtime type, via two
 independent, orthogonal mechanisms (a class may use either, both, or neither):
@@ -179,12 +189,14 @@ reflection and runs before DotCL boots.
 * **`assembly-package-generator.lisp`** — the code generator proper. Entry points
   `run-assembly-package-generator-batch` → `generate-assembly-packages-batch` (which resolves
   and validates every requested class against its assembly's metadata *before* generating
-  anything, via `resolve-batch-entry`; then, for any class with `--export-parents`/
-  `--export-interfaces` set, resolves its ancestor graph across *every* provided assembly's
-  metadata via a global index (`build-metadata-index`/`expand-ancestors`), folding newly-found
-  ancestors into the same working set before anything is generated — see
-  `doc/parents-and-interfaces-plan.md`) → `generate-class-file` (~1000 lines; the bulk of the
-  file). Bump `*generator-version*` (top of file) whenever generation *behavior* (the shape of
+  anything, via `resolve-batch-entry`; then a work queue, seeded by every explicitly-requested
+  class, recursively discovers related classes across all six `--export-*`/`--output-*` direction flags via
+  `expand-related` — a global index (`build-metadata-index`) plus two reverse indexes
+  (`build-reverse-indexes`) — folding newly-discovered classes into the same working set, each
+  carrying its discoverer's entire flag set, before anything is generated — see
+  `doc/parents-and-interfaces-plan.md` and `doc/plan-v38.md`'s Part B) → `generate-class-file`
+  (~1000 lines; the bulk of the file). Bump `*generator-version*` (top of file) whenever
+  generation *behavior* (the shape of
   emitted `.lisp` files) changes, and add a changelog line in its docstring —
   `doc/generator-design-notes.md`'s "Generator Version History" section has the detailed
   rationale per version and should gain an entry for significant changes. `VERSION` in

@@ -3,6 +3,13 @@
 * Author: (design) — for implementation by a later session
 * Status: APPROVED-FOR-IMPLEMENTATION (not yet implemented)
 * Related: `PLAN.md` "Parents and Interfaces" section (the original idea sketch)
+* **Superseded/generalized by Version 39:** `doc/plan-v38.md`'s Part B generalizes this plan's
+  `expand-ancestors` (renamed `expand-related`) into a recursive, multi-direction, flag-
+  propagating mechanism also covering `--output-nested`/`--output-children`/
+  `--output-implementations`. The upward-direction design described below (post-pass re-export,
+  skip-with-comment conflict handling, `--skip-missing`) is otherwise unchanged by Version 39 —
+  see `doc/generator-design-notes.md`'s "Recursive Related-Class Discovery (Version 39)" section
+  for what changed and why.
 
 Locked design decisions:
 1. Re-export via a **post-pass of `import`/`shadowing-import` + `export` calls**

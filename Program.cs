@@ -26,6 +26,9 @@ var argErrors = new List<string>();
 bool exportAllParents = false;
 bool exportAllInterfaces = false;
 bool exportAllObject = false;
+bool outputAllNested = false;
+bool outputAllChildren = false;
+bool outputAllImplementations = false;
 bool skipMissing = false;
 bool enableDefgenericDynamic = false;
 bool enableDefgenericStatic = false;
@@ -60,6 +63,9 @@ for (int i = 0; i < args.Length; i++) {
                 ExportParents = exportAllParents,
                 ExportInterfaces = exportAllInterfaces,
                 ExportObject = exportAllObject,
+                OutputNested = outputAllNested,
+                OutputChildren = outputAllChildren,
+                OutputImplementations = outputAllImplementations,
                 DefGenericDynamic = enableDefgenericDynamic,
                 DefGenericStatic = enableDefgenericStatic,
                 ExtensionMethods = enableExtensionMethods,
@@ -110,6 +116,42 @@ for (int i = 0; i < args.Length; i++) {
         } else {
             currentClass.ExportObject = false;
         }
+    } else if (args[i] == "--output-nested") {
+        if (currentClass == null) {
+            argErrors.Add("--output-nested specified before any --class.");
+        } else {
+            currentClass.OutputNested = true;
+        }
+    } else if (args[i] == "--no-output-nested") {
+        if (currentClass == null) {
+            argErrors.Add("--no-output-nested specified before any --class.");
+        } else {
+            currentClass.OutputNested = false;
+        }
+    } else if (args[i] == "--output-children") {
+        if (currentClass == null) {
+            argErrors.Add("--output-children specified before any --class.");
+        } else {
+            currentClass.OutputChildren = true;
+        }
+    } else if (args[i] == "--no-output-children") {
+        if (currentClass == null) {
+            argErrors.Add("--no-output-children specified before any --class.");
+        } else {
+            currentClass.OutputChildren = false;
+        }
+    } else if (args[i] == "--output-implementations") {
+        if (currentClass == null) {
+            argErrors.Add("--output-implementations specified before any --class.");
+        } else {
+            currentClass.OutputImplementations = true;
+        }
+    } else if (args[i] == "--no-output-implementations") {
+        if (currentClass == null) {
+            argErrors.Add("--no-output-implementations specified before any --class.");
+        } else {
+            currentClass.OutputImplementations = false;
+        }
     } else if (args[i] == "--defgeneric-dynamic") {
         if (currentClass == null) {
             argErrors.Add("--defgeneric-dynamic specified before any --class.");
@@ -158,6 +200,18 @@ for (int i = 0; i < args.Length; i++) {
         exportAllObject = true;
     } else if (args[i] == "--no-export-all-object") {
         exportAllObject = false;
+    } else if (args[i] == "--output-all-nested") {
+        outputAllNested = true;
+    } else if (args[i] == "--no-output-all-nested") {
+        outputAllNested = false;
+    } else if (args[i] == "--output-all-children") {
+        outputAllChildren = true;
+    } else if (args[i] == "--no-output-all-children") {
+        outputAllChildren = false;
+    } else if (args[i] == "--output-all-implementations") {
+        outputAllImplementations = true;
+    } else if (args[i] == "--no-output-all-implementations") {
+        outputAllImplementations = false;
     } else if (args[i] == "--skip-missing") {
         skipMissing = true;
     } else if (args[i] == "--no-skip-missing") {
@@ -245,6 +299,9 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
                 manifest.Append(" :export-parents ").Append(cls.ExportParents ? "t" : "nil");
                 manifest.Append(" :export-interfaces ").Append(cls.ExportInterfaces ? "t" : "nil");
                 manifest.Append(" :export-object ").Append(cls.ExportObject ? "t" : "nil");
+                manifest.Append(" :output-nested ").Append(cls.OutputNested ? "t" : "nil");
+                manifest.Append(" :output-children ").Append(cls.OutputChildren ? "t" : "nil");
+                manifest.Append(" :output-implementations ").Append(cls.OutputImplementations ? "t" : "nil");
                 manifest.Append(" :defgeneric-dynamic ").Append(cls.DefGenericDynamic ? "t" : "nil");
                 manifest.Append(" :defgeneric ").Append(cls.DefGenericStatic ? "t" : "nil");
                 manifest.Append(" :extension-methods ").Append(cls.ExtensionMethods ? "t" : "nil");
@@ -392,9 +449,13 @@ void PrintHelp() {
         "of re-evaluated accessors, for the most recently given",
         "--class.");
     Console.WriteLine();
-    Console.WriteLine("Parents and interfaces (per-class, attach to the most recently given --class);");
-    Console.WriteLine("each has a --no- counterpart that turns it back off for just that one class,");
-    Console.WriteLine("overriding a --export-all-* sticky default in effect (see below):");
+    Console.WriteLine("Parents, interfaces, and related-class discovery (per-class, attach to the most");
+    Console.WriteLine("recently given --class); each has a --no- counterpart that turns it back off for");
+    Console.WriteLine("just that one class, overriding a --export-all-*/--output-all-* sticky default in");
+    Console.WriteLine("effect (see below). A class discovered via any of these flags carries the");
+    Console.WriteLine("discovering class's own complete flag set (all --export-*/--output-*/--defgeneric*/");
+    Console.WriteLine("--extension-methods flags) and is itself processed the same way, so discovery/");
+    Console.WriteLine("re-export cascades recursively through the whole connected component:");
     Opt("--export-parents / --no-export-parents", "Also generate packages for, and re-export",
         "non-conflicting members from, every super-class",
         "of the most recently given --class (excluding",
@@ -405,6 +466,25 @@ void PrintHelp() {
     Opt("--export-object / --no-export-object", "When combined with --export-parents, also",
         "generate a package for, and re-export from,",
         "System.Object.");
+    Opt("--output-nested / --no-output-nested", "Also generate packages for every type nested",
+        "inside the most recently given --class (and,",
+        "recursively, types nested inside those). Unlike",
+        "--export-parents/--export-interfaces, discovered",
+        "types are only added to the batch as their own",
+        "packages -- nothing is re-exported into this",
+        "class's own package.");
+    Opt("--output-children / --no-output-children", "Also generate packages for every direct and",
+        "indirect subclass of the most recently given",
+        "--class found in any provided assembly. Generate-",
+        "only, like --output-nested -- never re-exported",
+        "into this class's own package. Can pull in a very",
+        "large number of types from a widely-derived base",
+        "class; a warning is printed if the total discovered",
+        "class count is large.");
+    Opt("--output-implementations / --no-output-implementations", "Also generate packages for every type",
+        "(found in any provided assembly) that implements",
+        "the most recently given --class, if it is an",
+        "interface. Generate-only, like --output-nested.");
     Opt("--defgeneric / --no-defgeneric", "Also contribute the most recently given",
         "--class's instance methods and instance",
         "property/field accessors to the shared",
@@ -437,11 +517,15 @@ void PrintHelp() {
         "comment instead. ON by default.");
     Console.WriteLine();
     Console.WriteLine("Sticky defaults (change the default for the current and every subsequent --class,");
-    Console.WriteLine("in command-line order; a class's own --export-*/--no-export-*/--defgeneric*");
-    Console.WriteLine("flags above always override these, for that one class only):");
+    Console.WriteLine("in command-line order; a class's own --export-*/--output-*/--no-export-*/");
+    Console.WriteLine("--no-output-*/--defgeneric* flags above always override these, for that one");
+    Console.WriteLine("class only):");
     Opt("--export-all-parents / --no-export-all-parents", "Default --export-parents on/off.");
     Opt("--export-all-interfaces / --no-export-all-interfaces", "Default --export-interfaces on/off.");
     Opt("--export-all-object / --no-export-all-object", "Default --export-object on/off.");
+    Opt("--output-all-nested / --no-output-all-nested", "Default --output-nested on/off.");
+    Opt("--output-all-children / --no-output-all-children", "Default --output-children on/off.");
+    Opt("--output-all-implementations / --no-output-all-implementations", "Default --output-implementations on/off.");
     Opt("--enable-defgeneric / --no-enable-defgeneric", "Default --defgeneric on/off.");
     Opt("--enable-defgeneric-dynamic / --no-enable-defgeneric-dynamic", "Default --defgeneric-dynamic on/off.");
     Opt("--enable-extension-methods / --no-enable-extension-methods", "Default --extension-methods on/off.",
@@ -482,6 +566,9 @@ class ClassSpec {
     public bool ExportParents;
     public bool ExportInterfaces;
     public bool ExportObject;
+    public bool OutputNested;
+    public bool OutputChildren;
+    public bool OutputImplementations;
     public bool DefGenericDynamic;
     public bool DefGenericStatic;
     public bool ExtensionMethods;

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Diagnostics.Debug
-;;; Generator Version: 38
-;;; Creation Date: 2026-07-06T00:35:02Z
+;;; Generator Version: 39
+;;; Creation Date: 2026-07-06T00:55:09Z
 
 (cl:in-package :system-diagnostics-debug)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Diagnostics.Debug"))
 (cl:defconstant <type-str> "System.Diagnostics.Debug")
-(cl:defconstant <creation> "2026-07-06T00:35:02Z")
-(cl:defconstant <version> 38)
+(cl:defconstant <creation> "2026-07-06T00:55:09Z")
+(cl:defconstant <version> 39)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

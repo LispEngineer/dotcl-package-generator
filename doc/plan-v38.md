@@ -304,15 +304,15 @@ propagation**:
     `--export-object`).
   * `--export-interfaces` — the class's `:interfaces` (existing; already
     transitive).
-  * `--export-nested` — types whose FQ starts with `"<class-fq>+"` (transitively
+  * `--output-nested` — types whose FQ starts with `"<class-fq>+"` (transitively
     nested in one pass, since `+` is the nesting separator and FQ names are
     unique).
-  * `--export-children` — direct subclasses (types whose `:superclass` `string=`
+  * `--output-children` — direct subclasses (types whose `:superclass` `string=`
     this class), walked transitively via the work-queue.
-  * `--export-implementations` — types whose `:interfaces` contains this class's
+  * `--output-implementations` — types whose `:interfaces` contains this class's
     FQ (already transitive, since `.NET`'s `GetInterfaces()` is transitive).
 * **Every discovered class is enqueued carrying the discovering class's full
-  per-class boolean flag set** (all `--export-*` flags **plus** `--defgeneric`,
+  per-class boolean flag set** (all `--export-*`/`--output-*` flags **plus** `--defgeneric`,
   `--defgeneric-dynamic`, `--extension-methods`). It is therefore itself
   processed for further discovery and re-export under those same flags —
   discovery cascades through the whole connected component. Constant-properties
@@ -322,7 +322,7 @@ propagation**:
     working set **and** recorded as re-export sources for the discovering class
     (into `child-ancestor-fqs`), exactly as v33 does — so the discovering class
     re-exports those ancestors' members into itself.
-  * `--export-nested`/`--export-children`/`--export-implementations` discoveries
+  * `--output-nested`/`--output-children`/`--output-implementations` discoveries
     are **only** added to the working set. They are **never** recorded as
     re-export sources; the anchor / discovering class's own package is not
     modified by them.
@@ -335,7 +335,7 @@ propagation**:
   (existing `expand-ancestors` `missing` mechanism). The three downward
   directions have **no missing concept** — they enumerate whatever types exist in
   the provided assemblies; there is nothing to be "missing."
-* **Fan-out safety:** because `--export-children`/`--export-implementations` on a
+* **Fan-out safety:** because `--output-children`/`--output-implementations` on a
   widely-derived base/interface can pull in very many types (amplified by
   recursion), emit a `format-red`/warning to `*error-output*` reporting the total
   discovered-class count when it exceeds a threshold (e.g. 200), so an
@@ -347,16 +347,16 @@ Add three per-class flags + three sticky defaults, all modeled precisely on
 `--export-parents` / `--export-all-parents` (`Program.cs:75-86,135-138`), **all
 defaulting OFF** (unlike Part A):
 
-* Per-class: `--export-nested` / `--no-export-nested`, `--export-children` /
-  `--no-export-children`, `--export-implementations` /
-  `--no-export-implementations`. Each sets a bool on the current `ClassSpec`;
+* Per-class: `--output-nested` / `--no-output-nested`, `--output-children` /
+  `--no-output-children`, `--output-implementations` /
+  `--no-output-implementations`. Each sets a bool on the current `ClassSpec`;
   error if before any `--class`.
-* Sticky: `--export-all-nested` / `--no-export-all-nested`,
-  `--export-all-children` / `--no-export-all-children`,
-  `--export-all-implementations` / `--no-export-all-implementations`.
-* `ClassSpec` gains `bool ExportNested, ExportChildren, ExportImplementations;`;
+* Sticky: `--output-all-nested` / `--no-output-all-nested`,
+  `--output-all-children` / `--no-output-all-children`,
+  `--output-all-implementations` / `--no-output-all-implementations`.
+* `ClassSpec` gains `bool OutputNested, OutputChildren, OutputImplementations;`;
   seed each from the corresponding sticky in the `--class` branch.
-* Manifest: append `:export-nested`/`:export-children`/`:export-implementations`
+* Manifest: append `:output-nested`/`:output-children`/`:output-implementations`
   booleans to each `:classes` entry.
 * `--help`: add the three per-class flags to the parents/interfaces group and the
   three sticky flags to the sticky-defaults group, with a note that they
@@ -452,8 +452,8 @@ automatically.
     their own packages in the generated `packages.lisp`/`.asd`, that the anchor's
     own package is unchanged by downward discovery, and that a discovered class
     carrying `--export-parents` emits its own re-export block.
-  * Extend `make test`'s smoke invocation with an `--export-children` (or
-    `--export-implementations`) case, regenerate `cspackages-test/`, commit the
+  * Extend `make test`'s smoke invocation with an `--output-children` (or
+    `--output-implementations`) case, regenerate `cspackages-test/`, commit the
     diff.
   * `make check-parens`; `make build test`.
 
@@ -476,7 +476,7 @@ automatically.
   (`generate-master-wrapper`, `:870`) to dispatch across multiple overloaded
   extension methods of the same name, each invoked via its own holder's
   `dotnet:static`. v38 skips overloaded extension names with a comment instead.
-* **Generic superclass matching for `--export-children`:** v39 matches
+* **Generic superclass matching for `--output-children`:** v39 matches
   `:superclass` by exact FQ string, so a subclass whose base is a *closed*
   generic (`` Base`1[System.Int32] ``) won't match an anchor that is the *open*
   generic (`` Base`1 ``). Same class of limitation as extension generic matching.
@@ -521,9 +521,9 @@ automatically.
    in `packages.lisp` exports and in the class `.lisp` as a `dotnet:static`
    forward with a holder-naming docstring; load in a DotCL REPL and call
    `class:extension obj! ...` on a real instance.
-5. Manual end-to-end (Part B): generate an anchor with `--export-children`
+5. Manual end-to-end (Part B): generate an anchor with `--output-children`
    `--export-parents`; confirm the discovered subclasses appear as their own
    packages/`.asd` components, the anchor's own package is unchanged by the
    downward discovery, and a discovered subclass emits its own re-export block
-   (flag propagation). Confirm `--export-implementations` over an interface pulls
+   (flag propagation). Confirm `--output-implementations` over an interface pulls
    in implementers, and the fan-out warning fires on a deliberately wide base.

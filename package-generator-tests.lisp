@@ -1076,10 +1076,14 @@
       (when (probe-file out-dir)
         (uiop:delete-directory-tree out-dir :validate t))))
 
-  ;; 7. Parents and interfaces: expand-ancestors walks the superclass chain
-  ;;    and interfaces across a global metadata index (build-metadata-index),
-  ;;    as used by generate-assembly-packages-batch for
-  ;;    --export-parents/--export-interfaces/--export-object.
+  ;; 7. Parents and interfaces: expand-related's own internal multi-hop walk
+  ;;    resolves the full superclass chain and interfaces in ONE call
+  ;;    across a global metadata index (build-metadata-index), as used by
+  ;;    generate-assembly-packages-batch for --export-parents/
+  ;;    --export-interfaces/--export-object. (downward-discovered/
+  ;;    subclass-index/implementer-index are exercised separately in
+  ;;    section 15 below -- pass nil/empty tables here since these tests
+  ;;    only exercise the upward directions.)
   (let* ((object-plist '(:fully-qualified-name "System.Object" :kind :class :superclass nil :interfaces nil))
          (base-plist '(:fully-qualified-name "Fixture.Base" :kind :class
                        :superclass "System.Object" :interfaces ("Fixture.IBase")))
@@ -1095,53 +1099,62 @@
                   (dolist (p (list object-plist base-plist mid-plist derived-plist
                                    ibase-plist imid-plist iderived-plist))
                     (setf (gethash (getf p :fully-qualified-name) tbl) (cons p owning-entry)))
-                  tbl)))
+                  tbl))
+         (no-subclass-index (make-hash-table :test #'equal))
+         (no-implementer-index (make-hash-table :test #'equal)))
 
     ;; 7.1 export-parents alone walks the superclass chain, excluding System.Object by default.
-    (multiple-value-bind (ancestors missing)
-        (assembly-package-generator::expand-ancestors derived-plist t nil nil index)
+    (multiple-value-bind (ancestors downward missing)
+        (assembly-package-generator::expand-related derived-plist t nil nil nil nil nil
+                                                      index no-subclass-index no-implementer-index)
+      (declare (ignore downward))
       (assert-test missing nil
-                  "expand-ancestors finds no missing ancestors when the full chain is in the index")
+                  "expand-related finds no missing ancestors when the full chain is in the index")
       (assert-test (mapcar (lambda (a) (getf (car a) :fully-qualified-name)) ancestors)
                   '("Fixture.Mid" "Fixture.Base")
-                  "expand-ancestors (export-parents only) walks the superclass chain, excluding System.Object by default"))
+                  "expand-related (export-parents only) walks the superclass chain, excluding System.Object by default"))
 
     ;; 7.2 export-object also includes System.Object at the top of the chain.
-    (multiple-value-bind (ancestors missing)
-        (assembly-package-generator::expand-ancestors derived-plist t nil t index)
-      (declare (ignore missing))
+    (multiple-value-bind (ancestors downward missing)
+        (assembly-package-generator::expand-related derived-plist t nil t nil nil nil
+                                                      index no-subclass-index no-implementer-index)
+      (declare (ignore downward missing))
       (assert-test (mapcar (lambda (a) (getf (car a) :fully-qualified-name)) ancestors)
                   '("Fixture.Mid" "Fixture.Base" "System.Object")
-                  "expand-ancestors includes System.Object when export-object is true"))
+                  "expand-related includes System.Object when export-object is true"))
 
     ;; 7.3 export-interfaces alone walks only the interfaces list, not the superclass chain.
-    (multiple-value-bind (ancestors missing)
-        (assembly-package-generator::expand-ancestors derived-plist nil t nil index)
-      (declare (ignore missing))
+    (multiple-value-bind (ancestors downward missing)
+        (assembly-package-generator::expand-related derived-plist nil t nil nil nil nil
+                                                      index no-subclass-index no-implementer-index)
+      (declare (ignore downward missing))
       (assert-test (mapcar (lambda (a) (getf (car a) :fully-qualified-name)) ancestors)
                   '("Fixture.IDerived")
-                  "expand-ancestors (export-interfaces only) does not walk the superclass chain"))
+                  "expand-related (export-interfaces only) does not walk the superclass chain"))
 
     ;; 7.4 both flags together walk both graphs, recursing into each newly-found ancestor's own edges too.
-    (multiple-value-bind (ancestors missing)
-        (assembly-package-generator::expand-ancestors derived-plist t t nil index)
-      (declare (ignore missing))
+    (multiple-value-bind (ancestors downward missing)
+        (assembly-package-generator::expand-related derived-plist t t nil nil nil nil
+                                                      index no-subclass-index no-implementer-index)
+      (declare (ignore downward missing))
       (assert-test (sort (mapcar (lambda (a) (getf (car a) :fully-qualified-name)) ancestors) #'string<)
                   (sort (list "Fixture.Mid" "Fixture.Base" "Fixture.IDerived" "Fixture.IMid" "Fixture.IBase") #'string<)
-                  "expand-ancestors with both flags walks superclasses and each ancestor's own interfaces"))
+                  "expand-related with both flags walks superclasses and each ancestor's own interfaces"))
 
     ;; 7.5 An ancestor not present in the index is reported as missing, not silently dropped.
     (let ((sparse-index (let ((tbl (make-hash-table :test #'equal)))
                           (setf (gethash "Fixture.Derived" tbl) (cons derived-plist owning-entry))
                           (setf (gethash "Fixture.Mid" tbl) (cons mid-plist owning-entry))
                           tbl))) ;; Fixture.Base intentionally absent
-      (multiple-value-bind (ancestors missing)
-          (assembly-package-generator::expand-ancestors derived-plist t nil nil sparse-index)
+      (multiple-value-bind (ancestors downward missing)
+          (assembly-package-generator::expand-related derived-plist t nil nil nil nil nil
+                                                        sparse-index no-subclass-index no-implementer-index)
+        (declare (ignore downward))
         (assert-test (mapcar (lambda (a) (getf (car a) :fully-qualified-name)) ancestors)
                     '("Fixture.Mid")
-                    "expand-ancestors resolves as much of the chain as it can before hitting a gap")
+                    "expand-related resolves as much of the chain as it can before hitting a gap")
         (assert-test missing '(("Fixture.Base" . "Fixture.Mid"))
-                    "expand-ancestors reports an ancestor absent from the index as missing, along with the class that required it"))))
+                    "expand-related reports an ancestor absent from the index as missing, along with the class that required it"))))
 
   ;; 8. compute-reexports decides which ancestor-exported names to re-export
   ;;    into a child package: skip a name the child already declares itself
@@ -1771,6 +1784,145 @@
                           "packages.lisp exports clean-ext for fixture-ext-target")
               (assert-test (search "#:frob" packages-contents) nil
                           "packages.lisp does not export the skipped, ambiguous frob")))
+        (when (probe-file fixture-file)
+          (delete-file fixture-file))
+        (when (probe-file out-dir)
+          (uiop:delete-directory-tree out-dir :validate t)))))
+
+  ;; 15. Recursive Related-Class Discovery (Version 39, doc/plan-v38.md's Part
+  ;;     B): build-reverse-indexes and expand-related's downward directions,
+  ;;     plus an end-to-end check of flag propagation and the generate-only
+  ;;     (never re-export) guarantee for --output-children/--output-nested/
+  ;;     --output-implementations.
+  (let* ((anchor-plist '(:fully-qualified-name "Fixture.Rel.Anchor" :kind :class
+                          :superclass nil :interfaces nil))
+         (child1-plist '(:fully-qualified-name "Fixture.Rel.Child1" :kind :class
+                         :superclass "Fixture.Rel.Anchor" :interfaces ("Fixture.Rel.IChild")))
+         (child2-plist '(:fully-qualified-name "Fixture.Rel.Child2" :kind :class
+                         :superclass "Fixture.Rel.Anchor" :interfaces nil))
+         (grandchild-plist '(:fully-qualified-name "Fixture.Rel.GrandChild" :kind :class
+                             :superclass "Fixture.Rel.Child1" :interfaces nil))
+         (ichild-plist '(:fully-qualified-name "Fixture.Rel.IChild" :kind :interface
+                         :superclass nil :interfaces nil
+                         :methods ((:name "ChildIfaceMethod" :is-static nil
+                                    :return-type "System.Void" :parameters nil))))
+         (iface-plist '(:fully-qualified-name "Fixture.Rel.IFace" :kind :interface
+                        :superclass nil :interfaces nil))
+         (impl1-plist '(:fully-qualified-name "Fixture.Rel.Impl1" :kind :class
+                        :superclass nil :interfaces ("Fixture.Rel.IFace")))
+         (impl2-plist '(:fully-qualified-name "Fixture.Rel.Impl2" :kind :class
+                        :superclass nil :interfaces ("Fixture.Rel.IFace")))
+         (nested-plist '(:fully-qualified-name "Fixture.Rel.Anchor+Nested" :name "Nested"
+                         :namespace "Fixture.Rel" :kind :class :superclass nil :interfaces nil))
+         (deep-plist '(:fully-qualified-name "Fixture.Rel.Anchor+Nested+Deep" :name "Deep"
+                       :namespace "Fixture.Rel" :kind :class :superclass nil :interfaces nil))
+         (owning-entry (list :assembly-name "Fixture.Rel.dll"))
+         (index (let ((tbl (make-hash-table :test #'equal)))
+                  (dolist (p (list anchor-plist child1-plist child2-plist grandchild-plist
+                                   ichild-plist iface-plist impl1-plist impl2-plist
+                                   nested-plist deep-plist))
+                    (setf (gethash (getf p :fully-qualified-name) tbl) (cons p owning-entry)))
+                  tbl)))
+
+    ;; 15.1 build-reverse-indexes: subclass-index is DIRECT subclasses only
+    ;;      (GrandChild lands under Child1, not Anchor); implementer-index is
+    ;;      every implementer (already transitive, so no multi-hop distinction
+    ;;      to test here).
+    (multiple-value-bind (subclass-index implementer-index)
+        (assembly-package-generator::build-reverse-indexes index)
+      (assert-test (sort (mapcar (lambda (p) (getf (car p) :fully-qualified-name))
+                                 (gethash "Fixture.Rel.Anchor" subclass-index))
+                         #'string<)
+                  (sort (list "Fixture.Rel.Child1" "Fixture.Rel.Child2") #'string<)
+                  "build-reverse-indexes' subclass-index buckets Anchor's direct subclasses only")
+      (assert-test (mapcar (lambda (p) (getf (car p) :fully-qualified-name))
+                           (gethash "Fixture.Rel.Child1" subclass-index))
+                  '("Fixture.Rel.GrandChild")
+                  "build-reverse-indexes' subclass-index buckets Child1's own direct subclass separately (one hop)")
+      (assert-test (sort (mapcar (lambda (p) (getf (car p) :fully-qualified-name))
+                                 (gethash "Fixture.Rel.IFace" implementer-index))
+                         #'string<)
+                  (sort (list "Fixture.Rel.Impl1" "Fixture.Rel.Impl2") #'string<)
+                  "build-reverse-indexes' implementer-index buckets every implementer")
+
+      ;; 15.2 expand-related's downward directions: output-children is
+      ;;      single-hop per call (GrandChild excluded from Anchor's own
+      ;;      call); output-implementations is fully transitive in one
+      ;;      lookup; output-nested reaches every nesting depth in one call.
+      (multiple-value-bind (ancestor downward missing)
+          (assembly-package-generator::expand-related anchor-plist nil nil nil nil t nil
+                                                        index subclass-index implementer-index)
+        (assert-test ancestor nil "expand-related's downward-only call returns no ancestor-discovered")
+        (assert-test missing nil "expand-related's downward directions never report missing")
+        (assert-test (sort (mapcar (lambda (p) (getf (car p) :fully-qualified-name)) downward) #'string<)
+                    (sort (list "Fixture.Rel.Child1" "Fixture.Rel.Child2") #'string<)
+                    "expand-related's output-children returns only Anchor's direct subclasses"))
+
+      (multiple-value-bind (ancestor downward missing)
+          (assembly-package-generator::expand-related iface-plist nil nil nil nil nil t
+                                                        index subclass-index implementer-index)
+        (declare (ignore ancestor missing))
+        (assert-test (sort (mapcar (lambda (p) (getf (car p) :fully-qualified-name)) downward) #'string<)
+                    (sort (list "Fixture.Rel.Impl1" "Fixture.Rel.Impl2") #'string<)
+                    "expand-related's output-implementations returns every implementer"))
+
+      (multiple-value-bind (ancestor downward missing)
+          (assembly-package-generator::expand-related anchor-plist nil nil nil t nil nil
+                                                        index subclass-index implementer-index)
+        (declare (ignore ancestor missing))
+        (assert-test (sort (mapcar (lambda (p) (getf (car p) :fully-qualified-name)) downward) #'string<)
+                    (sort (list "Fixture.Rel.Anchor+Nested" "Fixture.Rel.Anchor+Nested+Deep") #'string<)
+                    "expand-related's output-nested reaches every nesting depth in one call")))
+
+    ;; 15.3 End-to-end via generate-assembly-packages-batch: requesting only
+    ;;      Anchor with --output-children --export-interfaces must (a) pull in
+    ;;      Child1/Child2 (direct) and GrandChild (transitively, via the outer
+    ;;      queue re-invoking expand-related on the propagated-flags Child1),
+    ;;      (b) propagate --export-interfaces to Child1, which independently
+    ;;      discovers and re-exports its own IChild interface into ITSELF
+    ;;      (never into Anchor), and (c) never add a re-export section for
+    ;;      Anchor itself (Anchor implements no interfaces of its own).
+    (let* ((fixture-metadata (list anchor-plist child1-plist child2-plist grandchild-plist ichild-plist))
+           (fixture-file (merge-pathnames "package-generator-tests-related-fixture.lispy-metadata"
+                                          (uiop:temporary-directory)))
+           (out-dir (merge-pathnames "package-generator-tests-related-out/"
+                                     (uiop:temporary-directory)))
+           (anchor-pkg (assembly-package-generator::type-fq-name-to-pkg-name "Fixture.Rel.Anchor"))
+           (child1-pkg (assembly-package-generator::type-fq-name-to-pkg-name "Fixture.Rel.Child1"))
+           (child2-pkg (assembly-package-generator::type-fq-name-to-pkg-name "Fixture.Rel.Child2"))
+           (grandchild-pkg (assembly-package-generator::type-fq-name-to-pkg-name "Fixture.Rel.GrandChild"))
+           (ichild-pkg (assembly-package-generator::type-fq-name-to-pkg-name "Fixture.Rel.IChild")))
+      (unwind-protect
+          (progn
+            (with-open-file (s fixture-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+              (prin1 fixture-metadata s))
+            (ensure-directories-exist out-dir)
+            (assembly-package-generator:generate-assembly-packages-batch
+             (list (list :metadata-file (namestring fixture-file)
+                         :assembly-name "Fixture.Rel.dll"
+                         :classes (list (list :name "Fixture.Rel.Anchor" :constant-properties ""
+                                              :output-children t :export-interfaces t))))
+             (namestring out-dir)
+             "2026-07-06T00:00:00Z"
+             "9.9.9"
+             (utils:qualify-path "csharp-assembly-utils-package.template.lisp")
+             (utils:qualify-path "csharp-assembly-utils.template.lisp")
+             nil)
+            (let* ((asd-file (merge-pathnames "csharp-assembly-packages.asd" out-dir))
+                   (asd-contents (uiop:read-file-string asd-file))
+                   (packages-file (merge-pathnames "packages.lisp" out-dir))
+                   (packages-contents (uiop:read-file-string packages-file)))
+              (dolist (pkg (list child1-pkg child2-pkg grandchild-pkg ichild-pkg))
+                (assert-test (not (null (search (format nil "\"~A\"" pkg) asd-contents))) t
+                            (format nil "csharp-assembly-packages.asd lists ~A as its own :file component" pkg)))
+              (assert-test (not (null (search (format nil "~A: re-exports inherited members from ~A" child1-pkg ichild-pkg)
+                                              packages-contents)))
+                          t
+                          "packages.lisp shows Child1 (propagated --export-interfaces) re-exporting from its own IChild")
+              (assert-test (search (format nil "~A: re-exports" anchor-pkg) packages-contents) nil
+                          "packages.lisp never adds a re-export section for Anchor itself (Anchor has no interfaces)")
+              (assert-test (search (format nil "~A: re-exports" grandchild-pkg) packages-contents) nil
+                          "packages.lisp never adds a re-export section for GrandChild (discovered generate-only, no interfaces)")))
         (when (probe-file fixture-file)
           (delete-file fixture-file))
         (when (probe-file out-dir)

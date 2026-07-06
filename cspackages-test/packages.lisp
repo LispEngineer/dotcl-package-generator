@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 38
-;;; Creation Date: 2026-07-06T00:35:02Z
+;;; Generator Version: 39
+;;; Creation Date: 2026-07-06T00:55:09Z
 
 (cl:in-package :cl-user)
 
@@ -1354,6 +1354,7 @@
    #:<creation>
    #:<version>
    #:dispose-async
+   #:configure-await
   ))
 
 ;;; Source File: system-i-disposable.lisp
@@ -2796,6 +2797,89 @@
    #:describe
   ))
 
+;;; Source File: assembly-to-lispy-test-target-nesting-container.lisp
+;;; C# Class: AssemblyToLispyTestTarget.NestingContainer
+;;; Constant Properties: (none)
+(cl:defpackage :assembly-to-lispy-test-target-nesting-container
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+  ))
+
+;;; Source File: assembly-to-lispy-test-target-abstract-base.lisp
+;;; C# Class: AssemblyToLispyTestTarget.AbstractBase
+;;; Constant Properties: (none)
+(cl:defpackage :assembly-to-lispy-test-target-abstract-base
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+  ))
+
+;;; Source File: assembly-to-lispy-test-target-i-dummy-interface.lisp
+;;; C# Class: AssemblyToLispyTestTarget.IDummyInterface
+;;; Constant Properties: (none)
+(cl:defpackage :assembly-to-lispy-test-target-i-dummy-interface
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:interface-method
+  ))
+
+;;; Source File: assembly-to-lispy-test-target-nesting-container-nested-level2.lisp
+;;; C# Class: AssemblyToLispyTestTarget.NestingContainer+NestedLevel2
+;;; Constant Properties: (none)
+(cl:defpackage :assembly-to-lispy-test-target-nesting-container-nested-level2
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+  ))
+
+;;; Source File: assembly-to-lispy-test-target-nesting-container-nested-level2-nested-level3.lisp
+;;; C# Class: AssemblyToLispyTestTarget.NestingContainer+NestedLevel2+NestedLevel3
+;;; Constant Properties: (none)
+(cl:defpackage :assembly-to-lispy-test-target-nesting-container-nested-level2-nested-level3
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+  ))
+
+;;; Source File: assembly-to-lispy-test-target-generic-class-1.lisp
+;;; C# Class: AssemblyToLispyTestTarget.GenericClass`1
+;;; Constant Properties: (none)
+(cl:defpackage :assembly-to-lispy-test-target-generic-class-1
+  (:use :cl)
+  (:shadow
+   #:+
+  )
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:+
+   #:interface-method
+  ))
+
 ;;; ===== Re-exports from parent/interface packages =====
 
 ;;; system-value-tuple-2: re-exports inherited members from system-collections-i-structural-comparable, system-collections-i-structural-equatable, system-i-comparable, system-runtime-compiler-services-i-tuple
@@ -2836,8 +2920,8 @@
 ;;; Skipped (system-io-memory-stream declares its own): write-byte
 ;;; Skipped (ambiguous across ancestors: system-marshal-by-ref-object, system-object): memberwise-clone
 (cl:shadowing-import '(system-io-stream::null system-io-stream::close) ':system-io-memory-stream)
-(cl:import '(system-io-stream::can-timeout system-io-stream::read-timeout system-io-stream::write-timeout system-io-stream::begin-read system-io-stream::begin-write system-io-stream::create-wait-handle system-io-stream::end-read system-io-stream::end-write system-io-stream::object-invariant system-io-stream::read-at-least system-io-stream::read-at-least-async system-io-stream::read-exactly system-io-stream::read-exactly-async system-io-stream::synchronized system-io-stream::validate-buffer-arguments system-io-stream::validate-copy-to-arguments system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::reference-equals system-object::to-string system-object::dummy-extension) ':system-io-memory-stream)
-(cl:export '(system-io-memory-stream::null system-io-memory-stream::can-timeout system-io-memory-stream::read-timeout system-io-memory-stream::write-timeout system-io-memory-stream::begin-read system-io-memory-stream::begin-write system-io-memory-stream::close system-io-memory-stream::create-wait-handle system-io-memory-stream::end-read system-io-memory-stream::end-write system-io-memory-stream::object-invariant system-io-memory-stream::read-at-least system-io-memory-stream::read-at-least-async system-io-memory-stream::read-exactly system-io-memory-stream::read-exactly-async system-io-memory-stream::synchronized system-io-memory-stream::validate-buffer-arguments system-io-memory-stream::validate-copy-to-arguments system-io-memory-stream::get-lifetime-service system-io-memory-stream::initialize-lifetime-service system-io-memory-stream::equals system-io-memory-stream::equals* system-io-memory-stream::finalize system-io-memory-stream::get-hash-code system-io-memory-stream::get-type system-io-memory-stream::reference-equals system-io-memory-stream::to-string system-io-memory-stream::dummy-extension) ':system-io-memory-stream)
+(cl:import '(system-io-stream::can-timeout system-io-stream::read-timeout system-io-stream::write-timeout system-io-stream::begin-read system-io-stream::begin-write system-io-stream::create-wait-handle system-io-stream::end-read system-io-stream::end-write system-io-stream::object-invariant system-io-stream::read-at-least system-io-stream::read-at-least-async system-io-stream::read-exactly system-io-stream::read-exactly-async system-io-stream::synchronized system-io-stream::validate-buffer-arguments system-io-stream::validate-copy-to-arguments system-i-async-disposable::configure-await system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::reference-equals system-object::to-string system-object::dummy-extension) ':system-io-memory-stream)
+(cl:export '(system-io-memory-stream::null system-io-memory-stream::can-timeout system-io-memory-stream::read-timeout system-io-memory-stream::write-timeout system-io-memory-stream::begin-read system-io-memory-stream::begin-write system-io-memory-stream::close system-io-memory-stream::create-wait-handle system-io-memory-stream::end-read system-io-memory-stream::end-write system-io-memory-stream::object-invariant system-io-memory-stream::read-at-least system-io-memory-stream::read-at-least-async system-io-memory-stream::read-exactly system-io-memory-stream::read-exactly-async system-io-memory-stream::synchronized system-io-memory-stream::validate-buffer-arguments system-io-memory-stream::validate-copy-to-arguments system-io-memory-stream::configure-await system-io-memory-stream::get-lifetime-service system-io-memory-stream::initialize-lifetime-service system-io-memory-stream::equals system-io-memory-stream::equals* system-io-memory-stream::finalize system-io-memory-stream::get-hash-code system-io-memory-stream::get-type system-io-memory-stream::reference-equals system-io-memory-stream::to-string system-io-memory-stream::dummy-extension) ':system-io-memory-stream)
 
 ;;; system-io-stream-reader: re-exports inherited members from system-io-text-reader, system-i-disposable, system-marshal-by-ref-object
 ;;; Skipped (system-io-stream-reader declares its own): null
@@ -2855,6 +2939,49 @@
 (cl:import '(system-io-text-reader::synchronized system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-marshal-by-ref-object::memberwise-clone) ':system-io-stream-reader)
 (cl:export '(system-io-stream-reader::synchronized system-io-stream-reader::get-lifetime-service system-io-stream-reader::initialize-lifetime-service system-io-stream-reader::memberwise-clone) ':system-io-stream-reader)
 
+;;; system-argument-exception: re-exports inherited members from system-system-exception, system-runtime-serialization-i-serializable, system-exception, system-object
+;;; Skipped (system-argument-exception declares its own): get-object-data
+;;; Skipped (system-argument-exception declares its own): message
+;;; Skipped (ambiguous across ancestors: system-exception, system-object): get-type
+;;; Skipped (ambiguous across ancestors: system-exception, system-object): to-string
+(cl:import '(system-exception::data system-exception::help-link system-exception::h-result system-exception::inner-exception system-exception::source system-exception::stack-trace system-exception::target-site system-exception::get-base-exception system-exception::add-serialize-object-state system-exception::remove-serialize-object-state system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::memberwise-clone system-object::reference-equals system-object::dummy-extension) ':system-argument-exception)
+(cl:export '(system-argument-exception::data system-argument-exception::help-link system-argument-exception::h-result system-argument-exception::inner-exception system-argument-exception::source system-argument-exception::stack-trace system-argument-exception::target-site system-argument-exception::get-base-exception system-argument-exception::add-serialize-object-state system-argument-exception::remove-serialize-object-state system-argument-exception::equals system-argument-exception::equals* system-argument-exception::finalize system-argument-exception::get-hash-code system-argument-exception::memberwise-clone system-argument-exception::reference-equals system-argument-exception::dummy-extension) ':system-argument-exception)
+
+;;; system-system-exception: re-exports inherited members from system-exception, system-runtime-serialization-i-serializable, system-object
+;;; Skipped (ambiguous across ancestors: system-exception, system-runtime-serialization-i-serializable): get-object-data
+;;; Skipped (ambiguous across ancestors: system-exception, system-object): get-type
+;;; Skipped (ambiguous across ancestors: system-exception, system-object): to-string
+(cl:import '(system-exception::data system-exception::help-link system-exception::h-result system-exception::inner-exception system-exception::message system-exception::source system-exception::stack-trace system-exception::target-site system-exception::get-base-exception system-exception::add-serialize-object-state system-exception::remove-serialize-object-state system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::memberwise-clone system-object::reference-equals system-object::dummy-extension) ':system-system-exception)
+(cl:export '(system-system-exception::data system-system-exception::help-link system-system-exception::h-result system-system-exception::inner-exception system-system-exception::message system-system-exception::source system-system-exception::stack-trace system-system-exception::target-site system-system-exception::get-base-exception system-system-exception::add-serialize-object-state system-system-exception::remove-serialize-object-state system-system-exception::equals system-system-exception::equals* system-system-exception::finalize system-system-exception::get-hash-code system-system-exception::memberwise-clone system-system-exception::reference-equals system-system-exception::dummy-extension) ':system-system-exception)
+
+;;; system-exception: re-exports inherited members from system-object, system-runtime-serialization-i-serializable
+;;; Skipped (system-exception declares its own): get-type
+;;; Skipped (system-exception declares its own): to-string
+;;; Skipped (system-exception declares its own): get-object-data
+(cl:import '(system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::memberwise-clone system-object::reference-equals system-object::dummy-extension) ':system-exception)
+(cl:export '(system-exception::equals system-exception::equals* system-exception::finalize system-exception::get-hash-code system-exception::memberwise-clone system-exception::reference-equals system-exception::dummy-extension) ':system-exception)
+
+;;; system-io-stream: re-exports inherited members from system-marshal-by-ref-object, system-i-async-disposable, system-i-disposable, system-object
+;;; Skipped (ambiguous across ancestors: system-marshal-by-ref-object, system-object): memberwise-clone
+;;; Skipped (system-io-stream declares its own): dispose-async
+;;; Skipped (system-io-stream declares its own): dispose
+(cl:import '(system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-i-async-disposable::configure-await system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::reference-equals system-object::to-string system-object::dummy-extension) ':system-io-stream)
+(cl:export '(system-io-stream::get-lifetime-service system-io-stream::initialize-lifetime-service system-io-stream::configure-await system-io-stream::equals system-io-stream::equals* system-io-stream::finalize system-io-stream::get-hash-code system-io-stream::get-type system-io-stream::reference-equals system-io-stream::to-string system-io-stream::dummy-extension) ':system-io-stream)
+
+;;; system-marshal-by-ref-object: re-exports inherited members from system-object
+;;; Skipped (system-marshal-by-ref-object declares its own): memberwise-clone
+(cl:import '(system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::reference-equals system-object::to-string system-object::dummy-extension) ':system-marshal-by-ref-object)
+(cl:export '(system-marshal-by-ref-object::equals system-marshal-by-ref-object::equals* system-marshal-by-ref-object::finalize system-marshal-by-ref-object::get-hash-code system-marshal-by-ref-object::get-type system-marshal-by-ref-object::reference-equals system-marshal-by-ref-object::to-string system-marshal-by-ref-object::dummy-extension) ':system-marshal-by-ref-object)
+
+;;; system-io-text-reader: re-exports inherited members from system-marshal-by-ref-object, system-i-disposable
+;;; Skipped (system-io-text-reader declares its own): dispose
+(cl:import '(system-marshal-by-ref-object::get-lifetime-service system-marshal-by-ref-object::initialize-lifetime-service system-marshal-by-ref-object::memberwise-clone) ':system-io-text-reader)
+(cl:export '(system-io-text-reader::get-lifetime-service system-io-text-reader::initialize-lifetime-service system-io-text-reader::memberwise-clone) ':system-io-text-reader)
+
+;;; system-collections-i-collection: re-exports inherited members from system-collections-i-enumerable
+(cl:import '(system-collections-i-enumerable::get-enumerator) ':system-collections-i-collection)
+(cl:export '(system-collections-i-collection::get-enumerator) ':system-collections-i-collection)
+
 ;;; system-xml-xml-reader: re-exports inherited members from system-i-disposable
 ;;; Skipped (system-xml-xml-reader declares its own): dispose
 
@@ -2866,4 +2993,12 @@
 ;;; Skipped (system-collections-specialized-name-value-collection declares its own): copy-to
 (cl:import '(system-collections-specialized-name-object-collection-base::read-only? system-collections-specialized-name-object-collection-base::keys system-collections-specialized-name-object-collection-base::base-add system-collections-specialized-name-object-collection-base::base-clear system-collections-specialized-name-object-collection-base::base-get system-collections-specialized-name-object-collection-base::base-get-all-keys system-collections-specialized-name-object-collection-base::base-get-all-values system-collections-specialized-name-object-collection-base::base-get-key system-collections-specialized-name-object-collection-base::base-has-keys system-collections-specialized-name-object-collection-base::base-remove system-collections-specialized-name-object-collection-base::base-remove-at system-collections-specialized-name-object-collection-base::base-set system-collections-i-collection::synchronized? system-collections-i-collection::sync-root system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::memberwise-clone system-object::reference-equals system-object::to-string system-object::dummy-extension) ':system-collections-specialized-name-value-collection)
 (cl:export '(system-collections-specialized-name-value-collection::read-only? system-collections-specialized-name-value-collection::keys system-collections-specialized-name-value-collection::base-add system-collections-specialized-name-value-collection::base-clear system-collections-specialized-name-value-collection::base-get system-collections-specialized-name-value-collection::base-get-all-keys system-collections-specialized-name-value-collection::base-get-all-values system-collections-specialized-name-value-collection::base-get-key system-collections-specialized-name-value-collection::base-has-keys system-collections-specialized-name-value-collection::base-remove system-collections-specialized-name-value-collection::base-remove-at system-collections-specialized-name-value-collection::base-set system-collections-specialized-name-value-collection::synchronized? system-collections-specialized-name-value-collection::sync-root system-collections-specialized-name-value-collection::equals system-collections-specialized-name-value-collection::equals* system-collections-specialized-name-value-collection::finalize system-collections-specialized-name-value-collection::get-hash-code system-collections-specialized-name-value-collection::get-type system-collections-specialized-name-value-collection::memberwise-clone system-collections-specialized-name-value-collection::reference-equals system-collections-specialized-name-value-collection::to-string system-collections-specialized-name-value-collection::dummy-extension) ':system-collections-specialized-name-value-collection)
+
+;;; system-collections-specialized-name-object-collection-base: re-exports inherited members from system-object, system-collections-i-collection, system-collections-i-enumerable, system-runtime-serialization-i-deserialization-callback, system-runtime-serialization-i-serializable
+;;; Skipped (system-collections-specialized-name-object-collection-base declares its own): count
+;;; Skipped (system-collections-specialized-name-object-collection-base declares its own): get-enumerator
+;;; Skipped (system-collections-specialized-name-object-collection-base declares its own): on-deserialization
+;;; Skipped (system-collections-specialized-name-object-collection-base declares its own): get-object-data
+(cl:import '(system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::memberwise-clone system-object::reference-equals system-object::to-string system-object::dummy-extension system-collections-i-collection::synchronized? system-collections-i-collection::sync-root system-collections-i-collection::copy-to) ':system-collections-specialized-name-object-collection-base)
+(cl:export '(system-collections-specialized-name-object-collection-base::equals system-collections-specialized-name-object-collection-base::equals* system-collections-specialized-name-object-collection-base::finalize system-collections-specialized-name-object-collection-base::get-hash-code system-collections-specialized-name-object-collection-base::get-type system-collections-specialized-name-object-collection-base::memberwise-clone system-collections-specialized-name-object-collection-base::reference-equals system-collections-specialized-name-object-collection-base::to-string system-collections-specialized-name-object-collection-base::dummy-extension system-collections-specialized-name-object-collection-base::synchronized? system-collections-specialized-name-object-collection-base::sync-root system-collections-specialized-name-object-collection-base::copy-to) ':system-collections-specialized-name-object-collection-base)
 
