@@ -10,6 +10,40 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.40.2 — 2026-07-06
+
+**`:interfaces-closed` restructured as a plist, with a documented `GETF`-vs-`MEMBER` caveat.**
+
+* `:interfaces-closed` (new in 2.40.1, below) is now emitted as a true plist — identity
+  string, then a list of that identity's closed form(s) — matching the convention every
+  other key in this metadata schema already follows, instead of a list of
+  `(identity closed-1 closed-2 ...)` tuples.
+* **Because its keys are strings, not symbols, this plist cannot be safely read with `GETF`**
+  (the CL standard specifies `GETF` compares keys with `EQ`, and a string freshly read from a
+  metadata file is never guaranteed to be `EQ` to a query string, even when `STRING=`).
+  Consumers must instead use `(second (member identity interfaces-closed :test #'string=))`.
+  This is documented prominently in `doc/assembly-to-lispy.md`'s schema entry (an
+  `[!IMPORTANT]` callout), explained in full in `doc/generator-design-notes.md`'s "Generic
+  Superclass/Interface Identity Matching (Version 40)" section, and demonstrated live in
+  `tests/synthetic-target.test.lisp`'s regression test — not just described in prose.
+* No `*generator-version*` change (still 40 — this only refines the already-added metadata
+  keys' shape, not ancestor-resolution behavior).
+
+## 2.40.1 — 2026-07-06
+
+**Fixed a second, related bug: a type implementing the same open generic interface more than
+once (legal C#, e.g. `class Foo : IEquatable<int>, IEquatable<string>`) produced a duplicate
+`:interfaces` entry and a genuine key collision in `:interfaces-closed` (new in 2.40.0,
+below), silently losing one closed instantiation's information.**
+
+* `:interfaces`/`:interfaces-closed` are now computed by grouping `Type.GetInterfaces()` by
+  identity, not a naive one-to-one mapping. `:interfaces` is deduplicated (one entry per
+  distinct identity); `:interfaces-closed` groups *all* closed forms for a given identity
+  together under that one identity, rather than emitting a separate, colliding entry per
+  implementation.
+* No `*generator-version*` change (still 40 — this closes a gap in the same Version 40 fix's
+  metadata shape, not a new behavior change to ancestor resolution itself).
+
 ## 2.40.0 — 2026-07-06
 
 **Fixed a correctness bug: a generic superclass/interface could never be resolved as an

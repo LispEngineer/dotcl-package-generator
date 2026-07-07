@@ -68,6 +68,7 @@ TODO
     could also just be `"*"` as a single entry.
 * Add the Assembly as `<assembly>`
 * Add the Assembly to the per-package comment in `packages.lisp`
+* Add the generator options for each package in `packages.lisp`
 
 
 # Clone a Boxed Struct
@@ -212,6 +213,11 @@ obj!)` form instead, deprecating Option A's per-type codegen.
   * The ugly workaround in v20 would make it hard for users, who are not
     typically aware of the generic arity of the classes they use and might
     not easily guess the package name.
+  * Maybe ``List`1`` could become `list<1>` in the package name?
+    * We are already using `<>` as a suffix to indicate a method with generic arguments.
+    * But it would not be a good *filename* for the package.
+    * Maybe `<>` is for 1, and `<2>` is for 2 (and higher)?
+      * Check how C# interprets `<>` in an open type vs higher # of type parameters?
 
 * Make a `FILES.md`
 * Make `Makefile` introspect the `.asd` for the version number.
@@ -294,15 +300,20 @@ identity form (`:interfaces` deduplicated by identity, since C# permits implemen
 open generic interface more than once closed over different type arguments, e.g. `class Foo :
 IEquatable<int>, IEquatable<string>`); the discarded closed-instantiation information is
 preserved separately via two new sibling metadata keys, `:superclass-closed` (a string) and
-`:interfaces-closed` (a list of `(identity closed-1 closed-2 ...)` lists, one per generic
-identity, grouping *all* of that identity's closed forms together rather than one entry per
-interface Reflection returns — required precisely because of the same-interface-multiple-times
-case, which a naive one-entry-per-interface/cons-keyed-by-identity design would silently corrupt).
-Both new keys are documentation-only, using the same simplified generic notation
-`:type`/`:return-type` already use. No change was needed to `assembly-package-generator.lisp`'s
-own resolution logic. See `doc/generator-design-notes.md`'s "Generic Superclass/Interface
-Identity Matching (Version 40)" section, `doc/assembly-to-lispy.md`'s updated schema, and
-`RELEASES.md`'s 2.40.0 entry.
+`:interfaces-closed` (a **plist** -- identity string, then a list of that identity's closed
+form(s) -- one pair per generic identity, grouping *all* of that identity's closed forms
+together rather than one entry per interface Reflection returns — required precisely because
+of the same-interface-multiple-times case, which a naive one-entry-per-interface design would
+silently corrupt). `:interfaces-closed`'s keys are strings, not symbols, so — unlike every other
+key in this schema — it must never be read with `GETF` (specified to compare keys with `EQ`,
+which a string freshly read from a metadata file is never guaranteed to be relative to a query
+string, even when `STRING=`); the documented, correct lookup is `(second (member identity
+interfaces-closed :test #'string=))`. Both new keys are otherwise documentation-only, using the
+same simplified generic notation `:type`/`:return-type` already use. No change was needed to
+`assembly-package-generator.lisp`'s own resolution logic. See
+`doc/generator-design-notes.md`'s "Generic Superclass/Interface Identity Matching (Version 40)"
+section, `doc/assembly-to-lispy.md`'s updated schema, and `RELEASES.md`'s 2.40.0/2.40.1/2.40.2
+entries.
 
 
 # Handle Extension Methods in the Main Class

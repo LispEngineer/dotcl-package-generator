@@ -546,37 +546,49 @@
               (when (not (stringp i))
                 (setf valid nil)
                 (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Interface name in :interfaces must be a string, got ~S~%" context i))))
-          ;; :interfaces-closed (Version 40): one (identity closed-1 closed-2 ...) list
-          ;; per GENERIC identity in :interfaces only (a non-generic identity's closed
-          ;; form would be identical to its identity, already in :interfaces, so it is
-          ;; omitted entirely rather than duplicated). More than one closed form under
-          ;; the same identity is possible and legal C# (e.g. "class Foo : IEquatable<int>,
-          ;; IEquatable<string>" implements the same open IEquatable`1 twice, closed over
-          ;; different arguments) -- this is exactly why each entry is a proper list
-          ;; (identity . (closed-1 closed-2 ...)), not a single (identity . closed) cons:
-          ;; a cons-per-identity representation cannot hold two closed forms under one
-          ;; key without one silently shadowing the other in any assoc-style lookup.
-          ;; :interfaces itself is deduped by identity (so it never lists the same
-          ;; interface identity twice, even when a type implements it multiple times
-          ;; closed over different arguments), so every :interfaces-closed identity must
-          ;; appear in :interfaces exactly once.
+          ;; :interfaces-closed (Version 40): a PLIST -- identity string, then a list of
+          ;; that identity's closed form(s) -- one key/value pair per GENERIC identity in
+          ;; :interfaces only (a non-generic identity's closed form would be identical to
+          ;; its identity, already in :interfaces, so it is omitted entirely rather than
+          ;; duplicated). More than one closed form under the same identity is possible
+          ;; and legal C# (e.g. "class Foo : IEquatable<int>, IEquatable<string>"
+          ;; implements the same open IEquatable`1 twice, closed over different
+          ;; arguments) -- this is exactly why each pair's value is a LIST, not a single
+          ;; closed form. :interfaces itself is deduped by identity (so it never lists
+          ;; the same interface identity twice), so every :interfaces-closed identity
+          ;; must appear in :interfaces, and no identity may repeat as a key here.
+          ;;
+          ;; IMPORTANT: this plist's KEYS ARE STRINGS, not symbols. CL's GETF is
+          ;; specified to compare keys with EQ, and a string freshly read from a
+          ;; metadata file via READ is never EQ to a string literal a consumer types,
+          ;; even when STRING=. So GETF must never be used on :interfaces-closed (or in
+          ;; this validator below) -- the correct lookup is (second (member identity
+          ;; interfaces-closed :test #'string=)). See doc/generator-design-notes.md's
+          ;; "Generic Superclass/Interface Identity Matching (Version 40)" section and
+          ;; doc/assembly-to-lispy.md's schema entry for the full rationale and a
+          ;; worked example.
           (when (and t-ifaces-closed (not (listp t-ifaces-closed)))
             (setf valid nil)
             (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed must be a list, got ~S~%" context t-ifaces-closed))
-          (when t-ifaces-closed
-            (dolist (entry t-ifaces-closed)
-              (if (and (consp entry) (stringp (car entry)) (cdr entry)
-                       (every #'stringp (cdr entry)))
-                  (progn
-                    (unless (member (car entry) t-ifaces :test #'string=)
-                      (setf valid nil)
-                      (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed identity ~S does not appear in :interfaces~%" context (car entry)))
-                    (unless (= 1 (count (car entry) t-ifaces-closed :key #'car :test #'string=))
-                      (setf valid nil)
-                      (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed identity ~S appears more than once as a top-level entry (closed forms for one identity must be grouped into a single entry's list, not split across entries)~%" context (car entry))))
-                  (progn
-                    (setf valid nil)
-                    (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed entry must be a (string string+) list, got ~S~%" context entry)))))
+          (when (and t-ifaces-closed (oddp (length t-ifaces-closed)))
+            (setf valid nil)
+            (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed must have an even length (a plist), got length ~D~%" context (length t-ifaces-closed)))
+          (when (and t-ifaces-closed (evenp (length t-ifaces-closed)))
+            (let ((seen-keys nil))
+              (loop for (key val) on t-ifaces-closed by #'cddr
+                    do (if (and (stringp key) (listp val) val (every #'stringp val))
+                           (progn
+                             (unless (member key t-ifaces :test #'string=)
+                               (setf valid nil)
+                               (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed identity ~S does not appear in :interfaces~%" context key))
+                             (if (member key seen-keys :test #'string=)
+                                 (progn
+                                   (setf valid nil)
+                                   (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed identity ~S appears more than once as a key (closed forms for one identity must be grouped into a single value list, not split across keys)~%" context key))
+                                 (push key seen-keys)))
+                           (progn
+                             (setf valid nil)
+                             (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed key/value pair must be (string (string+)), got ~S / ~S~%" context key val))))))
           (when (and t-flags (not (listp t-flags)))
             (setf valid nil)
             (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :flags must be a list, got ~S~%" context t-flags))

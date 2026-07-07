@@ -2087,19 +2087,66 @@ exactly the kind of information loss `:interfaces-closed` exists to prevent in t
 
 The fix: `AssemblyToLispy.cs` now groups `type.GetInterfaces()` by identity (`GroupBy`) before
 building either list. `:interfaces` becomes the deduplicated identity set (one entry per group);
-`:interfaces-closed` becomes one entry *per identity*, whose remaining elements are *all* of that
-identity's closed forms in reflection-discovery order — a proper one-to-many list, not a cons
-pair, so a same-identity multiple-instantiation case (rare, but real, and exactly the kind of
-gap that would otherwise fail silently rather than loudly) is representable without collision.
+`:interfaces-closed` becomes one key/value pair *per identity*, whose value is a list of *all*
+of that identity's closed forms in reflection-discovery order, so a same-identity multiple-
+instantiation case (rare, but real, and exactly the kind of gap that would otherwise fail
+silently rather than loudly) is representable without collision:
+
+```lisp
+:interfaces-closed
+  ("System.IEquatable`1" ("System.IEquatable`1[System.Int32]" "System.IEquatable`1[System.String]"))
+```
+
+### Why a plist, and the `GETF`/`EQ` trap it doesn't actually solve on its own
+
+`:interfaces-closed` is emitted as a **plist** — identity, then its value, alternating — matching
+the convention every other key in this schema already follows (`:name`, `:kind`, `:properties`,
+etc. are all plist keys), rather than an alist of `(identity . closed-forms)` conses. This was a
+deliberate choice, not a default: plain Lisp lists of conses/tuples were the first two drafts of
+this exact key (first a single `(identity . closed)` cons per interface, then, after the
+collision above, a list of `(identity closed-1 closed-2 ...)` tuples) before settling on the plist
+shape for consistency with the rest of the metadata format.
+
+**This plist's keys are strings, not symbols or keywords — and that has a real consequence.**
+Common Lisp's `GETF` is specified to compare keys with `EQ`. A string read fresh from a metadata
+file via `READ` (`utils:safe-read-form-from-file`) is never `EQ` to a string literal a consumer
+types in their own code, even when the two are `STRING=` — two distinct string objects with
+identical contents are not `EQ` under any portable CL implementation. So `(getf interfaces-closed
+"System.IEquatable\`1")` is **not** guaranteed to find the entry above; it is likely to silently
+return `nil` instead. This is not a plist-specific problem unique to this key — it is exactly why
+CL programmers are taught to use keyword symbols (which are always `EQ`-comparable, since the
+reader interns them into one canonical package) as plist/`GETF` keys, and why every *other* key in
+this schema is a keyword, not a string. `:interfaces-closed` breaks that pattern on purpose,
+because its keys are C# type-identity strings straight out of `:interfaces` (converting them to
+keyword symbols, e.g. `` :|System.IEquatable`1| ``, would be inconsistent with the rest of the
+schema, where a type's fully-qualified name is always a plain string, and would look unusual for
+generic-arity backtick names).
+
+The resolution: `:interfaces-closed` keeps its plist shape, but the correct lookup is `MEMBER`,
+never `GETF`:
+
+```lisp
+(second (member "System.IEquatable`1" interfaces-closed :test #'string=))
+;; => ("System.IEquatable`1[System.Int32]" "System.IEquatable`1[System.String]")
+```
+
+`MEMBER` finds the cons cell in the list whose `car` is `STRING=` to the query, so `(second ...)`
+of that result is exactly the value that would immediately follow that key in the plist. This is
+documented prominently in `doc/assembly-to-lispy.md`'s `:interfaces-closed` schema entry (an
+`[!IMPORTANT]` callout), in the comments directly above `interfacesClosed`'s construction in
+`AssemblyToLispy.cs`, and demonstrated live (not just described) in
+`tests/synthetic-target.test.lisp`'s `MultiEquatable` assertions.
 
 Both new keys remain strictly descriptive/documentation-only — nothing in
 `assembly-package-generator.lisp` reads either key; ancestor resolution always matches on the
 identity form (and correctly needs no per-instantiation distinction, since a class implementing
 the same open interface twice is still just one ancestor to discover/re-export from once).
-`tests/framework.lisp`'s schema validator checks both keys' shape, that every
-`:interfaces-closed` identity actually appears in `:interfaces`, and that no identity appears
-more than once as a top-level `:interfaces-closed` entry, and `doc/assembly-to-lispy.md`
-documents the exact semantics and omission rules.
+`tests/framework.lisp`'s schema validator checks both keys' shape (including that
+`:interfaces-closed` has an even length and every value is a non-empty list of strings), that
+every `:interfaces-closed` identity actually appears in `:interfaces`, and that no identity
+appears more than once as a key — using `MEMBER`/`LOOP ... BY #'CDDR` throughout its own checking
+code, never `GETF`, so the validator itself never relies on the unsafe pattern it exists partly
+to steer consumers away from.
 
 ### Verification
 

@@ -252,7 +252,15 @@
   ;; closed over different type arguments -- legal C#. Before the identity-grouping
   ;; follow-up fix, :interfaces would have contained "System.IEquatable`1" TWICE, and
   ;; :interfaces-closed would have had two entries sharing that one key (a real
-  ;; assoc-style collision, silently losing one closed form to any lookup by identity).
+  ;; collision, silently losing one closed form to any lookup by identity).
+  ;;
+  ;; :interfaces-closed is a PLIST, but its keys are STRINGS -- GETF is specified to
+  ;; compare keys with EQ, which a freshly-READ string is never guaranteed to be
+  ;; relative to a string literal in this test, even when STRING=. So the lookup below
+  ;; deliberately uses (second (member identity interfaces-closed :test #'string=)),
+  ;; never GETF -- this is the correct, documented access pattern (see
+  ;; doc/assembly-to-lispy.md's :interfaces-closed schema entry), demonstrated live here
+  ;; rather than just described in prose.
   (let ((me (find-if (lambda (cls)
                        (string= (getf cls :fully-qualified-name)
                                 "AssemblyToLispyTestTarget.MultiEquatable"))
@@ -261,15 +269,13 @@
     (when me
       (assert-equal 1 (count "System.IEquatable`1" (getf me :interfaces) :test #'string=)
                     ":interfaces must list System.IEquatable`1 exactly once, even though MultiEquatable implements it twice (deduplicated by identity)")
-      (let ((entries (remove "System.IEquatable`1" (getf me :interfaces-closed)
-                              :key #'first :test-not #'string=)))
-        (assert-equal 1 (length entries)
-                      ":interfaces-closed must have exactly one top-level entry for System.IEquatable`1 (not one per implementation)")
-        (when entries
-          (let ((closed-forms (rest (first entries))))
-            (assert-equal 2 (length closed-forms)
-                          "That one entry must group BOTH closed instantiations together")
-            (assert-true (member "System.IEquatable`1[System.Int32]" closed-forms :test #'string=)
-                        "The IEquatable<int> closed form must be present")
-            (assert-true (member "System.IEquatable`1[System.String]" closed-forms :test #'string=)
-                        "The IEquatable<string> closed form must be present")))))))
+      (let ((closed-forms (second (member "System.IEquatable`1" (getf me :interfaces-closed) :test #'string=))))
+        (assert-not-null closed-forms
+                          ":interfaces-closed must have an entry for System.IEquatable`1 (looked up via MEMBER, not GETF)")
+        (when closed-forms
+          (assert-equal 2 (length closed-forms)
+                        "That one entry's value must group BOTH closed instantiations together")
+          (assert-true (member "System.IEquatable`1[System.Int32]" closed-forms :test #'string=)
+                      "The IEquatable<int> closed form must be present")
+          (assert-true (member "System.IEquatable`1[System.String]" closed-forms :test #'string=)
+                      "The IEquatable<string> closed form must be present"))))))

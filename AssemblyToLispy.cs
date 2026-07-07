@@ -181,15 +181,28 @@ namespace PackageGenerator {
                         .OrderBy(g => g.Key)
                         .ToList();
                     var interfaces = interfaceGroups.Select(g => g.Key).ToList();
-                    // :interfaces-closed (Version 40): one (identity closed-1 closed-2 ...)
-                    // entry per GENERIC identity, in the same order as :interfaces -- the list
-                    // of closed forms has more than one element only for the rare same-open-
-                    // interface-multiple-closed-instantiations case above; a non-generic
-                    // identity is omitted entirely (identity and closed form are identical,
-                    // already fully captured by :interfaces).
+                    // :interfaces-closed (Version 40): a PLIST -- identity string, then a list
+                    // of that identity's closed form(s) -- one key/value pair per GENERIC
+                    // identity in :interfaces, in the same order. The value list has more than
+                    // one element only for the rare same-open-interface-multiple-closed-
+                    // instantiations case above; a non-generic identity is omitted entirely
+                    // (identity and closed form are identical, already fully captured by
+                    // :interfaces). Emitted as a true plist (matching every other key in this
+                    // metadata schema) rather than an alist of tuples, BUT this plist's keys
+                    // are strings, not symbols -- CL's GETF is specified to compare keys with
+                    // EQ, and a string freshly read from this file via READ is never EQ to a
+                    // string literal a consumer types, even when STRING=. Consumers must look
+                    // up an identity with (second (member identity interfaces-closed :test
+                    // #'string=)), never (getf interfaces-closed identity). See
+                    // doc/generator-design-notes.md's "Generic Superclass/Interface Identity
+                    // Matching (Version 40)" section and doc/assembly-to-lispy.md's schema
+                    // entry for the full rationale and a worked example.
                     var interfacesClosed = interfaceGroups
                         .Where(g => g.Any(pair => pair.Type.IsGenericType))
-                        .Select(g => $"({EscapeLispString(g.Key)}{string.Concat(g.Select(pair => $" {EscapeLispString(GetFriendlyTypeName(pair.Type))}"))})")
+                        .SelectMany(g => new[] {
+                            EscapeLispString(g.Key),
+                            $"({string.Join(" ", g.Select(pair => EscapeLispString(GetFriendlyTypeName(pair.Type))))})"
+                        })
                         .ToList();
                     string flagsStr = GetTypeFlags(type);
 

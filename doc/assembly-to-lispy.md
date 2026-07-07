@@ -140,22 +140,35 @@ Each type entry plist contains the following entries, by key:
   than once, closed over different type arguments (e.g. `class Foo : IEquatable<int>,
   IEquatable<string>`, which compiles) — without deduplication this list would contain the
   same identity string twice.
-* `:interfaces-closed` (List of `(identity closed-1 closed-2 ...)` Lists or omitted): One
-  entry per identity in `:interfaces` that is actually a generic interface — `identity` is
-  that interface's exact string as it appears in `:interfaces` (for correlation, and
-  guaranteed unique across this list's entries); the remaining elements are that identity's
-  simplified-bracket-notation closed form(s), exactly as `:superclass-closed` computes each
-  one. There is more than one closed form under a single identity only in the same-open-
-  interface-implemented-multiple-times case described above (e.g. `("System.IEquatable\`1"
-  "System.IEquatable\`1[System.Int32]" "System.IEquatable\`1[System.String]")`) — this is
-  exactly why each entry groups *all* of that identity's closed forms into one list rather
-  than emitting one `(identity . closed)` pair per interface Reflection returns: a
-  one-cons-per-identity representation cannot hold two closed forms under the same key
-  without one silently shadowing the other in any `assoc`-style lookup. A **non**-generic
-  interface is never given an entry here at all (its identity and closed forms are
-  identical, already fully captured by `:interfaces`) — so this key is entirely omitted when
-  no implemented interface is generic. Descriptive/documentation-only, like
+* `:interfaces-closed` (Plist or omitted): Maps each identity in `:interfaces` that is
+  actually a generic interface to a list of that identity's simplified-bracket-notation
+  closed form(s), exactly as `:superclass-closed` computes each one — one key/value pair
+  per generic identity, in the plist form used everywhere else in this schema (`:name`,
+  `:kind`, etc. are all plist keys too). A value list has more than one element only in
+  the rare case where a type implements the *same* open generic interface more than once,
+  closed over different type arguments (legal C#, e.g. `class Foo : IEquatable<int>,
+  IEquatable<string>`, confirmed to compile) — this is exactly why each key's value is a
+  *list* of closed forms, not a single string:
+  ```lisp
+  :interfaces-closed
+    ("System.IEquatable`1" ("System.IEquatable`1[System.Int32]" "System.IEquatable`1[System.String]"))
+  ```
+  A **non**-generic interface is never given a key here at all (its identity and closed
+  form are identical, already fully captured by `:interfaces`) — so this whole key is
+  omitted when no implemented interface is generic. Descriptive/documentation-only, like
   `:superclass-closed`.
+
+  > [!IMPORTANT]
+  > **This plist's keys are strings, not symbols — do not look them up with `GETF`.**
+  > Common Lisp's `GETF` is specified to compare keys with `EQ`, and a string freshly
+  > read from a metadata file via `READ` is never `EQ` to a string literal you type in
+  > your own code, even when the two are `STRING=`. `(getf interfaces-closed
+  > "System.IEquatable\`1")` is not guaranteed to find the entry above. Instead, look up
+  > an identity with `MEMBER` and take the second element of what it returns:
+  > ```lisp
+  > (second (member "System.IEquatable`1" interfaces-closed :test #'string=))
+  > ;; => ("System.IEquatable`1[System.Int32]" "System.IEquatable`1[System.String]")
+  > ```
 * `:flags` (List of Keywords or `nil`): A list of active boolean type flags, converted
   to Lisp-friendly kebab-case keywords. If no flags are active, this value is `nil`.
   Supported flag keywords are:
