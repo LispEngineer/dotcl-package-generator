@@ -61,6 +61,8 @@ Perhaps use `or` and `bitwise-or` for the operator overloads.
 # Add More to Generated `.lisp` Files
 
 TODO
+* All package generator options in effect when the class was generated
+  * As a plist? alist? set? list?
 * Add Constant Properties as structured `<constant-properties>`
   * A Lisp list of all the selected properties (strings); 
     could also just be `"*"` as a single entry.
@@ -264,6 +266,37 @@ obj!)` form instead, deprecating Option A's per-type codegen.
 
 
 ---
+
+# Fix Generic Superclass/Interface Ancestor Matching (Pre-existing, Found 2026-07-06)
+
+**Found while manually verifying `--export-parents`/`--export-interfaces` against a real,
+third-party class hierarchy** (MonoGameGum's `Gum.Collections.GraphicalUiElementCollection`),
+not introduced by Version 38/39 -- present, unchanged, since Version 33's original
+`expand-ancestors`.
+
+A generic superclass/interface reference's `:superclass`/`:interfaces` metadata value used
+.NET's raw `Type.FullName`, which for a CLOSED generic instantiation (e.g. deriving from
+`List<int>`) is the full, assembly-qualified, bracketed CLR form -- never matching the generic
+type *definition*'s own bare `:fully-qualified-name` (the only form under which a generic type
+is ever separately reflected as its own metadata entry) -- and for a generic type referencing
+its own unresolved type parameter (e.g. `class Derived<T> : Base<T>`) is documented to return
+`null`, silently losing the namespace when the code fell back to `Type.Name`. Both made
+`--export-parents`/`--export-interfaces`/`--output-children`/`--output-implementations`
+ancestor resolution fail outright, or misreport a genuinely-present ancestor as "missing"
+(confirmed to be the true cause of a previously-flagged, unexplained `Makefile` comment about
+`System.ValueTuple\`2`'s own generic interfaces spuriously reporting as unresolvable).
+
+**DONE (Version 40, 2026-07-06).** A new `GetTypeIdentityFullName` helper in
+`AssemblyToLispy.cs` resolves both cases identically: for any generic type, use
+`GetGenericTypeDefinition().FullName` (never `null`, never assembly-qualified) instead of the
+type's own `FullName`. `:superclass`/`:interfaces` now always hold this bare, matchable
+identity form; the discarded closed-instantiation information is preserved separately via two
+new sibling metadata keys, `:superclass-closed`/`:interfaces-closed` (documentation-only, using
+the same simplified generic notation `:type`/`:return-type` already use). No change was needed
+to `assembly-package-generator.lisp`'s own resolution logic. See
+`doc/generator-design-notes.md`'s "Generic Superclass/Interface Identity Matching (Version 40)"
+section, `doc/assembly-to-lispy.md`'s updated schema, and `RELEASES.md`'s 2.40.0 entry.
+
 
 # Handle Extension Methods in the Main Class
 

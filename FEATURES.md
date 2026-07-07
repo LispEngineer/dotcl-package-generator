@@ -687,6 +687,15 @@ this to a warning and drops just that ancestor. See
 design and rationale (including why no topological sort of the `defpackage` forms is
 needed).
 
+A **generic** superclass/interface (whether closed to concrete type arguments, e.g. deriving
+from `List<int>`, or a generic type's own base referencing its own unresolved type parameter)
+resolves as an ancestor correctly (Version 40) — matched by the generic type *definition*'s
+bare identity, never a specific instantiation's assembly-qualified form. The discarded
+concrete-instantiation information is preserved separately in the reflected metadata's
+`:superclass-closed`/`:interfaces-closed` sibling keys (documentation-only; not used for
+ancestor resolution). See `doc/generator-design-notes.md`'s "Generic Superclass/Interface
+Identity Matching (Version 40)" section.
+
 
 
 ## Extension Methods

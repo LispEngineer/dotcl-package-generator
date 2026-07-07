@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 39
-;;; Creation Date: 2026-07-06T00:55:09Z
+;;; Generator Version: 40
+;;; Creation Date: 2026-07-07T01:02:29Z
 
 (cl:in-package :cl-user)
 
@@ -1193,6 +1193,32 @@
    #:<creation>
    #:<version>
    #:compare-to
+  ))
+
+;;; Source File: system-i-comparable-1.lisp
+;;; C# Class: System.IComparable`1
+;;; Constant Properties: (none)
+(cl:defpackage :system-i-comparable-1
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:compare-to
+  ))
+
+;;; Source File: system-i-equatable-1.lisp
+;;; C# Class: System.IEquatable`1
+;;; Constant Properties: (none)
+(cl:defpackage :system-i-equatable-1
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:equals
   ))
 
 ;;; Source File: system-runtime-compiler-services-i-tuple.lisp
@@ -2836,6 +2862,19 @@
    #:interface-method
   ))
 
+;;; Source File: assembly-to-lispy-test-target-concrete-derived-from-generic.lisp
+;;; C# Class: AssemblyToLispyTestTarget.ConcreteDerivedFromGeneric
+;;; Constant Properties: (none)
+(cl:defpackage :assembly-to-lispy-test-target-concrete-derived-from-generic
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+  ))
+
 ;;; Source File: assembly-to-lispy-test-target-nesting-container-nested-level2.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.NestingContainer+NestedLevel2
 ;;; Constant Properties: (none)
@@ -2880,9 +2919,23 @@
    #:interface-method
   ))
 
+;;; Source File: assembly-to-lispy-test-target-generic-base-for-superclass-test-1.lisp
+;;; C# Class: AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1
+;;; Constant Properties: (none)
+(cl:defpackage :assembly-to-lispy-test-target-generic-base-for-superclass-test-1
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:generic-base-method
+  ))
+
 ;;; ===== Re-exports from parent/interface packages =====
 
-;;; system-value-tuple-2: re-exports inherited members from system-collections-i-structural-comparable, system-collections-i-structural-equatable, system-i-comparable, system-runtime-compiler-services-i-tuple
+;;; system-value-tuple-2: re-exports inherited members from system-collections-i-structural-comparable, system-collections-i-structural-equatable, system-i-comparable, system-i-comparable-1, system-i-equatable-1, system-runtime-compiler-services-i-tuple
 ;;; Skipped (system-value-tuple-2 declares its own): compare-to
 ;;; Skipped (system-value-tuple-2 declares its own): equals
 ;;; Skipped (system-value-tuple-2 declares its own): get-hash-code
@@ -3001,4 +3054,14 @@
 ;;; Skipped (system-collections-specialized-name-object-collection-base declares its own): get-object-data
 (cl:import '(system-object::equals system-object::equals* system-object::finalize system-object::get-hash-code system-object::get-type system-object::memberwise-clone system-object::reference-equals system-object::to-string system-object::dummy-extension system-collections-i-collection::synchronized? system-collections-i-collection::sync-root system-collections-i-collection::copy-to) ':system-collections-specialized-name-object-collection-base)
 (cl:export '(system-collections-specialized-name-object-collection-base::equals system-collections-specialized-name-object-collection-base::equals* system-collections-specialized-name-object-collection-base::finalize system-collections-specialized-name-object-collection-base::get-hash-code system-collections-specialized-name-object-collection-base::get-type system-collections-specialized-name-object-collection-base::memberwise-clone system-collections-specialized-name-object-collection-base::reference-equals system-collections-specialized-name-object-collection-base::to-string system-collections-specialized-name-object-collection-base::dummy-extension system-collections-specialized-name-object-collection-base::synchronized? system-collections-specialized-name-object-collection-base::sync-root system-collections-specialized-name-object-collection-base::copy-to) ':system-collections-specialized-name-object-collection-base)
+
+;;; assembly-to-lispy-test-target-concrete-derived-from-generic: re-exports inherited members from assembly-to-lispy-test-target-generic-base-for-superclass-test-1, system-collections-generic-list-1
+(cl:shadowing-import '(system-collections-generic-list-1::count system-collections-generic-list-1::find system-collections-generic-list-1::remove system-collections-generic-list-1::reverse system-collections-generic-list-1::sort) ':assembly-to-lispy-test-target-concrete-derived-from-generic)
+(cl:import '(assembly-to-lispy-test-target-generic-base-for-superclass-test-1::generic-base-method system-collections-generic-list-1::capacity system-collections-generic-list-1::item system-collections-generic-list-1::add system-collections-generic-list-1::add-range system-collections-generic-list-1::as-read-only system-collections-generic-list-1::binary-search system-collections-generic-list-1::clear system-collections-generic-list-1::contains system-collections-generic-list-1::convert-all system-collections-generic-list-1::copy-to system-collections-generic-list-1::ensure-capacity system-collections-generic-list-1::exists system-collections-generic-list-1::find-all system-collections-generic-list-1::find-index system-collections-generic-list-1::find-last system-collections-generic-list-1::find-last-index system-collections-generic-list-1::for-each system-collections-generic-list-1::get-enumerator system-collections-generic-list-1::get-range system-collections-generic-list-1::index-of system-collections-generic-list-1::insert system-collections-generic-list-1::insert-range system-collections-generic-list-1::last-index-of system-collections-generic-list-1::remove-all system-collections-generic-list-1::remove-at system-collections-generic-list-1::remove-range system-collections-generic-list-1::slice system-collections-generic-list-1::to-array system-collections-generic-list-1::trim-excess system-collections-generic-list-1::true-for-all) ':assembly-to-lispy-test-target-concrete-derived-from-generic)
+(cl:export '(assembly-to-lispy-test-target-concrete-derived-from-generic::generic-base-method assembly-to-lispy-test-target-concrete-derived-from-generic::capacity assembly-to-lispy-test-target-concrete-derived-from-generic::count assembly-to-lispy-test-target-concrete-derived-from-generic::item assembly-to-lispy-test-target-concrete-derived-from-generic::add assembly-to-lispy-test-target-concrete-derived-from-generic::add-range assembly-to-lispy-test-target-concrete-derived-from-generic::as-read-only assembly-to-lispy-test-target-concrete-derived-from-generic::binary-search assembly-to-lispy-test-target-concrete-derived-from-generic::clear assembly-to-lispy-test-target-concrete-derived-from-generic::contains assembly-to-lispy-test-target-concrete-derived-from-generic::convert-all assembly-to-lispy-test-target-concrete-derived-from-generic::copy-to assembly-to-lispy-test-target-concrete-derived-from-generic::ensure-capacity assembly-to-lispy-test-target-concrete-derived-from-generic::exists assembly-to-lispy-test-target-concrete-derived-from-generic::find assembly-to-lispy-test-target-concrete-derived-from-generic::find-all assembly-to-lispy-test-target-concrete-derived-from-generic::find-index assembly-to-lispy-test-target-concrete-derived-from-generic::find-last assembly-to-lispy-test-target-concrete-derived-from-generic::find-last-index assembly-to-lispy-test-target-concrete-derived-from-generic::for-each assembly-to-lispy-test-target-concrete-derived-from-generic::get-enumerator assembly-to-lispy-test-target-concrete-derived-from-generic::get-range assembly-to-lispy-test-target-concrete-derived-from-generic::index-of assembly-to-lispy-test-target-concrete-derived-from-generic::insert assembly-to-lispy-test-target-concrete-derived-from-generic::insert-range assembly-to-lispy-test-target-concrete-derived-from-generic::last-index-of assembly-to-lispy-test-target-concrete-derived-from-generic::remove assembly-to-lispy-test-target-concrete-derived-from-generic::remove-all assembly-to-lispy-test-target-concrete-derived-from-generic::remove-at assembly-to-lispy-test-target-concrete-derived-from-generic::remove-range assembly-to-lispy-test-target-concrete-derived-from-generic::reverse assembly-to-lispy-test-target-concrete-derived-from-generic::slice assembly-to-lispy-test-target-concrete-derived-from-generic::sort assembly-to-lispy-test-target-concrete-derived-from-generic::to-array assembly-to-lispy-test-target-concrete-derived-from-generic::trim-excess assembly-to-lispy-test-target-concrete-derived-from-generic::true-for-all) ':assembly-to-lispy-test-target-concrete-derived-from-generic)
+
+;;; assembly-to-lispy-test-target-generic-base-for-superclass-test-1: re-exports inherited members from system-collections-generic-list-1
+(cl:shadowing-import '(system-collections-generic-list-1::count system-collections-generic-list-1::find system-collections-generic-list-1::remove system-collections-generic-list-1::reverse system-collections-generic-list-1::sort) ':assembly-to-lispy-test-target-generic-base-for-superclass-test-1)
+(cl:import '(system-collections-generic-list-1::capacity system-collections-generic-list-1::item system-collections-generic-list-1::add system-collections-generic-list-1::add-range system-collections-generic-list-1::as-read-only system-collections-generic-list-1::binary-search system-collections-generic-list-1::clear system-collections-generic-list-1::contains system-collections-generic-list-1::convert-all system-collections-generic-list-1::copy-to system-collections-generic-list-1::ensure-capacity system-collections-generic-list-1::exists system-collections-generic-list-1::find-all system-collections-generic-list-1::find-index system-collections-generic-list-1::find-last system-collections-generic-list-1::find-last-index system-collections-generic-list-1::for-each system-collections-generic-list-1::get-enumerator system-collections-generic-list-1::get-range system-collections-generic-list-1::index-of system-collections-generic-list-1::insert system-collections-generic-list-1::insert-range system-collections-generic-list-1::last-index-of system-collections-generic-list-1::remove-all system-collections-generic-list-1::remove-at system-collections-generic-list-1::remove-range system-collections-generic-list-1::slice system-collections-generic-list-1::to-array system-collections-generic-list-1::trim-excess system-collections-generic-list-1::true-for-all) ':assembly-to-lispy-test-target-generic-base-for-superclass-test-1)
+(cl:export '(assembly-to-lispy-test-target-generic-base-for-superclass-test-1::capacity assembly-to-lispy-test-target-generic-base-for-superclass-test-1::count assembly-to-lispy-test-target-generic-base-for-superclass-test-1::item assembly-to-lispy-test-target-generic-base-for-superclass-test-1::add assembly-to-lispy-test-target-generic-base-for-superclass-test-1::add-range assembly-to-lispy-test-target-generic-base-for-superclass-test-1::as-read-only assembly-to-lispy-test-target-generic-base-for-superclass-test-1::binary-search assembly-to-lispy-test-target-generic-base-for-superclass-test-1::clear assembly-to-lispy-test-target-generic-base-for-superclass-test-1::contains assembly-to-lispy-test-target-generic-base-for-superclass-test-1::convert-all assembly-to-lispy-test-target-generic-base-for-superclass-test-1::copy-to assembly-to-lispy-test-target-generic-base-for-superclass-test-1::ensure-capacity assembly-to-lispy-test-target-generic-base-for-superclass-test-1::exists assembly-to-lispy-test-target-generic-base-for-superclass-test-1::find assembly-to-lispy-test-target-generic-base-for-superclass-test-1::find-all assembly-to-lispy-test-target-generic-base-for-superclass-test-1::find-index assembly-to-lispy-test-target-generic-base-for-superclass-test-1::find-last assembly-to-lispy-test-target-generic-base-for-superclass-test-1::find-last-index assembly-to-lispy-test-target-generic-base-for-superclass-test-1::for-each assembly-to-lispy-test-target-generic-base-for-superclass-test-1::get-enumerator assembly-to-lispy-test-target-generic-base-for-superclass-test-1::get-range assembly-to-lispy-test-target-generic-base-for-superclass-test-1::index-of assembly-to-lispy-test-target-generic-base-for-superclass-test-1::insert assembly-to-lispy-test-target-generic-base-for-superclass-test-1::insert-range assembly-to-lispy-test-target-generic-base-for-superclass-test-1::last-index-of assembly-to-lispy-test-target-generic-base-for-superclass-test-1::remove assembly-to-lispy-test-target-generic-base-for-superclass-test-1::remove-all assembly-to-lispy-test-target-generic-base-for-superclass-test-1::remove-at assembly-to-lispy-test-target-generic-base-for-superclass-test-1::remove-range assembly-to-lispy-test-target-generic-base-for-superclass-test-1::reverse assembly-to-lispy-test-target-generic-base-for-superclass-test-1::slice assembly-to-lispy-test-target-generic-base-for-superclass-test-1::sort assembly-to-lispy-test-target-generic-base-for-superclass-test-1::to-array assembly-to-lispy-test-target-generic-base-for-superclass-test-1::trim-excess assembly-to-lispy-test-target-generic-base-for-superclass-test-1::true-for-all) ':assembly-to-lispy-test-target-generic-base-for-superclass-test-1)
 

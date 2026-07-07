@@ -490,7 +490,9 @@
                (t-underlying (getf type-entry :enum-underlying-type))
                (t-doc (getf type-entry :documentation))
                (tsuper (getf type-entry :superclass))
+               (tsuper-closed (getf type-entry :superclass-closed))
                (t-ifaces (getf type-entry :interfaces))
+               (t-ifaces-closed (getf type-entry :interfaces-closed))
                (t-flags (getf type-entry :flags))
                (t-props (getf type-entry :properties))
                (t-fields (getf type-entry :fields))
@@ -500,7 +502,7 @@
                (context (format nil "Type '~A'" (if fqname fqname (if tname tname "Unknown")))))
 
           (when (not (validate-plist-keys type-entry '(:name :fully-qualified-name :kind)
-                                         '(:name :fully-qualified-name :namespace :kind :enum-underlying-type :documentation :superclass :interfaces :flags :properties :fields :constructors :methods :events)
+                                         '(:name :fully-qualified-name :namespace :kind :enum-underlying-type :documentation :superclass :superclass-closed :interfaces :interfaces-closed :flags :properties :fields :constructors :methods :events)
                                          context))
             (setf valid nil))
           
@@ -525,6 +527,17 @@
           (when (and tsuper (not (stringp tsuper)))
             (setf valid nil)
             (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :superclass must be a string, got ~S~%" context tsuper))
+          ;; :superclass-closed (Version 40): the closed/instantiated generic form,
+          ;; a sibling of :superclass (which is always the bare, matchable generic
+          ;; type DEFINITION identity -- see doc/generator-design-notes.md's
+          ;; "Generic Superclass/Interface Identity Matching (Version 40)" section).
+          ;; Only ever present alongside a present :superclass.
+          (when (and tsuper-closed (not (stringp tsuper-closed)))
+            (setf valid nil)
+            (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :superclass-closed must be a string, got ~S~%" context tsuper-closed))
+          (when (and tsuper-closed (not tsuper))
+            (setf valid nil)
+            (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :superclass-closed is present but :superclass is absent~%" context))
           (when (and t-ifaces (not (listp t-ifaces)))
             (setf valid nil)
             (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces must be a list, got ~S~%" context t-ifaces))
@@ -533,6 +546,37 @@
               (when (not (stringp i))
                 (setf valid nil)
                 (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Interface name in :interfaces must be a string, got ~S~%" context i))))
+          ;; :interfaces-closed (Version 40): one (identity closed-1 closed-2 ...) list
+          ;; per GENERIC identity in :interfaces only (a non-generic identity's closed
+          ;; form would be identical to its identity, already in :interfaces, so it is
+          ;; omitted entirely rather than duplicated). More than one closed form under
+          ;; the same identity is possible and legal C# (e.g. "class Foo : IEquatable<int>,
+          ;; IEquatable<string>" implements the same open IEquatable`1 twice, closed over
+          ;; different arguments) -- this is exactly why each entry is a proper list
+          ;; (identity . (closed-1 closed-2 ...)), not a single (identity . closed) cons:
+          ;; a cons-per-identity representation cannot hold two closed forms under one
+          ;; key without one silently shadowing the other in any assoc-style lookup.
+          ;; :interfaces itself is deduped by identity (so it never lists the same
+          ;; interface identity twice, even when a type implements it multiple times
+          ;; closed over different arguments), so every :interfaces-closed identity must
+          ;; appear in :interfaces exactly once.
+          (when (and t-ifaces-closed (not (listp t-ifaces-closed)))
+            (setf valid nil)
+            (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed must be a list, got ~S~%" context t-ifaces-closed))
+          (when t-ifaces-closed
+            (dolist (entry t-ifaces-closed)
+              (if (and (consp entry) (stringp (car entry)) (cdr entry)
+                       (every #'stringp (cdr entry)))
+                  (progn
+                    (unless (member (car entry) t-ifaces :test #'string=)
+                      (setf valid nil)
+                      (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed identity ~S does not appear in :interfaces~%" context (car entry)))
+                    (unless (= 1 (count (car entry) t-ifaces-closed :key #'car :test #'string=))
+                      (setf valid nil)
+                      (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed identity ~S appears more than once as a top-level entry (closed forms for one identity must be grouped into a single entry's list, not split across entries)~%" context (car entry))))
+                  (progn
+                    (setf valid nil)
+                    (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :interfaces-closed entry must be a (string string+) list, got ~S~%" context entry)))))
           (when (and t-flags (not (listp t-flags)))
             (setf valid nil)
             (utils:format-red *error-output* "[SCHEMA ERROR] ~A: :flags must be a list, got ~S~%" context t-flags))

@@ -10,6 +10,27 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.40.0 — 2026-07-06
+
+**Fixed a correctness bug: a generic superclass/interface could never be resolved as an
+ancestor, even when genuinely present in the provided assemblies.**
+
+* `:superclass`/`:interfaces` (the metadata fields `--export-parents`/`--export-interfaces`/
+  `--output-children`/`--output-implementations` all resolve ancestors by) previously used
+  .NET's raw `Type.FullName` for a generic base/interface, which is either a closed
+  instantiation's full assembly-qualified bracketed form (never matching the generic type
+  definition's own bare identity) or, for a generic type referencing its own unresolved type
+  parameter, documented to return `null` — silently losing the namespace when the code fell
+  back to `Type.Name`. Both cases made ancestor resolution fail outright or misreport a
+  genuinely-present ancestor as "missing." Confirmed against a real class hierarchy
+  (MonoGameGum's `Gum.Collections.GraphicalUiElementCollection`).
+* `:superclass`/`:interfaces` now always hold the generic type definition's bare, matchable
+  identity, fixing resolution for any class with a generic ancestor. Two new metadata sibling
+  keys, `:superclass-closed`/`:interfaces-closed`, preserve the discarded closed-instantiation
+  information for documentation purposes. See `doc/assembly-to-lispy.md`'s updated schema and
+  `doc/generator-design-notes.md`'s "Generic Superclass/Interface Identity Matching (Version 40)"
+  section (`*generator-version*` bumped to 40).
+
 ## 2.39.0 — 2026-07-05
 
 **Added recursive, multi-direction related-class discovery, with flag propagation.**

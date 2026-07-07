@@ -355,6 +355,67 @@ namespace AssemblyToLispyTestTarget
     }
 
     /// <summary>
+    /// A generic base class whose own base class (System.Collections.Generic.List&lt;T&gt;)
+    /// references ITS OWN unresolved generic type parameter, to test Version 40's
+    /// :superclass/:interfaces fix: previously, Type.FullName for a generic type
+    /// parameterized by an unresolved type parameter (rather than a closed, concrete
+    /// type) returns null, silently losing the namespace when the code fell back to
+    /// Type.Name (producing bare "List`1" instead of
+    /// "System.Collections.Generic.List`1"). GetTypeIdentityFullName's
+    /// GetGenericTypeDefinition().FullName fix handles this case identically to the
+    /// closed-generic case below, since both need only the generic type DEFINITION's
+    /// identity, never the specific instantiation.
+    /// </summary>
+    /// <typeparam name="T">A generic type parameter, passed through unresolved to the base class.</typeparam>
+    public class GenericBaseForSuperclassTest<T> : System.Collections.Generic.List<T>
+    {
+        /// <summary>
+        /// A method of its own, so --export-parents/--export-children has something
+        /// concrete to re-export/discover in end-to-end tests.
+        /// </summary>
+        public T GenericBaseMethod()
+        {
+            return default(T)!;
+        }
+    }
+
+    /// <summary>
+    /// A concrete (non-generic) class deriving from a CLOSED instantiation of
+    /// GenericBaseForSuperclassTest -- to test Version 40's fix for the OTHER half of
+    /// the same bug: previously, a closed generic base's :superclass was the full,
+    /// assembly-qualified CLR form (e.g.
+    /// "AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1[[...]]"), which could
+    /// never string-match GenericBaseForSuperclassTest`1's own bare
+    /// :fully-qualified-name, so --export-parents could never resolve it. Also
+    /// exercises the new :superclass-closed sibling key, which preserves the
+    /// discarded closed-instantiation information (here,
+    /// "...GenericBaseForSuperclassTest`1[AssemblyToLispyTestTarget.EdgeCaseStruct]").
+    /// </summary>
+    public class ConcreteDerivedFromGeneric : GenericBaseForSuperclassTest<EdgeCaseStruct>
+    {
+    }
+
+    /// <summary>
+    /// A class implementing the SAME open generic interface (IEquatable&lt;T&gt;) more than
+    /// once, closed over different type arguments -- legal C# (confirmed to compile
+    /// directly). This is the specific case Version 40's :interfaces/:interfaces-closed
+    /// identity-grouping fix exists to handle without collision: without grouping,
+    /// :interfaces would contain "System.IEquatable`1" twice, and :interfaces-closed would
+    /// have two entries sharing that same key, silently losing one closed form to any
+    /// assoc-style lookup by identity. See doc/generator-design-notes.md's "Generic
+    /// Superclass/Interface Identity Matching (Version 40)" section's "A same-identity
+    /// collision this needed a second fix for" discussion.
+    /// </summary>
+    public class MultiEquatable : System.IEquatable<int>, System.IEquatable<string>
+    {
+        /// <summary>Implements IEquatable&lt;int&gt;.</summary>
+        public bool Equals(int other) => false;
+
+        /// <summary>Implements IEquatable&lt;string&gt;.</summary>
+        public bool Equals(string? other) => false;
+    }
+
+    /// <summary>
     /// A class with public types nested three levels deep, to test that the CIL
     /// nested-type separator '+' (e.g. NestingContainer+NestedLevel2) is handled
     /// correctly in :fully-qualified-name and in the derived Lisp package name.

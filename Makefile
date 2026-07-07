@@ -107,7 +107,8 @@ test: build
 	      --class AssemblyToLispyTestTarget.EventTestClass \
 	      --class AssemblyToLispyTestTarget.NestingContainer --output-nested \
 	      --class AssemblyToLispyTestTarget.AbstractBase --output-children \
-	      --class AssemblyToLispyTestTarget.IDummyInterface --output-implementations
+	      --class AssemblyToLispyTestTarget.IDummyInterface --output-implementations \
+	      --class AssemblyToLispyTestTarget.ConcreteDerivedFromGeneric --export-parents
 	# EventTestClass demonstrates Version 38's extension-method injection
 	# (--extension-methods, ON by default) against a real, generated package:
 	# see EventTestClassExtensions in AssemblyToLispyTestTarget/EdgeCases.cs
@@ -118,6 +119,12 @@ test: build
 	# pulls in its own NestedLevel2/NestedLevel3 in one prefix scan; AbstractBase
 	# and IDummyInterface both independently discover GenericClass`1 (which extends
 	# the former and implements the latter) as its own package, deduplicated.
+	# ConcreteDerivedFromGeneric demonstrates Version 40's :superclass/:interfaces
+	# generic-identity fix: its superclass is a CLOSED instantiation
+	# (GenericBaseForSuperclassTest<EdgeCaseStruct>) of a generic type defined in
+	# this same assembly -- before the fix, --export-parents could never resolve
+	# a closed-generic superclass at all (see doc/generator-design-notes.md's
+	# "Generic Superclass/Interface Identity Matching (Version 40)" section).
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo;
 	# System.Collections.Generic.List, SortedList; System.Text.StringBuilder;
 	# System.Drawing.Point/F; Size/F
@@ -158,18 +165,20 @@ version:
 #
 # --class 'System.ValueTuple`2' --export-interfaces --skip-missing
 #
-# produces:
+# produces (post-Version-40 -- see below):
 # Warning: Ancestor class not found in any provided assembly metadata (skipped): System.IValueTupleInternal
 # Generating package for C# Class: System.Collections.IStructuralComparable
 # Generating package for C# Class: System.Collections.IStructuralEquatable
 # Generating package for C# Class: System.IComparable
+# Generating package for C# Class: System.IComparable`1
+# Generating package for C# Class: System.IEquatable`1
 # Generating package for C# Class: System.Runtime.CompilerServices.ITuple
 #
-# Four real public interfaces resolve and generate fine; IValueTupleInternal is warned-and-dropped. Without --skip-missing, the same run correctly hard-errors and writes nothing. I'd suggest adding --export-interfaces --skip-missing to just one of the existing ValueTuple\N`` entries (not all 7 — no need to bloat the smoke test with duplicate coverage).
+# Six real public interfaces resolve and generate fine; IValueTupleInternal is warned-and-dropped. Without --skip-missing, the same run correctly hard-errors and writes nothing. I'd suggest adding --export-interfaces --skip-missing to just one of the existing ValueTuple\N`` entries (not all 7 — no need to bloat the smoke test with duplicate coverage).
 #
-# One caveat surfaced by this same check
+# A formerly-open caveat, now fixed (Version 40)
 #
-# You'll also see IComparable\1/IEquatable`1reported "missing" alongsideIValueTupleInternal — that's **not** a real missing-assembly case, it's the generic-interface-name-formatting bug I flagged earlier (:interfacesemits generic interfaces without their namespace, so they can never match a:fully-qualified-name). It affects nearly every generic-interface reference in this whole assembly set (Dictionary<K,V>, List<T>, Vector2/3/4, TimeSpan, String, etc. all show the same symptom). If you want cspackages-testto demonstrate--skip-missingcleanly,ValueTupleis good specifically because it has *both* kinds in one place, side by side — but worth knowing the two are different bugs, only one of which--skip-missing` is meant to paper over.
+# Before Version 40, IComparable\1/IEquatable`1 (System.ValueTuple`2's own generic interfaces) were ALSO incorrectly reported "missing" alongside the genuinely-missing IValueTupleInternal — not a real missing-assembly case, but a :interfaces-formatting bug (a generic interface reference lost its namespace, so it could never match its own type's :fully-qualified-name; see doc/generator-design-notes.md's "Generic Superclass/Interface Identity Matching (Version 40)" section, and AssemblyToLispyTestTarget/EdgeCases.cs's GenericBaseForSuperclassTest/ConcreteDerivedFromGeneric for the dedicated regression test). It affected nearly every generic-interface/superclass reference in this whole assembly set (Dictionary<K,V>, List<T>, Vector2/3/4, TimeSpan, String, etc. all showed the same symptom) -- all now resolve correctly. ValueTuple remains a good demonstration spot precisely because it has *both* kinds side by side: a real --skip-missing case (IValueTupleInternal) and, historically, the now-fixed generic-formatting case.
 #
 # A genuine "real assembly not provided" example, if you want that flavor instead
 #

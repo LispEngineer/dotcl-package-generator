@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: AssemblyToLispyTestTarget.GenericClass`1
-;;; Generator Version: 39
-;;; Creation Date: 2026-07-06T00:55:09Z
+;;; Generator Version: 40
+;;; Creation Date: 2026-07-07T01:02:29Z
 
 (cl:in-package :assembly-to-lispy-test-target-generic-class-1)
 
 (cl:defconstant <type> (dotnet:resolve-type "AssemblyToLispyTestTarget.GenericClass`1"))
 (cl:defconstant <type-str> "AssemblyToLispyTestTarget.GenericClass`1")
-(cl:defconstant <creation> "2026-07-06T00:55:09Z")
-(cl:defconstant <version> 39)
+(cl:defconstant <creation> "2026-07-07T01:02:29Z")
+(cl:defconstant <version> 40)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

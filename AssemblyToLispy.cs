@@ -150,8 +150,47 @@ namespace PackageGenerator {
 
                     // Phase 2A: Retrieve type kind, superclass, interfaces, and flags
                     string kindStr = GetTypeKind(type);
-                    string superclassStr = type.BaseType != null ? EscapeLispString(type.BaseType.FullName ?? type.BaseType.Name) : "nil";
-                    var interfaces = type.GetInterfaces().Select(i => i.FullName ?? i.Name).OrderBy(name => name).ToList();
+                    string superclassStr = type.BaseType != null ? EscapeLispString(GetTypeIdentityFullName(type.BaseType)) : "nil";
+                    // :superclass-closed (Version 40): only emitted when type.BaseType is
+                    // actually a generic type, so it differs from superclassStr's identity
+                    // form -- see GetTypeIdentityFullName's docstring for why :superclass
+                    // itself was changed to the bare identity form, and
+                    // doc/generator-design-notes.md's "Generic Superclass/Interface Identity
+                    // Matching (Version 40)" section for the full rationale. Uses the same
+                    // simplified backtick/bracket notation as :type/:return-type
+                    // (GetFriendlyTypeName), not the raw, potentially assembly-qualified
+                    // Type.FullName -- this key exists to show which concrete type argument(s)
+                    // were used, not to carry full CLR/assembly-qualification fidelity (which
+                    // is a separate, currently unimplemented follow-up if ever needed).
+                    string? superclassClosedStr = (type.BaseType != null && type.BaseType.IsGenericType)
+                        ? GetFriendlyTypeName(type.BaseType)
+                        : null;
+                    // Grouped by identity, not just mapped 1:1, because C# allows a type to
+                    // implement the SAME open generic interface more than once, closed over
+                    // different type arguments (e.g. "class Foo : IEquatable<int>,
+                    // IEquatable<string>" -- confirmed to compile; see
+                    // doc/generator-design-notes.md's "Generic Superclass/Interface Identity
+                    // Matching (Version 40)" section for the follow-up that added this
+                    // grouping). Without grouping, :interfaces would contain the same identity
+                    // string twice, and an :interfaces-closed alist keyed by identity would have
+                    // two entries sharing one key -- silently losing one instantiation's closed
+                    // form to any assoc-style lookup by identity.
+                    var interfaceGroups = type.GetInterfaces()
+                        .Select(i => (Identity: GetTypeIdentityFullName(i), Type: i))
+                        .GroupBy(pair => pair.Identity)
+                        .OrderBy(g => g.Key)
+                        .ToList();
+                    var interfaces = interfaceGroups.Select(g => g.Key).ToList();
+                    // :interfaces-closed (Version 40): one (identity closed-1 closed-2 ...)
+                    // entry per GENERIC identity, in the same order as :interfaces -- the list
+                    // of closed forms has more than one element only for the rare same-open-
+                    // interface-multiple-closed-instantiations case above; a non-generic
+                    // identity is omitted entirely (identity and closed form are identical,
+                    // already fully captured by :interfaces).
+                    var interfacesClosed = interfaceGroups
+                        .Where(g => g.Any(pair => pair.Type.IsGenericType))
+                        .Select(g => $"({EscapeLispString(g.Key)}{string.Concat(g.Select(pair => $" {EscapeLispString(GetFriendlyTypeName(pair.Type))}"))})")
+                        .ToList();
                     string flagsStr = GetTypeFlags(type);
 
                     // Phase 2B: Retrieve properties and fields
@@ -218,8 +257,14 @@ namespace PackageGenerator {
                     if (superclassStr != "nil") {
                         parts.Add($":superclass {superclassStr}");
                     }
+                    if (superclassClosedStr != null) {
+                        parts.Add($":superclass-closed {EscapeLispString(superclassClosedStr)}");
+                    }
                     if (interfaces.Any()) {
                         parts.Add($":interfaces {FormatLispList(interfaces)}");
+                    }
+                    if (interfacesClosed.Any()) {
+                        parts.Add($":interfaces-closed ({string.Join(" ", interfacesClosed)})");
                     }
                     if (flagsStr != "nil") {
                         parts.Add($":flags {flagsStr}");
@@ -799,6 +844,44 @@ namespace PackageGenerator {
                 }
             }
             return name;
+        }
+
+        /// <summary>
+        ///   Gets a type's own identity name -- suitable for matching against another type's
+        ///   :fully-qualified-name (as done by dotcl-packagegen's --export-parents/--export-
+        ///   interfaces/--output-children/--output-implementations, and, since Version 40, the
+        ///   fix this method is part of) -- as opposed to <see cref="GetFriendlyTypeName"/>,
+        ///   which describes a specific (possibly closed/constructed) generic instantiation for
+        ///   display purposes.
+        /// </summary>
+        /// <remarks>
+        ///   For a generic type, <c>Type.FullName</c> describes the specific instantiation the
+        ///   reflected reference actually is: for a CLOSED generic (all type arguments resolved
+        ///   to concrete types, e.g. a field/base/interface typed as <c>List&lt;int&gt;</c>),
+        ///   it is the full assembly-qualified bracketed form (e.g.
+        ///   <c>"System.Collections.Generic.List`1[[System.Int32, System.Private.CoreLib, ...]]"</c>);
+        ///   for a generic type whose arguments are themselves unresolved type parameters (e.g.
+        ///   a generic type's own base class referencing its own type parameter, as in
+        ///   <c>class Derived&lt;T&gt; : Base&lt;T&gt;</c>), <c>Type.FullName</c> is documented
+        ///   to return <c>null</c> outright. Neither of these matches the generic type
+        ///   DEFINITION's own :fully-qualified-name (always the bare, unqualified
+        ///   <c>Name`Arity</c> form -- the only form under which a generic type is ever
+        ///   separately reflected as its own top-level metadata entry, since no arbitrary closed
+        ///   instantiation is ever itself a distinct reflected type). This method always resolves
+        ///   to that bare identity form for a generic type (via
+        ///   <c>GetGenericTypeDefinition().FullName</c>, which is never null and never
+        ///   assembly-qualified/bracketed, regardless of whether TYPE itself is closed or still
+        ///   references an unresolved type parameter), and to <c>Type.FullName ?? Type.Name</c>
+        ///   unchanged for a non-generic type.
+        /// </remarks>
+        /// <param name="type">The type whose identity name is needed.</param>
+        /// <returns>The type's identity name, safe for cross-type identity matching.</returns>
+        private static string GetTypeIdentityFullName(Type type) {
+            if (type.IsGenericType) {
+                Type definition = type.GetGenericTypeDefinition();
+                return definition.FullName ?? definition.Name;
+            }
+            return type.FullName ?? type.Name;
         }
 
         /// <summary>

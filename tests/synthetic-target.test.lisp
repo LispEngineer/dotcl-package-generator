@@ -203,4 +203,47 @@
     (assert-not-null lvl3 "Should find NestingContainer+NestedLevel2+NestedLevel3 (two levels of '+' nesting)")
     (when lvl3
       (assert-equal "NestedLevel3" (getf lvl3 :name) "NestedLevel3's :name is its simple name, without '+'")
-      (assert-true (member :nested (getf lvl3 :flags)) "NestedLevel3 should have the :nested flag"))))
+      (assert-true (member :nested (getf lvl3 :flags)) "NestedLevel3 should have the :nested flag")))
+
+  ;; Test Version 40's :superclass/:interfaces generic-identity fix (see
+  ;; doc/generator-design-notes.md's "Generic Superclass/Interface Identity
+  ;; Matching (Version 40)" section):
+  ;;
+  ;; GenericBaseForSuperclassTest<T>'s own base is System.Collections.Generic.List<T>,
+  ;; referencing GenericBaseForSuperclassTest's OWN unresolved type parameter --
+  ;; Type.FullName is documented to return null for this case, and the pre-fix
+  ;; code fell back to Type.Name, silently losing the "System.Collections.Generic."
+  ;; namespace prefix (producing bare "List`1"). :superclass must be the full,
+  ;; correctly-namespaced generic type DEFINITION identity.
+  (let ((gbfst (find-if (lambda (cls)
+                          (string= (getf cls :fully-qualified-name)
+                                   "AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1"))
+                        *metadata*)))
+    (assert-not-null gbfst "Should find GenericBaseForSuperclassTest`1")
+    (when gbfst
+      (assert-equal "System.Collections.Generic.List`1" (getf gbfst :superclass)
+                    "GenericBaseForSuperclassTest`1's :superclass must keep its full namespace, not fall back to a bare Type.Name")
+      ;; List<T> here is itself parameterized by GenericBaseForSuperclassTest's
+      ;; own (still unresolved) type parameter, so GetFriendlyTypeName still
+      ;; renders it with a bracketed argument -- :superclass-closed is present
+      ;; but is not expected to equal the bare identity form.
+      (assert-not-null (getf gbfst :superclass-closed)
+                        "GenericBaseForSuperclassTest`1's :superclass-closed should be present (its base is generic)")))
+
+  ;; ConcreteDerivedFromGeneric derives from a CLOSED instantiation
+  ;; (GenericBaseForSuperclassTest<EdgeCaseStruct>) of a generic type DEFINED IN
+  ;; THIS SAME ASSEMBLY. Before the fix, :superclass would have been the full,
+  ;; assembly-qualified CLR form of that closed instantiation -- unable to
+  ;; string-match GenericBaseForSuperclassTest`1's own bare
+  ;; :fully-qualified-name above, so --export-parents could never resolve it.
+  (let ((cdfg (find-if (lambda (cls)
+                         (string= (getf cls :fully-qualified-name)
+                                  "AssemblyToLispyTestTarget.ConcreteDerivedFromGeneric"))
+                       *metadata*)))
+    (assert-not-null cdfg "Should find ConcreteDerivedFromGeneric")
+    (when cdfg
+      (assert-equal "AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1" (getf cdfg :superclass)
+                    "ConcreteDerivedFromGeneric's :superclass must be the bare generic type DEFINITION identity, matching GenericBaseForSuperclassTest`1's own :fully-qualified-name exactly")
+      (assert-equal "AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1[AssemblyToLispyTestTarget.EdgeCaseStruct]"
+                    (getf cdfg :superclass-closed)
+                    "ConcreteDerivedFromGeneric's :superclass-closed preserves the closed instantiation's concrete type argument"))))

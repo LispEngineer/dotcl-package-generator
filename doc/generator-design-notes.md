@@ -1968,3 +1968,149 @@ surprising output), `generate-assembly-packages-batch` counts every class discov
 Phase B work queue and prints a warning to `*error-output*` if the total exceeds 200, so an
 accidental combinatorial crawl is visible to the user rather than just "the tool is taking a long
 time" — the batch itself is never truncated or refused.
+
+## Generic Superclass/Interface Identity Matching (Version 40)
+
+### The bug, and how it was found
+
+Reported live against a real, third-party class hierarchy while verifying Version 39's
+`--export-parents`/`--export-interfaces` behavior: generating
+`MonoGameGum.GueDeriving.ContainerRuntime` worked correctly, but requesting
+`Gum.Collections.GraphicalUiElementCollection` (also from the Gum/MonoGameGum codebase) with
+`--export-parents --export-interfaces` failed with:
+
+```
+Error: Ancestor class not found in any provided assembly metadata: RenderingLibrary.Graphics.ObservableCollectionNoReset`1[[Gum.Wireframe.GraphicalUiElement, GumCommon, Version=2026.5.8.1, Culture=neutral, PublicKeyToken=null]] (required by Gum.Collections.GraphicalUiElementCollection)
+```
+
+— even though `RenderingLibrary.Graphics.ObservableCollectionNoReset\`1` (the class
+`GraphicalUiElementCollection` actually derives from, via the closed instantiation
+`ObservableCollectionNoReset<GraphicalUiElement>`) was plainly visible, as its own top-level
+entry, in the very same batch's reflected metadata.
+
+The root cause is in `AssemblyToLispy.cs`, not this file: `:superclass`/`:interfaces` were
+formatted using .NET's raw `Type.FullName`, which behaves very differently for a generic type
+than for an ordinary one, in two distinct ways that both produce the same downstream symptom
+(the metadata-index lookup in `expand-related`/`build-reverse-indexes` — a plain `gethash` keyed
+on `:fully-qualified-name` — silently, or noisily, fails to find an ancestor that is genuinely
+present):
+
+1. **Closed generic instantiation** (a base/interface parameterized by concrete type(s), e.g.
+   deriving from `ObservableCollectionNoReset<GraphicalUiElement>`): `Type.FullName` returns the
+   *specific instantiation's* full, assembly-qualified, bracketed CLR form (the string in the
+   error message above). This can never equal the generic type *definition*'s own
+   `:fully-qualified-name` (always the bare `` Name`Arity `` form, e.g.
+   `` RenderingLibrary.Graphics.ObservableCollectionNoReset`1 ``) — and no arbitrary closed
+   instantiation is *ever* itself separately reflected as its own top-level metadata entry (only
+   the generic type definition is, when the reflecting assembly enumerates its own types), so a
+   closed instantiation was *never* going to resolve, no matter which assemblies were provided.
+   This is a hard error (unless `--skip-missing`), so it surfaces loudly.
+2. **Generic type referencing its own unresolved type parameter** (a generic type's own base
+   class, e.g. `class Derived<T> : Base<T>` — `Derived<T>`'s own `:superclass` reflects `Base<T>`
+   where `T` is `Derived`'s own, still-unresolved, type parameter): `Type.FullName` is
+   *documented* to return `null` for this case, and the pre-fix code fell back to `Type.Name`,
+   silently dropping the namespace entirely (e.g. bare `"ObservableCollection\`1"` instead of
+   `"System.Collections.ObjectModel.ObservableCollection\`1"`). Since `--skip-missing`'s warning
+   path and its hard-error path both print whatever string ended up in `:superclass`/
+   `:interfaces` verbatim, this symptom is easy to mistake for a genuine "wrong assembly"
+   problem — which is exactly what happened before this bug was diagnosed: a `Makefile` comment
+   from the `--skip-missing`/`ValueTuple` smoke-test example had already flagged
+   `System.IComparable\`1`/`System.IEquatable\`1` (`System.ValueTuple\`2`'s own generic
+   interfaces) being spuriously reported "missing", attributing it to "the generic-interface-
+   name-formatting bug" without yet having traced it to this exact root cause. Both symptoms are
+   the same bug.
+
+Since this bug predates Version 38/39 entirely (it was already present in Version 33's original
+`expand-ancestors`, unchanged by the rename to `expand-related`), it silently affected *any*
+class whose immediate ancestor was a generic type in either of these two shapes — plausibly a
+large fraction of real-world `--export-parents`/`--export-interfaces` (and, since Version 39,
+`--output-children`/`--output-implementations`) usage against realistic OOP hierarchies (generic
+container base classes, `IEquatable<T>`/`IComparable<T>`, etc.), not an edge case.
+
+### The fix
+
+A new `AssemblyToLispy.cs` helper, `GetTypeIdentityFullName`, resolves both cases identically:
+for any generic type (`Type.IsGenericType`), use `GetGenericTypeDefinition().FullName` — which is
+*never* `null` and *never* assembly-qualified/bracketed, regardless of whether the original type
+was closed to concrete arguments or still open on its own declaring type's type parameter — in
+place of the type's own `FullName`. A non-generic type is completely unaffected (still
+`Type.FullName ?? Type.Name`, as before). `:superclass`/`:interfaces` now always hold this bare,
+matchable identity form, used in place of the previous `type.BaseType.FullName ?? type.BaseType.Name`
+/ `i.FullName ?? i.Name` at the two call sites (`AssemblyToLispy.cs`'s general-metadata Phase 2A
+block).
+
+No change was needed to `assembly-package-generator.lisp`'s own resolution logic
+(`expand-related`, `build-metadata-index`, `build-reverse-indexes`) at all — they already assumed
+`:superclass`/`:interfaces` were reliable identity-matching keys; the metadata just wasn't
+honoring that contract for generic ancestors. This mirrors Version 30's precedent (a metadata-
+only `AssemblyToLispy.cs` fix needing zero changes to this file's own code), which is why
+`*generator-version*` is still bumped here: real generated output changes for any real assembly
+with a generic ancestor in either of the two shapes above (a previously hard-erroring or
+falsely-"missing"-reported ancestor now resolves and generates correctly).
+
+### Preserving the discarded closed-instantiation information
+
+Making `:superclass`/`:interfaces` always the bare identity form necessarily *discards* which
+concrete type argument(s) a closed generic ancestor actually used (or, in the unresolved-type-
+parameter case, that parameter's own name) — information the pre-fix (buggy) format at least
+*attempted* to carry, even though it was useless for matching. Rather than lose it outright, two
+new sibling metadata keys preserve it, using the exact same simplified backtick/bracket notation
+`:type`/`:return-type` already use for the identical purpose (`GetFriendlyTypeName`):
+
+* **`:superclass-closed`** (string, omitted entirely when the superclass is non-generic — i.e.
+  whenever it would be textually identical to `:superclass`): the base class with its actual
+  generic argument(s) shown, e.g.
+  `` "RenderingLibrary.Graphics.ObservableCollectionNoReset`1[Gum.Wireframe.GraphicalUiElement]" ``.
+* **`:interfaces-closed`** (list of `(identity closed-1 closed-2 ...)` lists, one per *generic*
+  identity in `:interfaces` only — a non-generic interface is never given an entry here, since
+  its identity and closed forms are identical and it's already fully captured by `:interfaces`):
+  each entry's first element is that interface's own identity string as it appears in
+  `:interfaces` (for correlation back to it, guaranteed to appear at most once across
+  `:interfaces-closed`'s own entries); the rest of the entry is that identity's closed form(s).
+
+### A same-identity collision this needed a second fix for: implementing one generic interface multiple times
+
+`:interfaces`/`:interfaces-closed` needed one more correction after the initial Version 40 fix
+shipped, caught by a follow-up question rather than a fresh bug report: C# permits a type to
+implement the *same* open generic interface more than once, each time closed over different
+concrete type arguments — `class Foo : System.IEquatable<int>, System.IEquatable<string>`
+compiles without complaint (confirmed directly). `GetTypeIdentityFullName` maps *both* of
+`Foo`'s `IEquatable<T>` implementations to the exact same identity string
+(`"System.IEquatable\`1"`), which is correct in isolation (that's the whole point of the
+identity form), but the *first* draft of this fix built `:interfaces`/`:interfaces-closed` by a
+naive 1:1 `Select` over `Type.GetInterfaces()` — producing a literal duplicate identity string
+in `:interfaces`, and, far worse, two separate `:interfaces-closed` entries sharing the identical
+key (`("System.IEquatable\`1" . "...[System.Int32]")` and `("System.IEquatable\`1" .
+"...[System.String]")`). A cons-keyed-by-identity representation cannot hold two closed forms
+under one key without one silently shadowing the other in any `assoc`-style lookup by identity —
+exactly the kind of information loss `:interfaces-closed` exists to prevent in the first place.
+
+The fix: `AssemblyToLispy.cs` now groups `type.GetInterfaces()` by identity (`GroupBy`) before
+building either list. `:interfaces` becomes the deduplicated identity set (one entry per group);
+`:interfaces-closed` becomes one entry *per identity*, whose remaining elements are *all* of that
+identity's closed forms in reflection-discovery order — a proper one-to-many list, not a cons
+pair, so a same-identity multiple-instantiation case (rare, but real, and exactly the kind of
+gap that would otherwise fail silently rather than loudly) is representable without collision.
+
+Both new keys remain strictly descriptive/documentation-only — nothing in
+`assembly-package-generator.lisp` reads either key; ancestor resolution always matches on the
+identity form (and correctly needs no per-instantiation distinction, since a class implementing
+the same open interface twice is still just one ancestor to discover/re-export from once).
+`tests/framework.lisp`'s schema validator checks both keys' shape, that every
+`:interfaces-closed` identity actually appears in `:interfaces`, and that no identity appears
+more than once as a top-level `:interfaces-closed` entry, and `doc/assembly-to-lispy.md`
+documents the exact semantics and omission rules.
+
+### Verification
+
+Confirmed against the real, motivating third-party case:
+`Gum.Collections.GraphicalUiElementCollection --export-parents --export-interfaces` (with
+`GumCommon.dll`/`MonoGameGum.dll` provided) now correctly generates a package for
+`RenderingLibrary.Graphics.ObservableCollectionNoReset\`1` and re-exports its members, instead of
+hard-erroring. A dedicated regression fixture was added to
+`AssemblyToLispyTestTarget/EdgeCases.cs`: `GenericBaseForSuperclassTest<T>` (whose own base,
+`System.Collections.Generic.List<T>`, exercises the unresolved-type-parameter/lost-namespace
+case) and `ConcreteDerivedFromGeneric : GenericBaseForSuperclassTest<EdgeCaseStruct>` (whose base
+exercises the closed-instantiation/never-matches case), both asserted directly against in
+`tests/synthetic-target.test.lisp`, plus an end-to-end `--export-parents` smoke-test invocation
+(`Makefile`) confirming real resolution end-to-end, not just the metadata shape.

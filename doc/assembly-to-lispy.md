@@ -105,10 +105,57 @@ Each type entry plist contains the following entries, by key:
   documentation summary. Omitted if no documentation is found.
 * `:superclass` (String or `nil`): The fully qualified name of the base class. 
   If there is no base class (such as for interfaces or `System.Object`), 
-  this value is `nil`.
-* `:interfaces` (List of Strings or `nil`): An alphabetically sorted list of the fully
-  qualified names of all interfaces implemented by this type. If no interfaces are 
-  implemented, this value is `nil`.
+  this value is `nil`. **When the base class is a generic type** (whether closed to
+  concrete type arguments, e.g. `List<int>`, or still parameterized by this type's own
+  unresolved type parameter, e.g. `class Derived<T> : Base<T>`), this value is always
+  the generic type *definition*'s own identity — the same bare, unqualified
+  `` Name`Arity `` form under which that type is separately reflected as its own
+  top-level entry's `:fully-qualified-name` (e.g. `` System.Collections.Generic.List`1 ``)
+  — **never** a specific instantiation's closed/assembly-qualified form. This is
+  deliberate (Version 40 of the package generator; see
+  `doc/generator-design-notes.md`'s "Generic Superclass/Interface Identity Matching
+  (Version 40)" section): `:superclass` exists so downstream tooling can match a
+  type's base against another type's own `:fully-qualified-name`, and no arbitrary
+  closed generic instantiation is ever itself a separately reflected type — only the
+  open generic type definition is. See `:superclass-closed` below for the discarded
+  closed-instantiation information, preserved under a sibling key.
+* `:superclass-closed` (String or omitted): Present only when `:superclass` is present
+  **and** the base class is a generic type (in either sense above) — i.e. omitted
+  whenever it would be textually identical to `:superclass` (a non-generic base).
+  The base class formatted with simplified generic-argument bracket notation (the same
+  notation `:type`/`:return-type` use, via the recursive backtick/bracket formatter —
+  see Phase 2C's "Simplified Generic Type Formatting" below), preserving which concrete
+  type argument(s) (or, in the unresolved-type-parameter case, the parameter's own name)
+  the base class actually uses. This is descriptive/documentation-only — nothing in this
+  generator needs it, since ancestor resolution always matches on `:superclass`'s bare
+  identity form instead.
+* `:interfaces` (List of Strings or `nil`): An alphabetically sorted, **deduplicated** list of
+  the fully qualified names of all interfaces implemented by this type. If no interfaces are 
+  implemented, this value is `nil`. Exactly like `:superclass` above, a **generic**
+  interface reference (closed or still parameterized by this type's own unresolved type
+  parameter) is always the generic type definition's own bare identity, never a specific
+  instantiation's closed/assembly-qualified form — see `:interfaces-closed` below for the
+  discarded per-interface closed-instantiation information. Deduplication matters here
+  specifically because C# permits a type to implement the *same* open generic interface more
+  than once, closed over different type arguments (e.g. `class Foo : IEquatable<int>,
+  IEquatable<string>`, which compiles) — without deduplication this list would contain the
+  same identity string twice.
+* `:interfaces-closed` (List of `(identity closed-1 closed-2 ...)` Lists or omitted): One
+  entry per identity in `:interfaces` that is actually a generic interface — `identity` is
+  that interface's exact string as it appears in `:interfaces` (for correlation, and
+  guaranteed unique across this list's entries); the remaining elements are that identity's
+  simplified-bracket-notation closed form(s), exactly as `:superclass-closed` computes each
+  one. There is more than one closed form under a single identity only in the same-open-
+  interface-implemented-multiple-times case described above (e.g. `("System.IEquatable\`1"
+  "System.IEquatable\`1[System.Int32]" "System.IEquatable\`1[System.String]")`) — this is
+  exactly why each entry groups *all* of that identity's closed forms into one list rather
+  than emitting one `(identity . closed)` pair per interface Reflection returns: a
+  one-cons-per-identity representation cannot hold two closed forms under the same key
+  without one silently shadowing the other in any `assoc`-style lookup. A **non**-generic
+  interface is never given an entry here at all (its identity and closed forms are
+  identical, already fully captured by `:interfaces`) — so this key is entirely omitted when
+  no implemented interface is generic. Descriptive/documentation-only, like
+  `:superclass-closed`.
 * `:flags` (List of Keywords or `nil`): A list of active boolean type flags, converted
   to Lisp-friendly kebab-case keywords. If no flags are active, this value is `nil`.
   Supported flag keywords are:
@@ -310,8 +357,12 @@ This sub-phase extracts top-level type kind and classification properties:
 * **Kind of Type**: Output a `:kind` key (e.g., `:class`, `:struct`, 
   `:interface`, `:enum`, `:delegate`).
 * **Inheritance**:
-  * `:superclass`: Fully qualified name of the base class.
-  * `:interfaces`: A list of fully qualified names of implemented interfaces.
+  * `:superclass`: Fully qualified name of the base class -- always the bare generic
+    type DEFINITION identity for a generic base (never a closed/assembly-qualified
+    instantiation; see `:superclass-closed`, Version 40).
+  * `:interfaces`: A list of fully qualified names of implemented interfaces --
+    likewise always each interface's bare generic type DEFINITION identity when
+    generic (see `:interfaces-closed`, Version 40).
 * **Type Flags**: Convert standard boolean reflection checks (`IsSealed`, `IsAbstract`, 
   etc.) to Lisp-friendly keywords, mapped under a `:flags` key, e.g. 
   `(:flags (:sealed :abstract))`.
