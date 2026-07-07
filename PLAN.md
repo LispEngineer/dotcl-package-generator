@@ -217,7 +217,7 @@ obj!)` form instead, deprecating Option A's per-type codegen.
     * We are already using `<>` as a suffix to indicate a method with generic arguments.
     * But it would not be a good *filename* for the package.
     * Maybe `<>` is for 1, and `<2>` is for 2 (and higher)?
-      * Check how C# interprets `<>` in an open type vs higher # of type parameters?
+  * C# (not CIL) uses `<>`, `<,>`, `<,,>` for multiple type arguments in an open type.
 
 * Make a `FILES.md`
 * Make `Makefile` introspect the `.asd` for the version number.
