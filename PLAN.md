@@ -290,12 +290,19 @@ ancestor resolution fail outright, or misreport a genuinely-present ancestor as 
 `AssemblyToLispy.cs` resolves both cases identically: for any generic type, use
 `GetGenericTypeDefinition().FullName` (never `null`, never assembly-qualified) instead of the
 type's own `FullName`. `:superclass`/`:interfaces` now always hold this bare, matchable
-identity form; the discarded closed-instantiation information is preserved separately via two
-new sibling metadata keys, `:superclass-closed`/`:interfaces-closed` (documentation-only, using
-the same simplified generic notation `:type`/`:return-type` already use). No change was needed
-to `assembly-package-generator.lisp`'s own resolution logic. See
-`doc/generator-design-notes.md`'s "Generic Superclass/Interface Identity Matching (Version 40)"
-section, `doc/assembly-to-lispy.md`'s updated schema, and `RELEASES.md`'s 2.40.0 entry.
+identity form (`:interfaces` deduplicated by identity, since C# permits implementing the same
+open generic interface more than once closed over different type arguments, e.g. `class Foo :
+IEquatable<int>, IEquatable<string>`); the discarded closed-instantiation information is
+preserved separately via two new sibling metadata keys, `:superclass-closed` (a string) and
+`:interfaces-closed` (a list of `(identity closed-1 closed-2 ...)` lists, one per generic
+identity, grouping *all* of that identity's closed forms together rather than one entry per
+interface Reflection returns — required precisely because of the same-interface-multiple-times
+case, which a naive one-entry-per-interface/cons-keyed-by-identity design would silently corrupt).
+Both new keys are documentation-only, using the same simplified generic notation
+`:type`/`:return-type` already use. No change was needed to `assembly-package-generator.lisp`'s
+own resolution logic. See `doc/generator-design-notes.md`'s "Generic Superclass/Interface
+Identity Matching (Version 40)" section, `doc/assembly-to-lispy.md`'s updated schema, and
+`RELEASES.md`'s 2.40.0 entry.
 
 
 # Handle Extension Methods in the Main Class

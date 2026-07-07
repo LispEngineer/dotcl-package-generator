@@ -246,4 +246,30 @@
                     "ConcreteDerivedFromGeneric's :superclass must be the bare generic type DEFINITION identity, matching GenericBaseForSuperclassTest`1's own :fully-qualified-name exactly")
       (assert-equal "AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1[AssemblyToLispyTestTarget.EdgeCaseStruct]"
                     (getf cdfg :superclass-closed)
-                    "ConcreteDerivedFromGeneric's :superclass-closed preserves the closed instantiation's concrete type argument"))))
+                    "ConcreteDerivedFromGeneric's :superclass-closed preserves the closed instantiation's concrete type argument")))
+
+  ;; MultiEquatable implements the SAME open generic interface (IEquatable<T>) twice,
+  ;; closed over different type arguments -- legal C#. Before the identity-grouping
+  ;; follow-up fix, :interfaces would have contained "System.IEquatable`1" TWICE, and
+  ;; :interfaces-closed would have had two entries sharing that one key (a real
+  ;; assoc-style collision, silently losing one closed form to any lookup by identity).
+  (let ((me (find-if (lambda (cls)
+                       (string= (getf cls :fully-qualified-name)
+                                "AssemblyToLispyTestTarget.MultiEquatable"))
+                     *metadata*)))
+    (assert-not-null me "Should find MultiEquatable")
+    (when me
+      (assert-equal 1 (count "System.IEquatable`1" (getf me :interfaces) :test #'string=)
+                    ":interfaces must list System.IEquatable`1 exactly once, even though MultiEquatable implements it twice (deduplicated by identity)")
+      (let ((entries (remove "System.IEquatable`1" (getf me :interfaces-closed)
+                              :key #'first :test-not #'string=)))
+        (assert-equal 1 (length entries)
+                      ":interfaces-closed must have exactly one top-level entry for System.IEquatable`1 (not one per implementation)")
+        (when entries
+          (let ((closed-forms (rest (first entries))))
+            (assert-equal 2 (length closed-forms)
+                          "That one entry must group BOTH closed instantiations together")
+            (assert-true (member "System.IEquatable`1[System.Int32]" closed-forms :test #'string=)
+                        "The IEquatable<int> closed form must be present")
+            (assert-true (member "System.IEquatable`1[System.String]" closed-forms :test #'string=)
+                        "The IEquatable<string> closed form must be present")))))))
