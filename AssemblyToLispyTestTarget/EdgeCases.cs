@@ -56,7 +56,7 @@ namespace AssemblyToLispyTestTarget
         /// <summary>
         /// Fires when something interesting happens.
         /// </summary>
-        public event EventHandler SomethingHappened;
+        public event EventHandler SomethingHappened = delegate { };
 
         /// <summary>
         /// Raises SomethingHappened, so the synthetic event has a way to be exercised
@@ -139,7 +139,9 @@ namespace AssemblyToLispyTestTarget
         /// An event whose synthesized add-click/remove-click wrapper names collide with
         /// the AddClick()/RemoveClick() methods below.
         /// </summary>
-        public event EventHandler Click;
+#pragma warning disable CS0067 // deliberately never raised; only its add/remove wrapper naming collision with AddClick()/RemoveClick() is under test
+        public event EventHandler Click = delegate { };
+#pragma warning restore CS0067
 
         /// <summary>
         /// An unrelated method that happens to map to the same Lisp name (add-click) that
