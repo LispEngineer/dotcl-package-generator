@@ -1212,7 +1212,9 @@ namespace PackageGenerator {
                 AssertDefaultValue("hello", "\"hello\"");
                 AssertDefaultValue(true, "t");
                 AssertDefaultValue(false, "nil");
-                AssertDefaultValue('A', "#\\LATIN CAPITAL LETTER A");
+                // DotCL 0.1.17: UCD character names print with underscores, not
+                // spaces, so a #\<name> literal reads back as one reader token.
+                AssertDefaultValue('A', "#\\LATIN_CAPITAL_LETTER_A");
                 AssertDefaultValue(' ', "#\\Space");
                 AssertDefaultValue('\n', "#\\Newline");
                 AssertDefaultValue(123, "123");

@@ -309,3 +309,22 @@ they'd need to land in DotCL itself.
    `assembly-package-generator.lisp`'s >200-discovered-class fan-out warning, and the
    collision caveats already accepted-and-documented (not silently ignored) in
    `doc/make-everything-defgeneric.md`.
+
+## Follow-up: DotCL 0.1.17
+
+DotCL 0.1.17 implemented suggestions #1 (`dotnet:class-for-type`) and #2 (`defmethod`
+class-object specializer support) from this appendix almost verbatim — its own `RELEASES.md`
+explicitly credits this document. `dcl-packagegen`'s Generator Version 41 rebuilt
+`--defgeneric` on exactly this API (see `doc/generator-design-notes.md`'s Version 41 section
+and `doc/make-everything-defgeneric.md`), eliminating the entire simple-name/FullName
+collision-race caveat this document analyzes above for the non-generic case.
+
+Suggestion #3 (an open-generic marker class in the CPL) was **not** implemented in 0.1.17, and
+remains the real blocker for dispatching on an open generic type's own definition (as opposed
+to a specific closed instantiation, which 0.1.17's `DotNetTypeDisplayName` fix already handles
+correctly). See `doc/dispatch-on-open-generics.md` for a full, current treatment of that gap
+(expanding on this document's "Recommended robust pattern"/"Worked example" sections above,
+which remain accurate for hand-written code targeting a specific closed instantiation), and
+`doc/post-dotcl-0.1.17-generic-enhancements.md` for the living, broader post-0.1.17 follow-up
+survey this note is itself now superseded by — check that document for the current status of
+suggestion #4 and any newer gaps.

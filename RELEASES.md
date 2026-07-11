@@ -10,6 +10,31 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.41.0 — 2026-07-10
+
+**Consolidated `--defgeneric`/`--defgeneric-dynamic` into a single `--defgeneric`, built on
+DotCL 0.1.17's `dotnet:class-for-type` and `defmethod` class-object-specializer support.**
+
+* **Requires `DotCL.Runtime` >= 0.1.17** (`dotcl-packagegen.csproj` bumped from `0.1.15`) — this
+  is a hard dependency bump, not optional.
+* Every `--defgeneric`-generated dispatch `defmethod` now specializes on
+  `#.(dotnet:class-for-type "<fq-name>")` instead of a literal, generation-time-guessed
+  simple-name symbol — an ordinary top-level form (no `cl:eval`/`eval-when`/backquote) that is
+  also immune to the pre-0.1.17 load-order-dependent naming-collision risk the old `--defgeneric`
+  had to document as an accepted caveat.
+* **Breaking:** `--defgeneric-dynamic`/`--no-defgeneric-dynamic`/`--enable-defgeneric-dynamic`/
+  `--no-enable-defgeneric-dynamic` and the `csharp-generics-dynamic` package/file/`.asd`
+  component are removed outright (clean break, not deprecated) — the new single mechanism
+  strictly dominates both of the old two-mechanism approach's tradeoffs. Callers using
+  `--defgeneric-dynamic` must switch to `--defgeneric`.
+* **New limitation:** a generic-arity class (e.g. `` Dictionary`2 ``) opted into `--defgeneric`
+  is now skipped, with an explanatory comment, rather than silently emitting a defmethod that
+  could never fire — DotCL cannot yet dispatch on an open generic type's own definition. See
+  `doc/dispatch-on-open-generics.md` for the mechanism and a proposal to lift this upstream.
+* `*generator-version*` bumped 40 → 41 (generated-code shape change). See
+  `doc/generator-design-notes.md`'s Version 41 section and `doc/make-everything-defgeneric.md`
+  for full detail.
+
 ## 2.40.2 — 2026-07-06
 
 **`:interfaces-closed` restructured as a plist, with a documented `GETF`-vs-`MEMBER` caveat.**

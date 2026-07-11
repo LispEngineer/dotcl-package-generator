@@ -136,17 +136,15 @@ re-export sources. See `doc/plan-v38.md`'s Part B, `doc/generator-design-notes.m
 Related-Class Discovery (Version 39)" section, and `FEATURES.md`'s same-named section.
 
 A class can also opt into unifying its instance methods and instance property/field accessors
-into a shared package of CLOS generic functions dispatching on C# runtime type, via two
-independent, orthogonal mechanisms (a class may use either, both, or neither):
-`--defgeneric`/`--no-defgeneric` (static — a literal, generation-time specializer symbol; simple
-and readable, but has a documented same-simple-name collision caveat) into the `csharp-generics`
-package, and `--defgeneric-dynamic`/`--no-defgeneric-dynamic` (dynamic — installed at load time
-against each type's actual runtime CLOS class object; fully robust, uglier generated code) into
-the `csharp-generics-dynamic` package. Each has its own sticky
-`--enable-defgeneric`/`--no-enable-defgeneric` and
-`--enable-defgeneric-dynamic`/`--no-enable-defgeneric-dynamic` (same
-current-and-subsequent-`--class` semantics as `--export-all-parents`). See
-`doc/make-everything-defgeneric.md`, `doc/make-everything-defgeneric-dynamic.md`, and
+into a shared `csharp-generics` package of CLOS generic functions dispatching on C# runtime
+type, via `--defgeneric`/`--no-defgeneric` (plus sticky
+`--enable-defgeneric`/`--no-enable-defgeneric`, same current-and-subsequent-`--class` semantics
+as `--export-all-parents`). Each dispatch `defmethod` specializes on
+`#.(dotnet:class-for-type "<fq-name>")` (requires `DotCL.Runtime` >= 0.1.17), resolved by the
+class's exact fully-qualified name at read time — no naming-collision risk. A generic-arity
+class (e.g. `` Dictionary`2 ``) is skipped with a comment instead, since DotCL cannot yet
+dispatch on an open generic type's own definition — see `doc/dispatch-on-open-generics.md` and
+`doc/post-dotcl-0.1.17-generic-enhancements.md`. See `doc/make-everything-defgeneric.md` and
 `FEATURES.md`'s "Unified Generic Methods" section.
 
 A class can also opt into having matching C# extension methods (found anywhere in the provided

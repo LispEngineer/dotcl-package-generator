@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Runtime.CompilerServices.ITuple
-;;; Generator Version: 40
-;;; Creation Date: 2026-07-07T01:02:29Z
+;;; Generator Version: 41
+;;; Creation Date: 2026-07-11T03:36:09Z
 
 (cl:in-package :system-runtime-compiler-services-i-tuple)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Runtime.CompilerServices.ITuple"))
 (cl:defconstant <type-str> "System.Runtime.CompilerServices.ITuple")
-(cl:defconstant <creation> "2026-07-07T01:02:29Z")
-(cl:defconstant <version> 40)
+(cl:defconstant <creation> "2026-07-11T03:36:09Z")
+(cl:defconstant <version> 41)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

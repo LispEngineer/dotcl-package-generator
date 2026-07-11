@@ -2161,3 +2161,81 @@ case) and `ConcreteDerivedFromGeneric : GenericBaseForSuperclassTest<EdgeCaseStr
 exercises the closed-instantiation/never-matches case), both asserted directly against in
 `tests/synthetic-target.test.lisp`, plus an end-to-end `--export-parents` smoke-test invocation
 (`Makefile`) confirming real resolution end-to-end, not just the metadata shape.
+
+## Consolidating `--defgeneric`/`--defgeneric-dynamic` on DotCL 0.1.17 (Version 41)
+
+### Context
+
+DotCL 0.1.17 shipped three new pieces, explicitly credited in its own `RELEASES.md` to this
+project's `doc/dotcl-0.1.16-defgeneric-csharp-generic-notes.md` research doc: `dotnet:class-for-type`
+(a public, lazily-registering lookup returning the CLOS class DotCL uses for a .NET type, given
+its `System.Type` or a type-name string — usable directly as a `defmethod` specializer via
+read-time `#.`), `defmethod` support for a class *object* (not just a class-name symbol) as a
+specializer, and — as a load-bearing side effect — `DotNetTypeDisplayName` now gives every
+*closed* generic instantiation its own distinct, readable class name (`List<Int32>` vs.
+`List<String>`) instead of every instantiation colliding on the bare backtick form.
+
+Together these obsoleted the entire reason the Version 34/35 split existed: Version 34's
+`--defgeneric-dynamic` was robust (resolved the real class object at load time) but ugly
+(`cl:eval` of a backquoted `defmethod` inside `cl:eval-when`); Version 35's `--defgeneric` was
+simple (a plain top-level `defmethod`) but carried an accepted collision caveat (a literal
+specializer symbol guessed at generation time from the type's simple name, vulnerable to
+DotCL's load-order-dependent simple-name/FullName registration race). `#.(dotnet:class-for-type
+"<fq-name>")` used directly as a specializer gets both properties at once: it's a plain,
+ordinary top-level form (Version 35's simplicity), but it resolves the *exact* named type by its
+fully-qualified name at read time and hands back the real, already-assigned class object
+(Version 34's robustness) — no guessing, no race.
+
+### The change
+
+`generate-batch-generics-file`'s per-class emission was rewritten to emit
+`#.(dotnet:class-for-type "<fq-name>")` in specializer position instead of the literal
+`dotcl-internal::|<simple-name>|` symbol Version 35 computed via `dotnet-type-simple-name`. That
+helper, along with `build-simple-name-index`/`classify-simple-name-conflicts` (Version 36's
+actual-conflict-reporting machinery) and their per-class collision comment, were deleted
+outright as dead code — not merely unused — since the caveat they existed to document and
+report no longer applies. `generate-batch-generics-dynamic-file`,
+`compute-defgeneric-dynamic-model`, `*csharp-generics-dynamic-package-name*`, the
+`--defgeneric-dynamic`/`--no-defgeneric-dynamic`/`--enable-defgeneric-dynamic`/
+`--no-enable-defgeneric-dynamic` CLI flags, and the `csharp-generics-dynamic` package were all
+removed in the same change — a clean break, not a deprecation shim, since the new mechanism
+strictly dominates both predecessors for every case it supports. `%compute-defgeneric-model`,
+`emit-defgeneric-defpackage`, and `collect-class-instance-generics` (the mechanism-agnostic
+shared plumbing) were untouched.
+
+`dotcl-packagegen.csproj`'s `DotCL.Runtime` `PackageReference` was bumped from `0.1.15` to
+`0.1.17` — a hard requirement, since `dotnet:class-for-type` and the class-object-specializer
+`defmethod` support don't exist before it.
+
+### The one new limitation: generic-arity classes
+
+`DotNetTypeDisplayName`'s closed-instantiation fix (the side effect this consolidation relies
+on) has a corollary that surfaces a real, previously-latent gap rather than introducing one:
+for the *open* generic type definition itself (the only form `--class` can ever name for a
+generic type — see Version 40's note that no arbitrary closed instantiation is itself
+separately reflected), `DotNetTypeDisplayName` recurses over `Type.GetGenericArguments()`,
+which for an open definition returns its own *type parameters* (`TKey`, `TValue`), not concrete
+arguments — producing a display name (`Dictionary<TKey,TValue>`) that can never equal any real
+closed instance's registered name (`Dictionary<String,Int32>`). A `defmethod` built from
+`#.(dotnet:class-for-type "System.Collections.Generic.Dictionary\`2")` would therefore install
+against a CLOS class no real `Dictionary<K,V>` object is ever an instance of — syntactically
+valid, semantically dead. New helper `generic-arity-fq-name-p` (checks for .NET's backtick
+arity suffix in a fully-qualified name) detects this and makes `generate-batch-generics-file`
+skip such a class's dispatch block entirely, emitting an explanatory comment instead of a dead
+`defmethod`. See `doc/dispatch-on-open-generics.md` for the full mechanism and a proposal
+(open-generic marker class in DotCL's CPL) to lift this limitation upstream, and
+`doc/post-dotcl-0.1.17-generic-enhancements.md` for the broader post-0.1.17 follow-up survey.
+
+### Verification
+
+Empirically confirmed against the `Makefile` smoke test's real fixtures: `System.Threading.Timer`/
+`System.Timers.Timer` (the deliberate same-simple-name collision pair from Version 35/36's own
+verification) now both get a plain `defmethod` with no caveat comment, and correctly dispatch
+independently (regression check for the exact bug 0.1.17's `DotNetTypeDisplayName` fix and this
+consolidation together resolve). `` System.Collections.Generic.Dictionary`2 ``/
+`` System.Collections.Generic.SortedList`2 `` (opted into `--defgeneric` specifically to exercise
+the new skip path) are confirmed skipped with the expected comment, not emitting dead
+`defmethod`s. `csharp-generics-dynamic.lisp` no longer appears in generated output.
+`package-generator-tests.lisp`'s defgeneric test set was rewritten accordingly (merged into a
+single `--defgeneric` suite; the collision-comment test replaced with one asserting the absence
+of any collision-caveat text; a new test asserts the generic-arity skip path).

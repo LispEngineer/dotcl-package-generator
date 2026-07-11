@@ -475,8 +475,9 @@ Continue the "omit `nil`s" convention from Phase 2B.
       decimal values are serialized as simplified ratio literals (e.g. `5/4`)
       using GCD reduction.
     * Characters: Formatted as Common Lisp character literals (e.g. `#\Space`,
-      `#\Newline`, or `#\LATIN CAPITAL LETTER A`) leveraging DotCL's `LispChar`
-      definition.
+      `#\Newline`, or `#\LATIN_CAPITAL_LETTER_A` -- DotCL 0.1.17+ prints UCD
+      character names with underscores, not spaces, so the literal reads back
+      as a single reader token) leveraging DotCL's `LispChar` definition.
     * Enums, structs, and custom objects: Formatted as escaped Lisp strings
       (e.g. `"AllowThousands, Float"`), ensuring they parse as valid Lisp string
       literals.

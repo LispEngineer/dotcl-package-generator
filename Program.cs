@@ -30,7 +30,6 @@ bool outputAllNested = false;
 bool outputAllChildren = false;
 bool outputAllImplementations = false;
 bool skipMissing = false;
-bool enableDefgenericDynamic = false;
 bool enableDefgenericStatic = false;
 bool enableExtensionMethods = true;
 
@@ -66,7 +65,6 @@ for (int i = 0; i < args.Length; i++) {
                 OutputNested = outputAllNested,
                 OutputChildren = outputAllChildren,
                 OutputImplementations = outputAllImplementations,
-                DefGenericDynamic = enableDefgenericDynamic,
                 DefGenericStatic = enableDefgenericStatic,
                 ExtensionMethods = enableExtensionMethods,
             };
@@ -152,18 +150,6 @@ for (int i = 0; i < args.Length; i++) {
         } else {
             currentClass.OutputImplementations = false;
         }
-    } else if (args[i] == "--defgeneric-dynamic") {
-        if (currentClass == null) {
-            argErrors.Add("--defgeneric-dynamic specified before any --class.");
-        } else {
-            currentClass.DefGenericDynamic = true;
-        }
-    } else if (args[i] == "--no-defgeneric-dynamic") {
-        if (currentClass == null) {
-            argErrors.Add("--no-defgeneric-dynamic specified before any --class.");
-        } else {
-            currentClass.DefGenericDynamic = false;
-        }
     } else if (args[i] == "--defgeneric") {
         if (currentClass == null) {
             argErrors.Add("--defgeneric specified before any --class.");
@@ -216,10 +202,6 @@ for (int i = 0; i < args.Length; i++) {
         skipMissing = true;
     } else if (args[i] == "--no-skip-missing") {
         skipMissing = false;
-    } else if (args[i] == "--enable-defgeneric-dynamic") {
-        enableDefgenericDynamic = true;
-    } else if (args[i] == "--no-enable-defgeneric-dynamic") {
-        enableDefgenericDynamic = false;
     } else if (args[i] == "--enable-defgeneric") {
         enableDefgenericStatic = true;
     } else if (args[i] == "--no-enable-defgeneric") {
@@ -302,7 +284,6 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
                 manifest.Append(" :output-nested ").Append(cls.OutputNested ? "t" : "nil");
                 manifest.Append(" :output-children ").Append(cls.OutputChildren ? "t" : "nil");
                 manifest.Append(" :output-implementations ").Append(cls.OutputImplementations ? "t" : "nil");
-                manifest.Append(" :defgeneric-dynamic ").Append(cls.DefGenericDynamic ? "t" : "nil");
                 manifest.Append(" :defgeneric ").Append(cls.DefGenericStatic ? "t" : "nil");
                 manifest.Append(" :extension-methods ").Append(cls.ExtensionMethods ? "t" : "nil");
                 manifest.Append(')');
@@ -489,22 +470,15 @@ void PrintHelp() {
         "--class's instance methods and instance",
         "property/field accessors to the shared",
         "CSHARP-GENERICS package of unified CLOS generic",
-        "functions, each specializing directly on the C#",
-        "type's simple-name CLOS class. Simple, readable",
-        "generated code -- but if another --defgeneric",
-        "class in the same batch shares that simple name",
-        "(a same-named type from a different namespace),",
-        "dispatch for whichever one loses DotCL's class-",
-        "naming race is wrong. See",
-        "doc/make-everything-defgeneric.md.");
-    Opt("--defgeneric-dynamic / --no-defgeneric-dynamic", "Like --defgeneric, but into the separate",
-        "CSHARP-GENERICS-DYNAMIC package, with each",
-        "defmethod installed at load time against the",
-        "C# type's actual runtime CLOS class object --",
-        "slower/uglier generated code (cl:eval of a",
-        "backquoted defmethod), but immune to the simple-",
-        "name collision risk above. See",
-        "doc/make-everything-defgeneric-dynamic.md.");
+        "functions, each specializing on",
+        "#.(dotnet:class-for-type ...) (requires DotCL",
+        ">= 0.1.17) -- resolved by fully-qualified name",
+        "at read time, so no naming-collision caveat",
+        "applies. A generic-arity class (e.g.",
+        "Dictionary`2) is skipped with a comment instead:",
+        "DotCL cannot yet dispatch on an open generic",
+        "type. See doc/make-everything-defgeneric.md and",
+        "doc/dispatch-on-open-generics.md.");
     Opt("--extension-methods / --no-extension-methods", "Inject C# extension methods (found anywhere in",
         "the provided assemblies) whose 'this' parameter",
         "type is exactly the most recently given --class",
@@ -527,7 +501,6 @@ void PrintHelp() {
     Opt("--output-all-children / --no-output-all-children", "Default --output-children on/off.");
     Opt("--output-all-implementations / --no-output-all-implementations", "Default --output-implementations on/off.");
     Opt("--enable-defgeneric / --no-enable-defgeneric", "Default --defgeneric on/off.");
-    Opt("--enable-defgeneric-dynamic / --no-enable-defgeneric-dynamic", "Default --defgeneric-dynamic on/off.");
     Opt("--enable-extension-methods / --no-enable-extension-methods", "Default --extension-methods on/off.",
         "Defaults to ON (unlike the other sticky flags",
         "above), so extension-method injection happens",
@@ -569,7 +542,6 @@ class ClassSpec {
     public bool OutputNested;
     public bool OutputChildren;
     public bool OutputImplementations;
-    public bool DefGenericDynamic;
     public bool DefGenericStatic;
     public bool ExtensionMethods;
 }

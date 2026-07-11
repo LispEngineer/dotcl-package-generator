@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.SortedList`2
-;;; Generator Version: 40
-;;; Creation Date: 2026-07-07T01:02:29Z
+;;; Generator Version: 41
+;;; Creation Date: 2026-07-11T03:36:09Z
 
 (cl:in-package :system-collections-generic-sorted-list-2)
 
 (cl:defconstant <type> (dotnet:resolve-type "System.Collections.Generic.SortedList`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.SortedList`2")
-(cl:defconstant <creation> "2026-07-07T01:02:29Z")
-(cl:defconstant <version> 40)
+(cl:defconstant <creation> "2026-07-11T03:36:09Z")
+(cl:defconstant <version> 41)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:compile-toplevel :load-toplevel :execute)

@@ -560,15 +560,12 @@ feature (arity-1-only → any arity → the current two-tier dispatch).
 
 ## Unified Generic Methods
 
-**Summary:** opting a class into either of two independent, orthogonal mechanisms also folds
-its instance methods and instance property/field accessors into a shared package of CLOS
-generic functions that dispatch on the C# runtime type of the receiver — so, e.g.,
-`(csharp-generics:length x)` (static variant) or `(csharp-generics-dynamic:length x)` (dynamic
-variant) works whichever opted-in type `x` happens to be, forwarding to that type's own
-already-generated wrapper. A class may use either variant, both, or neither; each contributes
-its own package/file/`.asd` component entirely independently of the other.
+**Summary:** opting a class into `--defgeneric` folds its instance methods and instance
+property/field accessors into a shared `csharp-generics` package of CLOS generic functions that
+dispatch on the C# runtime type of the receiver — so, e.g., `(csharp-generics:length x)` works
+whichever opted-in type `x` happens to be, forwarding to that type's own already-generated
+wrapper.
 
-Both variants share the same scope and dispatch shape:
 * **Scope:** instance methods (including multi-overload Master Wrappers), instance
   property/field getters and setters (indexers included), and instance events (`add-X`/
   `remove-X` pairs, both folded in as plain method-names entries). **Excluded:** static members
@@ -579,58 +576,31 @@ Both variants share the same scope and dispatch shape:
   `((cl:setf name) new-value obj! cl:&rest args)` — the uniform `obj!`-first receiver
   position every instance wrapper already has lets one dispatch shape cover every class's
   wildly different arities via `cl:apply`.
-
-They differ only in *how* each `defmethod` is installed, and therefore in what each accepts as
-a tradeoff:
-
-### Static variant (`--defgeneric`)
-
 * **CLI:** `--defgeneric`/`--no-defgeneric` (per-class) plus sticky
   `--enable-defgeneric`/`--no-enable-defgeneric`, mirroring the `--export-parents`/
   `--export-all-parents` flag families.
-* **Dispatch installation is a literal specializer computed at generation time** — an ordinary
-  top-level `cl:defmethod`, no `cl:eval`/`eval-when`/backquote:
+* **Dispatch installation** specializes on `#.(dotnet:class-for-type "<fq-name>")` (DotCL
+  0.1.17+) — an ordinary top-level `cl:defmethod`, no `cl:eval`/`eval-when`/backquote, resolved
+  by the class's exact fully-qualified name at read time:
   ```lisp
-  (cl:defmethod length ((obj! dotcl-internal::|String|) cl:&rest args)
+  (cl:defmethod length ((obj! #.(dotnet:class-for-type "System.String")) cl:&rest args)
     (cl:apply (cl:function system-string:length) obj! args))
   ```
-* **Accepted caveat:** the specializer symbol assumes the C# type's *simple* name. If two
-  `--defgeneric`-opted-in classes in the same batch share a simple name across different
-  namespaces (e.g. `System.Threading.Timer` vs. `System.Timers.Timer`), DotCL's own
-  class-naming resolution gives the simple-name CLOS class to whichever registers first at
-  load time (unknowable at generation time) — dispatch for the other is silently wrong. Simple,
-  readable generated code, at the cost of this narrow, documented risk.
+* **No naming-collision caveat:** because the specializer resolves by fully-qualified name
+  directly, never a guessed simple-name symbol, two classes sharing a simple name across
+  different namespaces (e.g. `System.Threading.Timer` vs. `System.Timers.Timer`) each get their
+  own correct, independent dispatch — confirmed via the `Makefile` smoke test's real-world
+  `Timer` pair.
+* **Known limitation:** a generic-arity class (e.g. `` Dictionary`2 ``) opted into
+  `--defgeneric` is skipped, with an explanatory comment, rather than emitting a defmethod that
+  could never fire — DotCL cannot yet dispatch on an open generic type's own definition. See
+  `doc/dispatch-on-open-generics.md`.
 * **Output:** `csharp-generics.lisp` and a `csharp-generics` `cl:defpackage` in `packages.lisp`.
 
-See `doc/make-everything-defgeneric.md` for the full design rationale, the collision caveat's
-worked example (demonstrated, not just asserted, via the `Makefile` smoke test's real-world
-`Timer` pair), and `assembly-package-generator.lisp`'s Version 35 changelog entry.
-
-### Dynamic variant (`--defgeneric-dynamic`)
-
-* **CLI:** `--defgeneric-dynamic`/`--no-defgeneric-dynamic` (per-class) plus sticky
-  `--enable-defgeneric-dynamic`/`--no-enable-defgeneric-dynamic`.
-* **Dispatch installation is load-time**, immune to the static variant's collision risk: each
-  `defmethod` is installed against the class's own actual runtime CLOS class object, fetched
-  fresh via `EnsureDotNetTypeClass` and specialized on that object's own `(cl:class-name ...)`
-  — always the exact symbol DotCL registered for that specific class, whichever one it turned
-  out to be:
-  ```lisp
-  (cl:eval-when (:load-toplevel :execute)
-    (cl:let* ((cls (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                     (dotnet:resolve-type "System.String")))
-              (spec (cl:class-name cls)))
-      (cl:eval `(cl:defmethod length ((obj! ,spec) cl:&rest args)
-                  (cl:apply (cl:function system-string:length) obj! args)))
-      ...))
-  ```
-* **Tradeoff:** fully robust, at the cost of uglier, `cl:eval`-heavy generated code.
-* **Output:** `csharp-generics-dynamic.lisp` and a `csharp-generics-dynamic` `cl:defpackage` in
-  `packages.lisp`.
-
-See `doc/make-everything-defgeneric-dynamic.md` for the full design rationale and
-`assembly-package-generator.lisp`'s Version 34 changelog entry (renamed to `-dynamic` in
-Version 35, without any behavior change).
+See `doc/make-everything-defgeneric.md` for the full design rationale and history (this
+mechanism consolidates two earlier independent variants, `--defgeneric` and
+`--defgeneric-dynamic`, once DotCL 0.1.17 made a single mechanism strictly dominate both), and
+`assembly-package-generator.lisp`'s Version 41 changelog entry.
 
 
 
@@ -723,8 +693,8 @@ candidate is skipped, with a documenting comment, when:
 A surviving extension method is emitted calling `dotnet:static` on the *holder* type (not
 the class being extended), with `obj!` threaded through as the first argument — mirroring
 exactly how C#'s own extension-method call syntax desugars — and a docstring naming the
-holder's fully-qualified name and owning assembly. It also participates in
-`--defgeneric`/`--defgeneric-dynamic` unification like any other `obj!`-first wrapper.
+holder's fully-qualified name and owning assembly. It also participates in `--defgeneric`
+unification like any other `obj!`-first wrapper.
 
 See `doc/plan-v38.md` and `doc/generator-design-notes.md`'s "Extension Methods (Version 38)"
 section for the full design, including the deferred base-class/interface/generic-matching
@@ -744,7 +714,7 @@ discovered it is never modified.
 The significant behavior change is **recursive flag propagation**: every class discovered via
 *any* of the five discovery directions (the two upward ones from Version 33, plus these three new
 downward ones) now carries its discoverer's **entire** per-class flag set — all six
-`--export-*`/`--output-*` flags plus `--defgeneric`/`--defgeneric-dynamic`/`--extension-methods` — so
+`--export-*`/`--output-*` flags plus `--defgeneric`/`--extension-methods` — so
 discovery and re-export cascade recursively through the whole connected component a flag reaches.
 `--constant-properties` is never propagated (it names properties of one specific class); an
 explicitly-requested class that is also discovered keeps its own explicit flags and

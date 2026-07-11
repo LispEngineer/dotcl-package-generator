@@ -1,177 +1,135 @@
-# Turn Everything into Generic Methods — Static (Literal-Specializer) Variant
+# Turn Everything into Generic Methods
 
-* Status: IMPLEMENTED (Generator Version 35).
+* Status: IMPLEMENTED (Generator Version 41; supersedes the two earlier independent variants
+  from Versions 34/35, described below under "History").
 * Related: `PLAN.md`'s "Improve Turn Everything into Generic Methods" section (the design that
-  produced this variant); `doc/make-everything-defgeneric-dynamic.md` for the sibling
-  load-time-install variant this one exists alongside.
+  produced the original two variants); `doc/generator-design-notes.md`'s Version 41 section;
+  `doc/dispatch-on-open-generics.md` (the one known remaining limitation, see below);
+  `doc/post-dotcl-0.1.17-generic-enhancements.md`.
 
 ## Context
 
-Generator Version 34 shipped a working "unify every class's instance members into one shared
-package of CLOS generic functions" feature (see `doc/make-everything-defgeneric-dynamic.md`),
-but its generated code was judged too ugly to be the only option: every `defmethod` is
-installed via `cl:eval` of a backquoted form inside a `cl:eval-when`, because the correct
-specializer symbol is only knowable once DotCL resolves the class object at load time. This
-document describes the alternative the original design explicitly considered and deferred —
-"Simple + documented caveat" — now implemented as an independent, orthogonal second variant
-under the **original** flag/package names (`--defgeneric`, `csharp-generics`), freed up when the
-first variant was renamed to `-dynamic`.
+`--defgeneric` unifies every opted-in class's instance methods, instance property/field
+getters/setters (indexers included), and instance events (`add-X`/`remove-X` pairs) into one
+shared package (`csharp-generics`) of CLOS generic functions dispatching on the C# runtime type
+of the receiver — one `(name obj! cl:&rest args)` generic (or `((cl:setf name) new-value obj!
+cl:&rest args)` for a setter) per unified name, with each opted-in class contributing a
+`cl:defmethod` that forwards via `cl:apply` to that class's own already-generated wrapper
+function.
+
+Generator Version 41 rebuilt this on DotCL 0.1.17's `dotnet:class-for-type` (a public,
+lazily-registering lookup for a .NET type's CLOS class) plus `defmethod`'s new support for a
+class *object*, not just a class-name symbol, as a specializer (via read-time `#.`). Every
+emitted `defmethod` now specializes on `#.(dotnet:class-for-type "<fq-name>")`:
+
+```lisp
+;; System.Threading.Timer (system-threading-timer)
+(cl:defmethod change ((obj! #.(dotnet:class-for-type "System.Threading.Timer")) cl:&rest args)
+  (cl:apply (cl:function system-threading-timer:change) obj! args))
+```
+
+This is an ordinary top-level form — no `cl:eval`, no `cl:eval-when`, no backquote, no
+hand-written runtime lookup — that resolves the *exact* named type by its fully-qualified name
+at read time and hands back its real, already-assigned CLOS class object. **Requires
+`DotCL.Runtime` >= 0.1.17** (`dotcl-packagegen.csproj`'s `PackageReference`).
 
 ## Locked design decisions
 
-1. **Literal, generation-time `defmethod` specializer**, not a load-time-resolved one. Every
-   `cl:defmethod` this variant emits is an ordinary top-level form — no `cl:eval`, no
-   `cl:eval-when`, no backquote, no runtime class-object lookup. Instead, the specializer
-   symbol is computed directly at generation time from the C# type's *simple name* and written
-   literally into the source.
-2. **Static specializer collision caveat (accepted, not guarded against).** DotCL's
-   `EnsureDotNetTypeClass` (`Runtime.CLOS.cs`) names a type's CLOS class by its simple name only
-   when that name is free; a same-simple-name type from a *different* namespace instead gets
-   registered under its unique FullName symbol, and **which type wins that race is
-   load-order-dependent** — unknowable at generation time. This variant's literal specializer
-   always assumes the simple name. So: **if two `--defgeneric`-opted-in classes in the same
-   batch share a simple name across different namespaces, dispatch for whichever one loses
-   DotCL's registration race at load time is silently wrong** — its methods attach to the
-   *other* class's CLOS class. This is a real, demonstrated failure mode (see "Demonstrated
-   collision" below), documented with a comment above every class's `defmethod` block in the
-   generated file, not prevented. Use the sibling `--defgeneric-dynamic` variant
-   (`doc/make-everything-defgeneric-dynamic.md`) instead when this risk matters — e.g. when a
-   batch includes many classes and cannot easily audit for simple-name collisions.
-3. **Scope, package shape, and per-class opt-in are identical to the dynamic variant**: instance
-   methods + instance property/field getters/setters (indexers included) + instance events
-   (`add-X`/`remove-X` pairs, added in Generator Version 37 after a real-world report of a
-   missing `add-click`), excluding static members and generic/type-parameterized instance
-   methods (whose wrapper puts a type argument before `obj!`). Package name: `csharp-generics`.
-   A class may opt into this variant (`--defgeneric`/`--enable-defgeneric`), the dynamic
-   variant, both, or neither — entirely independent, orthogonal flags.
-
-## Exact `.NET` `Type.Name` reproduction: `dotnet-type-simple-name`
-
-The pre-existing `simple-type-name` helper (used only for human-readable docstrings/comments
-elsewhere in the generator) is **not** suitable for computing this variant's specializer symbol:
-it strips the backtick generic-arity suffix (`` List`1 `` → `List`) and never splits on CIL's
-`+` nested-type separator (`TimeZoneInfo+AdjustmentRule` stays whole). DotCL's
-`EnsureDotNetTypeClass` registers a type's simple-name CLOS class under exactly
-`Startup.Sym(type.Name)` — .NET reflection's own `Type.Name`, backtick and all, with nesting
-already resolved to just the innermost segment. `dotnet-type-simple-name` reproduces this
-exactly: everything after the **last** `.` or `+` in the fully-qualified name, keeping any
-trailing backtick arity intact:
-
-| Fully-qualified name | `simple-type-name` (display) | `dotnet-type-simple-name` (specializer) |
-|---|---|---|
-| `Microsoft.Xna.Framework.Vector2` | `Vector2` | `Vector2` |
-| `` System.Collections.Generic.List`1 `` | `List` | `` List`1 `` |
-| `System.TimeZoneInfo+AdjustmentRule` | `TimeZoneInfo+AdjustmentRule` | `AdjustmentRule` |
-
-The emitted specializer symbol is `dotcl-internal::|<dotnet-type-simple-name>|` — pipe-delimited
-so the Lisp reader preserves exact case and any embedded backtick, interned into the
-`DOTCL-INTERNAL` package to match where `Startup.Sym` puts a name not already present in `:cl`
-(`../dotcl/runtime/Startup.cs`'s `Sym`/`Internal` package).
+1. **One mechanism, one flag.** `--defgeneric`/`--no-defgeneric` (per-class), plus sticky
+   `--enable-defgeneric`/`--no-enable-defgeneric` CLI defaults. There is no longer a separate
+   `--defgeneric-dynamic` variant — see "History" below for why one existed and why it was
+   retired.
+2. **No naming-collision caveat.** Because `#.(dotnet:class-for-type fq-name)` always resolves
+   by the class's own fully-qualified name directly — never a guessed simple-name symbol — the
+   pre-0.1.17 load-order-dependent "which type wins DotCL's simple-name registration race" risk
+   (documented at length in this doc's Version 35-40 history, and empirically demonstrated
+   against `System.Threading.Timer`/`System.Timers.Timer`, two same-simple-name BCL types) no
+   longer applies. Confirmed against the same Makefile smoke-test pair: both now get their own
+   correct, independent `defmethod` with no caveat comment.
+3. **Known limitation: generic-arity classes are not supported.** A `--defgeneric`-opted-in
+   class whose fully-qualified name is a generic type definition (e.g.
+   `` System.Collections.Generic.Dictionary`2 ``) is **skipped**, with an explanatory comment,
+   rather than emitting a defmethod that could never fire — DotCL's `DotNetTypeDisplayName`
+   names an *open* generic's CLOS class from its own type *parameters* (e.g.
+   `Dictionary<TKey,TValue>`), which never matches any real *closed* instance's registered name
+   (e.g. `Dictionary<String,Int32>`). See `doc/dispatch-on-open-generics.md` for the full
+   mechanism and a proposal for DotCL to support this via an open-generic marker class in the
+   CPL. The class's own ordinary package is unaffected — only unified-dispatch coverage is
+   missing for it.
+4. **Scope and per-class opt-in unchanged from the original design**: instance methods +
+   instance property/field getters/setters (indexers included) + instance events (`add-X`/
+   `remove-X` pairs, added in Generator Version 37 after a real-world report of a missing
+   `add-click`), excluding static members and generic/type-parameterized instance methods
+   (whose wrapper puts a type argument before `obj!`).
 
 ## As-Built Implementation
 
 **CLI (`Program.cs`):** `ClassSpec.DefGenericStatic`; sticky `enableDefgenericStatic`;
-per-class `--defgeneric`/`--no-defgeneric` (bare names); sticky
-`--enable-defgeneric`/`--no-enable-defgeneric` (bare names); manifest key `:defgeneric` (bare).
+per-class `--defgeneric`/`--no-defgeneric`; sticky `--enable-defgeneric`/`--no-enable-defgeneric`;
+manifest key `:defgeneric`.
 
 **Lisp (`assembly-package-generator.lisp`):**
-* `collect-class-instance-generics` — shared, mechanism-agnostic collector, reused verbatim
-  from the dynamic variant (see that doc).
-* `%compute-defgeneric-model` (shared internal aggregator) / `compute-defgeneric-model` (this
-  variant's thin wrapper, keyed on `:defgeneric`).
+* `collect-class-instance-generics` — collects eligible method/setter names per class,
+  unchanged across this consolidation.
+* `%compute-defgeneric-model` (internal aggregator) / `compute-defgeneric-model` (public thin
+  wrapper).
+* `generic-arity-fq-name-p` — checks for .NET's backtick arity suffix in a fully-qualified name,
+  used to detect and skip a generic-arity class (see limitation 3 above).
 * `generate-batch-generics-file` — writes `csharp-generics.lisp`: one `cl:defgeneric`/
-  `(cl:setf …)` `cl:defgeneric` per unified name (identical shape to the dynamic variant's),
-  then per opted-in class a flat block of literal `cl:defmethod` forms:
-
-  ```lisp
-  ;; System.Threading.Timer (system-threading-timer)
-  ;; NOTE: specializes on the simple-name CLOS class dotcl-internal::|Timer|.
-  ;; Known simple-name conflict(s) among the types visible to the package
-  ;; generator (ACTUAL = also generated in this batch, so DotCL's
-  ;; simple-name/FullName naming race is guaranteed to happen; POSSIBLE =
-  ;; merely seen in the provided assemblies' metadata, not generated here):
-  ;;   ACTUAL: System.Timers.Timer
-  ;; See doc/make-everything-defgeneric.md's "Static specializer collision
-  ;; caveat" for the full mechanism and a worked example.
-  (cl:defmethod change ((obj! dotcl-internal::|Timer|) cl:&rest args)
-    (cl:apply (cl:function system-threading-timer:change) obj! args))
-  ```
-* `emit-defgeneric-defpackage` (shared helper) emits this variant's `csharp-generics`
-  `cl:defpackage`, independently of the dynamic variant's.
+  `(cl:setf …)` `cl:defgeneric` per unified name, then per opted-in class either a flat block of
+  literal `cl:defmethod` forms (specializing on `#.(dotnet:class-for-type "<fq-name>")`) or, for
+  a generic-arity class, a skip comment.
+* `emit-defgeneric-defpackage` emits the `csharp-generics` `cl:defpackage`.
 * `generate-batch-asd-file` adds `csharp-generics` as its own `.asd` `:file` component
-  (depending on `"packages"`, `"csharp-assembly-utils"`, and every one of *this variant's*
-  opted-in classes' package files), independently of the dynamic variant's component.
+  (depending on `"packages"`, `"csharp-assembly-utils"`, and every opted-in class's own package
+  file).
 
-## Reporting actual, known conflicts (Generator Version 36)
+## History
 
-The collision comment above isn't a generic, purely hypothetical warning — it reports real
-findings computed from every type the package generator can see:
+**Version 34** shipped the original working mechanism: every `defmethod` installed via
+`cl:eval` of a backquoted form inside a `cl:eval-when`, because — pre-0.1.17 — the correct
+specializer symbol was only knowable once DotCL resolved the class object at load time. Judged
+too ugly to be the only option.
 
-* `build-simple-name-index` builds a `dotnet-type-simple-name` → `(fully-qualified-name…)` hash
-  table from `build-metadata-index`'s full per-batch metadata index — **every** type reflected
-  in **every** provided assembly, not just the requested/generated ones. `generate-assembly-
-  packages-batch` builds this index once (previously it was scoped only to Phase B's ancestor
-  expansion) and threads it, plus a hash set of every fully-qualified-name actually generated
-  as its own package in this batch (`resolved-fq-set`, from `all-resolved`), down to
-  `generate-batch-generics-file`.
-* `classify-simple-name-conflicts`, given one class's fully-qualified-name plus those two
-  structures, returns every other type sharing that same simple name, each tagged:
-  * **`:actual`** — the other type is also present in `resolved-fq-set` (also generated as its
-    own package in this batch). Both types' generated files call `EnsureDotNetTypeClass` at
-    load time, so DotCL's simple-name/FullName naming race is **guaranteed** to actually
-    happen between them.
-  * **`:possible`** — the other type is only known to exist (reflected in one of the provided
-    assemblies' metadata) but is not itself generated in this batch. Nothing in this run's own
-    output forces it to register with DotCL, so there's no *guaranteed* collision from this run
-    alone — but the type is there, so the simple name isn't guaranteed exclusive to the
-    generated class either.
-* `generate-batch-generics-file`'s per-class comment lists every found conflict by name and
-  tag, or states plainly "No known simple-name conflicts" when `classify-simple-name-conflicts`
-  finds none — replacing the earlier generic "if another class collides" phrasing with an
-  actual, verifiable answer.
+**Version 35** split this into two independent, orthogonal variants: the Version 34 mechanism,
+renamed `--defgeneric-dynamic`/`csharp-generics-dynamic` (robust, ugly generated code), plus a
+new sibling under the freed-up `--defgeneric`/`csharp-generics` names emitting a **literal**
+specializer symbol computed at generation time (`dotcl-internal::|<simple-name>|`) — simple,
+readable generated code, but carrying an accepted collision caveat: DotCL's
+`EnsureDotNetTypeClass` names a type's CLOS class by its simple name only when free, and *which*
+same-simple-name type wins that race across a batch was load-order-dependent and unknowable at
+generation time. **Version 36** made that caveat's per-class comment report actual, known
+conflicts (`build-simple-name-index`/`classify-simple-name-conflicts`) instead of a purely
+hypothetical warning.
 
-## Demonstrated collision
-
-The `Makefile` smoke test opts both `System.Threading.Timer` and `System.Timers.Timer` into
-`--defgeneric` — genuine BCL types with the same simple name (`Timer`) in different namespaces,
-both exposing overlapping member names (e.g. `Dispose`). This is a deliberate demonstration of
-the documented caveat, not an oversight: inspect the generated `cspackages-test/csharp-generics.lisp`
-and confirm both classes' `defmethod` blocks specialize on the identical literal symbol
-`dotcl-internal::|Timer|`.
-
-**Empirically confirmed** (isolated REPL load of just these two classes' generated packages,
-via `dotcl` from the sibling `../dotcl` checkout): `class-of` a `System.Threading.Timer`
-instance is `#<STANDARD-CLASS Timer>` (the simple-name winner — its own `.lisp` file loaded
-first), while `class-of` a `System.Timers.Timer` instance is the distinct
-`#<STANDARD-CLASS System.Timers.Timer>` (the FullName-qualified loser) — confirmed not `eq`.
-The actual failure is sharper than "the loser's calls fail": because **both** classes'
-`defmethod dispose` forms specialize on the exact same literal symbol, ordinary CLOS
-method-redefinition semantics mean the second one *replaces* the first outright — there is only
-ever one `dispose` method active for that specializer, whichever class's `defmethod` form
-appears later in the file (i.e., later in `--class` command-line order):
-* Calling the shared generic on the **winning** type's own instance (`System.Threading.Timer`)
-  errors too — `DISPOSE: wrong number of arguments: 1 (expected 2)` — because the surviving
-  method actually forwards to the *other* class's wrapper function, whose arity doesn't match.
-* Calling it on the **losing** type's instance (`System.Timers.Timer`) gets a clean
-  `No applicable method for generic function DISPOSE`, since its actual class was never a
-  specializer target at all.
-
-So the caveat is, if anything, understated: a simple-name collision between two opted-in classes
-doesn't just misdirect the loser — it can break the *winner* too, for any member name both
-classes happen to share.
+**Version 41** retired both variants outright and replaced them with the single mechanism
+described above, once DotCL 0.1.17 made it possible to get Version 35's generated-code
+simplicity *and* Version 34's collision-proof robustness at the same time — see
+`doc/generator-design-notes.md`'s Version 41 section for the full rationale, and
+`doc/dotcl-0.1.16-defgeneric-csharp-generic-notes.md` for the prior-cycle research (credited by
+DotCL's own RELEASES.md) that drove the DotCL 0.1.17 API this consolidation depends on. The
+`--defgeneric-dynamic` flags, `csharp-generics-dynamic` package, and all supporting Lisp
+machinery (`generate-batch-generics-dynamic-file`, `compute-defgeneric-dynamic-model`, the old
+`dotnet-type-simple-name`/`build-simple-name-index`/`classify-simple-name-conflicts` collision
+machinery) were deleted, not deprecated — this was a clean break, since the new mechanism
+strictly dominates both predecessors for every case it supports.
 
 ## Verification
 
 1. `make check-parens` after any hand-edit.
 2. `make build test` — regenerates `cspackages-test/csharp-generics.lisp` and runs
    `check_parens.py` over it; inspect the diff to confirm no `cl:eval`/`eval-when`/backquote
-   anywhere in the file — only ordinary top-level `cl:defgeneric`/`cl:defmethod` forms.
+   anywhere in the file — only ordinary top-level `cl:defgeneric`/`cl:defmethod` forms, and no
+   `csharp-generics-dynamic.lisp` file at all.
 3. Manual REPL smoke: confirm `(csharp-generics:length "abc")` and a `System.Array` instance
    both dispatch to their respective packages, and that a settable property routes through
    `(setf (csharp-generics:… x) v)`.
-4. Collision spot-check (see "Demonstrated collision" above, empirically confirmed): load an
-   isolated batch of just `System.Threading.Timer`/`System.Timers.Timer` and confirm the
-   wrong-arity error on the winner and `no-applicable-method` on the loser, exactly as described.
+4. Collision spot-check: the Makefile smoke test opts both `System.Threading.Timer` and
+   `System.Timers.Timer` into `--defgeneric` — confirm both now get their own correct,
+   independent `defmethod` (no shared literal symbol, no caveat comment).
+5. Generic-arity skip spot-check: the Makefile smoke test opts
+   `` System.Collections.Generic.Dictionary`2 ``/`` System.Collections.Generic.SortedList`2 ``
+   into `--defgeneric` — confirm each gets a `SKIPPED` comment, not a dead `defmethod`.
 
 ## Known pre-existing issue found during verification (not introduced by this change)
 
