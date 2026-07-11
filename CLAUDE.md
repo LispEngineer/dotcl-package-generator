@@ -177,6 +177,18 @@ to it requires running at compile time too. This isn't a new ASDF-loadability re
 `csharp-generics.lisp` has resolved types at compile time unconditionally since Version 41
 already. See `doc/generator-design-notes.md`'s Version 45 section.
 
+A global flag (not per-class, not sticky — a single toggle for the whole invocation, like
+`--skip-missing`), `--csharp-generic-in-asd`/`--no-csharp-generic-in-asd` (**ON by default**),
+controls whether `csharp-generics.lisp` is listed as an active `:file` component in the
+generated `.asd` at all (only relevant if at least one class opted into `--defgeneric`).
+`--no-csharp-generic-in-asd` writes that component out as a comment instead, byte-for-byte
+identical to the active form, with an explanation that it's meant to be spliced manually into
+the *consuming* project's own `.asd` at a point after that project's own assembly is already
+loaded — since `csharp-generics.lisp` compiling at all as part of this generated system can hit
+the same dotcl/dotcl#49 class of failure the rest of this generator's output no longer does.
+`csharp-generics.lisp` is still generated as a file either way. See
+`doc/generator-design-notes.md`'s Version 46 section.
+
 `--version`/`--help` and `--test` boot the DotCL host (`DotclHost.Initialize()`); the
 metadata-reflection portion of a `--out-dir` invocation intentionally does not, since it's pure
 reflection and runs before DotCL boots.

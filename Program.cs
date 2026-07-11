@@ -30,6 +30,7 @@ bool outputAllNested = false;
 bool outputAllChildren = false;
 bool outputAllImplementations = false;
 bool skipMissing = false;
+bool csharpGenericInAsd = true;
 bool enableDefgenericStatic = false;
 bool enableExtensionMethods = true;
 bool ensureType = false;
@@ -206,6 +207,10 @@ for (int i = 0; i < args.Length; i++) {
         skipMissing = true;
     } else if (args[i] == "--no-skip-missing") {
         skipMissing = false;
+    } else if (args[i] == "--csharp-generic-in-asd") {
+        csharpGenericInAsd = true;
+    } else if (args[i] == "--no-csharp-generic-in-asd") {
+        csharpGenericInAsd = false;
     } else if (args[i] == "--enable-defgeneric") {
         enableDefgenericStatic = true;
     } else if (args[i] == "--no-enable-defgeneric") {
@@ -328,7 +333,7 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
         Console.WriteLine("[Program.cs] Running assembly package generator...");
         try {
             DotclHost.Call("RUN-ASSEMBLY-PACKAGE-GENERATOR-BATCH", manifestFile, outDir, creationTime, cliVersion,
-                            utilsPackageTemplatePath, utilsTemplatePath, skipMissing);
+                            utilsPackageTemplatePath, utilsTemplatePath, skipMissing, csharpGenericInAsd);
         } catch (Exception ex) {
             Console.Error.WriteLine($"[Program.cs] Error in assembly package generator: {ex.Message}");
             Console.Error.WriteLine(ex.StackTrace);
@@ -570,6 +575,26 @@ void PrintHelp() {
         "cannot be found in any provided assembly, warn",
         "and drop it (--skip-missing) instead of the",
         "default: stop with an error (--no-skip-missing).");
+    Opt("--csharp-generic-in-asd / --no-csharp-generic-in-asd", "Only matters if at least one --class opted",
+        "into --defgeneric (so csharp-generics.lisp is",
+        "actually generated). ON by default: the",
+        "generated csharp-assembly-packages.asd lists",
+        "csharp-generics.lisp as an ordinary :file",
+        "component, same as every other generated file.",
+        "--no-csharp-generic-in-asd instead writes that",
+        "component out as a COMMENT, with an explanation",
+        "that it's meant to be spliced manually into the",
+        "consuming project's own .asd -- at a point after",
+        "its own target assembly is already loaded --",
+        "since #.(dotnet:class-for-type ...) resolves",
+        "types at COMPILE time (see --ensure-type-in-",
+        "generic above), which can fail if this whole",
+        "generated system is loaded via ASDF :depends-on",
+        "before that assembly is in scope. csharp-generics.lisp",
+        "itself is still generated either way; only its",
+        "own .asd's :components entry is affected. See",
+        "doc/generator-design-notes.md's Version 46",
+        "section.");
     Console.WriteLine();
     Console.WriteLine("Other:");
     Opt("--test", "Run the generator's own Lisp unit tests plus the",

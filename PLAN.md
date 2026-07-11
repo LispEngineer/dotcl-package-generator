@@ -1015,4 +1015,21 @@ metadata field already produces.
   CLOS Registration Inside `csharp-generics.lisp` (Version 45)" section and `RELEASES.md`'s
   2.45.0 entry.
 
+* **DONE** (Generator Version 46): added `--csharp-generic-in-asd`/`--no-csharp-generic-in-asd`
+  (a *global* flag — applies to the whole invocation, not per-class or sticky, same as
+  `--skip-missing` — ON by default). Only matters when at least one class opted into
+  `--defgeneric` (so `csharp-generics.lisp` is actually generated); `--no-csharp-generic-in-asd`
+  writes that file's `:file` component out as a comment in `csharp-assembly-packages.asd`
+  instead of an active component, byte-for-byte identical to the active form, with an
+  explanation that it's meant to be spliced manually into the *consuming* project's own `.asd`
+  at a point after that project's own target assembly is already loaded. Rationale: unlike
+  every other generated file, `csharp-generics.lisp` resolves .NET types at compile time
+  unconditionally (Version 41's `#.(dotnet:class-for-type ...)`), so loading the whole generated
+  system as an ASDF `:depends-on` dependency before the consuming project's own assembly is in
+  scope can still fail on this one file even after Versions 42-44 fixed every other file for
+  exactly that scenario ([dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49)).
+  `csharp-generics.lisp` is still generated as a file either way; only its own `.asd` entry is
+  affected. See `doc/generator-design-notes.md`'s "`--csharp-generic-in-asd`: Excluding
+  `csharp-generics.lisp` from the `.asd` (Version 46)" section and `RELEASES.md`'s 2.46.0 entry.
+
 

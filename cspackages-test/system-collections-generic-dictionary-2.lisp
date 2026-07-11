@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 45
-;;; Creation Date: 2026-07-11T18:35:30Z
+;;; Generator Version: 46
+;;; Creation Date: 2026-07-11T19:17:50Z
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-11T18:35:30Z")
-(cl:defconstant <version> 45)
+(cl:defconstant <creation> "2026-07-11T19:17:50Z")
+(cl:defconstant <version> 46)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Generic.Dictionary`2 constructor overloads. Dispatches at runtime.

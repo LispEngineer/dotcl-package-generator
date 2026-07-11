@@ -11,7 +11,7 @@
 
 
 (defun generate-batch-asd-file (entries-with-resolved output-dir creation-time cli-version child-ancestor-fqs
-                                 &optional defgeneric-model)
+                                 &optional defgeneric-model (csharp-generic-in-asd t))
   "Writes csharp-assembly-packages.asd into OUTPUT-DIR, listing every
    generated class package (from ENTRIES-WITH-RESOLVED, a list of
    (entry . resolved) pairs as accumulated by
@@ -35,7 +35,20 @@
    its own *CSHARP-GENERICS-PACKAGE-NAME* :file component, depending on
    \"packages\", \"csharp-assembly-utils\", and every one of its own
    opted-in classes' package files (must load last -- see
-   doc/make-everything-defgeneric.md)."
+   doc/make-everything-defgeneric.md) -- UNLESS CSHARP-GENERIC-IN-ASD (T by
+   default; Program.cs's --csharp-generic-in-asd/--no-csharp-generic-in-asd,
+   Version 46) is NIL, in which case that :file form is instead written out
+   as a comment, with an explanation that it's meant to be spliced manually
+   into the consuming project's own .asd at a point after that project's
+   own target assembly is already loaded: #.(dotnet:class-for-type ...)
+   inside csharp-generics.lisp resolves types at COMPILE time (Version 41),
+   which can fail if this whole generated system is loaded via ASDF
+   :depends-on before the consuming project's own assembly is in scope
+   (dotcl/dotcl#49) -- the same underlying constraint --ensure-type-in-
+   generic (Version 45) works around per-class-registration-order, but this
+   flag addresses at the .asd-component level instead. Has no effect when
+   DEFGENERIC-MODEL is nil (nothing to comment out). See
+   doc/generator-design-notes.md's Version 46 section."
   (let ((output-file (merge-pathnames (make-pathname :name "csharp-assembly-packages" :type "asd")
                                        (pathname (concatenate 'string output-dir "/")))))
     (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
@@ -78,15 +91,31 @@
             (format stream "   (:file \"~A\" :depends-on (\"packages\" \"csharp-assembly-utils\"~{ \"~A\"~}))~%"
                     pkg-name ancestor-pkg-names))))
       (when defgeneric-model
-        (format stream "   (:file \"~A\" :depends-on (\"packages\" \"csharp-assembly-utils\"~{ \"~A\"~}))~%"
-                *csharp-generics-package-name*
-                (mapcar (lambda (c) (getf c :pkg-name)) (getf defgeneric-model :classes))))
+        (let ((depends-on-pkgs (mapcar (lambda (c) (getf c :pkg-name)) (getf defgeneric-model :classes))))
+          (if csharp-generic-in-asd
+              (format stream "   (:file \"~A\" :depends-on (\"packages\" \"csharp-assembly-utils\"~{ \"~A\"~}))~%"
+                      *csharp-generics-package-name* depends-on-pkgs)
+              (progn
+                (format stream "   ;; ~A.lisp is NOT included above as a :components entry~%"
+                        *csharp-generics-package-name*)
+                (format stream "   ;; (--no-csharp-generic-in-asd): #.(dotnet:class-for-type ...) inside it~%")
+                (format stream "   ;; resolves .NET types at COMPILE time, unlike every other file in~%")
+                (format stream "   ;; this system, which can fail if this whole system is loaded via~%")
+                (format stream "   ;; ASDF :depends-on before the consuming project's own target~%")
+                (format stream "   ;; assembly is in scope (see doc/generator-design-notes.md's~%")
+                (format stream "   ;; Version 41/46 sections and dotcl/dotcl#49). To use~%")
+                (format stream "   ;; --defgeneric-generated dispatch, splice the commented-out~%")
+                (format stream "   ;; component below into the CONSUMING project's own .asd~%")
+                (format stream "   ;; :components list instead, at a point after its own assembly~%")
+                (format stream "   ;; references are already loaded:~%")
+                (format stream "   ;; (:file \"~A\" :depends-on (\"packages\" \"csharp-assembly-utils\"~{ \"~A\"~}))~%"
+                        *csharp-generics-package-name* depends-on-pkgs)))))
       (format stream "  ))~%"))
     output-file))
 
 (defun generate-assembly-packages-batch (assembly-entries output-dir creation-time cli-version
                                           package-template-path utils-template-path
-                                          &optional skip-missing)
+                                          &optional skip-missing (csharp-generic-in-asd t))
   "Loads each entry's metadata file, resolves all requested classes across
    all entries, and only then generates the .lisp package files, so a
    class name that cannot be found aborts the whole run before anything is
@@ -136,7 +165,19 @@
    and doc/make-everything-defgeneric.md), then finally a
    csharp-assembly-packages.asd tying them all together; CLI-VERSION (the
    dotcl-packagegen tool's own semver, e.g. \"2.20.0\") is used in that
-   file's long description."
+   file's long description. CSHARP-GENERIC-IN-ASD (T by default -- Program.cs's
+   --csharp-generic-in-asd/--no-csharp-generic-in-asd, Version 46) is passed
+   straight through to GENERATE-BATCH-ASD-FILE, which only consults it when
+   a DEFGENERIC-MODEL actually exists: when NIL, csharp-generics.lisp's own
+   :file component is written out as a comment instead of an active
+   component, since #.(dotnet:class-for-type ...) resolves types at COMPILE
+   time (see doc/generator-design-notes.md's Version 41/45 sections), which
+   can fail if this whole system is loaded via ASDF :depends-on before the
+   consuming project's own target assembly is in scope (dotcl/dotcl#49) --
+   the commented-out form is meant to be spliced manually into the
+   consuming project's own .asd instead, at a point after that assembly is
+   already loaded. csharp-generics.lisp itself is still generated either
+   way; only its own .asd entry is affected."
   (let ((entries-with-resolved nil)
         (entry-resolved-table (make-hash-table :test #'eq))
         (all-not-found nil)
@@ -291,13 +332,13 @@
         (generate-batch-generics-file output-dir creation-time defgeneric-model)
 
         (generate-batch-asd-file entries-with-resolved-pairs output-dir creation-time cli-version
-                                  child-ancestor-fqs defgeneric-model)))
+                                  child-ancestor-fqs defgeneric-model csharp-generic-in-asd)))
 
     t))
 
 (defun run-assembly-package-generator-batch (manifest-file output-dir creation-time cli-version
                                               package-template-path utils-template-path
-                                              &optional skip-missing)
+                                              &optional skip-missing (csharp-generic-in-asd t))
   "CLI entry point called by DotclHost.Call for the single-pass generator.
    MANIFEST-FILE is a Lisp-reader-compatible list of plists, one per
    assembly:
@@ -341,6 +382,10 @@
    whether an unresolvable parent/interface ancestor is a hard error
    (default/NIL) or a dropped-with-a-warning (T) -- see
    GENERATE-ASSEMBLY-PACKAGES-BATCH / EXPAND-ANCESTORS.
+   CSHARP-GENERIC-IN-ASD (also a plain scalar, T by default; Program.cs's
+   --csharp-generic-in-asd/--no-csharp-generic-in-asd, Version 46) is
+   passed straight through to GENERATE-ASSEMBLY-PACKAGES-BATCH /
+   GENERATE-BATCH-ASD-FILE -- see its own docstring for the full rationale.
    Maps string parameters safely and reports errors in red."
   (handler-case
       (let ((mfile (and manifest-file (> (length manifest-file) 0) manifest-file))
@@ -357,7 +402,8 @@
           (error "csharp-assembly-utils template not found: ~A" utils-template-path))
         (let ((assembly-entries (utils:safe-read-form-from-file mfile)))
           (generate-assembly-packages-batch assembly-entries odir creation-time cli-version
-                                             package-template-path utils-template-path skip-missing)))
+                                             package-template-path utils-template-path skip-missing
+                                             csharp-generic-in-asd)))
     (error (c)
       (utils:format-red *error-output* "Error in assembly-package-generator: ~A~%" c)
       (error c))))

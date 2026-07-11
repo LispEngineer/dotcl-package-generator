@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.ICollection
-;;; Generator Version: 45
-;;; Creation Date: 2026-07-11T18:35:30Z
+;;; Generator Version: 46
+;;; Creation Date: 2026-07-11T19:17:50Z
 
 (cl:in-package :system-collections-i-collection)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.ICollection"))
 (cl:defconstant <type-str> "System.Collections.ICollection")
-(cl:defconstant <creation> "2026-07-11T18:35:30Z")
-(cl:defconstant <version> 45)
+(cl:defconstant <creation> "2026-07-11T19:17:50Z")
+(cl:defconstant <version> 46)
 
 (cl:defun count (obj!)
   "Gets the number of elements contained in the System.Collections.ICollection."

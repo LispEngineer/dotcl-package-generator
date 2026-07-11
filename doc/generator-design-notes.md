@@ -2638,3 +2638,79 @@ has no entry in `csharp-generics.lisp` to place anything ahead of. Sticky-only, 
 already demonstrates, confirming the eval-when appears (with `:compile-toplevel`) in
 `csharp-generics.lisp` immediately before the opted-in class's own `defmethod` block, and is
 absent for the other; `check_parens.py` confirms the new shape is well-formed.
+
+## `--csharp-generic-in-asd`: Excluding `csharp-generics.lisp` from the `.asd` (Version 46)
+
+### The remaining problem Version 45 didn't solve
+
+Version 45's `--ensure-type-in-generic` controls registration *order* within
+`csharp-generics.lisp`, once it does compile — but it doesn't change the fact that
+`csharp-generics.lisp` compiles at all as part of the generated `csharp-assembly-packages`
+system. `#.(dotnet:class-for-type "<fq-name>")` resolves and registers its named type at
+**compile time**, unconditionally, for every `--defgeneric`-opted class, since Version 41 — a
+CLOS `defmethod` specializer must be resolvable at macroexpansion/compile time by design (the
+same "Compile-Time Constraint" this file's much older section documents), so unlike `<type>`
+(Version 42's symbol-macro fix), this cannot be deferred to load time at all. If the whole
+generated system is loaded as an ASDF `:depends-on` dependency of another project before that
+project's own target assembly is in scope — the exact scenario
+[dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49) reported — compiling
+`csharp-generics.lisp` can fail even after every *other* fix in this generator (Version
+42/43/44) has made every other generated file in the same system load cleanly in that scenario.
+
+### The fix: let the user exclude it from the `.asd`, with a ready-to-paste replacement
+
+New global flag `--csharp-generic-in-asd`/`--no-csharp-generic-in-asd` (not per-class, not
+sticky in the usual per-class sense — a single toggle for the whole invocation, exactly like
+`--skip-missing`), **ON by default** (matching every prior version's behavior: an active
+`:file` component). `--no-csharp-generic-in-asd` instead writes that component out as a
+**comment**:
+
+```lisp
+   ;; csharp-generics.lisp is NOT included above as a :components entry
+   ;; (--no-csharp-generic-in-asd): #.(dotnet:class-for-type ...) inside it
+   ;; resolves .NET types at COMPILE time, unlike every other file in
+   ;; this system, which can fail if this whole system is loaded via
+   ;; ASDF :depends-on before the consuming project's own target
+   ;; assembly is in scope (see doc/generator-design-notes.md's
+   ;; Version 41/46 sections and dotcl/dotcl#49). To use
+   ;; --defgeneric-generated dispatch, splice the commented-out
+   ;; component below into the CONSUMING project's own .asd
+   ;; :components list instead, at a point after its own assembly
+   ;; references are already loaded:
+   ;; (:file "csharp-generics" :depends-on ("packages" "csharp-assembly-utils" "system-object" ...))
+```
+
+`csharp-generics.lisp` itself is still generated as a real `.lisp` file either way — this flag
+only changes whether `csharp-assembly-packages.asd` treats it as one of its own components.
+The commented-out line is deliberately kept byte-for-byte identical to the active form (same
+`:depends-on` list, same file name), so a user who needs `--defgeneric` dispatch can uncomment
+it verbatim into their own project's `.asd`, at whatever point in their own component list
+comes after their own assembly references are already loaded (the exact problem the original
+issue reporter was solving by hand, splicing files into their own system's components).
+
+### Threading
+
+`generate-batch-asd-file`/`generate-assembly-packages-batch`/
+`run-assembly-package-generator-batch` (`apg-batch-orchestration.lisp`) each gained a new
+optional `csharp-generic-in-asd` parameter, defaulting to `T` for any caller that omits it
+(matching the flag's own ON-by-default semantics — existing tests that call
+`generate-assembly-packages-batch` directly without this argument are unaffected). Program.cs
+threads its own new `csharpGenericInAsd` global bool as a trailing scalar argument to
+`DotclHost.Call`, exactly like `skipMissing` already is (not folded into the manifest, since it
+is a single whole-invocation flag, not a per-class one).
+
+### Scope
+
+Has no effect when no class opted into `--defgeneric` (no `defgeneric-model`, hence nothing to
+comment out or include). Independent of `--ensure-type-in-generic` (Version 45) — they can be
+combined freely; `--no-csharp-generic-in-asd` with `--ensure-type-in-generic` still emits the
+per-class `EnsureDotNetTypeClass` eval-when inside `csharp-generics.lisp` itself, just with the
+whole file excluded from the generated `.asd`'s active components.
+
+### Verification
+
+`make build test`: the Makefile's smoke test now passes `--no-csharp-generic-in-asd` for the
+whole invocation, confirming `csharp-assembly-packages.asd`'s `csharp-generics.lisp` component
+is written as a comment (byte-identical to the active form apart from the `;; ` prefix and
+explanation) rather than an active `:file` entry; `check_parens.py` confirms the rest of the
+`.asd` (every other component, still active) remains well-formed.

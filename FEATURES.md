@@ -226,6 +226,37 @@ limitation of `--defgeneric` itself, distinct from `<type>`'s load-time-deferred
 this just adds one more already-unavoidable-in-kind compile-time call alongside ones the file
 was already making. See `doc/generator-design-notes.md`'s Version 45 section.
 
+**`--csharp-generic-in-asd`/`--no-csharp-generic-in-asd`** (global — applies to the whole
+invocation, not per-class or sticky, same as `--skip-missing` — **ON by default**) controls
+whether `csharp-generics.lisp` is listed as an active `:file` component in the generated
+`csharp-assembly-packages.asd` at all. Only matters if at least one class opted into
+`--defgeneric` (otherwise there's no `csharp-generics.lisp` to include or exclude).
+`--no-csharp-generic-in-asd` writes that component out as a **comment** instead:
+
+```lisp
+   ;; csharp-generics.lisp is NOT included above as a :components entry
+   ;; (--no-csharp-generic-in-asd): #.(dotnet:class-for-type ...) inside it
+   ;; resolves .NET types at COMPILE time, unlike every other file in
+   ;; this system, which can fail if this whole system is loaded via
+   ;; ASDF :depends-on before the consuming project's own target
+   ;; assembly is in scope (see doc/generator-design-notes.md's
+   ;; Version 41/46 sections and dotcl/dotcl#49). To use
+   ;; --defgeneric-generated dispatch, splice the commented-out
+   ;; component below into the CONSUMING project's own .asd
+   ;; :components list instead, at a point after its own assembly
+   ;; references are already loaded:
+   ;; (:file "csharp-generics" :depends-on ("packages" "csharp-assembly-utils" "system-object" ...))
+```
+
+`csharp-generics.lisp` is still generated as a real file either way — only this `.asd`'s own
+`:components` entry is affected. The commented-out line is byte-for-byte identical to the
+active form, ready to paste into a consuming project's own `.asd` at whatever point its own
+assembly references are already loaded — the exact hand-rolled workaround
+[dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49)'s reporter had settled on before this
+generator addressed it directly. Freely combinable with `--ensure-type-in-generic`: the
+per-class eval-when it adds still appears inside `csharp-generics.lisp` even when the whole
+file is excluded from the `.asd`. See `doc/generator-design-notes.md`'s Version 46 section.
+
 
 
 ## Constructors

@@ -10,6 +10,31 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.46.0 — 2026-07-11
+
+**Added `--csharp-generic-in-asd`/`--no-csharp-generic-in-asd` (global, ON by default): lets
+`csharp-generics.lisp` be excluded from the generated `.asd`'s `:components`, commented out for
+manual inclusion in a consuming project instead.**
+
+* Only has any effect when at least one `--class` opted into `--defgeneric` (so
+  `csharp-generics.lisp` is actually generated). `--no-csharp-generic-in-asd` writes its `:file`
+  component out as a comment instead of an active component, with an explanation that it's meant
+  to be spliced manually into the *consuming* project's own `.asd`, at a point after that
+  project's own target assembly is already loaded.
+* Rationale: `csharp-generics.lisp`'s `#.(dotnet:class-for-type ...)` resolves .NET types at
+  *compile* time, unconditionally, since 2.41.0 — an accepted, already-documented limitation
+  distinct from every other generated file's load-time-deferred resolution. If the whole
+  generated system is loaded via an ASDF `:depends-on` before the consuming project's own
+  assembly is in scope ([dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49)), compiling
+  `csharp-generics.lisp` specifically can fail even though every other file in the same system
+  loads fine. `--no-csharp-generic-in-asd` sidesteps compiling it as part of the auto-generated
+  system entirely, while keeping the exact component text available as a ready-to-paste comment.
+* `csharp-generics.lisp` itself is still generated as a file either way; only its own `.asd`
+  entry is affected.
+* `*generator-version*` bumped 45 → 46 (generated-code shape change, `csharp-assembly-packages.asd`
+  only, and only when `--defgeneric` is used at all). See `doc/generator-design-notes.md`'s
+  Version 46 section.
+
 ## 2.45.0 — 2026-07-11
 
 **Added `--ensure-type-in-generic`/`--no-ensure-type-in-generic` (sticky, OFF by default): an

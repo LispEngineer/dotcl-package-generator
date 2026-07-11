@@ -47,7 +47,7 @@ test: build
 	# System.AppDomain System.Diagnostics.Debug System.Environment System.Globalization.CultureInfo
 	rm -rf $(GEN_TEST_DIR)
 	mkdir -p $(GEN_TEST_DIR)
-	$(EXECUTABLE) --out-dir $(GEN_TEST_DIR) \
+	$(EXECUTABLE) --out-dir $(GEN_TEST_DIR) --no-csharp-generic-in-asd \
    	    --assembly $(REF_DIR)System.Console.dll \
 	      --class System.Console \
 	    --assembly $(REF_DIR)System.Runtime.dll \
@@ -136,6 +136,12 @@ test: build
 	# Timer's own --defgeneric defmethod block there; Timers.Timer (also
 	# --defgeneric, but neither --ensure-type flag) gets neither (both sticky
 	# defaults are turned back off immediately after Timer).
+	# The whole invocation also passes Version 46's --no-csharp-generic-in-asd
+	# (global, not per-class), so csharp-assembly-packages.asd's own
+	# csharp-generics.lisp :file component is written out as a comment
+	# instead of an active component -- demonstrating the flag's OFF path;
+	# every prior version's golden output already demonstrates the ON
+	# (default) path.
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo;
 	# System.Collections.Generic.List, SortedList; System.Text.StringBuilder;
 	# System.Drawing.Point/F; Size/F
