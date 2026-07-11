@@ -1,0 +1,605 @@
+;;; Douglas P. Fields, Jr. - symbolics@lisp.engineer
+;;; Copyright 2026 Douglas P. Fields, Jr.
+;;;
+;;; Developed with Antigravity CLI (Gemini 3.5 Flash and 3.1 Pro)
+;;;
+;;; C# Assembly Lisp Package Generator -- overload/generic-arity dispatch engine
+;;; Split out of the former assembly-package-generator.lisp (pure internal
+;;; reorganization; see doc/generator-design-notes.md).
+
+(in-package :assembly-package-generator)
+
+
+(defun group-properties-by-name (properties)
+  "Groups property plists by :name, preserving first-seen order. Ordinary
+   C# properties are never overloaded, but indexers (this[...]) can be, so a
+   group may contain more than one property plist."
+  (let ((table (make-hash-table :test #'equal))
+        (order nil))
+    (dolist (p properties)
+      (let ((name (getf p :name)))
+        (unless (gethash name table)
+          (push name order))
+        (push p (gethash name table))))
+    (mapcar (lambda (name) (cons name (nreverse (gethash name table))))
+            (nreverse order))))
+
+(defun generic-type-param-names (arity)
+  "Returns ARITY distinct Lisp parameter names for a generic method's type
+   arguments (each bound by the caller to a .NET type -- a type-name string,
+   alias, or System.Type object -- for dotnet:invoke-generic/static-generic
+   to instantiate the method with). ARITY 1 keeps the single legacy name
+   \"type\" (pre-dating support for arity > 1, and still the common case);
+   ARITY > 1 uses \"type-1\" through \"type-ARITY\" so each type argument
+   gets its own binding."
+  (if (= arity 1)
+      (list "type")
+      (loop for i from 1 to arity collect (format nil "type-~D" i))))
+
+(defun method-generic-cell-key (m)
+  "Returns a key identifying method plist M's generic-arity 'cell': nil for
+   a non-generic method, or its (integer) :generic-arity for a generic one.
+   See split-by-generic-arity."
+  (and (getf m :is-generic) (getf m :generic-arity)))
+
+(defun split-by-generic-arity (methods)
+  "Partitions METHODS (already-clean method plists sharing one C# method
+   name and one static/instance mode) into an ordered list of sub-lists,
+   one per distinct generic-arity 'cell' (method-generic-cell-key),
+   preserving first-seen order within each cell and across cells.
+
+   A single generated Lisp function can only bind one fixed number of
+   generic type-argument parameters (one Lisp parameter per type argument --
+   see generic-type-param-names), so overloads of the same C# method name
+   that disagree on generic arity cannot share one wrapper's lambda list.
+   The canonical real-world example is System.Linq.Enumerable's Aggregate,
+   which has three same-named overloads of generic arity 1, 2, and 3
+   respectively: METHODS (Aggregate's clean, e.g. all-static, overloads)
+   would split into three single-method cells here, one per arity, so each
+   gets generated as its own function (see generate-method-name-wrappers)
+   instead of being incorrectly merged into one.
+
+   The overwhelmingly common case -- a non-generic method, or a generic
+   method whose every overload shares the same arity -- returns a single
+   one-cell list, so callers can treat \"only one cell\" as \"nothing
+   changes from before generic-arity splitting existed.\""
+  (let ((table (make-hash-table :test #'eql))
+        (order nil))
+    (dolist (m methods)
+      (let ((key (method-generic-cell-key m)))
+        (unless (nth-value 1 (gethash key table))
+          (push key order))
+        (push m (gethash key table))))
+    (mapcar (lambda (key) (nreverse (gethash key table))) (nreverse order))))
+
+(defun generic-arity-suffix (cell)
+  "Returns \"\" for a non-generic CELL (a list of method plists sharing one
+   method-generic-cell-key, from split-by-generic-arity), or \"-arity-N\"
+   for a generic CELL of arity N. Used only to name the internal
+   (unexported) per-arity function generate-generic-cell-wrapper defines
+   for CELL when a method name splits into more than one cell -- see
+   internal-arity-fn-name and generate-method-name-wrappers's Version 28
+   two-tier dispatch (generic-arity-dispatch-mode)."
+  (let ((m (first cell)))
+    (if (getf m :is-generic)
+        (format nil "-arity-~D" (getf m :generic-arity))
+        "")))
+
+(defun generic-arity-dispatch-mode (cells)
+  "Returns one of :single, :split-with-plain, or :split-all-generic,
+   describing how CELLS (from split-by-generic-arity -- one per distinct
+   generic-arity 'cell' of a method name's clean overloads within one
+   static/instance mode) should be exposed publicly:
+
+   :single -- exactly one cell (the non-generic cell alone, or one generic
+   arity alone, e.g. Select<TSource,TResult>'s overloads, which all share
+   arity 2): no dispatch is needed; BASE-NAME is the one and only function,
+   exactly as if generic-arity splitting didn't exist.
+
+   :split-with-plain -- more than one cell, and one of them is the
+   non-generic cell: BASE-NAME handles only that non-generic cell (no type
+   argument); a new BASE-NAME<> dispatcher handles all the generic cells,
+   resolving which one to call by counting the type argument(s) it's given
+   (and falling through to BASE-NAME itself when given an empty list).
+
+   :split-all-generic -- more than one cell, none of them non-generic (e.g.
+   System.Linq.Enumerable.Aggregate, overloaded at generic arity 1, 2, and
+   3, with no non-generic overload at all): BASE-NAME itself becomes the
+   dispatcher (no <> suffix -- there is no non-generic call form it would
+   otherwise need to be disambiguated from)."
+  (cond
+    ((<= (length cells) 1) :single)
+    ((some (lambda (cell) (null (method-generic-cell-key (first cell)))) cells)
+     :split-with-plain)
+    (t :split-all-generic)))
+
+(defun internal-arity-fn-name (base-name cell)
+  "Returns the (unexported) Lisp function name generate-generic-cell-wrapper
+   uses for one generic-arity CELL of BASE-NAME's overloads when more than
+   one cell exists for this name (generic-arity-dispatch-mode is not
+   :single): BASE-NAME suffixed by generic-arity-suffix, e.g.
+   \"aggregate-arity-2\". Never itself exported -- see
+   method-name-wrapper-names / compute-package-exports-and-shadows, which
+   list only BASE-NAME and/or BASE-NAME<>."
+  (concatenate 'string base-name (generic-arity-suffix cell)))
+
+(defun method-name-wrapper-names (clean-methods base-name)
+  "Returns the list of Lisp function name(s) generate-method-name-wrappers
+   will EXPORT for CLEAN-METHODS (already static/instance-partitioned
+   overloads of one C# method name) under BASE-NAME: (list BASE-NAME) in
+   the common single-cell case (generic-arity-dispatch-mode :single,
+   covering all non-generic methods and single-generic-arity methods
+   alike); (list BASE-NAME (concatenate BASE-NAME \"<>\")) when a
+   non-generic overload coexists with generic ones at other arities
+   (:split-with-plain); or (list BASE-NAME) again when every overload is
+   generic but at different arities (:split-all-generic), since BASE-NAME
+   itself becomes the dispatcher then. The internal per-arity functions
+   generate-generic-cell-wrapper defines under internal-arity-fn-name are
+   deliberately never included here -- they stay unexported. Kept separate
+   from generate-method-name-wrappers so compute-package-exports-and-shadows
+   can list exactly the same names packages.lisp should export without
+   re-running the actual code-generation logic. IMPORTANT: this must always
+   mirror exactly what generate-method-name-wrappers emits as exported
+   top-level defuns -- the main drift risk in this file."
+  (let* ((cells (split-by-generic-arity clean-methods))
+         (mode (generic-arity-dispatch-mode cells)))
+    (case mode
+      (:split-with-plain (list base-name (concatenate 'string base-name "<>")))
+      (t (list base-name)))))
+
+(defun format-param-type-check (param-type arg-str)
+  "Returns a Lisp type checking expression string for the given C# parameter type."
+  (cond
+    ((member param-type '("System.Double" "System.Single" "System.Int32" "System.Int64" "System.Int16" "System.Byte" "System.Decimal") :test #'string=)
+     (format nil "(cl:numberp ~A)" arg-str))
+    ((string= param-type "System.Boolean")
+     (format nil "(cl:typep ~A 'cl:boolean)" arg-str))
+    ((string= param-type "System.String")
+     (format nil "(cl:stringp ~A)" arg-str))
+    (t
+     (format nil "(cl:or (cl:null ~A) (dotnet:object-type ~A))" arg-str arg-str))))
+
+(cl:defun complex-group-p (clean-methods)
+  "Returns t if the group of clean methods requires a master wrapper dispatch (either multiple overloads or presence of default arguments)."
+  (cl:or (cl:>= (cl:length clean-methods) 2)
+         (cl:some (cl:lambda (m)
+                    (cl:some (cl:lambda (p) (cl:getf p :has-default)) (cl:getf m :parameters)))
+                  clean-methods)))
+
+(cl:defun collect-key-params (methods prefix-len)
+  "Collects the union of all keyword parameters from methods beyond prefix-len."
+  (cl:let ((key-params nil))
+    (cl:dolist (m methods)
+      (cl:let ((params (cl:nthcdr prefix-len (cl:getf m :parameters))))
+        (cl:dolist (p params)
+          (cl:let* ((pname (cl:getf p :name))
+                    (existing (cl:find pname key-params :key (cl:lambda (kp) (cl:getf kp :name)) :test #'cl:string=)))
+            (cl:unless existing
+              (cl:push p key-params))))))
+    (cl:nreverse key-params)))
+
+(cl:defun find-parameter-default-str (pname methods)
+  "Locates the C# default value of parameter pname across methods and returns it as a Lisp expression string."
+  (cl:dolist (m methods)
+    (cl:let ((p (cl:find pname (cl:getf m :parameters) :key (cl:lambda (param) (cl:getf param :name)) :test #'cl:string=)))
+      (cl:when (cl:and p (cl:getf p :has-default))
+        (cl:return (cl:getf p :default-value)))))
+  "cl:nil")
+
+(cl:defun common-parameter-prefix (methods)
+  "Determines the maximum common positional parameter prefix across methods based on lack of default values."
+  (cl:let* ((param-lists (cl:mapcar (cl:lambda (m) (cl:getf m :parameters)) methods))
+            (min-len (cl:reduce #'cl:min (cl:mapcar #'cl:length param-lists)))
+            (prefix nil))
+    (cl:loop for idx from 0 to (cl:1- min-len) do
+      (cl:let* ((first-param (cl:nth idx (cl:first param-lists)))
+                ;; A parameter cannot be positional if it has a default value in any overload.
+                (no-default-p (cl:every (cl:lambda (pl)
+                                          (cl:let ((p (cl:nth idx pl)))
+                                            (cl:not (cl:getf p :has-default))))
+                                        param-lists)))
+        (cl:if no-default-p
+            (cl:push first-param prefix)
+            (cl:loop-finish))))
+    (cl:nreverse prefix)))
+
+(cl:defun max-mandatory-parameter-len (methods)
+  "Returns the maximum number of mandatory parameters (parameters without defaults) in any single overload."
+  (cl:let ((max-len 0))
+    (cl:dolist (m methods)
+      (cl:let* ((params (cl:getf m :parameters))
+                (mandatory-count
+                  (cl:loop for p in params
+                           for idx from 0
+                           while (cl:not (cl:getf p :has-default))
+                           count t)))
+        (cl:setf max-len (cl:max max-len mandatory-count))))
+    max-len))
+
+(cl:defun collect-optional-positional-params (methods prefix-len max-mand-len)
+  "Collects parameter descriptors for optional positional parameters from index prefix-len to max-mand-len."
+  (cl:let ((opt-params nil))
+    (cl:loop for idx from prefix-len to (cl:1- max-mand-len) do
+      (cl:let ((found-param nil))
+        (cl:dolist (m methods)
+          (cl:let ((params (cl:getf m :parameters)))
+            (cl:when (cl:< idx (cl:length params))
+              (cl:setf found-param (cl:nth idx params))
+              (cl:return))))
+        (cl:when found-param
+          (cl:push found-param opt-params))))
+    (cl:nreverse opt-params)))
+
+(cl:defun uniquify-positional-params (params)
+  "Given the ordered list of positional dispatch-slot parameter plists
+   (PREFIX appended with OPT-PARAMS), returns a copy where any :name whose
+   mapped Lisp name collides with an earlier slot's gets a numeric suffix, so
+   every slot binds a distinct lambda-list variable. Each slot's
+   representative parameter is picked arbitrarily from whichever overload
+   happens to have one there (see collect-optional-positional-params), so two
+   unrelated overloads can coincidentally share a parameter name at different
+   positional slots (e.g. TimeSpan's 3-arg ctor's 'seconds' at index 2 vs. its
+   4-arg ctor's unrelated 'seconds' at index 3)."
+  (cl:let ((seen nil))
+    (cl:mapcar (cl:lambda (p)
+                 (cl:let* ((base-name (cl:getf p :name))
+                           (final-name base-name)
+                           (suffix 2))
+                   (cl:loop while (cl:member (map-param-name final-name) seen :test #'cl:string=) do
+                     (cl:setf final-name (cl:format nil "~A~D" base-name suffix))
+                     (cl:incf suffix))
+                   (cl:push (map-param-name final-name) seen)
+                   (cl:list* :name final-name p)))
+               params)))
+
+(cl:defun format-master-overload-condition (cm prefix opt-params key-params)
+  "Generates Lisp conditional test expression checking supplied-p flags and parameter types for cm."
+  (cl:let* ((cond-parts nil)
+            (cm-params (cl:getf cm :parameters))
+            (prefix-len (cl:length prefix))
+            (max-mand-len (+ prefix-len (cl:length opt-params))))
+    ;; 1. Check positional prefix types by position index
+    (cl:loop for pp in prefix
+             for idx from 0 do
+      (cl:let* ((lpname (map-param-name (cl:getf pp :name)))
+                (cm-p (cl:nth idx cm-params))
+                (type-check (format-param-type-check (cl:getf cm-p :type) lpname)))
+        (cl:push type-check cond-parts)))
+    ;; 2. Check optional positional parameters presence and types
+    (cl:loop for op in opt-params
+             for idx from prefix-len to (cl:1- max-mand-len) do
+      (cl:let* ((op-name (map-param-name (cl:getf op :name)))
+                (supplied-var (cl:format nil "supplied-~A" op-name))
+                (cm-p (cl:nth idx cm-params)))
+        (cl:if cm-p
+            (cl:progn
+              (cl:push supplied-var cond-parts)
+              (cl:push (format-param-type-check (cl:getf cm-p :type) op-name) cond-parts))
+            (cl:push (cl:format nil "(cl:not ~A)" supplied-var) cond-parts))))
+    ;; 3. Check keyword parameters presence and types
+    (cl:dolist (kp key-params)
+      (cl:let* ((pname (cl:getf kp :name))
+             (lpname (map-param-name pname))
+             (supplied-var (cl:format nil "supplied-~A" lpname))
+             (cm-p (cl:find pname cm-params :key (cl:lambda (p) (cl:getf p :name)) :test #'cl:string=)))
+        (cl:if cm-p
+            (cl:progn
+              (cl:unless (cl:getf cm-p :has-default)
+                (cl:push supplied-var cond-parts))
+              (cl:push (format-param-type-check (cl:getf cm-p :type) lpname) cond-parts))
+            (cl:push (cl:format nil "(cl:not ~A)" supplied-var) cond-parts))))
+    (cl:format nil "(cl:and ~{~A~^ ~})" (cl:nreverse cond-parts))))
+
+(cl:defun master-overload-param-names (cm prefix opt-params)
+  "Maps CM's (a method or constructor plist) parameters to the master
+   wrapper's bound variable names by positional index: names from PREFIX for
+   positional args, from OPT-PARAMS for optional positional args beyond that,
+   and CM's own (mapped) parameter name for anything past that (keyword args)."
+  (cl:let* ((cm-params (cl:getf cm :parameters))
+            (prefix-len (cl:length prefix))
+            (max-mand-len (+ prefix-len (cl:length opt-params))))
+    (cl:loop for p in cm-params
+             for idx from 0
+             collect (cl:cond
+                       ((cl:< idx prefix-len)
+                        (map-param-name (cl:getf (cl:nth idx prefix) :name)))
+                       ((cl:< idx max-mand-len)
+                        (map-param-name (cl:getf (cl:nth (- idx prefix-len) opt-params) :name)))
+                       (cl:t
+                        (map-param-name (cl:getf p :name)))))))
+
+(cl:defun format-invocation-expr (fq-name dotnet-method-name static-p is-generic-p generic-type-args-str param-names
+                                   &optional static-typed-args)
+  "Builds the 4-way static/instance x generic/non-generic
+   dotnet:static/dotnet:static-generic/dotnet:invoke/dotnet:invoke-generic
+   call-expression string, shared by generate-single-overload and
+   format-master-overload-action (previously duplicated between the two).
+   STATIC-TYPED-ARGS, if supplied (generate-single-overload's own
+   typed-call optimization for value-type static receiver-less params --
+   never used by the Master Wrapper action), overrides PARAM-NAMES in the
+   static, non-generic branch."
+  (cl:cond
+    ((cl:and static-p is-generic-p)
+     (cl:format nil "(dotnet:static-generic <type-str> \"~A\" (cl:list ~A)~@[ ~{~A~^ ~}~])" dotnet-method-name generic-type-args-str param-names))
+    (static-p
+     (cl:if static-typed-args
+         (cl:format nil "(dotnet:static <type-str> \"~A\"~@[~{ ~A~}~])" dotnet-method-name static-typed-args)
+         (cl:format nil "(dotnet:static <type-str> \"~A\"~@[ ~{~A~^ ~}~])" dotnet-method-name param-names)))
+    (is-generic-p
+     (cl:format nil "(dotnet:invoke-generic (cl:the (dotnet \"~A\") obj!) \"~A\" (cl:list ~A)~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name generic-type-args-str param-names))
+    (cl:t
+     (cl:format nil "(dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name param-names))))
+
+(cl:defun format-master-overload-action (cm fq-name name static-p is-generic-p generic-type-names prefix opt-params)
+  "Generates C# invocation code for cm, mapping parameter names to the
+   master wrapper's bound variables. GENERIC-TYPE-NAMES (from
+   generic-type-param-names) is the ordered list of Lisp type-argument
+   variable names bound by the wrapper's own lambda list; ignored unless
+   IS-GENERIC-P."
+  (cl:let* ((param-names (master-overload-param-names cm prefix opt-params))
+            (dotnet-method-name (cl:or (cl:getf cm :mangled-name) name))
+            (type-args-str (cl:format nil "~{~A~^ ~}" generic-type-names)))
+    (format-invocation-expr fq-name dotnet-method-name static-p is-generic-p type-args-str param-names)))
+
+(cl:defun format-supplied-args-expr (prefix opt-params key-params)
+  "Generates Lisp expression constructing a plist of supplied arguments at runtime."
+  (cl:let ((parts nil))
+    (cl:dolist (pp prefix)
+      (cl:let ((lpname (map-param-name (cl:getf pp :name))))
+        (cl:push (cl:format nil "(cl:list :~A ~A)" lpname lpname) parts)))
+    (cl:dolist (op opt-params)
+      (cl:let* ((lpname (map-param-name (cl:getf op :name)))
+                (supplied-var (cl:format nil "supplied-~A" lpname)))
+        (cl:push (cl:format nil "(cl:when ~A (cl:list :~A ~A))" supplied-var lpname lpname) parts)))
+    (cl:dolist (kp key-params)
+      (cl:let* ((lpname (map-param-name (cl:getf kp :name)))
+             (supplied-var (cl:format nil "supplied-~A" lpname)))
+        (cl:push (cl:format nil "(cl:when ~A (cl:list :~A ~A))" supplied-var lpname lpname) parts)))
+    (cl:format nil "(cl:append ~{~A~^ ~})" (cl:nreverse parts))))
+
+(cl:defun generate-master-wrapper (stream methods name mname fq-name static-p is-generic-p)
+  "Generates Master Wrapper defun with precise dispatch cond block and fallback error signaling.
+   When IS-GENERIC-P, every method in METHODS is assumed to share the same
+   :generic-arity (the arity of the first is used to compute the wrapper's
+   type-argument parameter names -- see generic-type-param-names)."
+  (cl:let* ((generic-arity (cl:and is-generic-p (cl:getf (cl:first methods) :generic-arity)))
+            (generic-type-names (cl:and is-generic-p (generic-type-param-names generic-arity)))
+            (raw-prefix (common-parameter-prefix methods))
+            (prefix-len (cl:length raw-prefix))
+            (max-mand-len (max-mandatory-parameter-len methods))
+            (raw-opt-params (collect-optional-positional-params methods prefix-len max-mand-len))
+            (uniquified (uniquify-positional-params (cl:append raw-prefix raw-opt-params)))
+            (prefix (cl:subseq uniquified 0 prefix-len))
+            (opt-params (cl:nthcdr prefix-len uniquified))
+            (prefix-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) prefix))
+            (key-params (collect-key-params methods max-mand-len))
+            (args-list nil))
+    (cl:when is-generic-p
+      (cl:setf args-list (cl:append args-list generic-type-names)))
+    (cl:unless static-p
+      (cl:setf args-list (cl:append args-list (cl:list "obj!"))))
+    (cl:setf args-list (cl:append args-list prefix-names))
+    (cl:when opt-params
+      (cl:setf args-list (cl:append args-list (cl:list "cl:&optional")))
+      (cl:dolist (op opt-params)
+        (cl:let* ((op-name (map-param-name (cl:getf op :name)))
+                  (supplied-var (cl:format nil "supplied-~A" op-name)))
+          (cl:setf args-list (cl:append args-list (cl:list (cl:format nil "(~A cl:nil ~A)" op-name supplied-var)))))))
+    (cl:when key-params
+      (cl:setf args-list (cl:append args-list (cl:list "cl:&key")))
+      (cl:dolist (kp key-params)
+        (cl:let* ((kp-name (map-param-name (cl:getf kp :name)))
+               (kp-default (find-parameter-default-str (cl:getf kp :name) methods))
+               (supplied-var (cl:format nil "supplied-~A" kp-name)))
+          (cl:setf args-list (cl:append args-list (cl:list (cl:format nil "(~A ~A ~A)" kp-name kp-default supplied-var)))))))
+    
+    (cl:format stream "(cl:defun ~A (~{~A~^ ~})~%" mname args-list)
+    (cl:let* ((header (cl:format nil "Master wrapper for ~A.~A overloads. Dispatches at runtime." fq-name name))
+              (docstring (format-combined-overloads-docstring header #'method-signature-str methods))
+              (escaped-docstring (escape-lisp-string docstring)))
+      (cl:format stream "  \"~A\"~%" escaped-docstring))
+    (cl:format stream "  (cl:cond~%")
+
+    ;; Sort methods by parameter count descending for specificity
+    (cl:let ((sorted-methods (cl:sort (cl:copy-list methods) #'> :key (cl:lambda (m) (cl:length (cl:getf m :parameters))))))
+      (cl:dolist (cm sorted-methods)
+        (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
+              (action-str (format-master-overload-action cm fq-name name static-p is-generic-p generic-type-names prefix opt-params)))
+          (cl:format stream "    (~A~%" cond-str)
+          (cl:format stream "     ~A)~%" action-str))))
+
+    (cl:let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
+      (cl:format stream "    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
+      (cl:format stream "                    :package-name \"~A\"~%" (cl:string-upcase (type-fq-name-to-pkg-name fq-name)))
+      (cl:format stream "                    :class-name <type-str>~%")
+      (cl:format stream "                    :method-name \"~A\"~%" name)
+      (cl:format stream "                    :supplied-args ~A))))~%~%" supplied-args-expr))))
+
+(cl:defun format-constructor-master-overload-action (cm prefix opt-params)
+  "Generates C# constructor invocation code for cm (a constructor plist),
+   mapping parameter names to the master wrapper's bound variables."
+  (cl:let ((param-names (master-overload-param-names cm prefix opt-params)))
+    (cl:format nil "(dotnet:new <type-str>~@[ ~{~A~^ ~}~])" param-names)))
+
+(cl:defun generate-constructor-master-wrapper (stream ctors fq-name)
+  "Generates a Master Wrapper 'new' defun with precise dispatch cond block
+   and fallback error signaling, covering all clean constructor overloads.
+   Constructors have no static/instance split (unlike generate-master-wrapper),
+   so exactly one 'new' function is always emitted here."
+  (cl:let* ((raw-prefix (common-parameter-prefix ctors))
+            (prefix-len (cl:length raw-prefix))
+            (max-mand-len (max-mandatory-parameter-len ctors))
+            (raw-opt-params (collect-optional-positional-params ctors prefix-len max-mand-len))
+            (uniquified (uniquify-positional-params (cl:append raw-prefix raw-opt-params)))
+            (prefix (cl:subseq uniquified 0 prefix-len))
+            (opt-params (cl:nthcdr prefix-len uniquified))
+            (prefix-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) prefix))
+            (key-params (collect-key-params ctors max-mand-len))
+            (args-list prefix-names))
+    (cl:when opt-params
+      (cl:setf args-list (cl:append args-list (cl:list "cl:&optional")))
+      (cl:dolist (op opt-params)
+        (cl:let* ((op-name (map-param-name (cl:getf op :name)))
+                  (supplied-var (cl:format nil "supplied-~A" op-name)))
+          (cl:setf args-list (cl:append args-list (cl:list (cl:format nil "(~A cl:nil ~A)" op-name supplied-var)))))))
+    (cl:when key-params
+      (cl:setf args-list (cl:append args-list (cl:list "cl:&key")))
+      (cl:dolist (kp key-params)
+        (cl:let* ((kp-name (map-param-name (cl:getf kp :name)))
+               (kp-default (find-parameter-default-str (cl:getf kp :name) ctors))
+               (supplied-var (cl:format nil "supplied-~A" kp-name)))
+          (cl:setf args-list (cl:append args-list (cl:list (cl:format nil "(~A ~A ~A)" kp-name kp-default supplied-var)))))))
+
+    (cl:format stream "(cl:defun new (~{~A~^ ~})~%" args-list)
+    (cl:let* ((header (cl:format nil "Master wrapper for ~A constructor overloads. Dispatches at runtime." fq-name))
+              (docstring (format-combined-overloads-docstring header #'constructor-signature-str ctors))
+              (escaped-docstring (escape-lisp-string docstring)))
+      (cl:format stream "  \"~A\"~%" escaped-docstring))
+    (cl:format stream "  (cl:cond~%")
+
+    ;; Sort constructors by parameter count descending for specificity
+    (cl:let ((sorted-ctors (cl:sort (cl:copy-list ctors) #'> :key (cl:lambda (m) (cl:length (cl:getf m :parameters))))))
+      (cl:dolist (cm sorted-ctors)
+        (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
+                 (action-str (format-constructor-master-overload-action cm prefix opt-params)))
+          (cl:format stream "    (~A~%" cond-str)
+          (cl:format stream "     ~A)~%" action-str))))
+
+    (cl:let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
+      (cl:format stream "    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
+      (cl:format stream "                    :package-name \"~A\"~%" (cl:string-upcase (type-fq-name-to-pkg-name fq-name)))
+      (cl:format stream "                    :class-name <type-str>~%")
+      (cl:format stream "                    :method-name \"new\"~%")
+      (cl:format stream "                    :supplied-args ~A))))~%~%" supplied-args-expr))))
+
+(cl:defun generate-single-overload (stream m mname fq-name static-p)
+  "Generates Lisp wrapper function for a single clean C# overload."
+  (cl:let* ((m-doc (cl:getf m :documentation))
+            (summary (cl:getf m-doc :summary))
+            (returns (cl:getf m-doc :returns))
+            (params (cl:getf m :parameters))
+            (is-generic-p (cl:getf m :is-generic))
+            (generic-type-names (cl:and is-generic-p (generic-type-param-names (cl:getf m :generic-arity))))
+            (generic-type-args-str (cl:format nil "~{~A~^ ~}" generic-type-names))
+            (param-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) params))
+            (args-str (cl:cond
+                        ((cl:and static-p is-generic-p)
+                         (cl:format nil "~A~@[ ~{~A~^ ~}~]" generic-type-args-str param-names))
+                        (static-p
+                         (cl:format nil "~{~A~^ ~}" param-names))
+                        (is-generic-p
+                         (cl:format nil "~A obj!~@[ ~{~A~^ ~}~]" generic-type-args-str param-names))
+                        (cl:t
+                         (cl:format nil "obj!~@[ ~{~A~^ ~}~]" param-names))))
+            (docstring (build-docstring summary returns params m-doc))
+            (escaped-docstring (escape-lisp-string docstring))
+            (dotnet-method-name (cl:or (cl:getf m :mangled-name) (cl:getf m :name)))
+            ;; For static method params, add (the (dotnet "Type") arg) hints
+            (static-typed-args
+              (cl:if static-p
+                  (cl:mapcar (cl:lambda (pn pt)
+                            (cl:format nil "(cl:the (dotnet \"~A\") ~A)" pt pn))
+                          param-names
+                          (cl:mapcar (cl:lambda (p) (cl:getf p :type)) params))
+                  nil)))
+       
+       (cl:format stream "(cl:defun ~A (~A)~%" mname args-str)
+       (cl:when (cl:> (cl:length escaped-docstring) 0)
+         (cl:format stream "  \"~A\"~%" escaped-docstring))
+       (cl:format stream "  ~A)~%~%"
+                  (format-invocation-expr fq-name dotnet-method-name static-p is-generic-p generic-type-args-str param-names static-typed-args))))
+
+(defun generate-generic-cell-wrapper (stream cell name mname fq-name static-p)
+  "Generates the Lisp wrapper function for one generic-arity CELL (a list
+   of method plists sharing one method-generic-cell-key, from
+   split-by-generic-arity) under name MNAME: generate-single-overload for a
+   lone non-complex overload, generate-master-wrapper (unchanged runtime
+   type/optional/key dispatch) for a complex overload group sharing that
+   arity -- e.g. group-by-arity-3's 2 overloads differing by an optional
+   trailing comparer. This existing inner dispatch is unaffected by, and
+   sits underneath, any outer generic-arity dispatch
+   generate-method-name-wrappers adds via generate-generic-arity-dispatcher."
+  (if (and (= (length cell) 1) (not (complex-group-p cell)))
+      (generate-single-overload stream (first cell) mname fq-name static-p)
+      (generate-master-wrapper stream cell name mname fq-name static-p (getf (first cell) :is-generic))))
+
+(defun generate-generic-arity-dispatcher (stream cells base-name dispatcher-name fq-name
+                                           &optional plain-fallback-name)
+  "Generates the DISPATCHER-NAME function (either BASE-NAME<> or, when
+   every overload of this name is generic, bare BASE-NAME itself -- see
+   generic-arity-dispatch-mode) that resolves which of CELLS' internal
+   per-generic-arity functions (internal-arity-fn-name, already emitted by
+   generate-generic-cell-wrapper and never exported) to call at runtime, by
+   counting the type argument(s) passed as its first parameter: a bare
+   (non-list) type selects the arity-1 cell, a cl:list of N types selects
+   the arity-N cell. Type arguments themselves are never Lisp lists, so
+   cl:listp on that first argument unambiguously distinguishes the two
+   calling conventions. The remaining arguments are forwarded verbatim (via
+   &rest/apply) to the resolved internal function, so this dispatcher never
+   needs to know that function's own lambda-list shape (which may itself be
+   a Master Wrapper's &optional/&key lambda list).
+
+   When PLAIN-FALLBACK-NAME is supplied (the :split-with-plain case, set to
+   BASE-NAME), an empty list/nil TYPES argument dispatches straight through
+   to PLAIN-FALLBACK-NAME (the non-generic overload(s)) instead of
+   erroring."
+  (format stream "(cl:defun ~A (types cl:&rest args)~%" dispatcher-name)
+  (format stream "  \"Dispatches ~A by the generic type argument(s) in TYPES: pass a~%" dispatcher-name)
+  (format stream "   single .NET type (a type-name string, alias, or System.Type object) to~%")
+  (format stream "   select the single-type-argument overload, or a cl:list of types to~%")
+  (format stream "   select the overload taking that many type arguments; ARGS are the~%")
+  (format stream "   remaining arguments, forwarded unchanged to the resolved overload.~@[~%   Passing cl:nil or an empty list calls the non-generic ~A overload(s).~]\"~%"
+          plain-fallback-name plain-fallback-name)
+  (format stream "  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))~%")
+  (format stream "    (cl:case (cl:length type-list)~%")
+  (when plain-fallback-name
+    (format stream "      (0 (cl:apply (cl:function ~A) args))~%" plain-fallback-name))
+  (dolist (cell cells)
+    (let* ((m (first cell))
+           (arity (getf m :generic-arity))
+           (internal-name (internal-arity-fn-name base-name cell)))
+      (format stream "      (~D (cl:apply (cl:function ~A) (cl:append type-list args)))~%" arity internal-name)))
+  (format stream "      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
+  (format stream "                      :package-name \"~A\"~%" (string-upcase (type-fq-name-to-pkg-name fq-name)))
+  (format stream "                      :class-name <type-str>~%")
+  (format stream "                      :method-name \"~A\"~%" dispatcher-name)
+  (format stream "                      :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))~%~%"))
+
+(defun generate-method-name-wrappers (stream clean-methods name base-name fq-name static-p)
+  "Generates the public Lisp wrapper function(s) for one C# method NAME's
+   already static/instance-partitioned CLEAN-METHODS, under BASE-NAME.
+
+   generic-arity-dispatch-mode determines the shape:
+   :single (the overwhelmingly common case -- non-generic, or every
+   overload shares one generic arity) generates exactly BASE-NAME, exactly
+   as if generic-arity splitting didn't exist.
+   :split-with-plain (a non-generic overload coexists with generic ones at
+   other arities) generates BASE-NAME for the non-generic cell alone, an
+   internal (unexported) function per generic cell (internal-arity-fn-name),
+   and a BASE-NAME<> dispatcher (generate-generic-arity-dispatcher) that
+   picks among them by counting type arguments at runtime (falling through
+   to BASE-NAME on an empty type list).
+   :split-all-generic (every overload is generic, just at different
+   arities, e.g. Enumerable.Aggregate's arity-1/2/3 overloads) generates an
+   internal function per cell plus BASE-NAME itself as the dispatcher (no
+   <> suffix needed since there's no non-generic form to disambiguate).
+
+   method-name-wrapper-names computes the same exported name(s) without
+   generating any code, for compute-package-exports-and-shadows."
+  (let* ((cells (split-by-generic-arity clean-methods))
+         (mode (generic-arity-dispatch-mode cells)))
+    (case mode
+      (:single
+       (generate-generic-cell-wrapper stream (first cells) name base-name fq-name static-p))
+      (:split-with-plain
+       (let* ((plain-cell (find-if (lambda (c) (null (method-generic-cell-key (first c)))) cells))
+              (generic-cells (remove plain-cell cells)))
+         (generate-generic-cell-wrapper stream plain-cell name base-name fq-name static-p)
+         (dolist (cell generic-cells)
+           (generate-generic-cell-wrapper stream cell name (internal-arity-fn-name base-name cell) fq-name static-p))
+         (generate-generic-arity-dispatcher stream generic-cells base-name
+                                             (concatenate 'string base-name "<>") fq-name base-name)))
+      (:split-all-generic
+       (dolist (cell cells)
+         (generate-generic-cell-wrapper stream cell name (internal-arity-fn-name base-name cell) fq-name static-p))
+       (generate-generic-arity-dispatcher stream cells base-name base-name fq-name)))))

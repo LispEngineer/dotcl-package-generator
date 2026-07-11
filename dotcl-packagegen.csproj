@@ -133,7 +133,7 @@
   <!-- tool itself) whose content is copied verbatim into every generated batch's -->
   <!-- packages.lisp / csharp-assembly-utils.lisp                                -->
   <!-- (see GENERATE-BATCH-PACKAGES-FILE / GENERATE-BATCH-UTILS-FILE in           -->
-  <!-- assembly-package-generator.lisp), so a copy is placed next to the          -->
+  <!-- apg-reexports-and-generics.lisp), so a copy is placed next to the          -->
   <!-- executable, mirroring the dotcl-packagegen.asd Content copy above.        -->
   <!-- ========================================================================= -->
   <ItemGroup>

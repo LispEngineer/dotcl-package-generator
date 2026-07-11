@@ -12,6 +12,16 @@
   (format *error-output* "[generator-tests.lisp] Running all tests...~%")
 
   (format *error-output* "[generator-tests.lisp] Running Package Generator tests...~%")
-  (run-package-generator-tests)
+  (run-naming-tests)
+  (run-overload-classification-tests)
+  (run-batch-resolution-tests)
+  (run-property-field-codegen-tests)
+  (run-generic-method-codegen-tests)
+  (run-operator-overload-tests)
+  (run-events-tests)
+  (run-parents-interfaces-tests)
+  (run-defgeneric-tests)
+  (run-extension-methods-tests)
+  (run-related-discovery-tests)
 
   (format *error-output* "[generator-tests.lisp] ...tests complete.~%"))
