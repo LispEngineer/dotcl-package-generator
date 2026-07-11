@@ -2548,3 +2548,93 @@ needed updating.
 one `--class` so both code paths (present/absent) are exercised in `cspackages-test/`'s checked-
 in golden output, alongside every other class's now-block-free output; `check_parens.py`
 confirms both shapes are well-formed.
+
+## `--ensure-type-in-generic`: CLOS Registration Inside `csharp-generics.lisp` (Version 45)
+
+### Why a second flag, in a second location
+
+Version 44 made the per-class "Register C# Type with CLOS" `eval-when` opt-in, but scoped
+entirely to a class's *own* package file. `--defgeneric`-generated code lives somewhere else
+entirely: `csharp-generics.lisp`, a single shared file holding one `defmethod` block per
+opted-in class, each specializing on `#.(dotnet:class-for-type "<fq-name>")` (Version 41). The
+natural follow-up request: let a class opt into the *same* registration call, but placed
+directly in `csharp-generics.lisp` itself, immediately before that class's own block — the
+same underlying goal (deterministic same-simple-name collision-winner order) but scoped to
+where `--defgeneric`'s own dispatch code actually lives, independent of whether that class's
+own file separately uses `--ensure-type`.
+
+### The generated shape
+
+`generate-batch-generics-file` (`apg-reexports-and-generics.lisp`), for a class whose
+`:ensure-type-in-generic` is true (and which isn't a generic-arity skip case — such a class has
+no `#.` specializer at all, so nothing to place ahead of), now emits:
+
+```lisp
+;; Register C# Type with CLOS (--ensure-type-in-generic) --
+;; :compile-toplevel is required here, unlike --ensure-type's own
+;; per-class eval-when: #.(dotnet:class-for-type ...) below is
+;; read-time-evaluated, i.e. already resolved at COMPILE time of
+;; this file, so influencing same-simple-name collision order
+;; relative to it requires running at compile time too. See
+;; doc/generator-design-notes.md's Version 45 section.
+(cl:eval-when (:compile-toplevel :load-toplevel :execute)
+  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                 (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2")))
+```
+
+immediately before that class's `(let ((spec "#.(dotnet:class-for-type ...)")) ...)` block of
+`defmethod` forms.
+
+### Why `:compile-toplevel` is required here, unlike `--ensure-type`
+
+Version 44's `--ensure-type` eval-when deliberately excludes `:compile-toplevel` — nothing in an
+*ordinary* class file needs compile-time type resolution, and including it would reintroduce
+the exact ASDF-`:depends-on`-phase failure `<type>` itself was fixed for (Version 42). This new
+eval-when is different: it exists specifically to influence the registration order *relative to*
+`#.(dotnet:class-for-type ...)`'s own read-time evaluation, which happens **during compilation**
+of `csharp-generics.lisp` — `#.` is a reader macro; read-time evaluation is inherently part of
+the read phase `compile-file` performs on every top-level form, not deferred to any later phase.
+An eval-when restricted to `:load-toplevel`/`:execute` only runs its body during the *load*
+phase — strictly after the entire file has already been read and compiled, meaning after every
+`#.` call in it (for every opted-in class, not just this one) has already run and already
+resolved/registered its type. Placed there, it would have zero effect on collision order; to
+actually run *before* the `#.` calls for classes appearing later in the file, it must itself run
+at read/compile time, hence `:compile-toplevel`.
+
+### Not a new ASDF-loadability regression
+
+This might look like it reopens the dotcl/dotcl#49 class of problem the whole `<type>`
+symbol-macro/`--ensure-type` opt-in work was about. It doesn't, because `csharp-generics.lisp`
+already has this exact property unconditionally, for every `--defgeneric`-opted-in class, since
+Version 41: `#.(dotnet:class-for-type "<fq-name>")` itself resolves and registers the named type
+**at compile time**, with no way to defer it (a `defmethod` specializer must be resolvable at
+macroexpansion/compile time by CLOS's own design — this is the identical "Compile-Time
+Constraint" this file's much older section documents, which a value-holding symbol-macro like
+`<type>` can dodge but a specializer fundamentally cannot). `--defgeneric` has therefore never
+been ASDF-`:depends-on`-safe the way plain generated packages now are, and this flag doesn't
+change that in either direction — it just adds one more, already-unavoidable-in-kind compile-time
+call alongside calls the file was already making.
+
+### Threading
+
+`compute-defgeneric-model`'s per-class `:classes` entries (`apg-reexports-and-generics.lisp`)
+gained an `:ensure-type-in-generic` key, read straight off the resolved-class plist's own
+`:ensure-type-in-generic` (a ninth optional parameter on `make-resolved-class`,
+`apg-batch-discovery.lisp`), which cascades to classes discovered via any of the five discovery
+directions exactly like `:defgeneric`/`:extension-methods`/`:ensure-type` already do (never
+`:constant-properties`), propagated at both of `make-resolved-class`'s call sites in
+`generate-assembly-packages-batch`'s Phase A/B (`apg-batch-orchestration.lisp`).
+
+### Scope
+
+Has no visible effect on a class that is not also `:defgeneric`-true, since such a class simply
+has no entry in `csharp-generics.lisp` to place anything ahead of. Sticky-only, like
+`--ensure-type` — no dedicated per-class override pair.
+
+### Verification
+
+`make build test`: the Makefile's smoke-test invocation exercises this on the same
+`System.Threading.Timer`/`System.Timers.Timer` same-simple-name collision pair `--ensure-type`
+already demonstrates, confirming the eval-when appears (with `:compile-toplevel`) in
+`csharp-generics.lisp` immediately before the opted-in class's own `defmethod` block, and is
+absent for the other; `check_parens.py` confirms the new shape is well-formed.

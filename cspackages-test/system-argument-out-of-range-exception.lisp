@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ArgumentOutOfRangeException
-;;; Generator Version: 44
-;;; Creation Date: 2026-07-11T16:27:42Z
+;;; Generator Version: 45
+;;; Creation Date: 2026-07-11T18:35:30Z
 
 (cl:in-package :system-argument-out-of-range-exception)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ArgumentOutOfRangeException"))
 (cl:defconstant <type-str> "System.ArgumentOutOfRangeException")
-(cl:defconstant <creation> "2026-07-11T16:27:42Z")
-(cl:defconstant <version> 44)
+(cl:defconstant <creation> "2026-07-11T18:35:30Z")
+(cl:defconstant <version> 45)
 
 (cl:defun new (cl:&optional (param-name cl:nil supplied-param-name) (message cl:nil supplied-message) (message2 cl:nil supplied-message2))
   "Master wrapper for System.ArgumentOutOfRangeException constructor overloads. Dispatches at runtime.

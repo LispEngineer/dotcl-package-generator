@@ -103,7 +103,7 @@
    re-invoking EXPAND-RELATED on each newly-discovered class in turn) and
    folds the result into the working set: a newly-discovered class carries
    its discoverer's ENTIRE flag set (all six direction flags plus
-   :defgeneric/:extension-methods/:ensure-type, never its
+   :defgeneric/:extension-methods/:ensure-type/:ensure-type-in-generic, never its
    :constant-properties), so discovery/re-export cascades recursively
    through the whole connected component a flag reaches, UNLESS it was
    ALSO explicitly requested, in which case the explicit request's own
@@ -168,7 +168,8 @@
     ;; --output-children/--output-implementations downward) via
     ;; EXPAND-RELATED. Every newly-discovered class is enqueued carrying
     ;; its discoverer's ENTIRE per-class flag set (all six export-*/output-*
-    ;; flags plus --defgeneric/--extension-methods/--ensure-type, but
+    ;; flags plus --defgeneric/--extension-methods/--ensure-type/
+    ;; --ensure-type-in-generic, but
     ;; never its discoverer's --constant-properties, which names properties
     ;; specific to one class), so discovery/re-export cascades recursively
     ;; through the whole connected component a flag reaches -- see PLAN.md's
@@ -220,7 +221,7 @@
                                           (getf rc :extension-methods)
                                           (getf rc :output-nested) (getf rc :output-children)
                                           (getf rc :output-implementations)
-                                          (getf rc :ensure-type))))
+                                          (getf rc :ensure-type) (getf rc :ensure-type-in-generic))))
                              (push new-rc (gethash owning-entry discovery-additions))
                              (setf queue (nconc queue (list new-rc))))))))))
 
@@ -306,7 +307,8 @@
                   :export-object t/nil :defgeneric t/nil
                   :extension-methods t/nil
                   :output-nested t/nil :output-children t/nil
-                  :output-implementations t/nil :ensure-type t/nil) ...)) ...)
+                  :output-implementations t/nil :ensure-type t/nil
+                  :ensure-type-in-generic t/nil) ...)) ...)
    :output-nested/:output-children/:output-implementations (per-class,
    Version 39, doc/plan-v38.md's Part B) discover, respectively, every type
    nested inside a class, every direct-or-indirect subclass of a class, and

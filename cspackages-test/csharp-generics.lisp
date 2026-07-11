@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 44
-;;; Creation Date: 2026-07-11T16:27:42Z
+;;; Generator Version: 45
+;;; Creation Date: 2026-07-11T18:35:30Z
 
 (cl:in-package :csharp-generics)
 
@@ -1013,6 +1013,17 @@ System.Timers.Timer: (cl:setf synchronizing-object) (cl:setf (system-timers-time
   (cl:apply (cl:function (cl:setf system-numerics-vector4:item)) new-value obj! args))
 
 ;; System.Threading.Timer (system-threading-timer)
+;; Register C# Type with CLOS (--ensure-type-in-generic) --
+;; :compile-toplevel is required here, unlike --ensure-type's own
+;; per-class eval-when: #.(dotnet:class-for-type ...) below is
+;; read-time-evaluated, i.e. already resolved at COMPILE time of
+;; this file, so influencing same-simple-name collision order
+;; relative to it requires running at compile time too. See
+;; doc/generator-design-notes.md's Version 45 section.
+(cl:eval-when (:compile-toplevel :load-toplevel :execute)
+  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                 (dotnet:resolve-type "System.Threading.Timer")))
+
 (cl:defmethod change ((obj! #.(dotnet:class-for-type "System.Threading.Timer")) cl:&rest args)
   (cl:apply (cl:function system-threading-timer:change) obj! args))
 (cl:defmethod dispose ((obj! #.(dotnet:class-for-type "System.Threading.Timer")) cl:&rest args)

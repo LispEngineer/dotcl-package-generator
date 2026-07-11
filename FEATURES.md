@@ -200,6 +200,32 @@ exact fully-qualified name.
 
 See `doc/generator-design-notes.md`'s Version 44 section for the full investigation.
 
+**`--ensure-type-in-generic`/`--no-ensure-type-in-generic`** (sticky only, OFF by default) is a
+second, independent flag for the same underlying registration call, placed somewhere different:
+directly inside `csharp-generics.lisp`, immediately before an opted-in class's own
+`#.(dotnet:class-for-type ...)`-specialized `defmethod` block there, rather than in that class's
+own package file. It has no effect on a class that isn't also `--defgeneric`-opted-in. Its
+`eval-when` includes `:compile-toplevel`, unlike `--ensure-type`'s — because
+`#.(dotnet:class-for-type ...)` is itself read-time-evaluated (already resolved *during
+compilation* of `csharp-generics.lisp`), a `:load-toplevel`/`:execute`-only eval-when would run
+only after every `#.` call in the file had already executed, too late to influence collision
+order relative to them:
+
+```lisp
+;; Register C# Type with CLOS (--ensure-type-in-generic) --
+;; :compile-toplevel is required here, unlike --ensure-type's own
+;; per-class eval-when: ...
+(cl:eval-when (:compile-toplevel :load-toplevel :execute)
+  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                 (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2")))
+```
+
+This isn't a new ASDF-`:depends-on`-loadability regression: `csharp-generics.lisp` has resolved
+types at compile time unconditionally since Version 41 (an accepted, already-documented
+limitation of `--defgeneric` itself, distinct from `<type>`'s load-time-deferred resolution) —
+this just adds one more already-unavoidable-in-kind compile-time call alongside ones the file
+was already making. See `doc/generator-design-notes.md`'s Version 45 section.
+
 
 
 ## Constructors

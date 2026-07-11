@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Threading.Timer
-;;; Generator Version: 44
-;;; Creation Date: 2026-07-11T16:27:42Z
+;;; Generator Version: 45
+;;; Creation Date: 2026-07-11T18:35:30Z
 
 (cl:in-package :system-threading-timer)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Threading.Timer"))
 (cl:defconstant <type-str> "System.Threading.Timer")
-(cl:defconstant <creation> "2026-07-11T16:27:42Z")
-(cl:defconstant <version> 44)
+(cl:defconstant <creation> "2026-07-11T18:35:30Z")
+(cl:defconstant <version> 45)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:load-toplevel :execute)

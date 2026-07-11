@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.IStructuralComparable
-;;; Generator Version: 44
-;;; Creation Date: 2026-07-11T16:27:42Z
+;;; Generator Version: 45
+;;; Creation Date: 2026-07-11T18:35:30Z
 
 (cl:in-package :system-collections-i-structural-comparable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.IStructuralComparable"))
 (cl:defconstant <type-str> "System.Collections.IStructuralComparable")
-(cl:defconstant <creation> "2026-07-11T16:27:42Z")
-(cl:defconstant <version> 44)
+(cl:defconstant <creation> "2026-07-11T18:35:30Z")
+(cl:defconstant <version> 45)
 
 (cl:defun compare-to (obj! other comparer)
   "Summary: Determines whether the current collection object precedes, occurs in the same position as, or follows another object in the sort order.

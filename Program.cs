@@ -33,6 +33,7 @@ bool skipMissing = false;
 bool enableDefgenericStatic = false;
 bool enableExtensionMethods = true;
 bool ensureType = false;
+bool ensureTypeInGeneric = false;
 
 ////////////////////////////////////////////////////////////////////////////
 // Parse arguments
@@ -69,6 +70,7 @@ for (int i = 0; i < args.Length; i++) {
                 DefGenericStatic = enableDefgenericStatic,
                 ExtensionMethods = enableExtensionMethods,
                 EnsureType = ensureType,
+                EnsureTypeInGeneric = ensureTypeInGeneric,
             };
             currentGroup.Classes.Add(currentClass);
         }
@@ -216,6 +218,10 @@ for (int i = 0; i < args.Length; i++) {
         ensureType = true;
     } else if (args[i] == "--no-ensure-type") {
         ensureType = false;
+    } else if (args[i] == "--ensure-type-in-generic") {
+        ensureTypeInGeneric = true;
+    } else if (args[i] == "--no-ensure-type-in-generic") {
+        ensureTypeInGeneric = false;
     } else if (args[i] == "--test") {
         isTestMode = true;
     }
@@ -293,6 +299,7 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
                 manifest.Append(" :defgeneric ").Append(cls.DefGenericStatic ? "t" : "nil");
                 manifest.Append(" :extension-methods ").Append(cls.ExtensionMethods ? "t" : "nil");
                 manifest.Append(" :ensure-type ").Append(cls.EnsureType ? "t" : "nil");
+                manifest.Append(" :ensure-type-in-generic ").Append(cls.EnsureTypeInGeneric ? "t" : "nil");
                 manifest.Append(')');
             }
             manifest.Append("))\n");
@@ -500,8 +507,8 @@ void PrintHelp() {
     Console.WriteLine("Sticky defaults (change the default for the current and every subsequent --class,");
     Console.WriteLine("in command-line order; a class's own --export-*/--output-*/--no-export-*/");
     Console.WriteLine("--no-output-*/--defgeneric* flags above always override these, for that one");
-    Console.WriteLine("class only -- except --ensure-type/--no-ensure-type, which has no dedicated");
-    Console.WriteLine("per-class override and applies directly, like the others below it):");
+    Console.WriteLine("class only -- except --ensure-type*/--no-ensure-type*, which have no dedicated");
+    Console.WriteLine("per-class override and apply directly, like the others below them):");
     Opt("--export-all-parents / --no-export-all-parents", "Default --export-parents on/off.");
     Opt("--export-all-interfaces / --no-export-all-interfaces", "Default --export-interfaces on/off.");
     Opt("--export-all-object / --no-export-all-object", "Default --export-object on/off.");
@@ -533,6 +540,30 @@ void PrintHelp() {
         "entirely); it only matters for hand-written code",
         "that dispatches on a generated type's simple-name",
         "CLOS symbol directly.");
+    Opt("--ensure-type-in-generic / --no-ensure-type-in-generic", "For the current and every subsequent",
+        "--class, emit a 'Register C# Type with CLOS'",
+        "eval-when directly inside csharp-generics.lisp,",
+        "immediately before that class's own",
+        "#.(dotnet:class-for-type ...)-specialized",
+        "defmethod block, so the type is registered",
+        "before its first use IN THAT FILE (as opposed",
+        "to --ensure-type above, which emits it in the",
+        "class's own file instead). Unlike --ensure-type's",
+        "eval-when, this one includes :compile-toplevel:",
+        "#.(dotnet:class-for-type ...) is read-time-",
+        "evaluated, i.e. it already runs at COMPILE time",
+        "of csharp-generics.lisp, so influencing",
+        "same-simple-name collision order relative to it",
+        "requires running at compile time too -- a",
+        "load-toplevel-only eval-when would run only",
+        "after the whole file (and every #. call in it)",
+        "had already been compiled. No dedicated per-class",
+        "override; only meaningful for a --defgeneric-",
+        "opted-in class (one with no entry in",
+        "csharp-generics.lisp is unaffected either way).",
+        "OFF by default. See",
+        "doc/generator-design-notes.md's Version 45",
+        "section.");
     Console.WriteLine();
     Console.WriteLine("Global:");
     Opt("--skip-missing / --no-skip-missing", "When a requested parent/interface ancestor",
@@ -573,4 +604,5 @@ class ClassSpec {
     public bool DefGenericStatic;
     public bool ExtensionMethods;
     public bool EnsureType;
+    public bool EnsureTypeInGeneric;
 }

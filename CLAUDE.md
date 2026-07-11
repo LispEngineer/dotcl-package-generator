@@ -166,6 +166,17 @@ wins a same-simple-name collision's friendly `dotcl-internal::|Name|` symbol, re
 hand-written user code dispatching via that pattern directly. See
 `doc/generator-design-notes.md`'s Version 44 section.
 
+A second, independent flag, `--ensure-type-in-generic`/`--no-ensure-type-in-generic` (same
+sticky-only semantics, OFF by default), places that same registration call directly inside
+`csharp-generics.lisp` instead, immediately before an opted-in class's own
+`#.(dotnet:class-for-type ...)`-specialized `defmethod` block there (no effect on a class that
+isn't also `--defgeneric`-opted-in). Its `eval-when` includes `:compile-toplevel`, unlike
+`--ensure-type`'s — `#.(dotnet:class-for-type ...)` is itself read-time-evaluated, already
+resolved during compilation of `csharp-generics.lisp`, so influencing collision order relative
+to it requires running at compile time too. This isn't a new ASDF-loadability regression:
+`csharp-generics.lisp` has resolved types at compile time unconditionally since Version 41
+already. See `doc/generator-design-notes.md`'s Version 45 section.
+
 `--version`/`--help` and `--test` boot the DotCL host (`DotclHost.Initialize()`); the
 metadata-reflection portion of a `--out-dir` invocation intentionally does not, since it's pure
 reflection and runs before DotCL boots.

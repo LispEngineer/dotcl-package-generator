@@ -140,8 +140,13 @@
    package, no file, no .asd component):
      :classes       -- one entry per opted-in class, in ALL-RESOLVED order:
                        (:pkg-name .. :fq-name .. :method-names (...)
-                        :setter-names (...)) -- see
-                        collect-class-instance-generics.
+                        :setter-names (...) :ensure-type-in-generic t/nil)
+                       -- method-names/setter-names, see
+                       collect-class-instance-generics; ensure-type-in-generic
+                       mirrors the resolved-class plist's own :ensure-type-in-generic
+                       (Version 45) -- whether GENERATE-BATCH-GENERICS-FILE
+                       should emit a \"Register C# Type with CLOS\" eval-when
+                       directly ahead of this class's own defmethod block.
      :method-names  -- the deduped union of every opted-in class's
                        method-names, in first-seen order.
      :setter-names  -- likewise for setter-names.
@@ -165,7 +170,8 @@
                 (collect-class-instance-generics cls (getf rc :constant-properties)
                                                   (getf rc :matched-extensions))
               (push (list :pkg-name pkg-name :fq-name fq-name
-                          :method-names method-names :setter-names setter-names)
+                          :method-names method-names :setter-names setter-names
+                          :ensure-type-in-generic (getf rc :ensure-type-in-generic))
                     classes)
               (dolist (n method-names) (push n all-methods))
               (dolist (n setter-names) (push n all-setters)))))
@@ -345,7 +351,18 @@
    open generic's CLOS class from its own type PARAMETERS (e.g.
    \"Dictionary<TKey,TValue>\"), which never matches any real closed
    instance's registered name, so a defmethod specializing on the open
-   type would never fire. See doc/dispatch-on-open-generics.md."
+   type would never fire. See doc/dispatch-on-open-generics.md.
+
+   A class whose :ensure-type-in-generic is true (--ensure-type-in-generic,
+   Version 45) gets an extra \"Register C# Type with CLOS\" eval-when
+   emitted immediately before its defmethod block, calling
+   EnsureDotNetTypeClass on its own fq-name directly -- unlike
+   --ensure-type's per-class-file eval-when (:load-toplevel/:execute only),
+   this one includes :compile-toplevel, since #.(dotnet:class-for-type ...)
+   below is itself read-time-evaluated (i.e. already resolved at COMPILE
+   time of this file); influencing same-simple-name collision order
+   relative to it requires running at compile time too. See
+   doc/generator-design-notes.md's Version 45 section."
   (when defgeneric-model
     (let ((output-file (merge-pathnames (make-pathname :name *csharp-generics-package-name* :type "lisp")
                                          (pathname (concatenate 'string output-dir "/"))))
@@ -391,7 +408,8 @@
           (let* ((pkg-name (getf c :pkg-name))
                  (fq-name (getf c :fq-name))
                  (method-names (getf c :method-names))
-                 (setter-names (getf c :setter-names)))
+                 (setter-names (getf c :setter-names))
+                 (ensure-type-in-generic (getf c :ensure-type-in-generic)))
             (format stream ";; ~A (~A)~%" fq-name pkg-name)
             (if (generic-arity-fq-name-p fq-name)
                 (progn
@@ -400,12 +418,24 @@
                   (format stream ";; type PARAMETERS, e.g. Dictionary<TKey,TValue>, which never matches~%")
                   (format stream ";; any real closed instance's registered name). See~%")
                   (format stream ";; doc/dispatch-on-open-generics.md.~%~%"))
-                (let ((spec (format nil "#.(dotnet:class-for-type ~S)" fq-name)))
-                  (dolist (name method-names)
-                    (format stream "(cl:defmethod ~A ((obj! ~A) cl:&rest args)~%" name spec)
-                    (format stream "  (cl:apply (cl:function ~A:~A) obj! args))~%" pkg-name name))
-                  (dolist (name setter-names)
-                    (format stream "(cl:defmethod (cl:setf ~A) (new-value (obj! ~A) cl:&rest args)~%" name spec)
-                    (format stream "  (cl:apply (cl:function (cl:setf ~A:~A)) new-value obj! args))~%" pkg-name name))
-                  (format stream "~%"))))))
+                (progn
+                  (when ensure-type-in-generic
+                    (format stream ";; Register C# Type with CLOS (--ensure-type-in-generic) --~%")
+                    (format stream ";; :compile-toplevel is required here, unlike --ensure-type's own~%")
+                    (format stream ";; per-class eval-when: #.(dotnet:class-for-type ...) below is~%")
+                    (format stream ";; read-time-evaluated, i.e. already resolved at COMPILE time of~%")
+                    (format stream ";; this file, so influencing same-simple-name collision order~%")
+                    (format stream ";; relative to it requires running at compile time too. See~%")
+                    (format stream ";; doc/generator-design-notes.md's Version 45 section.~%")
+                    (format stream "(cl:eval-when (:compile-toplevel :load-toplevel :execute)~%")
+                    (format stream "  (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\"~%")
+                    (format stream "                 (dotnet:resolve-type ~S)))~%~%" fq-name))
+                  (let ((spec (format nil "#.(dotnet:class-for-type ~S)" fq-name)))
+                    (dolist (name method-names)
+                      (format stream "(cl:defmethod ~A ((obj! ~A) cl:&rest args)~%" name spec)
+                      (format stream "  (cl:apply (cl:function ~A:~A) obj! args))~%" pkg-name name))
+                    (dolist (name setter-names)
+                      (format stream "(cl:defmethod (cl:setf ~A) (new-value (obj! ~A) cl:&rest args)~%" name spec)
+                      (format stream "  (cl:apply (cl:function (cl:setf ~A:~A)) new-value obj! args))~%" pkg-name name))
+                    (format stream "~%")))))))
       output-file)))

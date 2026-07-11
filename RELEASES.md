@@ -10,6 +10,32 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.45.0 — 2026-07-11
+
+**Added `--ensure-type-in-generic`/`--no-ensure-type-in-generic` (sticky, OFF by default): an
+alternate location for the "Register C# Type with CLOS" `eval-when`, placed inside
+`csharp-generics.lisp` itself rather than a class's own file.**
+
+* Emits the same `EnsureDotNetTypeClass` `eval-when` `--ensure-type` (2.44.0) made opt-in, but
+  this time directly ahead of an opted-in class's own `#.(dotnet:class-for-type ...)`-specialized
+  `defmethod` block inside `csharp-generics.lisp`, rather than inside that class's own package
+  file.
+* Unlike `--ensure-type`'s eval-when (`:load-toplevel`/`:execute` only), this one includes
+  `:compile-toplevel`: `#.(dotnet:class-for-type ...)` is itself read-time-evaluated, i.e.
+  already resolved *during compilation* of `csharp-generics.lisp` — an eval-when restricted to
+  `:load-toplevel`/`:execute` would run only after the whole file (and every `#.` call in it)
+  had already been compiled, too late to influence same-simple-name collision order relative to
+  those calls.
+* Not a new ASDF-`:depends-on`-safety regression: `csharp-generics.lisp`'s
+  `#.(dotnet:class-for-type ...)` mechanism has resolved types at compile time unconditionally
+  since 2.41.0 (`--defgeneric`'s own accepted, already-documented limitation, distinct from
+  `<type>`'s load-time-deferred resolution) — this adds another compile-time call alongside an
+  already-compile-time-dependent file, changing nothing about its existing characteristics.
+* Only meaningful for a class that is also `--defgeneric`-opted-in; a class with no entry in
+  `csharp-generics.lisp` is unaffected either way.
+* `*generator-version*` bumped 44 → 45 (generated-code shape change, `csharp-generics.lisp`
+  only). See `doc/generator-design-notes.md`'s Version 45 section for the full design writeup.
+
 ## 2.44.0 — 2026-07-11
 
 **Added `--ensure-type`/`--no-ensure-type` (sticky, OFF by default): the per-class "Register C#

@@ -998,4 +998,21 @@ metadata field already produces.
   "`--ensure-type`: the CLOS Registration `eval-when` Becomes Opt-In (Version 44)" section and
   `RELEASES.md`'s 2.44.0 entry.
 
+* **DONE** (Generator Version 45): added a second, independent flag,
+  `--ensure-type-in-generic`/`--no-ensure-type-in-generic` (same sticky-only semantics, OFF by
+  default), placing the same `EnsureDotNetTypeClass` registration call directly inside
+  `csharp-generics.lisp` instead — immediately before an opted-in class's own
+  `#.(dotnet:class-for-type ...)`-specialized `defmethod` block there, rather than in that
+  class's own package file (no effect on a class that isn't also `--defgeneric`-opted-in). Its
+  `eval-when` includes `:compile-toplevel`, unlike `--ensure-type`'s, because
+  `#.(dotnet:class-for-type ...)` is itself read-time-evaluated — already resolved *during
+  compilation* of `csharp-generics.lisp` — so influencing same-simple-name collision order
+  relative to those calls requires running at compile time too; a `:load-toplevel`/`:execute`-
+  only eval-when would run only after every `#.` call in the file had already executed. Not a
+  new ASDF-`:depends-on`-loadability regression: `csharp-generics.lisp` has resolved types at
+  compile time unconditionally since Version 41 already (`--defgeneric`'s own accepted,
+  pre-existing limitation). See `doc/generator-design-notes.md`'s "`--ensure-type-in-generic`:
+  CLOS Registration Inside `csharp-generics.lisp` (Version 45)" section and `RELEASES.md`'s
+  2.45.0 entry.
+
 
