@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector3
-;;; Generator Version: 46
-;;; Creation Date: 2026-07-11T19:17:50Z
+;;; Generator Version: 47
+;;; Creation Date: 2026-07-11T23:06:47Z
 
 (cl:in-package :system-numerics-vector3)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector3"))
 (cl:defconstant <type-str> "System.Numerics.Vector3")
-(cl:defconstant <creation> "2026-07-11T19:17:50Z")
-(cl:defconstant <version> 46)
+(cl:defconstant <creation> "2026-07-11T23:06:47Z")
+(cl:defconstant <version> 47)
 
 (cl:defun new (cl:&optional (value cl:nil supplied-value) (z cl:nil supplied-z) (z2 cl:nil supplied-z2))
   "Master wrapper for System.Numerics.Vector3 constructor overloads. Dispatches at runtime.
@@ -536,13 +536,6 @@ Parameters:
 "
   (dotnet:static <type-str> "op_UnsignedRightShift" (cl:the (dotnet "System.Numerics.Vector3") value) (cl:the (dotnet "System.Int32") shift-amount)))
 
-(cl:defun | (left right)
-  "Parameters:
-  - left (System.Numerics.Vector3): 
-  - right (System.Numerics.Vector3): 
-"
-  (dotnet:static <type-str> "op_BitwiseOr" (cl:the (dotnet "System.Numerics.Vector3") left) (cl:the (dotnet "System.Numerics.Vector3") right)))
-
 (cl:defun ~ (value)
   "Parameters:
   - value (System.Numerics.Vector3): 
@@ -598,6 +591,13 @@ Parameters:
   - vector (System.Numerics.Vector3): 
 "
   (dotnet:static <type-str> "AnyWhereAllBitsSet" (cl:the (dotnet "System.Numerics.Vector3") vector)))
+
+(cl:defun bitwise-or! (left right)
+  "Parameters:
+  - left (System.Numerics.Vector3): 
+  - right (System.Numerics.Vector3): 
+"
+  (dotnet:static <type-str> "op_BitwiseOr" (cl:the (dotnet "System.Numerics.Vector3") left) (cl:the (dotnet "System.Numerics.Vector3") right)))
 
 (cl:defun bitwise-and (left right)
   "Parameters:

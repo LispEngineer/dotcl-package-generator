@@ -112,15 +112,15 @@
                 (plain-syms (remove-if #'third reexports)))
             (when shadowing-syms
               (format stream "(cl:shadowing-import '(~{~A~^ ~}) ':~A)~%"
-                      (mapcar (lambda (r) (format nil "~A::~A" (first r) (second r))) shadowing-syms)
+                      (mapcar (lambda (r) (format nil "~A::~A" (first r) (safe-symbol-token (second r)))) shadowing-syms)
                       child-pkg))
             (when plain-syms
               (format stream "(cl:import '(~{~A~^ ~}) ':~A)~%"
-                      (mapcar (lambda (r) (format nil "~A::~A" (first r) (second r))) plain-syms)
+                      (mapcar (lambda (r) (format nil "~A::~A" (first r) (safe-symbol-token (second r)))) plain-syms)
                       child-pkg))
             (when reexports
               (format stream "(cl:export '(~{~A~^ ~}) ':~A)~%"
-                      (mapcar (lambda (r) (format nil "~A::~A" child-pkg (second r))) reexports)
+                      (mapcar (lambda (r) (format nil "~A::~A" child-pkg (safe-symbol-token (second r)))) reexports)
                       child-pkg)))
           (format stream "~%"))))))
 
@@ -203,11 +203,11 @@
     (when (getf model :shadows)
       (format stream "  (:shadow~%")
       (dolist (shad (getf model :shadows))
-        (format stream "   #:~A~%" shad))
+        (format stream "   #:~A~%" (safe-symbol-token shad)))
       (format stream "  )~%"))
     (format stream "  (:export~%")
     (dolist (exp (getf model :exports))
-      (format stream "   #:~A~%" exp))
+      (format stream "   #:~A~%" (safe-symbol-token exp)))
     (format stream "  ))~%~%")))
 
 (defun generate-batch-packages-file (entries-with-resolved output-dir creation-time package-template-path
@@ -268,11 +268,11 @@
               (when shadows
                 (format stream "  (:shadow~%")
                 (dolist (shad shadows)
-                  (format stream "   #:~A~%" shad))
+                  (format stream "   #:~A~%" (safe-symbol-token shad)))
                 (format stream "  )~%"))
               (format stream "  (:export~%")
               (dolist (exp exports)
-                (format stream "   #:~A~%" exp))
+                (format stream "   #:~A~%" (safe-symbol-token exp)))
               (format stream "  ))~%~%")))))
 
       (when (some (lambda (pair)
@@ -383,7 +383,7 @@
           (let ((specializers (remove-if-not
                                 (lambda (c) (member name (getf c :method-names) :test #'string=))
                                 classes)))
-            (format stream "(cl:defgeneric ~A (obj! cl:&rest args)~%" name)
+            (format stream "(cl:defgeneric ~A (obj! cl:&rest args)~%" (safe-symbol-token name))
             (format stream "  (:documentation \"Dispatches on the C# runtime type of OBJ!. Specialized by:~%")
             (dolist (c specializers)
               (format stream "~A: ~A (~A:~A)~%" (getf c :fq-name) name (getf c :pkg-name) name))
@@ -394,7 +394,7 @@
           (let ((specializers (remove-if-not
                                 (lambda (c) (member name (getf c :setter-names) :test #'string=))
                                 classes)))
-            (format stream "(cl:defgeneric (cl:setf ~A) (new-value obj! cl:&rest args)~%" name)
+            (format stream "(cl:defgeneric (cl:setf ~A) (new-value obj! cl:&rest args)~%" (safe-symbol-token name))
             (format stream "  (:documentation \"Dispatches on the C# runtime type of OBJ!. Specialized by:~%")
             (dolist (c specializers)
               (format stream "~A: (cl:setf ~A) (cl:setf (~A:~A ...))~%" (getf c :fq-name) name (getf c :pkg-name) name))
@@ -432,10 +432,10 @@
                     (format stream "                 (dotnet:resolve-type ~S)))~%~%" fq-name))
                   (let ((spec (format nil "#.(dotnet:class-for-type ~S)" fq-name)))
                     (dolist (name method-names)
-                      (format stream "(cl:defmethod ~A ((obj! ~A) cl:&rest args)~%" name spec)
-                      (format stream "  (cl:apply (cl:function ~A:~A) obj! args))~%" pkg-name name))
+                      (format stream "(cl:defmethod ~A ((obj! ~A) cl:&rest args)~%" (safe-symbol-token name) spec)
+                      (format stream "  (cl:apply (cl:function ~A:~A) obj! args))~%" pkg-name (safe-symbol-token name)))
                     (dolist (name setter-names)
-                      (format stream "(cl:defmethod (cl:setf ~A) (new-value (obj! ~A) cl:&rest args)~%" name spec)
-                      (format stream "  (cl:apply (cl:function (cl:setf ~A:~A)) new-value obj! args))~%" pkg-name name))
+                      (format stream "(cl:defmethod (cl:setf ~A) (new-value (obj! ~A) cl:&rest args)~%" (safe-symbol-token name) spec)
+                      (format stream "  (cl:apply (cl:function (cl:setf ~A:~A)) new-value obj! args))~%" pkg-name (safe-symbol-token name)))
                     (format stream "~%")))))))
       output-file)))

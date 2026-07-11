@@ -19,44 +19,6 @@ correctness. It needs new `AssemblyToLispy.cs` metadata
 flags) plus a `doc/assembly-to-lispy.md` schema update.
 
 
-# Fix Unescaped `|` Operator Export (Pre-existing, Found 2026-07-05)
-
-**Found while verifying the Version 35 static `--defgeneric` collision caveat**
-(`doc/make-everything-defgeneric.md`), not introduced by that work.
-
-`packages.lisp` exports C#'s bitwise-OR operator (mapped to the Lisp symbol name `|`, per
-Version 30's `op_BitwiseOr` → `|` mapping) as a bare, unescaped `#:|` token. This is invalid
-Lisp syntax — a symbol literally named `|` needs proper multiple-escape syntax (e.g. `#:\|` or
-an equivalent), not a bare `|` immediately followed by a newline, which a real Lisp reader
-parses as beginning an unterminated `|...|` escape and fails with "Unterminated escape in
-token." Confirmed via a real DotCL REPL load of a full generated batch containing
-`System.Numerics.Vector2`/`Vector3`/`Vector4` (which export this operator).
-
-This has apparently been present since Version 30 and was never caught because
-`check_parens.py` (the only automated syntax check on generated output, run by `make test`)
-validates only paren-balance, not full Lisp readability — nothing in the existing test suite
-actually loads generated `.lisp` output through a real Lisp reader. Likely affects every other
-mapped operator whose Lisp name is itself a reader macro character needing escaping (check `*`,
-`&`, `^`, `~`, etc. from Version 30's mapping table — some may already be fine unescaped, e.g.
-`+`/`-`/`=` are not reader macro characters, but `|` definitely needs escaping and others may
-need auditing too).
-
-Fix location: wherever `#:~A` (or equivalent bare-symbol-name `format` directives) are used to
-emit an exported/shadowed operator name in `generate-batch-packages-file`/
-`emit-defgeneric-defpackage` and the per-class `defpackage`/`defun` emission in
-`generate-class-file` — these need to escape reader-macro-character symbol names correctly
-(e.g. via a helper that wraps a name needing escaping in `|...|` with internal `|`/`\`
-backslash-escaped, or emits `\|` for the single-character case) rather than assuming every
-mapped operator name is reader-safe as a bare token.
-
-## Use a Different Operator
-
-Since `|` is a special character for the Lisp reader, (and so presumably too is `||`),
-let's use a different character for
-the logical and bitwise OR for the Lisp implementation.
-
-Perhaps use `or` and `bitwise-or` for the operator overloads.
-
 
 # Add More to Generated `.lisp` Files
 
@@ -1031,5 +993,44 @@ metadata field already produces.
   `csharp-generics.lisp` is still generated as a file either way; only its own `.asd` entry is
   affected. See `doc/generator-design-notes.md`'s "`--csharp-generic-in-asd`: Excluding
   `csharp-generics.lisp` from the `.asd` (Version 46)" section and `RELEASES.md`'s 2.46.0 entry.
+
+
+# **DONE v47** Fix Unescaped `|` Operator Export (Pre-existing, Found 2026-07-05)
+
+**Found while verifying the Version 35 static `--defgeneric` collision caveat**
+(`doc/make-everything-defgeneric.md`), not introduced by that work.
+
+`packages.lisp` exports C#'s bitwise-OR operator (mapped to the Lisp symbol name `|`, per
+Version 30's `op_BitwiseOr` → `|` mapping) as a bare, unescaped `#:|` token. This is invalid
+Lisp syntax — a symbol literally named `|` needs proper multiple-escape syntax (e.g. `#:\|` or
+an equivalent), not a bare `|` immediately followed by a newline, which a real Lisp reader
+parses as beginning an unterminated `|...|` escape and fails with "Unterminated escape in
+token." Confirmed via a real DotCL REPL load of a full generated batch containing
+`System.Numerics.Vector2`/`Vector3`/`Vector4` (which export this operator).
+
+This has apparently been present since Version 30 and was never caught because
+`check_parens.py` (the only automated syntax check on generated output, run by `make test`)
+validates only paren-balance, not full Lisp readability — nothing in the existing test suite
+actually loads generated `.lisp` output through a real Lisp reader. Likely affects every other
+mapped operator whose Lisp name is itself a reader macro character needing escaping (check `*`,
+`&`, `^`, `~`, etc. from Version 30's mapping table — some may already be fine unescaped, e.g.
+`+`/`-`/`=` are not reader macro characters, but `|` definitely needs escaping and others may
+need auditing too).
+
+Fix location: wherever `#:~A` (or equivalent bare-symbol-name `format` directives) are used to
+emit an exported/shadowed operator name in `generate-batch-packages-file`/
+`emit-defgeneric-defpackage` and the per-class `defpackage`/`defun` emission in
+`generate-class-file` — these need to escape reader-macro-character symbol names correctly
+(e.g. via a helper that wraps a name needing escaping in `|...|` with internal `|`/`\`
+backslash-escaped, or emits `\|` for the single-character case) rather than assuming every
+mapped operator name is reader-safe as a bare token.
+
+## Use a Different Operator
+
+Since `|` is a special character for the Lisp reader, (and so presumably too is `||`),
+let's use a different character for
+the logical and bitwise OR for the Lisp implementation.
+
+Perhaps use `or` and `bitwise-or` for the operator overloads.
 
 

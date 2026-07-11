@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Convert
-;;; Generator Version: 46
-;;; Creation Date: 2026-07-11T19:17:50Z
+;;; Generator Version: 47
+;;; Creation Date: 2026-07-11T23:06:47Z
 
 (cl:in-package :system-convert)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Convert"))
 (cl:defconstant <type-str> "System.Convert")
-(cl:defconstant <creation> "2026-07-11T19:17:50Z")
-(cl:defconstant <version> 46)
+(cl:defconstant <creation> "2026-07-11T23:06:47Z")
+(cl:defconstant <version> 47)
 
 (cl:define-symbol-macro db-null (dotnet:static <type-str> "DBNull"))
 (cl:setf (cl:documentation (cl:quote db-null) (cl:quote cl:variable)) "A constant that represents a database column that is absent of data; that is, database null.")

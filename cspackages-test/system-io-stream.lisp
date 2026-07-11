@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.Stream
-;;; Generator Version: 46
-;;; Creation Date: 2026-07-11T19:17:50Z
+;;; Generator Version: 47
+;;; Creation Date: 2026-07-11T23:06:47Z
 
 (cl:in-package :system-io-stream)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.Stream"))
 (cl:defconstant <type-str> "System.IO.Stream")
-(cl:defconstant <creation> "2026-07-11T19:17:50Z")
-(cl:defconstant <version> 46)
+(cl:defconstant <creation> "2026-07-11T23:06:47Z")
+(cl:defconstant <version> 47)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.IO.Stream class.

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2+KeyCollection
-;;; Generator Version: 46
-;;; Creation Date: 2026-07-11T19:17:50Z
+;;; Generator Version: 47
+;;; Creation Date: 2026-07-11T23:06:47Z
 
 (cl:in-package :system-collections-generic-dictionary-2-key-collection)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2+KeyCollection"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2+KeyCollection")
-(cl:defconstant <creation> "2026-07-11T19:17:50Z")
-(cl:defconstant <version> 46)
+(cl:defconstant <creation> "2026-07-11T23:06:47Z")
+(cl:defconstant <version> 47)
 
 (cl:defun new (dictionary)
   "Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2.KeyCollection class that reflects the keys in the specified System.Collections.Generic.Dictionary`2.

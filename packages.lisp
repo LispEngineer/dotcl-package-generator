@@ -61,7 +61,8 @@
             #:generate-batch-asd-file
             #:camel-to-kebab
             #:type-fq-name-to-pkg-name
-            #:split-string))
+            #:split-string
+            #:safe-symbol-token))
 
 (defpackage :package-generator-tests
   (:use :cl :assembly-package-generator :utils :monoutils)

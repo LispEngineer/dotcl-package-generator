@@ -53,4 +53,36 @@
               (assert-test (not (null (search "\"op_UnaryNegation\"" contents))) t
                           "generate-class-file's unary - wrapper invokes op_UnaryNegation")))
         (when (probe-file out-dir)
-          (uiop:delete-directory-tree out-dir :validate t)))))
+          (uiop:delete-directory-tree out-dir :validate t))))
+
+    ;; 13. op_BitwiseOr's Lisp mapping (AssemblyToLispy.cs's GetCleanMethodName) is
+    ;;     "bitwise-or!" (Version 47), not the bare "|" a real Lisp reader can't
+    ;;     read unescaped -- see PLAN.md's "Fix Unescaped | Operator Export" and
+    ;;     safe-symbol-token (run-naming-tests). Confirms the whole pipeline
+    ;;     (not just the mapping table) emits a readable, collision-free wrapper.
+  (let* ((class-plist
+             '(:fully-qualified-name "Fixture.BitwiseOrStruct"
+               :kind :struct
+               :fields nil
+               :properties nil
+               :methods ((:name "bitwise-or!" :mangled-name "op_BitwiseOr" :is-static t
+                          :return-type "Fixture.BitwiseOrStruct"
+                          :parameters ((:name "a" :type "Fixture.BitwiseOrStruct")
+                                       (:name "b" :type "Fixture.BitwiseOrStruct"))))
+               :constructors nil))
+           (out-dir (merge-pathnames "package-generator-tests-bitwise-or-out/"
+                                     (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-bitwise-or-struct.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file)))
+            (assert-test (not (null (search "(cl:defun bitwise-or! (a b)" contents))) t
+                        "generate-class-file emits a readable, unescaped wrapper name for op_BitwiseOr's bitwise-or! mapping")
+            (assert-test (not (null (search "\"op_BitwiseOr\"" contents))) t
+                        "generate-class-file's bitwise-or! wrapper invokes the real CLR method via :mangled-name")
+            (assert-test (null (search "(cl:defun | " contents)) t
+                        "generate-class-file no longer emits the unescaped bare | function name")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t)))))

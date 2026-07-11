@@ -1173,8 +1173,9 @@ the wrong operator.
 generation-logic changes needed at all):
 
 * The 8 remaining standard C# overloadable operators without a mapping: `op_Modulus` → `%`,
-  `op_BitwiseAnd` → `&`, `op_BitwiseOr` → `|`, `op_ExclusiveOr` → `^`, `op_LeftShift` → `<<`,
-  `op_RightShift` → `>>`, `op_UnsignedRightShift` → `>>>`, `op_OnesComplement` → `~`.
+  `op_BitwiseAnd` → `&`, `op_BitwiseOr` → `|` (superseded by `bitwise-or!` — see Version 47),
+  `op_ExclusiveOr` → `^`, `op_LeftShift` → `<<`, `op_RightShift` → `>>`,
+  `op_UnsignedRightShift` → `>>>`, `op_OnesComplement` → `~`.
 * C# 11's checked-operator variants, previously entirely unmapped: `op_CheckedAddition` → `+!`,
   `op_CheckedSubtraction` → `-!`, `op_CheckedMultiply` → `*!`, `op_CheckedDivision` → `/!`,
   `op_CheckedUnaryNegation` → `-!` (shared with `op_CheckedSubtraction`, mirroring how unchecked
@@ -2714,3 +2715,52 @@ whole invocation, confirming `csharp-assembly-packages.asd`'s `csharp-generics.l
 is written as a comment (byte-identical to the active form apart from the `;; ` prefix and
 explanation) rather than an active `:file` entry; `check_parens.py` confirms the rest of the
 `.asd` (every other component, still active) remains well-formed.
+
+## Fixing the Unescaped `|` Operator Export, and Renaming It (Version 47)
+
+Found 2026-07-05 (see PLAN.md's "Fix Unescaped `|` Operator Export" entry), present since
+Version 30: `op_BitwiseOr`'s Lisp mapping, the single character `|`, was emitted as a bare,
+unescaped token everywhere a generated `.lisp` file names a symbol — `#:|` in `defpackage`
+`:export`/`:shadow` clauses, `(cl:defun | ...)` as a literal function name, and the `PKG::SYM`
+tokens built for cross-package re-exports. A real Lisp reader treats `|` as a *multiple-escape*
+character, not a plain constituent, so every one of these forms failed to read at all
+("Unterminated escape in token") — confirmed via a real DotCL REPL load of a full generated
+batch containing `System.Numerics.Vector2`/`Vector3`/`Vector4`. `check_parens.py`, the only
+automated check `make test` runs against generated output, validates paren balance only, not
+full readability, so this went undetected since Version 30.
+
+**Two independent changes**, both needed:
+
+1. **General correctness fix**: a new `safe-symbol-token` helper (`apg-naming.lisp`, beside the
+   pre-existing `escape-lisp-string`, which only handles `"`/`\` inside *string* literals and
+   doesn't apply here) — returns a name unchanged unless it contains `|` or `\`, in which case
+   it returns the name wrapped in `|...|` with both characters backslash-escaped internally.
+   Routed through every site across `apg-reexports-and-generics.lisp`,
+   `apg-overload-dispatch.lisp`, and `apg-class-file-generator.lisp` that `~A`-interpolates a
+   raw mangled name into a symbol-token position (`defpackage` export/shadow lists,
+   `cl:defun`/`(cl:setf ...)`/`cl:defgeneric`/`cl:defmethod` names, and the `SYM` half of a
+   `PKG::SYM` re-export token) — roughly 20 call sites. This is a no-op for every name in
+   today's mapping table except `|` itself, so it produces no diff noise beyond the actual bug
+   fix, and it protects any future operator mapping that happens to reuse a reader-macro
+   character.
+2. **Renamed `op_BitwiseOr`'s mapping** (`AssemblyToLispy.cs`'s `GetCleanMethodName`) from `|`
+   to `bitwise-or!` — not the unadorned `bitwise-or`, because that already collides with a
+   genuinely distinct, unrelated method some BCL types define: `System.Numerics.Vector2`/
+   `Vector3`/`Vector4` each have their own plain static `BitwiseOr` method (alongside the
+   `op_BitwiseOr` operator), which ordinary camel-to-kebab mangling already maps to `bitwise-or`
+   — renaming the operator to the same name would have silently collapsed both into one
+   `cl:defun bitwise-or`, one silently shadowing the other, trading today's loud reader error
+   for a much worse silent-miscompile-style bug. The `!` suffix is never producible from a C#
+   identifier (mirroring this file's existing `+!`/`-!`/`*!`/`/!`/`explicit-cast!`
+   checked-operator convention), so it is guaranteed collision-free. After this rename, `|` is
+   no longer reachable from any currently-mapped operator, but `safe-symbol-token` remains in
+   place as the correctness backstop.
+
+### Verification
+
+`make build test` regenerates `cspackages-test/` against real `System.Numerics.Vector2`/
+`Vector3`/`Vector4`; every previous `#:|` / `(cl:defun | ...)` occurrence in
+`cspackages-test/packages.lisp` and `cspackages-test/system-numerics-vector*.lisp` becomes
+`#:bitwise-or!` / `(cl:defun bitwise-or! ...)`. Confirmed by actually loading the regenerated
+`packages.lisp` through a real Lisp reader — the concrete repro this fix targets — not just
+`check_parens.py`'s paren-balance check.

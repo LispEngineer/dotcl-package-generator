@@ -393,7 +393,7 @@
                (supplied-var (cl:format nil "supplied-~A" kp-name)))
           (cl:setf args-list (cl:append args-list (cl:list (cl:format nil "(~A ~A ~A)" kp-name kp-default supplied-var)))))))
     
-    (cl:format stream "(cl:defun ~A (~{~A~^ ~})~%" mname args-list)
+    (cl:format stream "(cl:defun ~A (~{~A~^ ~})~%" (safe-symbol-token mname) args-list)
     (cl:let* ((header (cl:format nil "Master wrapper for ~A.~A overloads. Dispatches at runtime." fq-name name))
               (docstring (format-combined-overloads-docstring header #'method-signature-str methods))
               (escaped-docstring (escape-lisp-string docstring)))
@@ -503,7 +503,7 @@
                           (cl:mapcar (cl:lambda (p) (cl:getf p :type)) params))
                   nil)))
        
-       (cl:format stream "(cl:defun ~A (~A)~%" mname args-str)
+       (cl:format stream "(cl:defun ~A (~A)~%" (safe-symbol-token mname) args-str)
        (cl:when (cl:> (cl:length escaped-docstring) 0)
          (cl:format stream "  \"~A\"~%" escaped-docstring))
        (cl:format stream "  ~A)~%~%"
@@ -543,7 +543,7 @@
    BASE-NAME), an empty list/nil TYPES argument dispatches straight through
    to PLAIN-FALLBACK-NAME (the non-generic overload(s)) instead of
    erroring."
-  (format stream "(cl:defun ~A (types cl:&rest args)~%" dispatcher-name)
+  (format stream "(cl:defun ~A (types cl:&rest args)~%" (safe-symbol-token dispatcher-name))
   (format stream "  \"Dispatches ~A by the generic type argument(s) in TYPES: pass a~%" dispatcher-name)
   (format stream "   single .NET type (a type-name string, alias, or System.Type object) to~%")
   (format stream "   select the single-type-argument overload, or a cl:list of types to~%")
@@ -553,12 +553,12 @@
   (format stream "  (cl:let* ((type-list (cl:if (cl:listp types) types (cl:list types))))~%")
   (format stream "    (cl:case (cl:length type-list)~%")
   (when plain-fallback-name
-    (format stream "      (0 (cl:apply (cl:function ~A) args))~%" plain-fallback-name))
+    (format stream "      (0 (cl:apply (cl:function ~A) args))~%" (safe-symbol-token plain-fallback-name)))
   (dolist (cell cells)
     (let* ((m (first cell))
            (arity (getf m :generic-arity))
            (internal-name (internal-arity-fn-name base-name cell)))
-      (format stream "      (~D (cl:apply (cl:function ~A) (cl:append type-list args)))~%" arity internal-name)))
+      (format stream "      (~D (cl:apply (cl:function ~A) (cl:append type-list args)))~%" arity (safe-symbol-token internal-name))))
   (format stream "      (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
   (format stream "                      :package-name \"~A\"~%" (string-upcase (type-fq-name-to-pkg-name fq-name)))
   (format stream "                      :class-name <type-str>~%")

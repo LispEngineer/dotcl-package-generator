@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: AssemblyToLispyTestTarget.NestingContainer+NestedLevel2
-;;; Generator Version: 46
-;;; Creation Date: 2026-07-11T19:17:50Z
+;;; Generator Version: 47
+;;; Creation Date: 2026-07-11T23:06:47Z
 
 (cl:in-package :assembly-to-lispy-test-target-nesting-container-nested-level2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "AssemblyToLispyTestTarget.NestingContainer+NestedLevel2"))
 (cl:defconstant <type-str> "AssemblyToLispyTestTarget.NestingContainer+NestedLevel2")
-(cl:defconstant <creation> "2026-07-11T19:17:50Z")
-(cl:defconstant <version> 46)
+(cl:defconstant <creation> "2026-07-11T23:06:47Z")
+(cl:defconstant <version> 47)
 
 (cl:defun new ()
   (dotnet:new <type-str>))

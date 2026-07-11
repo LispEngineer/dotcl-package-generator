@@ -842,7 +842,13 @@ namespace PackageGenerator {
                     case "op_Explicit": return "explicit-cast";
                     case "op_Modulus": return "%";
                     case "op_BitwiseAnd": return "&";
-                    case "op_BitwiseOr": return "|";
+                    // Not the bare "|": a real Lisp reader treats | as a multiple-escape
+                    // character, and it was never emitted with the escaping this needs
+                    // (Version 47 fix). "!" (never producible from a C# identifier) also
+                    // avoids colliding with an unrelated plain "BitwiseOr" method some
+                    // types (e.g. System.Numerics.Vector2/3/4) separately define, which
+                    // this same mangling already maps to "bitwise-or".
+                    case "op_BitwiseOr": return "bitwise-or!";
                     case "op_ExclusiveOr": return "^";
                     case "op_LeftShift": return "<<";
                     case "op_RightShift": return ">>";

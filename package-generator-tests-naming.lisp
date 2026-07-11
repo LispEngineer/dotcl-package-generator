@@ -81,4 +81,26 @@
 
   (assert-test (assembly-package-generator:split-string "")
                 '("")
-                "Split empty string"))
+                "Split empty string")
+
+    ;; 3. Test safe-symbol-token (PLAN.md's "Fix Unescaped | Operator Export"):
+    ;; a name containing a Lisp reader-macro character (| or \) must be
+    ;; escaped/wrapped for safe ~A-splicing into generated Lisp source as a
+    ;; bare symbol token; every other name (including every other
+    ;; currently-mapped operator, e.g. '+'/'%'/'<<') must be returned
+    ;; unchanged, so this fix produces no diff noise beyond the actual bug.
+  (assert-test (assembly-package-generator:safe-symbol-token "|")
+                "|\\||"
+                "safe-symbol-token escapes a bare | operator name")
+
+  (assert-test (assembly-package-generator:safe-symbol-token "bitwise-or!")
+                "bitwise-or!"
+                "safe-symbol-token leaves an ordinary name untouched")
+
+  (assert-test (assembly-package-generator:safe-symbol-token "+")
+                "+"
+                "safe-symbol-token leaves the bare '+' operator name untouched (not a reader-macro character)")
+
+  (assert-test (assembly-package-generator:safe-symbol-token "a\\b")
+                "|a\\\\b|"
+                "safe-symbol-token escapes an embedded backslash"))
