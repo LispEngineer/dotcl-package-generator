@@ -165,6 +165,15 @@ required assembly `.dll` and register types during both `:compile-toplevel` and
   (dotnet:invoke obj "X"))
 ```
 
+> **Note (Version 42):** this generator's own currently-generated CLOS registration form omits
+> `:compile-toplevel` entirely — `(cl:eval-when (:load-toplevel :execute) ...)` only, with no
+> preceding `dotnet:load-assembly` step — since forcing type resolution during a *dependency*
+> system's own compile phase reintroduces the exact ASDF-`:depends-on`-loadability failure this
+> generator's `<type>` binding was separately fixed for (see the "`<type>` Becomes a
+> `define-symbol-macro` (Version 42)" section below, and dotcl/dotcl#49). Read Option 2 above as
+> historical background on the underlying compile-time-resolution constraint, not as a
+> description of current generated output.
+
 ### Defining C# Types from Lisp
 
 When defining new C# proxy classes from Lisp using `dotnet:define-class` (or its
@@ -2239,3 +2248,95 @@ the new skip path) are confirmed skipped with the expected comment, not emitting
 `package-generator-tests.lisp`'s defgeneric test set was rewritten accordingly (merged into a
 single `--defgeneric` suite; the collision-comment test replaced with one asserting the absence
 of any collision-caveat text; a new test asserts the generic-arity skip path).
+
+## `<type>` Becomes a `define-symbol-macro` (Version 42)
+
+### The bug: `defconstant` runs its init-form at load time, not at use time
+
+[dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49) reported that a generated
+`cspackages` system fails to build when a consuming project includes it the normal ASDF way —
+as a `:depends-on` dependency of the consumer's own root system — rather than splicing its
+`.lisp` files directly into the root system's own `:components` (the inelegant workaround the
+issue's reporter had settled on). Per @snmsts's diagnosis: the consumer's build process loads
+each dependency system's fasl *before* compiling the root system, so that the dependency's
+packages/macros are visible while the root is compiled. Every generated class file's
+
+```lisp
+(cl:defconstant <type> (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2"))
+```
+
+runs its `dotnet:resolve-type` call right then, during that fasl load — but the target assembly
+(often a `PackageReference`, e.g. `MonoGame.Framework`) isn't loaded into *that* process, only
+into the final deployed app's, so resolution fails with "type not found". This is the exact
+same class of problem this file's much older "Compile-Time Constraint" section (above) already
+documents for `defmethod` specializers — a C#-type-resolving form evaluated in the wrong phase
+— just hitting a `defconstant`'s init-form instead of a `defmethod`'s specializer-list
+expansion. **That earlier section's `(eval-when (:compile-toplevel) ...)` example is no longer
+what current generated output actually emits** (see below) — read it as historical background
+on the underlying constraint, not as still-current guidance about this generator's own output.
+
+### The fix: defer resolution to point of use, and let DotCL 0.1.17 do the rest
+
+`emit-type-constants-and-clos-registration` (`apg-class-file-generator.lisp`) now emits
+
+```lisp
+(cl:define-symbol-macro <type> (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2"))
+```
+
+A symbol-macro registers a substitution only; `dotnet:resolve-type` runs solely where `<type>`
+is actually *used* — i.e., in the deployed app's own compiled code, at the app's own runtime,
+where the target assembly is genuinely present. The dependency fasl now loads cleanly during
+any consumer's build, with no resolution attempted at all.
+
+This costs nothing after first use: DotCL.Runtime >= 0.1.17 (already this generator's minimum
+version, per Version 41) added runtime auto-resolution — on a `resolve-type` miss, it eagerly
+loads the managed assemblies sitting in `AppContext.BaseDirectory` (where a deployed app's
+`PackageReference` DLLs are copied) and retries, and the result is memoized runtime-side after
+the first expansion of `<type>`, exactly the "memoized constant" behavior requested in the
+issue thread. (Prior to 0.1.17, `Program.cs` had to force-load such types itself via
+`typeof(...).FullName`, since `resolve-type`'s only two lookup strategies — already-loaded
+assemblies, and `Assembly.Load` by namespace prefix — both miss a `PackageReference` type whose
+assembly's simple name differs from the type's namespace. That force-load path is unrelated to
+this generator's own output and lives entirely in the DotCL repo/consumer's own code.)
+
+The immediately adjacent CLOS registration form is also affected, independently:
+
+```lisp
+(cl:eval-when (:load-toplevel :execute)
+  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                 (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2")))
+```
+
+was previously `(cl:eval-when (:compile-toplevel :load-toplevel :execute) ...)`. The
+`:compile-toplevel` branch unconditionally forced its own `resolve-type` call during the
+dependency's *compile* phase, regardless of the `<type>` fix above — reintroducing the exact
+same build failure by a second, independent path. Dropping `:compile-toplevel` means class
+registration, like `<type>` itself, now happens only when the file is actually loaded (or
+directly `eval`'d), never forced during a dependency's own compile pass.
+
+### Scope: what this fix does *not* touch
+
+Two other unconditionally- or optionally-emitted `defconstant`s carry the identical latent
+risk but are deliberately left unchanged for now (see `PLAN.md` for the open follow-up):
+
+* **C# `const` literal fields** (`emit-literal-field-constants`, always emitted when a class
+  has any) use `(cl:defconstant ... (dotnet:static <type-str> ...))` — also a load-time .NET
+  call, also unconditional. Left as `defconstant` in this version.
+* **`--constant-properties`-selected static properties/fields** (`pure-const-fields`/
+  `pure-const-props`) are *opt-in*: the whole point of `--constant-properties` is to force
+  `defconstant` instead of `define-symbol-macro`, accepting the already-documented
+  struct-aliasing-mutation risk (Version 29) in exchange for a true load-time-bound constant.
+  Converting these to symbol-macros unconditionally would defeat the flag's stated purpose, so
+  they too are left as `defconstant` — users who need a `--constant-properties`-generated
+  package to be ASDF-dependency-loadable before its target assembly is in scope should avoid
+  the flag for now, or splice the affected class's file into the consumer's own components as
+  before.
+
+### Verification
+
+`make build test` regenerates every `cspackages-test/*.lisp` golden file with the new `<type>`
+symbol-macro and narrowed `eval-when`; `check_parens.py` (run automatically as part of `make
+test`) confirms the new shape is still well-formed, and the existing Lisp/C# test suite
+(including `package-generator-tests-parents-interfaces.lisp`'s export-name-list assertions for
+`<type>`/`<type-str>`/`<creation>`/`<version>`, which check names only, not defining form) is
+unaffected.

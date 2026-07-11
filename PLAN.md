@@ -934,4 +934,33 @@ actually accepts a `System.Delegate`-typed argument to a void-returning `add_X`/
 and that `dotnet:make-delegate`'s delegate-type string format matches what an event's `:type`
 metadata field already produces.
 
+# `<type>` Loadable as an ASDF Dependency (2026-07-11)
+
+* **DONE** (Generator Version 42): fixed [dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49)
+  — a generated package failed to build when included as an ASDF `:depends-on` dependency of
+  another system (only worked when its files were spliced directly into the consumer's own
+  `:components`), because every class file's `<type>` binding was a `cl:defconstant` whose
+  `dotnet:resolve-type` init-form ran during the dependency's own fasl load, before the target
+  assembly was in scope there. `<type>` is now a `cl:define-symbol-macro`, and the adjacent
+  `EnsureDotNetTypeClass` `eval-when` dropped its `:compile-toplevel` branch, for the same
+  reason. See `doc/generator-design-notes.md`'s "`<type>` Becomes a `define-symbol-macro`
+  (Version 42)" section and `RELEASES.md`'s 2.42.0 entry.
+
+* **Open follow-up 1**: `emit-literal-field-constants` (C# `const` literal fields, always
+  emitted when a class has any — not behind any flag) still uses
+  `(cl:defconstant ... (dotnet:static <type-str> ...))`, the same load-time-.NET-call pattern
+  `<type>` was just fixed for. Left unconverted in this pass (scope was deliberately limited to
+  the always-present `<type>` binding named in the issue). A class with such fields would still
+  fail the same ASDF-`:depends-on` loadability check; revisit converting these to
+  `define-symbol-macro` too if this turns out to matter in practice.
+
+* **Open follow-up 2**: the opt-in `--constant-properties` flag exists specifically to force
+  `defconstant` over `define-symbol-macro`, and now also carries this same ASDF-dependency-phase
+  risk in addition to its already-documented struct-aliasing-mutation risk (Version 29).
+  Deliberately left as `defconstant` — converting it would defeat the flag's stated purpose —
+  but no doc-level warning about this specific new risk has been added yet to the
+  `--constant-properties` CLI help/`FEATURES.md` description. Consider adding one (e.g. "avoid
+  `--constant-properties` if this package needs to be loadable as an ASDF dependency before its
+  target assembly is in scope") if a real user hits this.
+
 

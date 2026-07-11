@@ -33,10 +33,16 @@ remaining genuinely custom piece of runtime logic now ships as its own generated
     a wrapped .NET object. Replaces the former `monoutils:dotnet-p`, which was backed by a
     native primitive (`MonoUtilsRegistrar.Initialize()` in this tool's own `MonoUtils.cs`) not
     reachable from a downstream host.
-*   **`dotnet:resolve-type`** (stock DotCL): evaluated at package load time to bind each class's
-    `<type>` constant, e.g. `(cl:defconstant <type> (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2"))`.
+*   **`dotnet:resolve-type`** (stock DotCL): evaluated on first use of each class's `<type>`
+    symbol-macro, e.g. `(cl:define-symbol-macro <type> (dotnet:resolve-type "Microsoft.Xna.Framework.Vector2"))`.
     Replaces the former `monoutils:get-type`, which only ever wrapped this same call for a
-    string argument — the only way generated code ever invoked it.
+    string argument — the only way generated code ever invoked it. `<type>` was originally a
+    `defconstant` (whose init-form runs at load time); Generator Version 42 switched it to a
+    `define-symbol-macro` so `resolve-type` runs only where `<type>` is actually used, fixing
+    dotcl/dotcl#49 (a generated package failed to build as an ASDF `:depends-on` dependency,
+    since the consumer's build process loaded the dependency's fasl — running `resolve-type` —
+    before the target assembly was in scope). See `doc/generator-design-notes.md`'s Version 42
+    section.
 *   **`csharp-assembly-utils:csharp-overload-not-found`** (defined in
     [csharp-assembly-utils.template.lisp](file:///home/dfields/src/cl/package-generator/csharp-assembly-utils.template.lisp),
     copied verbatim into every generated batch's `csharp-assembly-utils.lisp`; its `defpackage`

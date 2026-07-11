@@ -65,8 +65,11 @@ Each output file will start with a common preamble:
   * Switch to the package
 
 * Several relevant constants will be defined:
-  * The C# Type represented will be created as an exported constant
-    with angle bracket earmuffs called `<type>`. 
+  * The C# Type represented will be created as an exported binding
+    with angle bracket earmuffs called `<type>` — a `define-symbol-macro`,
+    not a `defconstant`, so resolving the type only happens where `<type>`
+    is actually used (see `doc/generator-design-notes.md`'s Version 42
+    section for why).
   * The C# Type represented as a String will be created as
     an exported constant called `<type-str>`
   * The date/time when this was created will be created as an

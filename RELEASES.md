@@ -10,6 +10,32 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.42.0 — 2026-07-11
+
+**Fixed [dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49): a generated package now
+loads cleanly as an ASDF `:depends-on` dependency of another system, instead of only working
+when its files are spliced directly into the consumer's own `:components`.**
+
+* Every generated class file's `<type>` binding is now a `cl:define-symbol-macro` instead of a
+  `cl:defconstant`. A `defconstant`'s init-form runs at *load* time; when the generated package
+  is an ASDF dependency, the consumer's build process loads the dependency's fasl (running
+  `dotnet:resolve-type` there) before the target assembly is necessarily in that build
+  process's own type-resolution context, so resolution failed with "type not found" even
+  though the identical call succeeds once the deployed app actually runs. A symbol-macro only
+  registers a substitution, deferring `resolve-type` to wherever `<type>` is actually *used*.
+* This is free of any repeated-evaluation cost after first use, since `DotCL.Runtime` >= 0.1.17
+  (already this tool's minimum, since 2.41.0) memoizes a `resolve-type` miss's assembly
+  auto-load-and-retry runtime-side after the first expansion.
+* The adjacent CLOS-registration `eval-when` (`EnsureDotNetTypeClass`) is narrowed from
+  `(:compile-toplevel :load-toplevel :execute)` to `(:load-toplevel :execute)` for the
+  identical reason — the dropped `:compile-toplevel` branch unconditionally forced its own
+  `resolve-type` call during a dependency's compile phase, which would have reintroduced the
+  same failure even after the `<type>` fix above.
+* `*generator-version*` bumped 41 → 42 (generated-code shape change). See
+  `doc/generator-design-notes.md`'s "`<type>` Becomes a `define-symbol-macro` (Version 42)"
+  section for the full writeup, including what was deliberately left out of scope (C# `const`
+  literal fields, and the opt-in `--constant-properties` flag) and why.
+
 ## 2.41.0 — 2026-07-10
 
 **Consolidated `--defgeneric`/`--defgeneric-dynamic` into a single `--defgeneric`, built on

@@ -1,17 +1,17 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ArgumentException
-;;; Generator Version: 41
-;;; Creation Date: 2026-07-11T03:36:09Z
+;;; Generator Version: 42
+;;; Creation Date: 2026-07-11T12:55:15Z
 
 (cl:in-package :system-argument-exception)
 
-(cl:defconstant <type> (dotnet:resolve-type "System.ArgumentException"))
+(cl:define-symbol-macro <type> (dotnet:resolve-type "System.ArgumentException"))
 (cl:defconstant <type-str> "System.ArgumentException")
-(cl:defconstant <creation> "2026-07-11T03:36:09Z")
-(cl:defconstant <version> 41)
+(cl:defconstant <creation> "2026-07-11T12:55:15Z")
+(cl:defconstant <version> 42)
 
 ;; Register C# Type with CLOS
-(cl:eval-when (:compile-toplevel :load-toplevel :execute)
+(cl:eval-when (:load-toplevel :execute)
   (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
                  (dotnet:resolve-type "System.ArgumentException")))
 

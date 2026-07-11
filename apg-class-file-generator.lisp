@@ -22,13 +22,30 @@
 
 (defun emit-type-constants-and-clos-registration (stream fq-name creation-time)
   "Writes the <type>/<type-str>/<creation>/<version> constants plus the
-   CLOS type-registration eval-when block."
-  (format stream "(cl:defconstant <type> (dotnet:resolve-type \"~A\"))~%" fq-name)
+   CLOS type-registration eval-when block.
+
+   <type> is a define-symbol-macro, not a defconstant: resolving a C# type
+   via dotnet:resolve-type must happen where the generated package is
+   actually LOADED (or its symbol-macro expansion actually USED), not
+   wherever its containing .asd's fasl happens to be loaded -- an ASDF
+   :depends-on consumer's build process loads a dependency's fasl before
+   the target assembly is necessarily in scope, so a defconstant's
+   load-time-evaluated init-form can fail there even though the same call
+   succeeds once the deployed app actually runs (DotCL.Runtime >= 0.1.17's
+   resolve-type auto-loads assemblies from AppContext.BaseDirectory on a
+   miss, and memoizes the result after first expansion, so this costs
+   nothing after first use). See dotcl/dotcl#49 and
+   doc/generator-design-notes.md's Version 42 section. The CLOS
+   registration eval-when below is likewise restricted to
+   :load-toplevel/:execute (no :compile-toplevel) for the same reason --
+   forcing EnsureDotNetTypeClass's own resolve-type call during a
+   dependency's compile phase would reintroduce the identical failure."
+  (format stream "(cl:define-symbol-macro <type> (dotnet:resolve-type \"~A\"))~%" fq-name)
   (format stream "(cl:defconstant <type-str> \"~A\")~%" fq-name)
   (format stream "(cl:defconstant <creation> \"~A\")~%" creation-time)
   (format stream "(cl:defconstant <version> ~D)~%~%" *generator-version*)
   (format stream ";; Register C# Type with CLOS~%")
-  (format stream "(cl:eval-when (:compile-toplevel :load-toplevel :execute)~%")
+  (format stream "(cl:eval-when (:load-toplevel :execute)~%")
   (format stream "  (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\"~%")
   (format stream "                 (dotnet:resolve-type \"~A\")))~%~%" fq-name))
 
