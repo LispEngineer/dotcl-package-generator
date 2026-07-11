@@ -953,6 +953,13 @@ metadata field already produces.
   the always-present `<type>` binding named in the issue). A class with such fields would still
   fail the same ASDF-`:depends-on` loadability check; revisit converting these to
   `define-symbol-macro` too if this turns out to matter in practice.
+  * **DONE** (Generator Version 43): a real build after Version 42 confirmed this did matter in
+    practice (enum members reflect as literal fields, and are extremely common). Converted to a
+    *memoized* `define-symbol-macro` (new `emit-memoized-constant-binding` helper), not a plain
+    one, to preserve the original run-once-then-cache performance instead of re-invoking
+    `dotnet:static` on every reference. See `doc/generator-design-notes.md`'s "Memoized
+    Symbol-Macros for Literal Fields and `--constant-properties` (Version 43)" section and
+    `RELEASES.md`'s 2.43.0 entry.
 
 * **Open follow-up 2**: the opt-in `--constant-properties` flag exists specifically to force
   `defconstant` over `define-symbol-macro`, and now also carries this same ASDF-dependency-phase
@@ -962,5 +969,33 @@ metadata field already produces.
   `--constant-properties` CLI help/`FEATURES.md` description. Consider adding one (e.g. "avoid
   `--constant-properties` if this package needs to be loadable as an ASDF dependency before its
   target assembly is in scope") if a real user hits this.
+  * **DONE** (Generator Version 43): same fix as follow-up 1 above — `pure-const-fields`/
+    `pure-const-props` now use the same memoized `define-symbol-macro` helper, preserving the
+    flag's one-time-evaluation performance intent while fixing ASDF-dependency loadability.
+    `--constant-properties`' documented behavior changed accordingly: it no longer switches
+    between `defconstant`/`define-symbol-macro` (both paths are `define-symbol-macro`s now),
+    only between memoized and plain (re-evaluated) semantics — `README.md`/`CLAUDE.md`/
+    `FEATURES.md` updated to describe this. The already-documented struct-aliasing-mutation
+    hazard (Version 29) is unchanged, since a memoized binding still caches a single shared
+    boxed instance exactly like `defconstant` did.
+
+# Per-Class CLOS Registration Made Opt-In (2026-07-11)
+
+* **DONE** (Generator Version 44): investigated whether the per-class "Register C# Type with
+  CLOS" `eval-when` (`EnsureDotNetTypeClass`), emitted unconditionally in every class file since
+  the generator's earliest CLOS-integration versions, was still necessary given DotCL 0.1.17's
+  `dotnet:class-for-type`/`class-of`/`typep` all lazily register a type's CLOS class themselves
+  on first real need (confirmed by reading `dotcl/dotcl`'s actual `Runtime.CLOS.cs`/
+  `Runtime.DotNet.cs`/`Runtime.Type.cs` source at the `v0.1.17` tag). Nothing this generator
+  itself emits — including `--defgeneric`, which dispatches via `class-for-type` on the exact
+  fully-qualified name — depends on it; its only remaining effect is on which type wins a
+  same-simple-name collision's friendly `dotcl-internal::|Name|` symbol (a determinism/cosmetic
+  concern since `dotcl/dotcl#50`, not a correctness one), relevant only to hand-written user code
+  dispatching via that simple-name pattern directly. Added new sticky-only
+  `--ensure-type`/`--no-ensure-type` (OFF by default, no separate per-class override pair — a
+  deliberate, requested exception to this tool's usual two-tier flag convention) gating whether
+  `generate-class-file` emits that block at all. See `doc/generator-design-notes.md`'s
+  "`--ensure-type`: the CLOS Registration `eval-when` Becomes Opt-In (Version 44)" section and
+  `RELEASES.md`'s 2.44.0 entry.
 
 

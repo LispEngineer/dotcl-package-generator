@@ -1,19 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Console
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-console)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Console"))
 (cl:defconstant <type-str> "System.Console")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
-
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.Console")))
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
 (cl:define-symbol-macro caps-lock (dotnet:static <type-str> "CapsLock"))
 (cl:setf (cl:documentation (cl:quote caps-lock) (cl:quote cl:variable)) "Gets a value indicating whether the CAPS LOCK keyboard toggle is turned on or turned off.")

@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :cl-user)
 
@@ -21,7 +21,8 @@
            #:csharp-overload-package-name
            #:csharp-overload-class-name
            #:csharp-overload-method-name
-           #:csharp-overload-supplied-args))
+           #:csharp-overload-supplied-args
+           #:+unbound-marker+))
 
 ;;; Source File: csharp-generics.lisp
 ;;; Purpose: unified CLOS generic functions dispatching on C# runtime

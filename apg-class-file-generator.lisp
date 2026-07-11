@@ -20,9 +20,9 @@
   (format stream ";;; Creation Date: ~A~%~%" creation-time)
   (format stream "(cl:in-package :~A)~%~%" pkg-name))
 
-(defun emit-type-constants-and-clos-registration (stream fq-name creation-time)
-  "Writes the <type>/<type-str>/<creation>/<version> constants plus the
-   CLOS type-registration eval-when block.
+(defun emit-type-constants-and-clos-registration (stream fq-name creation-time ensure-type)
+  "Writes the <type>/<type-str>/<creation>/<version> constants, plus the
+   CLOS type-registration eval-when block when ENSURE-TYPE is non-nil.
 
    <type> is a define-symbol-macro, not a defconstant: resolving a C# type
    via dotnet:resolve-type must happen where the generated package is
@@ -35,19 +35,42 @@
    resolve-type auto-loads assemblies from AppContext.BaseDirectory on a
    miss, and memoizes the result after first expansion, so this costs
    nothing after first use). See dotcl/dotcl#49 and
-   doc/generator-design-notes.md's Version 42 section. The CLOS
-   registration eval-when below is likewise restricted to
-   :load-toplevel/:execute (no :compile-toplevel) for the same reason --
-   forcing EnsureDotNetTypeClass's own resolve-type call during a
-   dependency's compile phase would reintroduce the identical failure."
+   doc/generator-design-notes.md's Version 42 section.
+
+   The CLOS registration eval-when (ENSURE-TYPE, --ensure-type/
+   --no-ensure-type, OFF by default) calls dotnet:static \"DotCL.Runtime\"
+   \"EnsureDotNetTypeClass\" eagerly at package-load time. class-of/typep
+   on any wrapped .NET object, and dotnet:class-for-type (what
+   --defgeneric's generated defmethods use), already lazily register a
+   type's CLOS class themselves on first real need -- nothing this
+   generator itself emits actually requires this eager call. Its only
+   remaining purpose is controlling REGISTRATION ORDER: when two .NET
+   types share a simple name across different namespaces, whichever gets
+   registered first keeps the friendly dotcl-internal::|Name| CLOS class
+   symbol (the other falls back to its assembly-qualified name, with a
+   console warning -- DotCL.Runtime >= 0.1.17/dotcl/dotcl#50 -- not a
+   silently-shared misdispatching class the way pre-0.1.17 DotCL behaved).
+   Eager, generation-order-based registration makes that outcome
+   deterministic and reproducible; without it, the winner depends on
+   whichever type the running program happens to touch first. This only
+   matters for hand-written user code that dispatches via the simple-name
+   pattern documented in doc/generator-design-notes.md's \".NET CLOS
+   Integration\" section -- --defgeneric is unaffected either way, since
+   it dispatches via class-for-type on the exact fully-qualified name. See
+   doc/generator-design-notes.md's Version 44 section. When emitted, this
+   eval-when is restricted to :load-toplevel/:execute (no :compile-toplevel)
+   for the same ASDF-dependency-phase reason as <type> itself -- forcing
+   EnsureDotNetTypeClass's own resolve-type call during a dependency's
+   compile phase would reintroduce the identical failure."
   (format stream "(cl:define-symbol-macro <type> (dotnet:resolve-type \"~A\"))~%" fq-name)
   (format stream "(cl:defconstant <type-str> \"~A\")~%" fq-name)
   (format stream "(cl:defconstant <creation> \"~A\")~%" creation-time)
   (format stream "(cl:defconstant <version> ~D)~%~%" *generator-version*)
-  (format stream ";; Register C# Type with CLOS~%")
-  (format stream "(cl:eval-when (:load-toplevel :execute)~%")
-  (format stream "  (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\"~%")
-  (format stream "                 (dotnet:resolve-type \"~A\")))~%~%" fq-name))
+  (when ensure-type
+    (format stream ";; Register C# Type with CLOS~%")
+    (format stream "(cl:eval-when (:load-toplevel :execute)~%")
+    (format stream "  (dotnet:static \"DotCL.Runtime\" \"EnsureDotNetTypeClass\"~%")
+    (format stream "                 (dotnet:resolve-type \"~A\")))~%~%" fq-name)))
 
 (defun emit-constructors (stream fq-name clean-ctors dirty-ctors)
   "Writes the 3-way dirty/single-clean/multi-clean constructor dispatch."
@@ -100,31 +123,53 @@
            (format stream ";;   ~A~%" (constructor-signature-str dc)))
          (format stream "~%"))))))
 
+(defun emit-memoized-constant-binding (stream cname member-name doc-str)
+  "Writes a private cache cl:defvar plus a memoizing cl:define-symbol-macro
+   binding CNAME to (dotnet:static <type-str> MEMBER-NAME): the dotnet:static
+   call runs lazily on first use, never at load time -- fixes
+   dotcl/dotcl#49 for these bindings the same way <type> itself was fixed
+   (emit-type-constants-and-clos-registration) -- and is cached in a
+   private %<name>-cache% variable thereafter, matching cl:defconstant's
+   original run-once-then-reuse behavior, including its existing
+   shared-boxed-instance aliasing hazard (see
+   emit-shared-mutable-constant-warning, still called by every caller of
+   this function, unchanged). %<name>-cache%'s '%' earmuffs can never
+   collide with a mapped C# member name (C# cannot produce '%' in an
+   identifier), the same collision-proofing trick as obj!/quote!, so it is
+   safe to leave unexported. See doc/generator-design-notes.md's Version 43
+   section. DOC-STR, if non-empty, is attached as CNAME's 'cl:variable
+   documentation, exactly as before."
+  (let ((cache-var (format nil "%~A-cache%" (string-trim "+" cname))))
+    (format stream "(cl:defvar ~A csharp-assembly-utils:+unbound-marker+)~%" cache-var)
+    (format stream "(cl:define-symbol-macro ~A~%" cname)
+    (format stream "  (cl:if (cl:eq ~A csharp-assembly-utils:+unbound-marker+)~%" cache-var)
+    (format stream "      (cl:setf ~A (dotnet:static <type-str> \"~A\"))~%" cache-var member-name)
+    (format stream "      ~A))~%" cache-var))
+  (if (> (length doc-str) 0)
+      (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
+      (format stream "~%")))
+
 (defun emit-literal-field-constants (stream literal-fields)
-  "Writes defconstants for compile-time literal fields."
+  "Writes memoized-symbol-macro bindings (see emit-memoized-constant-binding)
+   for compile-time literal fields."
   (dolist (f literal-fields)
     (let* ((cname (format nil "+~A+" (camel-to-kebab (getf f :name))))
            (f-doc (getf (getf f :documentation) :summary))
            (doc-str (if f-doc (escape-lisp-string f-doc) "")))
       (emit-shared-mutable-constant-warning stream (getf f :type))
-      (format stream "(cl:defconstant ~A (dotnet:static <type-str> \"~A\"))~%" cname (getf f :name))
-      (if (> (length doc-str) 0)
-          (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
-          (format stream "~%")))))
+      (emit-memoized-constant-binding stream cname (getf f :name) doc-str))))
 
 (defun emit-readonly-fields (stream pure-const-fields dynamic-const-fields)
-  "Writes runtime-readonly fields: pure-const-fields as defconstants,
-   dynamic-const-fields as define-symbol-macros."
+  "Writes runtime-readonly fields: pure-const-fields as memoized
+   symbol-macros (see emit-memoized-constant-binding), dynamic-const-fields
+   as plain (re-evaluated) define-symbol-macros."
   ;; Runtime Read-Only Fields (Constants)
   (dolist (f pure-const-fields)
     (let* ((cname (format nil "+~A+" (camel-to-kebab (getf f :name))))
            (f-doc (getf (getf f :documentation) :summary))
            (doc-str (if f-doc (escape-lisp-string f-doc) "")))
       (emit-shared-mutable-constant-warning stream (getf f :type))
-      (format stream "(cl:defconstant ~A (dotnet:static <type-str> \"~A\"))~%" cname (getf f :name))
-      (if (> (length doc-str) 0)
-          (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
-          (format stream "~%"))))
+      (emit-memoized-constant-binding stream cname (getf f :name) doc-str)))
 
   ;; Runtime Read-Only Fields (Dynamic)
   (dolist (f dynamic-const-fields)
@@ -137,8 +182,9 @@
           (format stream "~%")))))
 
 (defun emit-static-properties (stream pure-const-props dynamic-const-props writeable-static-props)
-  "Writes static properties: pure-const-props as defconstants,
-   dynamic-const-props as define-symbol-macros, writeable-static-props as
+  "Writes static properties: pure-const-props as memoized symbol-macros
+   (see emit-memoized-constant-binding), dynamic-const-props as plain
+   (re-evaluated) define-symbol-macros, writeable-static-props as
    getter/setter defuns."
   ;; Runtime Read-Only Properties
   ;; Pure Constant Properties
@@ -147,10 +193,7 @@
            (p-doc (getf (getf p :documentation) :summary))
            (doc-str (if p-doc (escape-lisp-string p-doc) "")))
       (emit-shared-mutable-constant-warning stream (getf p :type))
-      (format stream "(cl:defconstant ~A (dotnet:static <type-str> \"~A\"))~%" cname (getf p :name))
-      (if (> (length doc-str) 0)
-          (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
-          (format stream "~%"))))
+      (emit-memoized-constant-binding stream cname (getf p :name) doc-str)))
 
   ;; Runtime Read-Only Properties
   (dolist (p dynamic-const-props)
@@ -404,7 +447,8 @@
     (format stream "~%")))
 
 (defun generate-class-file (class-plist output-dir &optional constant-properties-list creation-time
-                                                       matched-extensions skipped-extensions)
+                                                       matched-extensions skipped-extensions
+                                                       ensure-type)
   "Generates the Lisp source file for a single class plist.
    CREATION-TIME, if supplied, is used verbatim as the file's creation-date
    stamp (so a batch of files generated in one run can share a single
@@ -414,7 +458,10 @@
    doc/plan-v38.md) are, respectively, the surviving (method-plist
    holder-plist holder-assembly-name) entries to emit as obj!-first
    wrappers, and the (method-plist holder-plist reason) entries to instead
-   document with a skip comment.
+   document with a skip comment. ENSURE-TYPE (nil unless this class opted
+   into --ensure-type -- Version 44) controls whether
+   emit-type-constants-and-clos-registration emits the \"Register C# Type
+   with CLOS\" eval-when at all.
    Driver: classifies CLASS-PLIST's members once (classify-class-members)
    and calls the emit-* section helpers in file order."
   (let* ((fq-name (getf class-plist :fully-qualified-name))
@@ -430,7 +477,7 @@
     (let ((classification (classify-class-members class-plist constant-properties-list)))
       (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
         (emit-class-file-header stream fq-name pkg-name creation-time)
-        (emit-type-constants-and-clos-registration stream fq-name creation-time)
+        (emit-type-constants-and-clos-registration stream fq-name creation-time ensure-type)
         (emit-constructors stream fq-name (cmc-clean-ctors classification) (cmc-dirty-ctors classification))
         (emit-literal-field-constants stream (cmc-literal-fields classification))
         (emit-readonly-fields stream (cmc-pure-const-fields classification) (cmc-dynamic-const-fields classification))

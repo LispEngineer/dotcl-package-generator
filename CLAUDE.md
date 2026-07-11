@@ -113,9 +113,10 @@ the most recently given `--class`. `--assembly` is repeatable and may have zero 
 options (metadata-only).
 
 `--constant-properties` (comma/semicolon-separated names, or `"*"` for all) forces static
-read-only properties to be emitted as `defconstant` instead of `define-symbol-macro` — safe
-only when the property genuinely never changes at runtime (e.g. `Vector2.Zero`), since
-reflection alone can't tell constants from properties that vary.
+read-only properties to be memoized — computed once, on first use, then cached for the life
+of the program — instead of re-evaluated on every reference; safe only when the property
+genuinely never changes at runtime (e.g. `Vector2.Zero`), since reflection alone can't tell
+constants from properties that vary.
 
 A class can also opt into generating packages for, and re-exporting non-conflicting members
 from, its ancestors: `--export-parents`/`--export-interfaces`/`--export-object` (per-class,
@@ -153,6 +154,17 @@ assemblies, exact concrete `this`-type match only) injected into its own package
 sticky `--enable-extension-methods`/`--no-enable-extension-methods` — **ON by default**, unlike
 every other sticky flag above. See `doc/plan-v38.md`, `doc/generator-design-notes.md`'s
 "Extension Methods (Version 38)" section, and `FEATURES.md`'s "Extension Methods" section.
+
+A class can also opt into emitting the per-class "Register C# Type with CLOS" `eval-when`
+(`EnsureDotNetTypeClass`) that every version before 44 emitted unconditionally, via
+`--ensure-type`/`--no-ensure-type` — **OFF by default**, and, unlike every flag above, sticky
+*only*: it applies directly to the current and every subsequent `--class`, with no separate
+per-class override pair. Nothing this generator itself emits actually needs this eager call —
+`class-of`/`typep`/`dotnet:class-for-type` (used by `--defgeneric`) all lazily register a
+type's CLOS class themselves on first real need; its only remaining effect is on which type
+wins a same-simple-name collision's friendly `dotcl-internal::|Name|` symbol, relevant only to
+hand-written user code dispatching via that pattern directly. See
+`doc/generator-design-notes.md`'s Version 44 section.
 
 `--version`/`--help` and `--test` boot the DotCL host (`DotclHost.Initialize()`); the
 metadata-reflection portion of a `--out-dir` invocation intentionally does not, since it's pure

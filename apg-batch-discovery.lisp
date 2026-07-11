@@ -13,7 +13,8 @@
 (defun make-resolved-class (class-plist constant-properties
                              &optional export-parents export-interfaces export-object
                                defgeneric extension-methods
-                               output-nested output-children output-implementations)
+                               output-nested output-children output-implementations
+                               ensure-type)
   "Builds a resolved-class plist: the unit of work generate-class-file,
    generate-batch-packages-file, generate-batch-asd-file, and the
    parents/interfaces re-export machinery all operate on. CLASS-PLIST is
@@ -26,19 +27,25 @@
    requesting any discovery) mirror the manifest's per-class flags of the
    same names; as of Version 39 a class discovered via any of them carries
    the *entire* flag set (all six of these, plus DEFGENERIC/EXTENSION-
-   METHODS below) of the class that discovered it, propagated verbatim by
-   GENERATE-ASSEMBLY-PACKAGES-BATCH's work queue, so discovery/re-export
-   cascades recursively through the whole connected component a flag
-   reaches -- see PLAN.md's \"Recursive Related-Class Discovery\" section.
-   DEFGENERIC (nil unless requested or propagated) mirrors the manifest's
-   per-class :defgeneric flag -- opts a class into the shared CSHARP-GENERICS
-   package of unified CLOS generic functions (see
-   doc/make-everything-defgeneric.md). EXTENSION-METHODS (nil unless
+   METHODS/ENSURE-TYPE below) of the class that discovered it, propagated
+   verbatim by GENERATE-ASSEMBLY-PACKAGES-BATCH's work queue, so
+   discovery/re-export cascades recursively through the whole connected
+   component a flag reaches -- see PLAN.md's \"Recursive Related-Class
+   Discovery\" section. DEFGENERIC (nil unless requested or propagated)
+   mirrors the manifest's per-class :defgeneric flag -- opts a class into
+   the shared CSHARP-GENERICS package of unified CLOS generic functions
+   (see doc/make-everything-defgeneric.md). EXTENSION-METHODS (nil unless
    requested or propagated; defaults to t at the CLI level for an
    explicitly-requested class -- see Program.cs's enableExtensionMethods)
    mirrors the manifest's per-class :extension-methods flag (Version 38,
    doc/plan-v38.md) -- whether this class's package should have matching
-   C# extension methods injected as obj!-first wrappers. The stored
+   C# extension methods injected as obj!-first wrappers. ENSURE-TYPE (nil
+   unless requested or propagated; defaults to nil at the CLI level -- see
+   Program.cs's ensureType) mirrors the manifest's per-class :ensure-type
+   flag (Version 44, doc/generator-design-notes.md) -- whether
+   generate-class-file should emit the \"Register C# Type with CLOS\"
+   eval-when (EnsureDotNetTypeClass) at all; see
+   emit-type-constants-and-clos-registration. The stored
    :matched-extensions/:skipped-extensions slots (initially nil) are
    filled in separately by GENERATE-ASSEMBLY-PACKAGES-BATCH once the whole
    working set and the extension-method index are available -- see
@@ -53,6 +60,7 @@
         :output-implementations output-implementations
         :defgeneric defgeneric
         :extension-methods extension-methods
+        :ensure-type ensure-type
         :matched-extensions nil
         :skipped-extensions nil))
 
@@ -84,7 +92,8 @@
                                           (getf class-entry :extension-methods)
                                           (getf class-entry :output-nested)
                                           (getf class-entry :output-children)
-                                          (getf class-entry :output-implementations))
+                                          (getf class-entry :output-implementations)
+                                          (getf class-entry :ensure-type))
                     resolved)
               (push cname not-found))))
       (values (nreverse resolved) (nreverse not-found)))))

@@ -1,19 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ValueTuple`7
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-value-tuple-7)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ValueTuple`7"))
 (cl:defconstant <type-str> "System.ValueTuple`7")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
-
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.ValueTuple`7")))
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
 (cl:defun new (cl:&optional (item1 cl:nil supplied-item1) (item2 cl:nil supplied-item2) (item3 cl:nil supplied-item3) (item4 cl:nil supplied-item4) (item5 cl:nil supplied-item5) (item6 cl:nil supplied-item6) (item7 cl:nil supplied-item7))
   "Master wrapper for System.ValueTuple`7 constructor overloads. Dispatches at runtime.
@@ -49,7 +44,7 @@ new(T1, T2, T3, T4, T5, T6, T7)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item1) (new-value obj!)
@@ -63,7 +58,7 @@ new(T1, T2, T3, T4, T5, T6, T7)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item2) (new-value obj!)
@@ -77,7 +72,7 @@ new(T1, T2, T3, T4, T5, T6, T7)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item3) (new-value obj!)
@@ -91,7 +86,7 @@ new(T1, T2, T3, T4, T5, T6, T7)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item4) (new-value obj!)
@@ -105,7 +100,7 @@ new(T1, T2, T3, T4, T5, T6, T7)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item5) (new-value obj!)
@@ -119,7 +114,7 @@ new(T1, T2, T3, T4, T5, T6, T7)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item6) (new-value obj!)
@@ -133,7 +128,7 @@ new(T1, T2, T3, T4, T5, T6, T7)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item7) (new-value obj!)

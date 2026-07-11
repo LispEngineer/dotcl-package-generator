@@ -1,21 +1,20 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Array
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-array)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Array"))
 (cl:defconstant <type-str> "System.Array")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.Array")))
-
-(cl:defconstant +max-length+ (dotnet:static <type-str> "MaxLength"))
+(cl:defvar %max-length-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +max-length+
+  (cl:if (cl:eq %max-length-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %max-length-cache% (dotnet:static <type-str> "MaxLength"))
+      %max-length-cache%))
 (cl:setf (cl:documentation (cl:quote +max-length+) (cl:quote cl:variable)) "Gets the maximum number of elements that may be contained in an array.")
 
 (cl:defun fixed-size? (obj!)

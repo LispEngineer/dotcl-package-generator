@@ -1,19 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-time-zone-info)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeZoneInfo"))
 (cl:defconstant <type-str> "System.TimeZoneInfo")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
-
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.TimeZoneInfo")))
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
 (cl:define-symbol-macro local (dotnet:static <type-str> "Local"))
 (cl:setf (cl:documentation (cl:quote local) (cl:quote cl:variable)) "Gets a System.TimeZoneInfo object that represents the local time zone.")

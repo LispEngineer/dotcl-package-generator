@@ -1,19 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Hashtable
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-collections-hashtable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Hashtable"))
 (cl:defconstant <type-str> "System.Collections.Hashtable")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
-
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.Collections.Hashtable")))
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (load-factor cl:nil supplied-load-factor) (equality-comparer cl:nil supplied-equality-comparer) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Hashtable constructor overloads. Dispatches at runtime.

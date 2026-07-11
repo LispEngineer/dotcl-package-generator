@@ -87,7 +87,9 @@ test: build
 	      --class 'System.Numerics.Vector4' --constant-properties "*" \
 	      --no-enable-defgeneric \
 	    --assembly $(REF_DIR)System.Threading.Timer.dll \
+	      --ensure-type \
 	      --class System.Threading.Timer --defgeneric \
+	      --no-ensure-type \
 	    --assembly $(REF_DIR)System.ComponentModel.TypeConverter.dll \
 	      --class System.Timers.Timer --defgeneric \
 	    --assembly $(REF_DIR)System.Diagnostics.Debug.dll \
@@ -125,6 +127,11 @@ test: build
 	# this same assembly -- before the fix, --export-parents could never resolve
 	# a closed-generic superclass at all (see doc/generator-design-notes.md's
 	# "Generic Superclass/Interface Identity Matching (Version 40)" section).
+	# System.Threading.Timer/System.Timers.Timer (the deliberate same-simple-name
+	# collision pair from Version 35/36/41's own verification) demonstrates
+	# Version 44's --ensure-type: only Timer opts in, so its class file emits
+	# the "Register C# Type with CLOS" eval-when while Timers.Timer's does not
+	# (--no-ensure-type turns the sticky default back off immediately after).
 	# Others for future: System.Globalization.CultureInfo, DateTimeFormatInfo;
 	# System.Collections.Generic.List, SortedList; System.Text.StringBuilder;
 	# System.Drawing.Point/F; Size/F

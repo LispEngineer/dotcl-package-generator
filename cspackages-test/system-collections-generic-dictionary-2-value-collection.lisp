@@ -1,19 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2+ValueCollection
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-collections-generic-dictionary-2-value-collection)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2+ValueCollection"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2+ValueCollection")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
-
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.Collections.Generic.Dictionary`2+ValueCollection")))
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
 (cl:defun new (dictionary)
   "Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2.ValueCollection class that reflects the values in the specified System.Collections.Generic.Dictionary`2.

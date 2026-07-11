@@ -31,20 +31,25 @@
   (and type-str (member type-str *immutable-primitive-types* :test #'string=) t))
 
 (defun emit-shared-mutable-constant-warning (stream type-str)
-  "Writes a warning comment to STREAM above a defconstant for a field/property of
-   TYPE-STR, unless TYPE-STR is a known-safe immutable-primitive-type-p type. A
-   defconstant's value form runs exactly once, so this constant is a single boxed .NET
-   object shared and re-returned on every reference to it for the life of the program;
-   if TYPE-STR is a mutable value type (a struct with settable properties/fields, e.g.
-   System.Numerics.Vector2 or Microsoft.Xna.Framework.Color), mutating this object --
-   through this constant, or through ANY other Lisp/C# reference that aliases the same
-   boxed instance -- permanently corrupts it for every future reference, since the same
-   box is shared, not freshly re-fetched the way a define-symbol-macro constant is. See
-   FEATURES.md's \"Static Constants and Symbol Macros\" section for the full
-   explanation and worked example of this hazard."
+  "Writes a warning comment to STREAM above a memoized constant binding (see
+   emit-memoized-constant-binding, apg-class-file-generator.lisp) for a
+   field/property of TYPE-STR, unless TYPE-STR is a known-safe
+   immutable-primitive-type-p type. Such a binding's dotnet:static call runs
+   exactly once (cached in a private variable on first use), so it is a
+   single boxed .NET object shared and re-returned on every reference to it
+   for the life of the program; if TYPE-STR is a mutable value type (a
+   struct with settable properties/fields, e.g. System.Numerics.Vector2 or
+   Microsoft.Xna.Framework.Color), mutating this object -- through this
+   constant, or through ANY other Lisp/C# reference that aliases the same
+   boxed instance -- permanently corrupts it for every future reference,
+   since the same box is shared, not freshly re-fetched the way a plain
+   (non-memoized) define-symbol-macro constant is. See FEATURES.md's
+   \"Static Constants and Symbol Macros\" section for the full explanation
+   and worked example of this hazard."
   (unless (immutable-primitive-type-p type-str)
     (format stream ";; WARNING: this is a single, permanently-cached boxed .NET object --~%")
-    (format stream ";; the defconstant form below only runs once. If ~A is a mutable~%" type-str)
+    (format stream ";; the binding below computes its value at most once (cached on first~%")
+    (format stream ";; use). If ~A is a mutable~%" type-str)
     (format stream ";; value type (struct) with settable properties/fields, mutating this~%")
     (format stream ";; object -- through this binding, or through ANY other reference that~%")
     (format stream ";; aliases the same boxed instance -- permanently corrupts it for every~%")
@@ -58,14 +63,15 @@
 (defun emit-obj-boxing-mutation-warning (stream)
   "Writes the boxed-obj!-mutation warning comment above a value-type
    instance property/field setf mutator -- a distinct hazard from
-   emit-shared-mutable-constant-warning's defconstant-caching warning
+   emit-shared-mutable-constant-warning's memoized-constant-caching warning
    (this one is about obj! itself potentially being an alias of a shared
-   value, e.g. a defconstant, at the CALL site, not about caching).
-   Previously duplicated verbatim at 3 sites inside generate-class-file's
-   instance-property and public-instance-field setf-mutator emission."
+   value, e.g. a memoized constant binding, at the CALL site, not about
+   caching). Previously duplicated verbatim at 3 sites inside
+   generate-class-file's instance-property and public-instance-field
+   setf-mutator emission."
   (format stream ";; Note: obj! here is a boxed reference to a .NET value type (struct).~%")
   (format stream ";; This setf mutates that exact boxed instance in place -- it does NOT~%")
   (format stream ";; silently discard the change. However, if obj! is an alias of a shared~%")
-  (format stream ";; or cached value (e.g. a constant defined via defconstant), this mutates~%")
+  (format stream ";; or cached value (e.g. a memoized constant binding), this mutates~%")
   (format stream ";; that shared instance for every other reference to it too. See~%")
   (format stream ";; FEATURES.md's \"Struct Boxing Caveat\" section for details.~%"))

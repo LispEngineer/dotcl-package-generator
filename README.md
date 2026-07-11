@@ -67,9 +67,10 @@ the most recently given `--class`. `--assembly` may be repeated to process sever
 in one invocation, and a `--assembly` with no `--class` options is valid (metadata-only).
 
 `--constant-properties` (comma/semicolon-separated names, or `"*"` for all) forces static
-read-only properties to be emitted as `defconstant` instead of `define-symbol-macro` — safe
-only when the property genuinely never changes at runtime (e.g. `Vector2.Zero`), since
-reflection alone can't tell constants from properties that vary.
+read-only properties to be memoized — computed once, on first use, then cached for the life
+of the program — instead of re-evaluated on every reference; safe only when the property
+genuinely never changes at runtime (e.g. `Vector2.Zero`), since reflection alone can't tell
+constants from properties that vary.
 
 Nested C# types (a class/struct/enum declared inside another type) are addressed by their
 CIL name, which separates nesting levels with `+` rather than `.` — e.g.

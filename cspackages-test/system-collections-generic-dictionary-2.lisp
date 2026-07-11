@@ -1,19 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
-
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.Collections.Generic.Dictionary`2")))
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Generic.Dictionary`2 constructor overloads. Dispatches at runtime.

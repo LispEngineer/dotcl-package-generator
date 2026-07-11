@@ -1,19 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector3
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-numerics-vector3)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector3"))
 (cl:defconstant <type-str> "System.Numerics.Vector3")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
-
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.Numerics.Vector3")))
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
 (cl:defun new (cl:&optional (value cl:nil supplied-value) (z cl:nil supplied-z) (z2 cl:nil supplied-z2))
   "Master wrapper for System.Numerics.Vector3 constructor overloads. Dispatches at runtime.
@@ -61,7 +56,8 @@ new(Single, Single, Single)
                     :supplied-args (cl:append (cl:when supplied-value (cl:list :value value)) (cl:when supplied-z (cl:list :z z)) (cl:when supplied-z2 (cl:list :z2 z2)))))))
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -71,11 +67,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +all-bits-set+ (dotnet:static <type-str> "AllBitsSet"))
+(cl:defvar %all-bits-set-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +all-bits-set+
+  (cl:if (cl:eq %all-bits-set-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %all-bits-set-cache% (dotnet:static <type-str> "AllBitsSet"))
+      %all-bits-set-cache%))
 (cl:setf (cl:documentation (cl:quote +all-bits-set+) (cl:quote cl:variable)) "Gets a vector where all bits are set to 1.")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -85,11 +86,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +e+ (dotnet:static <type-str> "E"))
+(cl:defvar %e-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +e+
+  (cl:if (cl:eq %e-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %e-cache% (dotnet:static <type-str> "E"))
+      %e-cache%))
 (cl:setf (cl:documentation (cl:quote +e+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to .")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -99,11 +105,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +epsilon+ (dotnet:static <type-str> "Epsilon"))
+(cl:defvar %epsilon-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +epsilon+
+  (cl:if (cl:eq %epsilon-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %epsilon-cache% (dotnet:static <type-str> "Epsilon"))
+      %epsilon-cache%))
 (cl:setf (cl:documentation (cl:quote +epsilon+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to .")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -113,11 +124,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +nan+ (dotnet:static <type-str> "NaN"))
+(cl:defvar %nan-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +nan+
+  (cl:if (cl:eq %nan-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %nan-cache% (dotnet:static <type-str> "NaN"))
+      %nan-cache%))
 (cl:setf (cl:documentation (cl:quote +nan+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to .")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -127,11 +143,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +negative-infinity+ (dotnet:static <type-str> "NegativeInfinity"))
+(cl:defvar %negative-infinity-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +negative-infinity+
+  (cl:if (cl:eq %negative-infinity-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %negative-infinity-cache% (dotnet:static <type-str> "NegativeInfinity"))
+      %negative-infinity-cache%))
 (cl:setf (cl:documentation (cl:quote +negative-infinity+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to .")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -141,11 +162,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +negative-zero+ (dotnet:static <type-str> "NegativeZero"))
+(cl:defvar %negative-zero-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +negative-zero+
+  (cl:if (cl:eq %negative-zero-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %negative-zero-cache% (dotnet:static <type-str> "NegativeZero"))
+      %negative-zero-cache%))
 (cl:setf (cl:documentation (cl:quote +negative-zero+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to .")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -155,11 +181,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +one+ (dotnet:static <type-str> "One"))
+(cl:defvar %one-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +one+
+  (cl:if (cl:eq %one-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %one-cache% (dotnet:static <type-str> "One"))
+      %one-cache%))
 (cl:setf (cl:documentation (cl:quote +one+) (cl:quote cl:variable)) "Gets a vector whose 3 elements are equal to one.")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -169,11 +200,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +pi+ (dotnet:static <type-str> "Pi"))
+(cl:defvar %pi-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +pi+
+  (cl:if (cl:eq %pi-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %pi-cache% (dotnet:static <type-str> "Pi"))
+      %pi-cache%))
 (cl:setf (cl:documentation (cl:quote +pi+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to .")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -183,11 +219,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +positive-infinity+ (dotnet:static <type-str> "PositiveInfinity"))
+(cl:defvar %positive-infinity-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +positive-infinity+
+  (cl:if (cl:eq %positive-infinity-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %positive-infinity-cache% (dotnet:static <type-str> "PositiveInfinity"))
+      %positive-infinity-cache%))
 (cl:setf (cl:documentation (cl:quote +positive-infinity+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to .")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -197,11 +238,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +tau+ (dotnet:static <type-str> "Tau"))
+(cl:defvar %tau-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +tau+
+  (cl:if (cl:eq %tau-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %tau-cache% (dotnet:static <type-str> "Tau"))
+      %tau-cache%))
 (cl:setf (cl:documentation (cl:quote +tau+) (cl:quote cl:variable)) "Gets a vector whose elements are equal to .")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -211,11 +257,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +unit-x+ (dotnet:static <type-str> "UnitX"))
+(cl:defvar %unit-x-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +unit-x+
+  (cl:if (cl:eq %unit-x-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %unit-x-cache% (dotnet:static <type-str> "UnitX"))
+      %unit-x-cache%))
 (cl:setf (cl:documentation (cl:quote +unit-x+) (cl:quote cl:variable)) "Gets the vector (1,0,0).")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -225,11 +276,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +unit-y+ (dotnet:static <type-str> "UnitY"))
+(cl:defvar %unit-y-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +unit-y+
+  (cl:if (cl:eq %unit-y-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %unit-y-cache% (dotnet:static <type-str> "UnitY"))
+      %unit-y-cache%))
 (cl:setf (cl:documentation (cl:quote +unit-y+) (cl:quote cl:variable)) "Gets the vector (0,1,0).")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -239,11 +295,16 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +unit-z+ (dotnet:static <type-str> "UnitZ"))
+(cl:defvar %unit-z-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +unit-z+
+  (cl:if (cl:eq %unit-z-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %unit-z-cache% (dotnet:static <type-str> "UnitZ"))
+      %unit-z-cache%))
 (cl:setf (cl:documentation (cl:quote +unit-z+) (cl:quote cl:variable)) "Gets the vector (0,0,1).")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector3 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector3 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -253,7 +314,11 @@ new(Single, Single, Single)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +zero+ (dotnet:static <type-str> "Zero"))
+(cl:defvar %zero-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +zero+
+  (cl:if (cl:eq %zero-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %zero-cache% (dotnet:static <type-str> "Zero"))
+      %zero-cache%))
 (cl:setf (cl:documentation (cl:quote +zero+) (cl:quote cl:variable)) "Gets a vector whose 3 elements are equal to zero.")
 
 (cl:defun item (obj! index)
@@ -262,7 +327,7 @@ new(Single, Single, Single)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf item) (new-value obj! index)
@@ -275,7 +340,7 @@ new(Single, Single, Single)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf x) (new-value obj!)
@@ -289,7 +354,7 @@ new(Single, Single, Single)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf y) (new-value obj!)
@@ -303,7 +368,7 @@ new(Single, Single, Single)
 ;; Note: obj! here is a boxed reference to a .NET value type (struct).
 ;; This setf mutates that exact boxed instance in place -- it does NOT
 ;; silently discard the change. However, if obj! is an alias of a shared
-;; or cached value (e.g. a constant defined via defconstant), this mutates
+;; or cached value (e.g. a memoized constant binding), this mutates
 ;; that shared instance for every other reference to it too. See
 ;; FEATURES.md's "Struct Boxing Caveat" section for details.
 (cl:defun (cl:setf z) (new-value obj!)

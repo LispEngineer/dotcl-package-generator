@@ -32,6 +32,7 @@ bool outputAllImplementations = false;
 bool skipMissing = false;
 bool enableDefgenericStatic = false;
 bool enableExtensionMethods = true;
+bool ensureType = false;
 
 ////////////////////////////////////////////////////////////////////////////
 // Parse arguments
@@ -67,6 +68,7 @@ for (int i = 0; i < args.Length; i++) {
                 OutputImplementations = outputAllImplementations,
                 DefGenericStatic = enableDefgenericStatic,
                 ExtensionMethods = enableExtensionMethods,
+                EnsureType = ensureType,
             };
             currentGroup.Classes.Add(currentClass);
         }
@@ -210,6 +212,10 @@ for (int i = 0; i < args.Length; i++) {
         enableExtensionMethods = true;
     } else if (args[i] == "--no-enable-extension-methods") {
         enableExtensionMethods = false;
+    } else if (args[i] == "--ensure-type") {
+        ensureType = true;
+    } else if (args[i] == "--no-ensure-type") {
+        ensureType = false;
     } else if (args[i] == "--test") {
         isTestMode = true;
     }
@@ -286,6 +292,7 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
                 manifest.Append(" :output-implementations ").Append(cls.OutputImplementations ? "t" : "nil");
                 manifest.Append(" :defgeneric ").Append(cls.DefGenericStatic ? "t" : "nil");
                 manifest.Append(" :extension-methods ").Append(cls.ExtensionMethods ? "t" : "nil");
+                manifest.Append(" :ensure-type ").Append(cls.EnsureType ? "t" : "nil");
                 manifest.Append(')');
             }
             manifest.Append("))\n");
@@ -493,7 +500,8 @@ void PrintHelp() {
     Console.WriteLine("Sticky defaults (change the default for the current and every subsequent --class,");
     Console.WriteLine("in command-line order; a class's own --export-*/--output-*/--no-export-*/");
     Console.WriteLine("--no-output-*/--defgeneric* flags above always override these, for that one");
-    Console.WriteLine("class only):");
+    Console.WriteLine("class only -- except --ensure-type/--no-ensure-type, which has no dedicated");
+    Console.WriteLine("per-class override and applies directly, like the others below it):");
     Opt("--export-all-parents / --no-export-all-parents", "Default --export-parents on/off.");
     Opt("--export-all-interfaces / --no-export-all-interfaces", "Default --export-interfaces on/off.");
     Opt("--export-all-object / --no-export-all-object", "Default --export-object on/off.");
@@ -505,6 +513,26 @@ void PrintHelp() {
         "Defaults to ON (unlike the other sticky flags",
         "above), so extension-method injection happens",
         "for every --class unless disabled.");
+    Opt("--ensure-type / --no-ensure-type", "Emit the per-class 'Register C# Type with",
+        "CLOS' eval-when (EnsureDotNetTypeClass) for the",
+        "current and every subsequent --class, so a",
+        "same-simple-name collision's generation-time",
+        "load order deterministically decides which type",
+        "keeps the friendly dotcl-internal::|Name| CLOS",
+        "class symbol (see doc/generator-design-notes.md's",
+        "\".NET CLOS Integration\" section). No dedicated",
+        "per-class override exists for this one -- unlike",
+        "the flags above, it applies directly to the",
+        "current and all following classes. OFF by default:",
+        "class-of/typep/dotnet:class-for-type already",
+        "register a type's CLOS class lazily on first real",
+        "need, so this is unnecessary for anything this",
+        "generator itself emits (including --defgeneric,",
+        "which dispatches via class-for-type on the exact",
+        "fully-qualified name, immune to the naming race",
+        "entirely); it only matters for hand-written code",
+        "that dispatches on a generated type's simple-name",
+        "CLOS symbol directly.");
     Console.WriteLine();
     Console.WriteLine("Global:");
     Opt("--skip-missing / --no-skip-missing", "When a requested parent/interface ancestor",
@@ -544,4 +572,5 @@ class ClassSpec {
     public bool OutputImplementations;
     public bool DefGenericStatic;
     public bool ExtensionMethods;
+    public bool EnsureType;
 }

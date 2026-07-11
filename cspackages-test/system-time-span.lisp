@@ -1,19 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-time-span)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
-
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.TimeSpan")))
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
 (cl:defun new (cl:&optional (ticks cl:nil supplied-ticks) (minutes cl:nil supplied-minutes) (seconds cl:nil supplied-seconds) (seconds2 cl:nil supplied-seconds2) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
   "Master wrapper for System.TimeSpan constructor overloads. Dispatches at runtime.
@@ -78,74 +73,163 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
                     :method-name "new"
                     :supplied-args (cl:append (cl:when supplied-ticks (cl:list :ticks ticks)) (cl:when supplied-minutes (cl:list :minutes minutes)) (cl:when supplied-seconds (cl:list :seconds seconds)) (cl:when supplied-seconds2 (cl:list :seconds2 seconds2)) (cl:when supplied-milliseconds (cl:list :milliseconds milliseconds)) (cl:when supplied-microseconds (cl:list :microseconds microseconds)))))))
 
-(cl:defconstant +hours-per-day+ (dotnet:static <type-str> "HoursPerDay"))
+(cl:defvar %hours-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +hours-per-day+
+  (cl:if (cl:eq %hours-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %hours-per-day-cache% (dotnet:static <type-str> "HoursPerDay"))
+      %hours-per-day-cache%))
 (cl:setf (cl:documentation (cl:quote +hours-per-day+) (cl:quote cl:variable)) "Represents the number of hours in 1 day. This field is constant.")
 
-(cl:defconstant +microseconds-per-day+ (dotnet:static <type-str> "MicrosecondsPerDay"))
+(cl:defvar %microseconds-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +microseconds-per-day+
+  (cl:if (cl:eq %microseconds-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %microseconds-per-day-cache% (dotnet:static <type-str> "MicrosecondsPerDay"))
+      %microseconds-per-day-cache%))
 (cl:setf (cl:documentation (cl:quote +microseconds-per-day+) (cl:quote cl:variable)) "Represents the number of microseconds in 1 day. This field is constant.")
 
-(cl:defconstant +microseconds-per-hour+ (dotnet:static <type-str> "MicrosecondsPerHour"))
+(cl:defvar %microseconds-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +microseconds-per-hour+
+  (cl:if (cl:eq %microseconds-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %microseconds-per-hour-cache% (dotnet:static <type-str> "MicrosecondsPerHour"))
+      %microseconds-per-hour-cache%))
 (cl:setf (cl:documentation (cl:quote +microseconds-per-hour+) (cl:quote cl:variable)) "Represents the number of microseconds in 1 hour. This field is constant.")
 
-(cl:defconstant +microseconds-per-millisecond+ (dotnet:static <type-str> "MicrosecondsPerMillisecond"))
+(cl:defvar %microseconds-per-millisecond-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +microseconds-per-millisecond+
+  (cl:if (cl:eq %microseconds-per-millisecond-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %microseconds-per-millisecond-cache% (dotnet:static <type-str> "MicrosecondsPerMillisecond"))
+      %microseconds-per-millisecond-cache%))
 (cl:setf (cl:documentation (cl:quote +microseconds-per-millisecond+) (cl:quote cl:variable)) "Represents the number of microseconds in 1 millisecond. This field is constant.")
 
-(cl:defconstant +microseconds-per-minute+ (dotnet:static <type-str> "MicrosecondsPerMinute"))
+(cl:defvar %microseconds-per-minute-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +microseconds-per-minute+
+  (cl:if (cl:eq %microseconds-per-minute-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %microseconds-per-minute-cache% (dotnet:static <type-str> "MicrosecondsPerMinute"))
+      %microseconds-per-minute-cache%))
 (cl:setf (cl:documentation (cl:quote +microseconds-per-minute+) (cl:quote cl:variable)) "Represents the number of microseconds in 1 minute. This field is constant.")
 
-(cl:defconstant +microseconds-per-second+ (dotnet:static <type-str> "MicrosecondsPerSecond"))
+(cl:defvar %microseconds-per-second-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +microseconds-per-second+
+  (cl:if (cl:eq %microseconds-per-second-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %microseconds-per-second-cache% (dotnet:static <type-str> "MicrosecondsPerSecond"))
+      %microseconds-per-second-cache%))
 (cl:setf (cl:documentation (cl:quote +microseconds-per-second+) (cl:quote cl:variable)) "Represents the number of microseconds in 1 second. This field is constant.")
 
-(cl:defconstant +milliseconds-per-day+ (dotnet:static <type-str> "MillisecondsPerDay"))
+(cl:defvar %milliseconds-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +milliseconds-per-day+
+  (cl:if (cl:eq %milliseconds-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %milliseconds-per-day-cache% (dotnet:static <type-str> "MillisecondsPerDay"))
+      %milliseconds-per-day-cache%))
 (cl:setf (cl:documentation (cl:quote +milliseconds-per-day+) (cl:quote cl:variable)) "Represents the number of milliseconds in 1 day. This field is constant.")
 
-(cl:defconstant +milliseconds-per-hour+ (dotnet:static <type-str> "MillisecondsPerHour"))
+(cl:defvar %milliseconds-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +milliseconds-per-hour+
+  (cl:if (cl:eq %milliseconds-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %milliseconds-per-hour-cache% (dotnet:static <type-str> "MillisecondsPerHour"))
+      %milliseconds-per-hour-cache%))
 (cl:setf (cl:documentation (cl:quote +milliseconds-per-hour+) (cl:quote cl:variable)) "Represents the number of milliseconds in 1 hour. This field is constant.")
 
-(cl:defconstant +milliseconds-per-minute+ (dotnet:static <type-str> "MillisecondsPerMinute"))
+(cl:defvar %milliseconds-per-minute-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +milliseconds-per-minute+
+  (cl:if (cl:eq %milliseconds-per-minute-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %milliseconds-per-minute-cache% (dotnet:static <type-str> "MillisecondsPerMinute"))
+      %milliseconds-per-minute-cache%))
 (cl:setf (cl:documentation (cl:quote +milliseconds-per-minute+) (cl:quote cl:variable)) "Represents the number of milliseconds in 1 minute. This field is constant.")
 
-(cl:defconstant +milliseconds-per-second+ (dotnet:static <type-str> "MillisecondsPerSecond"))
+(cl:defvar %milliseconds-per-second-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +milliseconds-per-second+
+  (cl:if (cl:eq %milliseconds-per-second-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %milliseconds-per-second-cache% (dotnet:static <type-str> "MillisecondsPerSecond"))
+      %milliseconds-per-second-cache%))
 (cl:setf (cl:documentation (cl:quote +milliseconds-per-second+) (cl:quote cl:variable)) "Represents the number of milliseconds in 1 second. This field is constant.")
 
-(cl:defconstant +minutes-per-day+ (dotnet:static <type-str> "MinutesPerDay"))
+(cl:defvar %minutes-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +minutes-per-day+
+  (cl:if (cl:eq %minutes-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %minutes-per-day-cache% (dotnet:static <type-str> "MinutesPerDay"))
+      %minutes-per-day-cache%))
 (cl:setf (cl:documentation (cl:quote +minutes-per-day+) (cl:quote cl:variable)) "Represents the number of minutes in 1 day. This field is constant.")
 
-(cl:defconstant +minutes-per-hour+ (dotnet:static <type-str> "MinutesPerHour"))
+(cl:defvar %minutes-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +minutes-per-hour+
+  (cl:if (cl:eq %minutes-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %minutes-per-hour-cache% (dotnet:static <type-str> "MinutesPerHour"))
+      %minutes-per-hour-cache%))
 (cl:setf (cl:documentation (cl:quote +minutes-per-hour+) (cl:quote cl:variable)) "Represents the number of minutes in 1 hour. This field is constant.")
 
-(cl:defconstant +nanoseconds-per-tick+ (dotnet:static <type-str> "NanosecondsPerTick"))
+(cl:defvar %nanoseconds-per-tick-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +nanoseconds-per-tick+
+  (cl:if (cl:eq %nanoseconds-per-tick-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %nanoseconds-per-tick-cache% (dotnet:static <type-str> "NanosecondsPerTick"))
+      %nanoseconds-per-tick-cache%))
 (cl:setf (cl:documentation (cl:quote +nanoseconds-per-tick+) (cl:quote cl:variable)) "Represents the number of nanoseconds per tick. This field is constant.")
 
-(cl:defconstant +seconds-per-day+ (dotnet:static <type-str> "SecondsPerDay"))
+(cl:defvar %seconds-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +seconds-per-day+
+  (cl:if (cl:eq %seconds-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %seconds-per-day-cache% (dotnet:static <type-str> "SecondsPerDay"))
+      %seconds-per-day-cache%))
 (cl:setf (cl:documentation (cl:quote +seconds-per-day+) (cl:quote cl:variable)) "Represents the number of seconds in 1 day. This field is constant.")
 
-(cl:defconstant +seconds-per-hour+ (dotnet:static <type-str> "SecondsPerHour"))
+(cl:defvar %seconds-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +seconds-per-hour+
+  (cl:if (cl:eq %seconds-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %seconds-per-hour-cache% (dotnet:static <type-str> "SecondsPerHour"))
+      %seconds-per-hour-cache%))
 (cl:setf (cl:documentation (cl:quote +seconds-per-hour+) (cl:quote cl:variable)) "Represents the number of seconds in 1 hour. This field is constant.")
 
-(cl:defconstant +seconds-per-minute+ (dotnet:static <type-str> "SecondsPerMinute"))
+(cl:defvar %seconds-per-minute-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +seconds-per-minute+
+  (cl:if (cl:eq %seconds-per-minute-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %seconds-per-minute-cache% (dotnet:static <type-str> "SecondsPerMinute"))
+      %seconds-per-minute-cache%))
 (cl:setf (cl:documentation (cl:quote +seconds-per-minute+) (cl:quote cl:variable)) "Represents the number of seconds in 1 minute. This field is constant.")
 
-(cl:defconstant +ticks-per-day+ (dotnet:static <type-str> "TicksPerDay"))
+(cl:defvar %ticks-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +ticks-per-day+
+  (cl:if (cl:eq %ticks-per-day-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %ticks-per-day-cache% (dotnet:static <type-str> "TicksPerDay"))
+      %ticks-per-day-cache%))
 (cl:setf (cl:documentation (cl:quote +ticks-per-day+) (cl:quote cl:variable)) "Represents the number of ticks in 1 day. This field is constant.")
 
-(cl:defconstant +ticks-per-hour+ (dotnet:static <type-str> "TicksPerHour"))
+(cl:defvar %ticks-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +ticks-per-hour+
+  (cl:if (cl:eq %ticks-per-hour-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %ticks-per-hour-cache% (dotnet:static <type-str> "TicksPerHour"))
+      %ticks-per-hour-cache%))
 (cl:setf (cl:documentation (cl:quote +ticks-per-hour+) (cl:quote cl:variable)) "Represents the number of ticks in 1 hour. This field is constant.")
 
-(cl:defconstant +ticks-per-microsecond+ (dotnet:static <type-str> "TicksPerMicrosecond"))
+(cl:defvar %ticks-per-microsecond-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +ticks-per-microsecond+
+  (cl:if (cl:eq %ticks-per-microsecond-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %ticks-per-microsecond-cache% (dotnet:static <type-str> "TicksPerMicrosecond"))
+      %ticks-per-microsecond-cache%))
 (cl:setf (cl:documentation (cl:quote +ticks-per-microsecond+) (cl:quote cl:variable)) "Represents the number of ticks in 1 microsecond. This field is constant.")
 
-(cl:defconstant +ticks-per-millisecond+ (dotnet:static <type-str> "TicksPerMillisecond"))
+(cl:defvar %ticks-per-millisecond-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +ticks-per-millisecond+
+  (cl:if (cl:eq %ticks-per-millisecond-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %ticks-per-millisecond-cache% (dotnet:static <type-str> "TicksPerMillisecond"))
+      %ticks-per-millisecond-cache%))
 (cl:setf (cl:documentation (cl:quote +ticks-per-millisecond+) (cl:quote cl:variable)) "Represents the number of ticks in 1 millisecond. This field is constant.")
 
-(cl:defconstant +ticks-per-minute+ (dotnet:static <type-str> "TicksPerMinute"))
+(cl:defvar %ticks-per-minute-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +ticks-per-minute+
+  (cl:if (cl:eq %ticks-per-minute-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %ticks-per-minute-cache% (dotnet:static <type-str> "TicksPerMinute"))
+      %ticks-per-minute-cache%))
 (cl:setf (cl:documentation (cl:quote +ticks-per-minute+) (cl:quote cl:variable)) "Represents the number of ticks in 1 minute. This field is constant.")
 
-(cl:defconstant +ticks-per-second+ (dotnet:static <type-str> "TicksPerSecond"))
+(cl:defvar %ticks-per-second-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +ticks-per-second+
+  (cl:if (cl:eq %ticks-per-second-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %ticks-per-second-cache% (dotnet:static <type-str> "TicksPerSecond"))
+      %ticks-per-second-cache%))
 (cl:setf (cl:documentation (cl:quote +ticks-per-second+) (cl:quote cl:variable)) "Represents the number of ticks in 1 second.")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.TimeSpan is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.TimeSpan is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -155,11 +239,16 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +max-value+ (dotnet:static <type-str> "MaxValue"))
+(cl:defvar %max-value-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +max-value+
+  (cl:if (cl:eq %max-value-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %max-value-cache% (dotnet:static <type-str> "MaxValue"))
+      %max-value-cache%))
 (cl:setf (cl:documentation (cl:quote +max-value+) (cl:quote cl:variable)) "Represents the maximum System.TimeSpan value. This field is read-only.")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.TimeSpan is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.TimeSpan is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -169,11 +258,16 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +min-value+ (dotnet:static <type-str> "MinValue"))
+(cl:defvar %min-value-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +min-value+
+  (cl:if (cl:eq %min-value-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %min-value-cache% (dotnet:static <type-str> "MinValue"))
+      %min-value-cache%))
 (cl:setf (cl:documentation (cl:quote +min-value+) (cl:quote cl:variable)) "Represents the minimum System.TimeSpan value. This field is read-only.")
 
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.TimeSpan is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.TimeSpan is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -183,7 +277,11 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +zero+ (dotnet:static <type-str> "Zero"))
+(cl:defvar %zero-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +zero+
+  (cl:if (cl:eq %zero-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %zero-cache% (dotnet:static <type-str> "Zero"))
+      %zero-cache%))
 (cl:setf (cl:documentation (cl:quote +zero+) (cl:quote cl:variable)) "Represents the zero System.TimeSpan value. This field is read-only.")
 
 (cl:defun days (obj!)

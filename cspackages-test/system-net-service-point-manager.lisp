@@ -1,23 +1,26 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Net.ServicePointManager
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 (cl:in-package :system-net-service-point-manager)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Net.ServicePointManager"))
 (cl:defconstant <type-str> "System.Net.ServicePointManager")
-(cl:defconstant <creation> "2026-07-11T12:55:15Z")
-(cl:defconstant <version> 42)
+(cl:defconstant <creation> "2026-07-11T16:27:42Z")
+(cl:defconstant <version> 44)
 
-;; Register C# Type with CLOS
-(cl:eval-when (:load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.Net.ServicePointManager")))
+(cl:defvar %default-non-persistent-connection-limit-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +default-non-persistent-connection-limit+
+  (cl:if (cl:eq %default-non-persistent-connection-limit-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %default-non-persistent-connection-limit-cache% (dotnet:static <type-str> "DefaultNonPersistentConnectionLimit"))
+      %default-non-persistent-connection-limit-cache%))
 
-(cl:defconstant +default-non-persistent-connection-limit+ (dotnet:static <type-str> "DefaultNonPersistentConnectionLimit"))
-
-(cl:defconstant +default-persistent-connection-limit+ (dotnet:static <type-str> "DefaultPersistentConnectionLimit"))
+(cl:defvar %default-persistent-connection-limit-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +default-persistent-connection-limit+
+  (cl:if (cl:eq %default-persistent-connection-limit-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %default-persistent-connection-limit-cache% (dotnet:static <type-str> "DefaultPersistentConnectionLimit"))
+      %default-persistent-connection-limit-cache%))
 
 (cl:define-symbol-macro encryption-policy (dotnet:static <type-str> "EncryptionPolicy"))
 

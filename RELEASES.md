@@ -10,6 +10,61 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.44.0 — 2026-07-11
+
+**Added `--ensure-type`/`--no-ensure-type` (sticky, OFF by default): the per-class "Register C#
+Type with CLOS" `eval-when` (`EnsureDotNetTypeClass`) that every previous version emitted
+unconditionally is now opt-in.**
+
+* Investigation into DotCL.Runtime's actual source found this eager registration call is not
+  needed by anything this generator itself emits: `class-of`/`typep` on any wrapped .NET
+  object, and `dotnet:class-for-type` (what `--defgeneric`'s generated `defmethod`s use),
+  already lazily register a type's CLOS class themselves on first real need.
+* Its only remaining effect is on registration *order*: when two .NET types share a simple
+  name across different namespaces, whichever is registered first keeps the friendly
+  `dotcl-internal::|Name|` CLOS class symbol. Eager, generation-order-based registration made
+  that deterministic; without it, the winner depends on whichever type the running program
+  happens to touch first. This only matters for hand-written user code dispatching via the
+  simple-name pattern (never `--defgeneric`, which is immune either way) — and per
+  `dotcl/dotcl#50` (already in the required DotCL.Runtime 0.1.17), a collision no longer causes
+  silent cross-type misdispatch regardless, only a less-friendly assembly-qualified name plus a
+  printed warning for whichever type loses the race.
+* `--ensure-type`/`--no-ensure-type` is sticky — it applies directly to the current and every
+  subsequent `--class`, with no separate per-class override pair (a deliberate exception to
+  this tool's usual two-tier sticky-default/per-class-override convention for every other
+  flag). Defaults to OFF, unlike this tool's other sticky flags (which all default to "off"
+  too, but via a distinct `--enable-*`/`--export-all-*`/`--output-all-*` naming scheme).
+* `*generator-version*` bumped 43 → 44 (generated-code shape change: every class file's
+  registration block now only appears when opted in). See `doc/generator-design-notes.md`'s
+  Version 44 section for the full investigation and design writeup.
+
+## 2.43.0 — 2026-07-11
+
+**Extended the [dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49) fix to the two
+remaining `defconstant` sites left out of scope in 2.42.0: C# `const` literal fields, and
+`--constant-properties`-selected static fields/properties.**
+
+* Both previously emitted `(cl:defconstant <name> (dotnet:static <type-str> "<Member>"))`,
+  whose load-time-evaluated init-form hit the same ASDF-`:depends-on`-phase failure `<type>`
+  was fixed for in 2.42.0 — a real build still failed even after that fix, since these two
+  sites weren't covered.
+* Rather than a plain (re-evaluated) `define-symbol-macro`, which would have silently changed
+  the performance characteristics of every C# `const`/enum member and every
+  `--constant-properties`-selected property (re-invoking a live .NET property/field read on
+  *every* reference instead of once), these now use a **memoized** symbol-macro: a private
+  cache variable, checked against a new shared `csharp-assembly-utils:+unbound-marker+`
+  sentinel, computes the value on first use and reuses it thereafter — preserving
+  `defconstant`'s original one-time-then-cached behavior (and its already-documented Version 29
+  shared-boxed-instance aliasing hazard, unchanged) while still deferring the actual
+  `dotnet:static` call away from load time.
+* `--constant-properties`' documented behavior changes slightly as a result: it no longer
+  changes re-evaluation semantics (both paths are now `define-symbol-macro`s), only which
+  bindings get memoized-and-earmuffed (`+foo+`) vs. plain re-evaluated (`foo`) naming. See the
+  updated `--constant-properties` description in `README.md`/`CLAUDE.md` and `FEATURES.md`'s
+  rewritten "Static Constants and Symbol Macros" section.
+* `*generator-version*` bumped 42 → 43 (generated-code shape change). See
+  `doc/generator-design-notes.md`'s Version 43 section for the full design writeup.
+
 ## 2.42.0 — 2026-07-11
 
 **Fixed [dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49): a generated package now

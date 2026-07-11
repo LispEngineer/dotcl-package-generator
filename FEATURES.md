@@ -141,29 +141,64 @@ Version 24.
 
 ### Per-class header
 
-Every generated `.lisp` file starts with the same four constants and one CLOS
-registration form, regardless of the C# type's kind:
+Every generated `.lisp` file starts with the same four constants, regardless of the C# type's
+kind:
 
 ```lisp
-(cl:defconstant <type> (dotnet:resolve-type "System.Numerics.Vector2"))
+(cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector2"))
 (cl:defconstant <type-str> "System.Numerics.Vector2")
 (cl:defconstant <creation> "2026-07-04T12:18:00Z")
-(cl:defconstant <version> 29)
-
-;; Register C# Type with CLOS
-(cl:eval-when (:compile-toplevel :load-toplevel :execute)
-  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
-                 (dotnet:resolve-type "System.Numerics.Vector2")))
+(cl:defconstant <version> 44)
 ```
 
 `<type>`/`<type-str>` are used throughout the rest of the file for `dotnet:static`,
 `dotnet:new`, and `(the (dotnet ...) ...)` type hints; `<creation>`/`<version>` just record
-provenance (all files from one CLI invocation share one `<creation>` timestamp). The CLOS
-registration makes the type dispatchable by `defgeneric`/`defmethod` via DotCL's
-`dotcl-internal` class wrappers (see `doc/generator-design-notes.md`'s ".NET CLOS
-Integration" section for the namespace-collision caveat this carries: CLOS registration
-keys only on the type's *short* name, so two same-named types in different namespaces
-share one CLOS class).
+provenance (all files from one CLI invocation share one `<creation>` timestamp). `<type>` is a
+`define-symbol-macro`, not a `defconstant` — `dotnet:resolve-type` only runs where `<type>` is
+actually used, not at load time, so a generated package loads cleanly even as an ASDF
+`:depends-on` dependency of another system before its target assembly is necessarily in scope
+(see `doc/generator-design-notes.md`'s Version 42 section, and
+[dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49)); DotCL.Runtime >= 0.1.17 memoizes
+the resolution runtime-side after first use, so this costs nothing after the first reference.
+
+**Optionally**, `--ensure-type` (sticky, OFF by default — see "CLOS Type Registration" below)
+adds a fifth form, a CLOS type-registration `eval-when`:
+
+```lisp
+;; Register C# Type with CLOS
+(cl:eval-when (:load-toplevel :execute)
+  (dotnet:static "DotCL.Runtime" "EnsureDotNetTypeClass"
+                 (dotnet:resolve-type "System.Numerics.Vector2")))
+```
+
+restricted to `:load-toplevel`/`:execute` (no `:compile-toplevel`) for the same
+ASDF-dependency-phase reason `<type>` itself is a symbol-macro.
+
+### CLOS Type Registration
+
+**Summary:** `--ensure-type`/`--no-ensure-type` (sticky only — applies directly to the current
+and every subsequent `--class`, no separate per-class override pair — **OFF by default**)
+controls whether a class's package eagerly registers its .NET type as a CLOS class at load
+time (the `eval-when` shown above). Nothing this generator itself emits actually needs this:
+`class-of`/`typep` on any wrapped .NET object, and `dotnet:class-for-type` (what `--defgeneric`
+uses), all lazily register a type's CLOS class themselves on first real need — confirmed by
+reading DotCL.Runtime's own source (`Runtime.CLOS.cs`/`Runtime.DotNet.cs`/`Runtime.Type.cs`).
+
+The one real effect eager registration still has: when two .NET types share a simple name
+across different namespaces (e.g. `System.Threading.Timer`/`System.Timers.Timer`), whichever
+gets registered *first* claims the friendly `dotcl-internal::|Timer|` CLOS class symbol; the
+other falls back to its uglier, assembly-qualified name (with a console warning —
+`dotcl/dotcl#50`, already in the required DotCL.Runtime >= 0.1.17 — not a silently-shared,
+misdispatching class the way pre-0.1.17 DotCL behaved). Generation-order-based eager
+registration makes *which* type wins the pretty name deterministic and reproducible; without
+it, the winner depends on whichever type the running program happens to touch first. This only
+matters if you write your own code dispatching directly on a generated type's simple-name CLOS
+symbol (`(defmethod get-x ((obj dotcl-internal::|Vector2|)) ...)`, per
+`doc/generator-design-notes.md`'s ".NET CLOS Integration" section) — `--defgeneric`-generated
+code is unaffected either way, since it dispatches via `#.(dotnet:class-for-type ...)` on the
+exact fully-qualified name.
+
+See `doc/generator-design-notes.md`'s Version 44 section for the full investigation.
 
 
 
@@ -197,57 +232,73 @@ not directly instantiable at runtime the normal way).
 
 ## Static Constants and Symbol Macros
 
-**Summary:** a static, read-only field or property becomes either a `defconstant`
-(compile-time constant) or a `define-symbol-macro` (re-evaluated dynamic property/field
-access on every reference), depending on whether it's a true CIL constant, a read-only
-field, or a property — and, for properties/fields specifically, whether `--constant-properties`
-opted it in as a constant.
+**Summary:** a static, read-only field or property always becomes a `define-symbol-macro` —
+never a `defconstant` (see below for why) — but in one of two flavors: **memoized** (computed
+once, on first use, then cached in a private variable) or **plain** (re-evaluated on every
+reference), depending on whether it's a true CIL constant, a read-only field, or a property —
+and, for properties/fields specifically, whether `--constant-properties` opted it in as
+memoized.
 
-* **Compile-time literal fields** (`:literal t` — C#'s `const`, always a static field):
-  always `defconstant`, since these are baked into the IL at compile time and genuinely
-  never change. This is also how **enum members** are generated — a C# enum's members
-  reflect as static literal fields of the enum type, so `System.DayOfWeek.Monday` becomes
-  `(cl:defconstant +monday+ (dotnet:static <type-str> "Monday"))` with no special-casing
-  needed anywhere in the generator.
+* **Compile-time literal fields** (`:literal t` — C#'s `const`, always a static field): always
+  memoized, since these are baked into the IL at compile time and genuinely never change. This
+  is also how **enum members** are generated — a C# enum's members reflect as static literal
+  fields of the enum type, so `System.DayOfWeek.Monday` becomes a memoized binding for
+  `(dotnet:static <type-str> "Monday")` with no special-casing needed anywhere in the generator.
   ```lisp
-  (cl:defconstant +zero+ (dotnet:static <type-str> "Zero"))
+  (cl:defvar %zero-cache% csharp-assembly-utils:+unbound-marker+)
+  (cl:define-symbol-macro +zero+
+    (cl:if (cl:eq %zero-cache% csharp-assembly-utils:+unbound-marker+)
+        (cl:setf %zero-cache% (dotnet:static <type-str> "Zero"))
+        %zero-cache%))
   (cl:setf (cl:documentation (cl:quote +zero+) (cl:quote cl:variable))
            "Returns a vector whose 2 elements are equal to zero.")
   ```
-* **Static read-only fields/properties** (a static field with `:init-only` but not
-  `:literal`, or any static property that is readable and not writeable): reflection
-  cannot tell whether such a property's value could ever change at runtime, so by default
-  these become `define-symbol-macro` — re-evaluated on every access:
+* **Static read-only fields/properties** (a static field with `:init-only` but not `:literal`,
+  or any static property that is readable and not writeable): reflection cannot tell whether
+  such a property's value could ever change at runtime, so by default these become a *plain*
+  `define-symbol-macro` — re-evaluated on every access:
   ```lisp
   (cl:define-symbol-macro local (dotnet:static <type-str> "Local"))
   ```
-  Passing `--constant-properties` with the field/property's name (or `"*"` for all) forces
-  it to `defconstant` instead. Despite the flag's name, it applies identically to matching
-  *fields* as well as properties.
+  Passing `--constant-properties` with the field/property's name (or `"*"` for all) instead
+  makes it *memoized*, matching the literal-field shape above. Despite the flag's name, it
+  applies identically to matching *fields* as well as properties.
 
-* Both forms get a `cl:setf (cl:documentation ...)` line attaching the XML-doc summary
-  (if any) as the symbol's Lisp `variable` documentation.
+* Every case gets a `cl:setf (cl:documentation ...)` line attaching the XML-doc summary (if
+  any) as the symbol's Lisp `variable` documentation.
 
-**⚠️ `--constant-properties` hazard for struct-typed constants.** `defconstant`'s value
-form runs exactly *once*, and `dotnet:static` returns a *reference* to a boxed CLR object,
-not a value-copied Lisp datum — so a `--constant-properties`-selected field/property whose
-type is a mutable struct (e.g. `Vector2.Zero`, `Color.White` — the exact examples this
-tool's own README/CLAUDE.md use to demonstrate the flag!) becomes a single boxed instance
+**Why never `defconstant`.** A `defconstant`'s init-form runs at *load* time. When a generated
+package is loaded as an ASDF `:depends-on` dependency of another system, the consumer's build
+process loads the dependency's fasl — running that init-form's `dotnet:resolve-type`/
+`dotnet:static` call — before the target .NET assembly is necessarily in that build process's
+own type-resolution context, so it fails even though the identical call succeeds once the
+deployed app actually runs (see [dotcl/dotcl#49](https://github.com/dotcl/dotcl/issues/49)).
+Every binding in this generator's output is therefore a `define-symbol-macro`; "memoized" is
+implemented as a *private* cache variable (see below) checked on each use, not as a literal
+`defconstant`.
+
+**⚠️ Hazard for struct-typed memoized constants (literal fields and `--constant-properties`
+selections).** A memoized binding's `dotnet:static` call runs exactly *once* (cached in its
+private `%name-cache%` variable on first use), and `dotnet:static` returns a *reference* to a
+boxed CLR object, not a value-copied Lisp datum — so a memoized field/property whose type is a
+mutable struct (e.g. `Vector2.Zero`, `Color.White` — the exact examples this tool's own
+README/CLAUDE.md use to demonstrate `--constant-properties`!) becomes a single boxed instance
 shared and re-returned by *every* reference to that constant for the remaining life of the
-program. Mutating it — through the constant directly, or through any other Lisp binding
-that happens to alias the same boxed instance — silently corrupts it everywhere, forever.
-The default `define-symbol-macro` path has no such hazard, since it re-invokes
-`dotnet:static` (and thus the real C# getter, which per ordinary value-type semantics
-returns an independent copy every time) on every single reference.
+program. Mutating it — through the constant directly, or through any other Lisp binding that
+happens to alias the same boxed instance — silently corrupts it everywhere, forever. The
+*plain* `define-symbol-macro` path (the `--constant-properties`-not-selected default) has no
+such hazard, since it re-invokes `dotnet:static` (and thus the real C# getter, which per
+ordinary value-type semantics returns an independent copy every time) on every single
+reference.
 
-Because of this, the generator now emits a detailed warning comment above every
-`--constant-properties`-selected `defconstant` (and above true C# literal/`const`-field
-`defconstant`s, applied uniformly, though C# cannot express a non-primitive `const` so
-that path is a no-op safety net in practice) whose type is not a recognized safe,
-effectively-immutable primitive:
+Because of this, the generator emits a detailed warning comment above every memoized binding
+(both `--constant-properties`-selected properties/fields, and true C# literal/`const` fields,
+applied uniformly, though C# cannot express a non-primitive `const` so that path is a no-op
+safety net in practice) whose type is not a recognized safe, effectively-immutable primitive:
 ```lisp
 ;; WARNING: this is a single, permanently-cached boxed .NET object --
-;; the defconstant form below only runs once. If System.Numerics.Vector2 is a mutable
+;; the binding below computes its value at most once (cached on first
+;; use). If System.Numerics.Vector2 is a mutable
 ;; value type (struct) with settable properties/fields, mutating this
 ;; object -- through this binding, or through ANY other reference that
 ;; aliases the same boxed instance -- permanently corrupts it for every
@@ -257,15 +308,24 @@ effectively-immutable primitive:
 ;; instance via the type's own constructor (new) if you need to mutate
 ;; a copy. See FEATURES.md's "Static Constants and Symbol Macros"
 ;; section and doc/generator-design-notes.md for the full explanation.
-(cl:defconstant +zero+ (dotnet:static <type-str> "Zero"))
+(cl:defvar %zero-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +zero+
+  (cl:if (cl:eq %zero-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %zero-cache% (dotnet:static <type-str> "Zero"))
+      %zero-cache%))
 ```
-This is a deliberately broad allowlist-based check (numeric primitives, `System.String`,
-`System.Char`, `System.Boolean`, `System.IntPtr`/`UIntPtr` are considered safe; everything
-else gets the warning), not a precise per-type mutability check — the generator only ever
-sees one type's own metadata at a time, with no cross-type lookup available to confirm
-whether some *other* referenced type actually has settable instance members. See
-`doc/generator-design-notes.md`'s Version 29 section for the full incident writeup
-(including the live REPL transcript that surfaced this) and `PLAN.md` for the tracked
+The private `%name-cache%` variable (never exported) is checked against a shared
+`csharp-assembly-utils:+unbound-marker+` sentinel — a single reload-safe, guaranteed-never-
+returned-by-DotCL value (a bare cons; `dotnet:static` never returns one) defined once per batch
+in `csharp-assembly-utils.lisp`, so every class file can share the exact same sentinel object
+without each needing its own. This is a deliberately broad allowlist-based check (numeric
+primitives, `System.String`, `System.Char`, `System.Boolean`, `System.IntPtr`/`UIntPtr` are
+considered safe; everything else gets the warning), not a precise per-type mutability check —
+the generator only ever sees one type's own metadata at a time, with no cross-type lookup
+available to confirm whether some *other* referenced type actually has settable instance
+members. See `doc/generator-design-notes.md`'s Version 29 section for the full incident
+writeup (including the live REPL transcript that surfaced this), its Version 42/43 sections for
+the ASDF-dependency-loadability fix and the memoization design, and `PLAN.md` for the tracked
 follow-up work (a safe way to *clone* a boxed struct, which would actually solve this
 rather than just warn about it).
 
@@ -334,7 +394,7 @@ positionally, unless the indexer itself is overloaded, in which case it is unsup
   ;; Note: obj! here is a boxed reference to a .NET value type (struct).
   ;; This setf mutates that exact boxed instance in place -- it does NOT
   ;; silently discard the change. However, if obj! is an alias of a shared
-  ;; or cached value (e.g. a constant defined via defconstant), this mutates
+  ;; or cached value (e.g. a memoized constant binding), this mutates
   ;; that shared instance for every other reference to it too. See
   ;; FEATURES.md's "Struct Boxing Caveat" section for details.
   ```
@@ -350,8 +410,9 @@ positionally, unless the indexer itself is overloaded, in which case it is unsup
 regardless of how the new value argument was produced (`dotnet:box`, a real invoked
 conversion call, and a `the`-typed literal all behave identically). The real caveat isn't
 data loss; it's **aliasing**: if that boxed object is shared by more than one Lisp
-binding — most dangerously, a `--constant-properties`-cached `defconstant` — mutating it
-through any one alias mutates it for every other alias too, including the "constant."
+binding — most dangerously, a `--constant-properties`-selected memoized constant binding —
+mutating it through any one alias mutates it for every other alias too, including the
+"constant."
 
 A struct obtained from Lisp (via `dotnet:new`, `dotnet:static`, a property getter, or a
 stored constant) is never a raw unboxed Lisp value — it's a `#<DOTNET ...>` reference to
@@ -374,11 +435,14 @@ DUNGEON-SLIME> x
 DUNGEON-SLIME> color:+white+
 #<DOTNET Microsoft.Xna.Framework.Color {R:55 G:255 B:255 A:255}>
 ```
-`color:+white+` — a `defconstant` — was permanently mutated, because `x` was bound to the
-*exact same box* `+white+` had always pointed to (`defconstant`'s value form runs once and
-is cached forever; `defparameter x color:+white+` just copies that reference, not the
-struct's contents). See "Static Constants and Symbol Macros" above for the full mechanism
-and why `define-symbol-macro`-based constants don't share this hazard.
+`color:+white+` — at the time of this transcript, a `defconstant`; since Version 43, a
+memoized `define-symbol-macro` (see "Static Constants and Symbol Macros" above) — was
+permanently mutated, because `x` was bound to the *exact same box* `+white+` had always
+pointed to (the value form runs once and is cached forever, whichever mechanism binds it;
+`defparameter x color:+white+` just copies that reference, not the struct's contents). The
+finding is unchanged by the Version 43 mechanism switch — only *plain* (non-memoized)
+`define-symbol-macro`-based constants (the `--constant-properties`-not-selected default)
+don't share this hazard, since each reference re-fetches an independent value.
 
 **No workaround currently exists** to safely obtain an independent, mutable copy of a
 cached struct constant from Lisp — this is tracked as a prioritized follow-up in

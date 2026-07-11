@@ -2316,6 +2316,10 @@ directly `eval`'d), never forced during a dependency's own compile pass.
 
 ### Scope: what this fix does *not* touch
 
+**Update (Version 43): both follow-ups below were addressed** — see the "Memoized Symbol-Macros
+for Literal Fields and `--constant-properties` (Version 43)" section further down. This
+section is left as-is as a historical record of Version 42's own, narrower scope decision.
+
 Two other unconditionally- or optionally-emitted `defconstant`s carry the identical latent
 risk but are deliberately left unchanged for now (see `PLAN.md` for the open follow-up):
 
@@ -2340,3 +2344,207 @@ test`) confirms the new shape is still well-formed, and the existing Lisp/C# tes
 (including `package-generator-tests-parents-interfaces.lisp`'s export-name-list assertions for
 `<type>`/`<type-str>`/`<creation>`/`<version>`, which check names only, not defining form) is
 unaffected.
+
+## Memoized Symbol-Macros for Literal Fields and `--constant-properties` (Version 43)
+
+### The remaining `defconstant`s Version 42 deliberately left alone
+
+Version 42 fixed the always-present `<type>` binding, but left two other `defconstant` sites
+alone (see the previous section's "Scope" note): `emit-literal-field-constants` (C# `const`
+literal fields, unconditionally emitted whenever a class has any — this is also how every enum
+member is generated) and the `pure-const-fields`/`pure-const-props` branches of
+`emit-readonly-fields`/`emit-static-properties` (`--constant-properties`-selected static
+fields/properties). Both emit `(cl:defconstant <name> (dotnet:static <type-str> "<Member>"))`.
+The user tried a real build after Version 42 shipped and confirmed it still failed — because a
+real project's generated packages routinely hit one or both of these paths (enum members are
+extremely common; `--constant-properties` is a documented, encouraged flag for genuinely
+constant values like `Vector2.Zero`). `dotnet:static`'s init-form runs at load time exactly like
+`dotnet:resolve-type`'s did, so both hit the identical ASDF-`:depends-on`-phase failure.
+
+### Why not just a plain `define-symbol-macro`
+
+The obvious next step — converting these to plain `define-symbol-macro`s, matching how
+`dynamic-const-fields`/`dynamic-const-props` (the `--constant-properties`-*not*-selected
+default) already work — was considered and rejected. A plain symbol-macro re-invokes
+`dotnet:static` (a live .NET property/field read) on *every* reference, not once. For a true C#
+`const`/enum member this silently changes performance characteristics that were previously
+"compute once at load, then a bare variable read forever after" into "a live reflection call on
+every single use," for every generated package, unconditionally. For `--constant-properties`
+specifically, it would also completely defeat the flag's entire documented purpose — the flag
+exists precisely to force one-time-evaluation semantics for values the user asserts never
+change; if every constant-properties selection behaved identically to the default, the flag
+would do nothing.
+
+### The fix: a memoized symbol-macro
+
+New helper `emit-memoized-constant-binding` (`apg-class-file-generator.lisp`), used by all
+three of the sites above, replacing their previously-duplicated `defconstant`-emission blocks:
+
+```lisp
+(cl:defvar %zero-cache% csharp-assembly-utils:+unbound-marker+)
+(cl:define-symbol-macro +zero+
+  (cl:if (cl:eq %zero-cache% csharp-assembly-utils:+unbound-marker+)
+      (cl:setf %zero-cache% (dotnet:static <type-str> "Zero"))
+      %zero-cache%))
+(cl:setf (cl:documentation (cl:quote +zero+) (cl:quote cl:variable))
+         "Returns a vector whose 2 elements are equal to zero.")
+```
+
+`dotnet:static` now runs lazily, on first use of `+zero+` (never at load time — fixing
+dotcl/dotcl#49 for these bindings the same way `<type>` itself was fixed), and its result is
+cached in a private `%zero-cache%` variable thereafter — every subsequent reference to `+zero+`
+reads the cached value directly, matching `defconstant`'s original run-once-then-reuse
+performance exactly, just deferred to first use instead of load time. This also, necessarily,
+preserves the already-documented Version 29 shared-boxed-instance aliasing hazard unchanged
+(`emit-shared-mutable-constant-warning` still emits its warning comment above every such
+binding whose type isn't a known-safe immutable primitive) — a memoized value is, by
+definition, the same hazard `defconstant` always had, just implemented differently.
+
+`%zero-cache%`'s `%` earmuffs are guaranteed collision-free the same way `obj!`/`quote!`/`t!`
+already are: C# cannot produce a `%` character in an identifier, so this private cache variable
+name can never collide with any mapped C# member name. It is never added to any package's
+export list, staying a purely internal implementation detail.
+
+### The shared `+unbound-marker+` sentinel
+
+The cache check needs a value guaranteed never to be `eq` to any real value `dotnet:static`
+could return — a plain keyword (e.g. `:unbound`) was rejected since DotCL may represent some C#
+values (e.g. certain enum-typed returns) as Lisp keywords, creating a real, if narrow, collision
+risk. Instead, a single sentinel is defined once per batch, in
+`csharp-assembly-utils.template.lisp` (copied verbatim into every batch's
+`csharp-assembly-utils.lisp`, exactly like the pre-existing `csharp-overload-not-found`
+condition — see Version 23):
+
+```lisp
+(cl:defconstant +unbound-marker+
+  (cl:if (cl:boundp '+unbound-marker+)
+         (cl:symbol-value '+unbound-marker+)
+         (cl:list :csharp-assembly-utils-unbound-marker)))
+```
+
+A bare cons is never returned by `dotnet:static` (DotCL only ever returns wrapped `.NET`
+objects, Lisp primitives, or keywords for enums — never a plain Lisp cons), so this is
+collision-free by construction. The `cl:boundp` check is the standard reload-safe idiom for a
+`defconstant` whose value isn't `eql`-stable across re-evaluation (a freshly-consed list would
+otherwise be a *different* object on a second load, which strict implementations like SBCL
+treat as an error for a redefined constant); this sentinel itself has no `.NET` dependency at
+all, so — unlike every other binding discussed in this file — it is completely safe as a
+literal `defconstant`, evaluated once when `csharp-assembly-utils.lisp` loads, with no
+ASDF-dependency-phase concern whatsoever.
+
+### `--constant-properties`' documented behavior update
+
+Since both paths (`--constant-properties`-selected and not) are now `define-symbol-macro`s,
+differing only in memoization, `--constant-properties`' description changes from "emit as
+`defconstant` instead of `define-symbol-macro`" to "memoize (cache after first use) instead of
+re-evaluating on every reference" — see the updated `README.md`/`CLAUDE.md`/`FEATURES.md` text.
+The flag's actual selection mechanism, XML-doc-summary attachment, and struct-aliasing hazard
+are all otherwise unchanged.
+
+### Scope
+
+`dynamic-const-fields`/`dynamic-const-props` (the `--constant-properties`-not-selected default)
+are untouched — they were already plain, non-memoized `define-symbol-macro`s, and remain so.
+
+### Verification
+
+`make build test` regenerates every `cspackages-test/*.lisp` golden file containing a literal
+field, enum member, or `--constant-properties`-selected member with the new
+`defvar`+memoizing-`define-symbol-macro` shape; `check_parens.py` confirms the new shape is
+still well-formed. No test in the existing suite asserts the literal string `defconstant`
+appears in generated output for these members, so none needed updating for the shape change
+itself.
+
+## `--ensure-type`: the CLOS Registration `eval-when` Becomes Opt-In (Version 44)
+
+### The question
+
+After Version 42/43 fixed every `defconstant`-based load-time `.NET` call this generator
+emits, a natural follow-up question came up: does the per-class "Register C# Type with CLOS"
+`eval-when` — `(cl:eval-when (:load-toplevel :execute) (dotnet:static "DotCL.Runtime"
+"EnsureDotNetTypeClass" (dotnet:resolve-type "<fq-name>")))`, emitted unconditionally in every
+class file since the generator's earliest CLOS-integration versions — still need to exist at
+all? Nothing in the dotcl/dotcl#49 issue thread claimed it didn't (that thread was entirely
+about `<type>`/`dotnet:resolve-type` and `Program.cs`'s own unrelated force-load workaround);
+this was a separate investigation.
+
+### What the actual DotCL.Runtime source shows
+
+Reading `dotcl/dotcl`'s `runtime/Runtime.CLOS.cs`/`Runtime.DotNet.cs`/`Runtime.Type.cs` at the
+`v0.1.17` tag (this generator's required minimum, per Version 41) turns up exactly five call
+sites for `EnsureDotNetTypeClass`:
+
+1. Itself, recursively, walking up `Type.BaseType`.
+2. `dotnet:class-for-type` (`DotNetClassForType`) — calls it directly: "return the CLOS class
+   DotCL uses (registering it lazily on first call)".
+3. `class-of` on any `LispDotNetObject` — calls it lazily, the first time any wrapped .NET
+   instance is encountered by `class-of`.
+4. `typep`/type-checking against a `LispDotNetObject` (`Runtime.Type.cs`) — same, lazy.
+5. `dotnet:define-class` (defining a new proxy type from Lisp) — eager, but unrelated to this
+   generator's own output.
+
+**Every consumer of a .NET type's CLOS class already registers it lazily, on demand.**
+`dotnet:invoke`/`dotnet:new`/`dotnet:static` don't themselves touch `EnsureDotNetTypeClass` at
+all (confirmed no CLOS-registration call anywhere in their implementation, nor in
+`dotnet:object-type`, which the generator's own overload-dispatch parameter-type-checks use —
+that primitive only asks "is this a wrapped .NET object," never touching CLOS). So nothing this
+generator emits — including `--defgeneric`'s generated `defmethod`s, which specialize via
+`#.(dotnet:class-for-type "<fq-name>")` (Version 41) — actually depends on the per-class file's
+eager registration call; `class-for-type` would register the class itself, right then, if it
+hadn't been already.
+
+### What eager registration actually buys: collision-winner determinism, not correctness
+
+The one real, still-relevant effect of eager, generation-order-based registration is on
+**registration order** in a same-simple-name collision: two .NET types in different namespaces
+sharing one short name (e.g. `System.Threading.Timer` vs `System.Timers.Timer`). Per
+`EnsureDotNetTypeClass`'s own logic, whichever gets registered *first* claims the friendly
+`dotcl-internal::|Timer|` symbol; the loser is registered under its uglier, assembly-qualified
+`FullName` instead (with a `WarnDisplayNameCollision` console warning — `dotcl/dotcl#50`,
+already shipped in the required 0.1.17, so this is not a *silent* problem the way pre-0.1.17
+DotCL's behavior was: two same-simple-name types used to silently *share* one CLOS class
+outright and misdispatch, which #50 fixed by giving the loser its own distinct class). Eager,
+per-class-file registration (in the stable, deterministic order `packages.lisp`/class files are
+generated and loaded) makes *which* type wins the pretty name reproducible across runs; without
+it, the winner depends entirely on whichever type the running program happens to touch first —
+non-deterministic from the generated code's own point of view.
+
+This only matters for **hand-written user code that dispatches directly on a generated type's
+simple-name CLOS symbol** — the pattern documented in this file's much older "Compile-Time
+Constraint"/".NET CLOS Integration" section (`(defmethod get-x ((obj dotcl-internal::|Vector2|))
+...)`). `--defgeneric`-generated code is entirely unaffected either way, since `class-for-type`
+resolves/registers by the type's *exact fully-qualified name*, immune to the simple-name race
+by construction (Version 41's whole point).
+
+### The change
+
+New sticky flag `--ensure-type`/`--no-ensure-type` (Program.cs's `ensureType`, mirroring
+`exportAllParents`/`enableDefgenericStatic`'s pattern), **OFF by default** — applying directly
+to the current and every subsequent `--class`, with **no separate per-class override pair**
+(a deliberate, requested exception to this tool's usual two-tier sticky-default/per-class-flag
+convention; every other sticky flag has a plain-named per-class partner that overrides it for
+one class only). `emit-type-constants-and-clos-registration` (`apg-class-file-generator.lisp`)
+gained a required `ensure-type` parameter wrapping the `eval-when` emission in a `cl:when` — the
+`<type>`/`<type-str>`/`<creation>`/`<version>` bindings above it are unconditional and
+unaffected. `generate-class-file` threads it through from the resolved-class plist's new
+`:ensure-type` key (`make-resolved-class`/`resolve-batch-entry`, `apg-batch-discovery.lisp`),
+which cascades to classes discovered via `--export-parents`/`--export-interfaces`/
+`--output-nested`/`--output-children`/`--output-implementations` exactly like `--defgeneric`/
+`--extension-methods` already do (never `--constant-properties`, per Version 39's rule),
+propagated at both of `make-resolved-class`'s call sites in
+`generate-assembly-packages-batch`'s Phase A/B (`apg-batch-orchestration.lisp`).
+
+### Scope
+
+Existing generated-output test call sites that invoke `generate-class-file` with only
+`(class-plist output-dir)` now implicitly pass `ensure-type = nil` — i.e. every existing test's
+generated fixture no longer includes the CLOS-registration block, matching the new OFF-by-
+default behavior. No test in the existing suite asserted on that block's literal text, so none
+needed updating.
+
+### Verification
+
+`make build test`: the Makefile's smoke-test invocation now passes `--ensure-type` on at least
+one `--class` so both code paths (present/absent) are exercised in `cspackages-test/`'s checked-
+in golden output, alongside every other class's now-block-free output; `check_parens.py`
+confirms both shapes are well-formed.

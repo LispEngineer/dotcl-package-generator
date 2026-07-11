@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 42
-;;; Creation Date: 2026-07-11T12:55:15Z
+;;; Generator Version: 44
+;;; Creation Date: 2026-07-11T16:27:42Z
 
 ;;; Douglas P. Fields, Jr. - symbolics@lisp.engineer
 ;;; Copyright 2026 Douglas P. Fields, Jr.
@@ -13,6 +13,18 @@
 ;;; copied into packages.lisp) is already defined.
 
 (cl:in-package :csharp-assembly-utils)
+
+;;; Sentinel marking a not-yet-computed memoized constant (see
+;;; emit-memoized-constant-binding in the generator's
+;;; apg-class-file-generator.lisp). Guaranteed distinguishable via cl:eq
+;;; from any real dotnet:static return value (DotCL never returns a bare
+;;; cons), and reload-safe -- the cl:boundp check means loading this file
+;;; twice in the same image does not signal a "constant redefined to a
+;;; non-eql value" error the way a plain (cl:list ...) defconstant would.
+(cl:defconstant +unbound-marker+
+  (cl:if (cl:boundp '+unbound-marker+)
+         (cl:symbol-value '+unbound-marker+)
+         (cl:list :csharp-assembly-utils-unbound-marker)))
 
 ;;; Condition signaled when a generated C# wrapper function's dispatcher
 ;;; fails to find a matching method overload at runtime.

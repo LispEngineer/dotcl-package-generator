@@ -103,7 +103,7 @@
    re-invoking EXPAND-RELATED on each newly-discovered class in turn) and
    folds the result into the working set: a newly-discovered class carries
    its discoverer's ENTIRE flag set (all six direction flags plus
-   :defgeneric/:extension-methods, never its
+   :defgeneric/:extension-methods/:ensure-type, never its
    :constant-properties), so discovery/re-export cascades recursively
    through the whole connected component a flag reaches, UNLESS it was
    ALSO explicitly requested, in which case the explicit request's own
@@ -168,7 +168,7 @@
     ;; --output-children/--output-implementations downward) via
     ;; EXPAND-RELATED. Every newly-discovered class is enqueued carrying
     ;; its discoverer's ENTIRE per-class flag set (all six export-*/output-*
-    ;; flags plus --defgeneric/--extension-methods, but
+    ;; flags plus --defgeneric/--extension-methods/--ensure-type, but
     ;; never its discoverer's --constant-properties, which names properties
     ;; specific to one class), so discovery/re-export cascades recursively
     ;; through the whole connected component a flag reaches -- see PLAN.md's
@@ -219,7 +219,8 @@
                                           (getf rc :defgeneric)
                                           (getf rc :extension-methods)
                                           (getf rc :output-nested) (getf rc :output-children)
-                                          (getf rc :output-implementations))))
+                                          (getf rc :output-implementations)
+                                          (getf rc :ensure-type))))
                              (push new-rc (gethash owning-entry discovery-additions))
                              (setf queue (nconc queue (list new-rc))))))))))
 
@@ -283,7 +284,8 @@
                 (cprops (getf rc :constant-properties)))
             (format *error-output* "Generating package for C# Class: ~A~%" (getf cls :fully-qualified-name))
             (generate-class-file cls output-dir cprops creation-time
-                                  (getf rc :matched-extensions) (getf rc :skipped-extensions))))
+                                  (getf rc :matched-extensions) (getf rc :skipped-extensions)
+                                  (getf rc :ensure-type))))
 
         (generate-batch-generics-file output-dir creation-time defgeneric-model)
 
@@ -304,7 +306,7 @@
                   :export-object t/nil :defgeneric t/nil
                   :extension-methods t/nil
                   :output-nested t/nil :output-children t/nil
-                  :output-implementations t/nil) ...)) ...)
+                  :output-implementations t/nil :ensure-type t/nil) ...)) ...)
    :output-nested/:output-children/:output-implementations (per-class,
    Version 39, doc/plan-v38.md's Part B) discover, respectively, every type
    nested inside a class, every direct-or-indirect subclass of a class, and
@@ -323,6 +325,12 @@
    class into having matching C# extension methods (exact concrete
    'this'-type match only) injected as obj!-first wrappers -- see
    COMPUTE-MATCHED-EXTENSIONS-FOR-CLASS and doc/plan-v38.md.
+   :ensure-type (per-class, resolved from Program.cs's
+   --ensure-type/--no-ensure-type, OFF by default) opts a class into
+   emitting the \"Register C# Type with CLOS\" eval-when
+   (EnsureDotNetTypeClass) that Version 43 and earlier always emitted
+   unconditionally -- see EMIT-TYPE-CONSTANTS-AND-CLOS-REGISTRATION and
+   doc/generator-design-notes.md's Version 44 section.
    PACKAGE-TEMPLATE-PATH/UTILS-TEMPLATE-PATH point at
    csharp-assembly-utils-package.template.lisp /
    csharp-assembly-utils.template.lisp, copied next to the executable.
