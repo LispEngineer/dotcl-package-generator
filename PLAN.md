@@ -181,7 +181,7 @@ obj!)` form instead, deprecating Option A's per-type codegen.
     * Maybe `<>` is for 1, and `<2>` is for 2 (and higher)?
   * C# (not CIL) uses `<>`, `<,>`, `<,,>` for multiple type arguments in an open type.
 
-* Make a `FILES.md`
+* **DONE (2026-07-11).** Make a `FILES.md`
 * Make `Makefile` introspect the `.asd` for the version number.
 * Make a new DotCL application with its own .csproj and .asd
   that uses generated packages and runs LOTS of tests (such as the
