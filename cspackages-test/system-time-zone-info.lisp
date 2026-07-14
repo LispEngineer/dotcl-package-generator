@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-time-zone-info)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeZoneInfo"))
 (cl:defconstant <type-str> "System.TimeZoneInfo")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:define-symbol-macro local (dotnet:static <type-str> "Local"))
 (cl:setf (cl:documentation (cl:quote local) (cl:quote cl:variable)) "Gets a System.TimeZoneInfo object that represents the local time zone.")
@@ -419,15 +419,15 @@ Returns: The value of the System.TimeZoneInfo.DisplayName property of the curren
   (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "ToString"))
 
 ;; The following C# System.TimeZoneInfo.TryConvertIanaIdToWindowsId overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryConvertIanaIdToWindowsId(String, out String&) -> Boolean
 
 ;; The following C# System.TimeZoneInfo.TryConvertWindowsIdToIanaId overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryConvertWindowsIdToIanaId(String, out String&) -> Boolean
 ;;   TryConvertWindowsIdToIanaId(String, String, out String&) -> Boolean
 
 ;; The following C# System.TimeZoneInfo.TryFindSystemTimeZoneById overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryFindSystemTimeZoneById(String, out TimeZoneInfo&) -> Boolean
 

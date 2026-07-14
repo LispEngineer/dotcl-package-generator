@@ -2764,3 +2764,146 @@ full readability, so this went undetected since Version 30.
 `#:bitwise-or!` / `(cl:defun bitwise-or! ...)`. Confirmed by actually loading the regenerated
 `packages.lisp` through a real Lisp reader — the concrete repro this fix targets — not just
 `check_parens.py`'s paren-balance check.
+
+## Constructors and Methods With Default Parameter Values (Version 48)
+
+Found 2026-07-14: `MonoGameGum.GueDeriving.TextRuntime` generated no constructor at all.
+Its only public constructor is `TextRuntime(bool fullInstantiation = true,
+RenderingLibrary.SystemManagers systemManagers = null)`, and `clean-constructor-p`
+(`apg-member-predicates.lisp`, unchanged since Version 10) rejected any parameter carrying
+`:has-default` outright, so this constructor — and every constructor like it — was
+classified dirty and skipped, only documented in a comment. Across all of MonoGameGum, 84
+of 265 public types had at least one constructor with defaults and no default-free
+constructor: roughly a third of the assembly was un-constructible from Lisp. This is not
+Gum-specific; optional parameters are pervasive in modern C#.
+
+Investigating turned up three further problems sharing the same code path, so all four had
+to be fixed together:
+
+1. **Every emitted default value was silently `cl:nil`.** `find-parameter-default-str`
+   (`apg-overload-dispatch.lisp`) put its `cl:return` inside a `cl:dolist`, which only
+   exits the `dolist` — the function always fell through to its trailing `"cl:nil"`
+   literal. Consequence in every package this generator had ever produced before this
+   fix: calling e.g. `(scroll-into-view obj item)` on `Gum.Forms.Controls.ListBox` passed
+   `null` for `scrollIntoViewStyle` instead of the real C# default `BringIntoView`, and any
+   `bool flag = true` default was silently passed as `false`. Wrong behavior, no error,
+   completely undetected since whichever version first gave a method a Master Wrapper with
+   a `&key` slot (methods, unlike constructors, were never blocked from reaching this code
+   — `clean-method-p` never checked `:has-default`).
+2. **Defaults were spliced with `~A`, not a proper literal printer.** Once (1) is fixed, a
+   string default (`""`) or an enum default (`"BringIntoView"`) would emit unquoted,
+   unreadable Lisp, since `:default-value` is a Lisp *datum* already parsed by the metadata
+   reader (`utils:safe-read-form-from-file`), not source text.
+3. **`&optional`/`&key` dispatch clauses required their `supplied-p` flag to be true**
+   whenever *any* overload had a parameter at that slot, with no way for a lone defaulted
+   parameter to be genuinely optional.
+4. **`collect-key-params` could bind the same mapped Lisp name twice in one lambda list**
+   — an invalid duplicate variable — when an optional-positional slot's arbitrarily-chosen
+   representative parameter (see Version 24's "TimeSpan `seconds`/`seconds2`" note) and a
+   later keyword parameter from a *different* overload happened to share a name after
+   `map-param-name`. Real, already-shipped example: `cspackages-test/system-io-stream.lisp`'s
+   `read-exactly-async` bound `cancellation-token` in both its `&optional` and `&key`
+   sections — invalid Lisp that `check_parens.py`'s paren-balance check couldn't catch
+   (same blind spot Version 47 found for `|`).
+
+### Metadata: `:default-kind` and `:default-type`
+
+`AssemblyToLispy.cs`'s `FormatParameterPlist` now emits `:default-kind` (one of `:null`,
+`:bool`, `:number`, `:char`, `:string`, `:enum`, or `:unrepresentable`) and `:default-type`
+(the default's own fully-qualified type) alongside the existing `:has-default`/
+`:default-value`, via a new `FormatDefaultValueWithKind(Type paramType, object? val)` —
+see `doc/assembly-to-lispy.md`'s updated Parameter Plist Details for the exact schema.
+`:unrepresentable` covers what reflection cannot round-trip as a Lisp literal:
+
+* A **non-nullable value-type parameter's `= default`** (e.g. `CancellationToken token =
+  default`) — reflection reports `ParameterInfo.DefaultValue` as `null` here, exactly like
+  a real reference-type null default, so `paramType.IsValueType && Nullable.GetUnderlyingType(paramType)
+  == null` disambiguates the two cases.
+* A **non-null struct/object default** whose value reflection cannot format as a Lisp
+  literal at all (the pre-existing `FormatDefaultValue` fallback path).
+
+`:enum` needed its own reflection quirk fix: for a `Nullable<TEnum>` parameter, `DefaultValue`
+arrives as a raw boxed value of the enum's *underlying* integral type (e.g. `Byte` for a
+`byte`-backed enum), not a boxed `TEnum` — so checking `val.GetType().IsEnum` (the initial,
+wrong approach) silently misclassified every nullable-enum default as `:number`.
+`FormatDefaultValueWithKind` instead checks `underlyingType.IsEnum` (`paramType` with any
+`Nullable<T>` unwrapped) and converts `val` via `Enum.ToObject` when it isn't already an
+instance of that type.
+
+### Generator: `usable-default-p` and correct literal emission
+
+New `usable-default-p` (`apg-member-predicates.lisp`) is true only for a `:has-default`
+parameter whose `:default-kind` isn't `:unrepresentable`. Every place that previously asked
+"does this parameter have a default" to decide positional-prefix/mandatory-length/Master-
+Wrapper-triggering questions (`common-parameter-prefix`, `max-mandatory-parameter-len`,
+`complex-group-p`, `format-master-overload-condition`, `emit-constructors`'s single-clean-
+constructor case) now asks `usable-default-p` instead — so an `:unrepresentable` default is
+treated everywhere as if the parameter had no default at all, i.e. it becomes *mandatory* in
+the generated wrapper rather than blocking the whole member. `clean-constructor-p`/
+`dirty-constructor-p` no longer look at `:has-default` at all, matching `clean-method-p`'s
+pre-existing (correct) behavior; `dirty-method-p` likewise dropped it, fixing a latent
+double-reporting bug where a defaulted method was previously listed *both* as clean (with a
+real wrapper) and dirty (in the "not yet supported" comment) — since `complex-group-p`
+already triggered a Master Wrapper for a defaulted method, dropping `:has-default` from
+`dirty-method-p` costs nothing methods weren't already getting.
+
+`find-parameter-default-str`'s `cl:dolist`/`cl:return` bug is fixed via `cl:return-from`,
+and it now calls new `format-default-literal`, which prints each `:default-kind` correctly
+instead of assuming `:default-value` is already valid Lisp source text: `:enum` constructs
+`(dotnet:enum-or "<default-type>" "<Member>" ...)`, splitting a `[Flags]` combination's
+comma-separated member names into multiple arguments to `dotnet:enum-or` (`doc/dotnet-dotcl-
+interop.md`); `:string`/`:char` are `~S`-printed (proper quoting); `:bool`/`:null` become
+`cl:t`/`cl:nil` explicitly; `:number` is `~A`-printed, relying on the same DotCL
+`SingleFloat`/`DoubleFloat` print/read symmetry `AssemblyToLispy.cs`'s original
+`FormatDefaultValue` already depended on.
+
+`format-master-overload-condition`'s `&optional`/`&key` clauses now check `usable-default-p`
+on *that specific overload's own parameter* at each slot (not the slot's arbitrarily-chosen
+representative): when it has a usable default, the clause becomes `(cl:or (cl:not
+supplied-x) <type-check>)` instead of unconditionally requiring `supplied-x`; otherwise
+(including `:unrepresentable`, which is why unrepresentable defaults are safely mandatory
+rather than silently wrong) behavior is unchanged. `master-overload-param-names` mirrors
+this: when the slot's plain bound variable would not hold the calling overload's real
+default-when-omitted value, it substitutes `(cl:if supplied-x x <that overload's own default
+literal>)` instead of the bare variable — correct per-overload even when two overloads
+disagree on a shared slot's default (e.g. one constructor's `fullInstantiation = true`
+landing in the same lambda-list slot, by index, as a *different* constructor's unrelated
+mandatory `id` parameter).
+
+### The compounding edge case: a slot's arbitrary representative colliding with an unrelated key parameter
+
+`collect-key-params` now takes the wrapper's already-bound prefix/optional-slot mapped
+names and skips adding any further parameter whose mapped name collides with one of
+them — this is the direct fix for the `read-exactly-async` invalid-lambda-list bug. But a
+constructor now reachable through this same machinery (unlike methods, which have always
+been able to trigger a Master Wrapper for a lone default) can expose a *further*, narrower
+bug this fix alone doesn't cover: if the excluded parameter's own name would otherwise have
+been used, by `master-overload-param-names`'s previous logic, to build a
+`(cl:if supplied-x x <default>)` reference into a slot that a *different* overload's
+unrelated parameter also occupies, the resulting `supplied-x`/`x` pair would silently alias
+onto that other overload's binding — potentially passing an entirely wrong value (e.g. an
+`id` integer where a `fullInstantiation` boolean default was intended). `master-overload-
+param-names` now takes `key-params` (the actual, post-exclusion list) as a fourth argument
+and checks membership before referencing a slot's `supplied-x`/`x` pair for a key-zone
+parameter; when a parameter was excluded by this collision, it unconditionally emits its own
+default literal instead (never a variable reference) — always correct, at the narrow cost
+that this one specific occurrence can't be overridden by the caller through this wrapper.
+(By C#'s own mandatory-parameters-before-optional rule, every parameter landing in the
+key zone necessarily has a usable default in the first place, so this fallback is always
+reachable and always sound.) Exercised by a purpose-built two-constructor edge case in
+`AssemblyToLispyTestTarget/EdgeCases.cs`'s `DefaultParameterTestClass`.
+
+### Verification
+
+`make build test` passes the full Lisp + C# suite (including new `FormatDefaultValueWithKind`
+kind/type assertions and `tests/framework.lisp` schema validation for `:default-kind`/
+`:default-type`) and regenerates `cspackages-test/` — every previously-`cl:nil` default
+becomes its real value, and `read-exactly-async`'s invalid lambda list is gone. Regenerating
+all 265 public types of a real third-party assembly (MonoGameGum) end-to-end: the 84 types
+with no usable constructor before this fix drop to 0 (the remaining types without a `new`
+are enums, interfaces, and static-only classes, which correctly have none). Manually
+confirmed `MonoGameGum.GueDeriving.TextRuntime` now generates
+`(cl:defun new (cl:&key (full-instantiation cl:t ...) (system-managers cl:nil ...)) ...)`,
+and `Gum.Forms.Controls.ListBox`'s `scroll-into-view` now defaults
+`scroll-into-view-style` to `(dotnet:enum-or "Gum.Forms.Controls.ScrollIntoViewStyle"
+"BringIntoView")` instead of silently passing `nil`.

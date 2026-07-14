@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Text.StringBuilder
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-text-string-builder)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Text.StringBuilder"))
 (cl:defconstant <type-str> "System.Text.StringBuilder")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (capacity2 cl:nil supplied-capacity2) (length cl:nil supplied-length) (capacity3 cl:nil supplied-capacity3))
   "Master wrapper for System.Text.StringBuilder constructor overloads. Dispatches at runtime.
@@ -302,7 +302,7 @@ Append(StringBuilder, Int32, Int32) -> StringBuilder
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-repeat-count (cl:list :repeat-count repeat-count)) (cl:when supplied-char-count (cl:list :char-count char-count)))))))
 
 ;; Note: System.Text.StringBuilder.Append also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   Append(ref StringBuilder+AppendInterpolatedStringHandler&) -> StringBuilder
 ;;   Append(IFormatProvider, ref StringBuilder+AppendInterpolatedStringHandler&) -> StringBuilder
@@ -462,7 +462,7 @@ Parameters:
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.Text.StringBuilder.AppendFormat also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   AppendFormat(String, params Object[]) -> StringBuilder
 ;;   AppendFormat(IFormatProvider, String, params Object[]) -> StringBuilder
@@ -560,7 +560,7 @@ AppendJoin(Char, IEnumerable) -> StringBuilder
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.Text.StringBuilder.AppendJoin also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   AppendJoin(String, params Object[]) -> StringBuilder
 ;;   AppendJoin(String, params String[]) -> StringBuilder
@@ -592,7 +592,7 @@ AppendLine(String) -> StringBuilder
                     :supplied-args (cl:append (cl:when supplied-value (cl:list :value value)))))))
 
 ;; Note: System.Text.StringBuilder.AppendLine also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   AppendLine(ref StringBuilder+AppendInterpolatedStringHandler&) -> StringBuilder
 ;;   AppendLine(IFormatProvider, ref StringBuilder+AppendInterpolatedStringHandler&) -> StringBuilder

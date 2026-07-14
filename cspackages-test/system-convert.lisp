@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Convert
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-convert)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Convert"))
 (cl:defconstant <type-str> "System.Convert")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:define-symbol-macro db-null (dotnet:static <type-str> "DBNull"))
 (cl:setf (cl:documentation (cl:quote db-null) (cl:quote cl:variable)) "A constant that represents a database column that is absent of data; that is, database null.")
@@ -114,7 +114,7 @@ FromHexString(Byte]) -> Byte[]
                     :supplied-args (cl:append (cl:list :s s))))))
 
 ;; Note: System.Convert.FromHexString also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   FromHexString(String, Byte], out Int32&, out Int32&) -> OperationStatus
 ;;   FromHexString(Char], Byte], out Int32&, out Int32&) -> OperationStatus
@@ -187,7 +187,7 @@ ToBase64String(Byte[], Base64FormattingOptions) -> String
     - in-array (System.Byte[]): An array of 8-bit unsigned integers.
     - options (System.Base64FormattingOptions): System.Base64FormattingOptions.InsertLineBreaks to insert a line break every 76 characters, or System.Base64FormattingOptions.None to not insert line breaks.
 
-ToBase64String(Byte], Base64FormattingOptions) -> String
+ToBase64String(Byte], Base64FormattingOptions = None) -> String
   Summary: Converts the 8-bit unsigned integers inside the specified read-only span into their equivalent string representation that is encoded with base-64 digits. You can optionally specify whether to insert line breaks in the return value.
   Returns: The string representation in base 64 of the elements in bytes. If the length of bytes is 0, an empty string is returned.
   Parameters:
@@ -218,8 +218,8 @@ ToBase64String(Byte[], Int32, Int32, Base64FormattingOptions) -> String
      (dotnet:static <type-str> "ToBase64String" in-array options length))
     ((cl:and (cl:or (cl:null in-array) (dotnet:object-type in-array)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-length) (cl:not supplied-options2))
      (dotnet:static <type-str> "ToBase64String" in-array options))
-    ((cl:and (cl:or (cl:null in-array) (dotnet:object-type in-array)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-length) (cl:not supplied-options2))
-     (dotnet:static <type-str> "ToBase64String" in-array options))
+    ((cl:and (cl:or (cl:null in-array) (dotnet:object-type in-array)) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:object-type options))) (cl:not supplied-length) (cl:not supplied-options2))
+     (dotnet:static <type-str> "ToBase64String" in-array (cl:if supplied-options options (dotnet:enum-or "System.Base64FormattingOptions" "None"))))
     ((cl:and (cl:or (cl:null in-array) (dotnet:object-type in-array)) (cl:not supplied-options) (cl:not supplied-length) (cl:not supplied-options2))
      (dotnet:static <type-str> "ToBase64String" in-array))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -227,11 +227,6 @@ ToBase64String(Byte[], Int32, Int32, Base64FormattingOptions) -> String
                     :class-name <type-str>
                     :method-name "ToBase64String"
                     :supplied-args (cl:append (cl:list :in-array in-array) (cl:when supplied-options (cl:list :options options)) (cl:when supplied-length (cl:list :length length)) (cl:when supplied-options2 (cl:list :options2 options2)))))))
-
-;; Note: System.Convert.ToBase64String also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ToBase64String(Byte], Base64FormattingOptions) -> String
 
 (cl:defun to-boolean (value cl:&optional (provider cl:nil supplied-provider))
   "Master wrapper for System.Convert.ToBoolean overloads. Dispatches at runtime.
@@ -2880,24 +2875,24 @@ ToUInt64(String, Int32) -> UInt64
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-provider (cl:list :provider provider)))))))
 
 ;; The following C# System.Convert.TryFromBase64Chars overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryFromBase64Chars(Char], Byte], out Int32&) -> Boolean
 
 ;; The following C# System.Convert.TryFromBase64String overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryFromBase64String(String, Byte], out Int32&) -> Boolean
 
 ;; The following C# System.Convert.TryToBase64Chars overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
-;;   TryToBase64Chars(Byte], Char], out Int32&, Base64FormattingOptions) -> Boolean
+;; (ref, out, or params) and are not yet supported:
+;;   TryToBase64Chars(Byte], Char], out Int32&, Base64FormattingOptions = None) -> Boolean
 
 ;; The following C# System.Convert.TryToHexString overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryToHexString(Byte], Char], out Int32&) -> Boolean
 ;;   TryToHexString(Byte], Byte], out Int32&) -> Boolean
 
 ;; The following C# System.Convert.TryToHexStringLower overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryToHexStringLower(Byte], Char], out Int32&) -> Boolean
 ;;   TryToHexStringLower(Byte], Byte], out Int32&) -> Boolean
 

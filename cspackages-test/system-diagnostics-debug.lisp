@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Diagnostics.Debug
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-diagnostics-debug)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Diagnostics.Debug"))
 (cl:defconstant <type-str> "System.Diagnostics.Debug")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun auto-flush ()
   (dotnet:static <type-str> "AutoFlush"))
@@ -33,15 +33,15 @@
 
 Assert(Boolean) -> Void
 
-Assert(Boolean, String) -> Void
+Assert(Boolean, String = null) -> Void
 
 Assert(Boolean, String, String) -> Void
 "
   (cl:cond
     ((cl:and (cl:typep condition 'cl:boolean) supplied-message (cl:stringp message) supplied-detail-message (cl:stringp detail-message))
      (dotnet:static <type-str> "Assert" condition message detail-message))
-    ((cl:and (cl:typep condition 'cl:boolean) supplied-message (cl:stringp message) (cl:not supplied-detail-message))
-     (dotnet:static <type-str> "Assert" condition message))
+    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:not supplied-message) (cl:stringp message)) (cl:not supplied-detail-message))
+     (dotnet:static <type-str> "Assert" condition (cl:if supplied-message message cl:nil)))
     ((cl:and (cl:typep condition 'cl:boolean) (cl:not supplied-message) (cl:not supplied-detail-message))
      (dotnet:static <type-str> "Assert" condition))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -51,9 +51,8 @@ Assert(Boolean, String, String) -> Void
                     :supplied-args (cl:append (cl:list :condition condition) (cl:when supplied-message (cl:list :message message)) (cl:when supplied-detail-message (cl:list :detail-message detail-message)))))))
 
 ;; Note: System.Diagnostics.Debug.Assert also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
-;;   Assert(Boolean, String) -> Void
 ;;   Assert(Boolean, ref Debug+AssertInterpolatedStringHandler&) -> Void
 ;;   Assert(Boolean, ref Debug+AssertInterpolatedStringHandler&, ref Debug+AssertInterpolatedStringHandler&) -> Void
 ;;   Assert(Boolean, String, String, params Object[]) -> Void
@@ -89,7 +88,7 @@ Fail(String, String) -> Void
   (dotnet:static <type-str> "Print" (cl:the (dotnet "System.String") message)))
 
 ;; Note: System.Diagnostics.Debug.Print also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   Print(String, params Object[]) -> Void
 
@@ -152,7 +151,7 @@ WriteIf(Boolean, Object, String) -> Void
                     :supplied-args (cl:append (cl:list :condition condition) (cl:list :message message) (cl:when supplied-category (cl:list :category category)))))))
 
 ;; Note: System.Diagnostics.Debug.WriteIf also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   WriteIf(Boolean, ref Debug+WriteIfInterpolatedStringHandler&) -> Void
 ;;   WriteIf(Boolean, ref Debug+WriteIfInterpolatedStringHandler&, String) -> Void
@@ -184,7 +183,7 @@ WriteLine(String, String) -> Void
                     :supplied-args (cl:append (cl:list :message message) (cl:when supplied-category (cl:list :category category)))))))
 
 ;; Note: System.Diagnostics.Debug.WriteLine also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   WriteLine(String, params Object[]) -> Void
 
@@ -215,7 +214,7 @@ WriteLineIf(Boolean, String, String) -> Void
                     :supplied-args (cl:append (cl:list :condition condition) (cl:list :value value) (cl:when supplied-category (cl:list :category category)))))))
 
 ;; Note: System.Diagnostics.Debug.WriteLineIf also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   WriteLineIf(Boolean, ref Debug+WriteIfInterpolatedStringHandler&) -> Void
 ;;   WriteLineIf(Boolean, ref Debug+WriteIfInterpolatedStringHandler&, String) -> Void

@@ -21,9 +21,33 @@
         (format nil "~A[~{~A~^, ~}] -> ~A" name param-strs return-type)
         (format nil "~A -> ~A" name return-type))))
 
+(defun format-default-suffix (p)
+  "Returns \"\" for a parameter plist P with no default, or a trailing
+   \" = <value>\" description of its default for a human-readable signature
+   string. A usable default (usable-default-p) renders its actual value; an
+   :unrepresentable default -- reflection reporting a non-nullable
+   value-type parameter's default(SomeStruct) as null, or a non-null
+   struct/object default -- renders a note naming its real C# type and
+   value instead, since the generated wrapper cannot supply it and requires
+   the caller to pass this argument explicitly (see usable-default-p and
+   clean-constructor-p/clean-method-p's docstrings)."
+  (if (not (getf p :has-default))
+      ""
+      (let ((kind (getf p :default-kind))
+            (val (getf p :default-value))
+            (default-type (getf p :default-type)))
+        (case kind
+          (:unrepresentable
+           (format nil " = ~A [C# default of type ~A -- not representable in Lisp, must be supplied]"
+                   val default-type))
+          (:null " = null")
+          (:string (format nil " = ~S" val))
+          (t (format nil " = ~A" val))))))
+
 (defun method-signature-str (method)
   "Return a human-readable signature string for a method, e.g.
-   'Contains(ref Rectangle, out bool) -> void'."
+   'Contains(ref Rectangle, out bool) -> void' or
+   'ScrollIntoView(Object, ScrollIntoViewStyle = BringIntoView) -> void'."
   (let* ((name (getf method :name))
          (return-type (simple-type-name (or (getf method :return-type) "void")))
          (params (getf method :parameters))
@@ -34,7 +58,7 @@
                                                      ((getf p :params) "params ")
                                                      (t "")))
                                      (type-str (simple-type-name (getf p :type))))
-                                 (format nil "~A~A" modifier-str type-str)))
+                                 (format nil "~A~A~A" modifier-str type-str (format-default-suffix p))))
                              params)))
     (format nil "~A(~{~A~^, ~}) -> ~A" name param-strs return-type)))
 
@@ -52,7 +76,7 @@
 
 (defun constructor-signature-str (ctor)
   "Return a human-readable signature string for a constructor, e.g.
-   'new(ref Rectangle, out bool)'."
+   'new(ref Rectangle, out bool)' or 'new(Boolean = true, SystemManagers = null)'."
   (let* ((params (getf ctor :parameters))
          (param-strs (mapcar (lambda (p)
                                (let ((modifier-str (cond
@@ -61,7 +85,7 @@
                                                      ((getf p :params) "params ")
                                                      (t "")))
                                      (type-str (simple-type-name (getf p :type))))
-                                 (format nil "~A~A" modifier-str type-str)))
+                                 (format nil "~A~A~A" modifier-str type-str (format-default-suffix p))))
                              params)))
     (format nil "new(~{~A~^, ~})" param-strs)))
 

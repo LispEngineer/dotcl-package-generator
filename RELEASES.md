@@ -10,6 +10,33 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.48.0 — 2026-07-14
+
+**Constructors (and methods) with C# default parameter values are now fully supported,
+generating a real wrapper instead of being skipped.**
+
+* A class whose only constructor(s) had every parameter defaulted (e.g.
+  `MonoGameGum.GueDeriving.TextRuntime(bool fullInstantiation = true, SystemManagers
+  systemManagers = null)`) previously got no `new` at all. `clean-constructor-p` no longer
+  disqualifies a defaulted parameter; a single such constructor (or any constructor/method
+  needing to make a parameter optional) now routes through the same Master Wrapper
+  `&optional`/`&key` dispatch multi-overload methods already used.
+* Fixed a real correctness bug present in every previously generated package: an omitted
+  optional argument was always silently passed as `nil`/`false` instead of its actual C#
+  default (`find-parameter-default-str`'s `cl:return` sat inside a `cl:dolist`, only
+  exiting the loop). Also fixed: an invalid duplicate-variable lambda list generated for
+  some methods sharing a parameter name across overloads at different positions (e.g.
+  `System.IO.Stream`'s `ReadExactlyAsync`).
+* New `:default-kind`/`:default-type` metadata keys (see `doc/assembly-to-lispy.md`) let
+  the generator emit each default's *actual* typed value — including constructing a boxed
+  enum default via `dotnet:enum-or` — rather than guessing from `:type`. A default that
+  cannot be faithfully represented as a Lisp literal (e.g. `CancellationToken token =
+  default`) makes that one parameter mandatory instead, with its real C# default surfaced
+  in the wrapper's docstring.
+* See `doc/generator-design-notes.md`'s "Constructors and Methods With Default Parameter
+  Values (Version 48)" section and `FEATURES.md`'s new "Default Parameter Values" section
+  for the full design writeup.
+
 ## 2.46.0 — 2026-07-11
 
 **Added `--csharp-generic-in-asd`/`--no-csharp-generic-in-asd` (global, ON by default): lets

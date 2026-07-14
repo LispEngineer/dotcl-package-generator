@@ -160,43 +160,87 @@
      (format nil "(cl:or (cl:null ~A) (dotnet:object-type ~A))" arg-str arg-str))))
 
 (cl:defun complex-group-p (clean-methods)
-  "Returns t if the group of clean methods requires a master wrapper dispatch (either multiple overloads or presence of default arguments)."
+  "Returns t if the group of clean methods requires a master wrapper dispatch (either multiple overloads or presence of a usable default argument)."
   (cl:or (cl:>= (cl:length clean-methods) 2)
          (cl:some (cl:lambda (m)
-                    (cl:some (cl:lambda (p) (cl:getf p :has-default)) (cl:getf m :parameters)))
+                    (cl:some #'usable-default-p (cl:getf m :parameters)))
                   clean-methods)))
 
-(cl:defun collect-key-params (methods prefix-len)
-  "Collects the union of all keyword parameters from methods beyond prefix-len."
-  (cl:let ((key-params nil))
+(cl:defun collect-key-params (methods prefix-len &optional excluded-mapped-names)
+  "Collects the union of all keyword parameters from methods beyond
+   prefix-len (an index into each overload's :parameters list -- despite
+   the name, callers pass the combined prefix + optional-positional slot
+   count, i.e. every overload's parameters from that index onward are
+   candidate keyword parameters), skipping any parameter whose *mapped*
+   Lisp name collides with one already bound earlier in the lambda list
+   (EXCLUDED-MAPPED-NAMES -- the wrapper's own positional/optional slot
+   names). Without this, two unrelated overloads whose parameters
+   map-param-name to the same Lisp name at different lambda-list positions
+   (one a positional/optional slot's arbitrarily-chosen representative, one
+   a &key slot) would produce an invalid lambda list with a duplicate bound
+   variable -- e.g. System.IO.Stream.ReadExactlyAsync's CancellationToken
+   parameter, present at different indices across its overloads."
+  (cl:let ((key-params nil)
+           (seen-mapped-names (cl:copy-list excluded-mapped-names)))
     (cl:dolist (m methods)
       (cl:let ((params (cl:nthcdr prefix-len (cl:getf m :parameters))))
         (cl:dolist (p params)
-          (cl:let* ((pname (cl:getf p :name))
-                    (existing (cl:find pname key-params :key (cl:lambda (kp) (cl:getf kp :name)) :test #'cl:string=)))
-            (cl:unless existing
+          (cl:let ((mapped (map-param-name (cl:getf p :name))))
+            (cl:unless (cl:member mapped seen-mapped-names :test #'cl:string=)
+              (cl:push mapped seen-mapped-names)
               (cl:push p key-params))))))
     (cl:nreverse key-params)))
 
+(cl:defun format-default-literal (p)
+  "Returns the Lisp source-text literal string to splice into a generated
+   &optional/&key lambda-list default-value form for parameter plist P,
+   which must satisfy usable-default-p. P's :default-value has already been
+   parsed into an actual Lisp datum by the metadata reader
+   (utils:safe-read-form-from-file), so printing it back correctly per its
+   :default-kind (rather than assuming :default-value is itself source
+   text) is required: a bare string or character datum has no surrounding
+   quote/#\\ syntax of its own. :enum is the one kind whose :default-value
+   is not a value of the target type at all -- it's the enum member
+   name(s) as a string (comma-separated for a [Flags] combination, e.g.
+   \"AllowThousands, Float\") -- so it constructs a boxed enum value via
+   dotnet:enum-or (see doc/dotnet-dotcl-interop.md) instead."
+  (cl:let ((kind (cl:getf p :default-kind))
+           (val (cl:getf p :default-value)))
+    (cl:case kind
+      (:null "cl:nil")
+      (:bool (cl:if val "cl:t" "cl:nil"))
+      (:number (cl:format nil "~A" val))
+      ((:char :string) (cl:format nil "~S" val))
+      (:enum
+       (cl:let* ((default-type (cl:getf p :default-type))
+                 (member-names (cl:mapcar (cl:lambda (part) (cl:string-trim " " part))
+                                           (uiop:split-string val :separator ","))))
+         (cl:format nil "(dotnet:enum-or ~S ~{~S~^ ~})" default-type member-names)))
+      (cl:t "cl:nil"))))
+
 (cl:defun find-parameter-default-str (pname methods)
-  "Locates the C# default value of parameter pname across methods and returns it as a Lisp expression string."
+  "Locates parameter PNAME's usable default (usable-default-p) across
+   METHODS (a method or constructor plist list) and returns its Lisp
+   literal source text (format-default-literal), or \"cl:nil\" if none of
+   METHODS' overloads declares a usable default for it -- matching a bare
+   &key slot's ordinary CL default-of-nil semantics."
   (cl:dolist (m methods)
     (cl:let ((p (cl:find pname (cl:getf m :parameters) :key (cl:lambda (param) (cl:getf param :name)) :test #'cl:string=)))
-      (cl:when (cl:and p (cl:getf p :has-default))
-        (cl:return (cl:getf p :default-value)))))
+      (cl:when (cl:and p (usable-default-p p))
+        (cl:return-from find-parameter-default-str (format-default-literal p)))))
   "cl:nil")
 
 (cl:defun common-parameter-prefix (methods)
-  "Determines the maximum common positional parameter prefix across methods based on lack of default values."
+  "Determines the maximum common positional parameter prefix across methods based on lack of a usable default value."
   (cl:let* ((param-lists (cl:mapcar (cl:lambda (m) (cl:getf m :parameters)) methods))
             (min-len (cl:reduce #'cl:min (cl:mapcar #'cl:length param-lists)))
             (prefix nil))
     (cl:loop for idx from 0 to (cl:1- min-len) do
       (cl:let* ((first-param (cl:nth idx (cl:first param-lists)))
-                ;; A parameter cannot be positional if it has a default value in any overload.
+                ;; A parameter cannot be positional if it has a usable default value in any overload.
                 (no-default-p (cl:every (cl:lambda (pl)
                                           (cl:let ((p (cl:nth idx pl)))
-                                            (cl:not (cl:getf p :has-default))))
+                                            (cl:not (usable-default-p p))))
                                         param-lists)))
         (cl:if no-default-p
             (cl:push first-param prefix)
@@ -204,14 +248,14 @@
     (cl:nreverse prefix)))
 
 (cl:defun max-mandatory-parameter-len (methods)
-  "Returns the maximum number of mandatory parameters (parameters without defaults) in any single overload."
+  "Returns the maximum number of mandatory parameters (parameters without a usable default) in any single overload."
   (cl:let ((max-len 0))
     (cl:dolist (m methods)
       (cl:let* ((params (cl:getf m :parameters))
                 (mandatory-count
                   (cl:loop for p in params
                            for idx from 0
-                           while (cl:not (cl:getf p :has-default))
+                           while (cl:not (usable-default-p p))
                            count t)))
         (cl:setf max-len (cl:max max-len mandatory-count))))
     max-len))
@@ -265,48 +309,103 @@
                 (cm-p (cl:nth idx cm-params))
                 (type-check (format-param-type-check (cl:getf cm-p :type) lpname)))
         (cl:push type-check cond-parts)))
-    ;; 2. Check optional positional parameters presence and types
+    ;; 2. Check optional positional parameters presence and types. When CM's
+    ;;    own parameter at this slot has a usable default, this clause may
+    ;;    match whether or not the caller supplied it -- only type-check it
+    ;;    if they did (master-overload-param-names substitutes CM's real
+    ;;    default when they didn't). Otherwise (no parameter here at all, or
+    ;;    one with no usable default -- including :unrepresentable, which is
+    ;;    effectively mandatory) behavior is unchanged from before.
     (cl:loop for op in opt-params
              for idx from prefix-len to (cl:1- max-mand-len) do
       (cl:let* ((op-name (map-param-name (cl:getf op :name)))
                 (supplied-var (cl:format nil "supplied-~A" op-name))
                 (cm-p (cl:nth idx cm-params)))
-        (cl:if cm-p
-            (cl:progn
-              (cl:push supplied-var cond-parts)
-              (cl:push (format-param-type-check (cl:getf cm-p :type) op-name) cond-parts))
-            (cl:push (cl:format nil "(cl:not ~A)" supplied-var) cond-parts))))
-    ;; 3. Check keyword parameters presence and types
+        (cl:cond
+          ((cl:null cm-p)
+           (cl:push (cl:format nil "(cl:not ~A)" supplied-var) cond-parts))
+          ((usable-default-p cm-p)
+           (cl:push (cl:format nil "(cl:or (cl:not ~A) ~A)" supplied-var (format-param-type-check (cl:getf cm-p :type) op-name)) cond-parts))
+          (cl:t
+           (cl:push supplied-var cond-parts)
+           (cl:push (format-param-type-check (cl:getf cm-p :type) op-name) cond-parts)))))
+    ;; 3. Check keyword parameters presence and types. Same usable-default-p
+    ;;    softening as (2) above, keyed to CM's own parameter, not the
+    ;;    slot's arbitrarily-chosen representative KP.
     (cl:dolist (kp key-params)
       (cl:let* ((pname (cl:getf kp :name))
              (lpname (map-param-name pname))
              (supplied-var (cl:format nil "supplied-~A" lpname))
              (cm-p (cl:find pname cm-params :key (cl:lambda (p) (cl:getf p :name)) :test #'cl:string=)))
-        (cl:if cm-p
-            (cl:progn
-              (cl:unless (cl:getf cm-p :has-default)
-                (cl:push supplied-var cond-parts))
-              (cl:push (format-param-type-check (cl:getf cm-p :type) lpname) cond-parts))
-            (cl:push (cl:format nil "(cl:not ~A)" supplied-var) cond-parts))))
+        (cl:cond
+          ((cl:null cm-p)
+           (cl:push (cl:format nil "(cl:not ~A)" supplied-var) cond-parts))
+          ((usable-default-p cm-p)
+           (cl:push (cl:format nil "(cl:or (cl:not ~A) ~A)" supplied-var (format-param-type-check (cl:getf cm-p :type) lpname)) cond-parts))
+          (cl:t
+           (cl:push supplied-var cond-parts)
+           (cl:push (format-param-type-check (cl:getf cm-p :type) lpname) cond-parts)))))
     (cl:format nil "(cl:and ~{~A~^ ~})" (cl:nreverse cond-parts))))
 
-(cl:defun master-overload-param-names (cm prefix opt-params)
+(cl:defun master-overload-param-names (cm prefix opt-params key-params)
   "Maps CM's (a method or constructor plist) parameters to the master
-   wrapper's bound variable names by positional index: names from PREFIX for
-   positional args, from OPT-PARAMS for optional positional args beyond that,
-   and CM's own (mapped) parameter name for anything past that (keyword args)."
+   wrapper's invocation-argument expressions by positional index: the
+   wrapper's own bound variable name (mapped from PREFIX for positional
+   args, from OPT-PARAMS for optional positional args beyond that, or CM's
+   own mapped parameter name for anything past that, i.e. keyword args) --
+   except when CM's own parameter at that index has a usable default
+   (usable-default-p) and lands in an optional-positional or keyword slot:
+   there, format-master-overload-condition only requires this clause's
+   supplied-p flag to be true when the caller actually supplied a value
+   (cl:or (cl:not supplied-x) ...), so the slot's shared CL:NIL
+   &optional/&key init form is not necessarily CM's real C# default, and the
+   expression passed to CM must instead be
+   (cl:if supplied-x x <CM's own default literal>). A prefix slot, or any
+   slot where CM's own parameter has no usable default, is unconditionally
+   required by that same cond clause, so the plain variable already holds
+   CM's real supplied value there.
+
+   Every parameter landing at idx >= (length prefix)+(length opt-params) --
+   the keyword zone -- necessarily has a usable default (a non-defaulted
+   parameter can never sort later than max-mandatory-parameter-len, by C#'s
+   own mandatory-before-optional parameter ordering rule), but collect-
+   key-params may have excluded CM's own occurrence of it entirely: if its
+   mapped name collides with a DIFFERENT, unrelated parameter that some
+   other overload's positional/optional slot arbitrarily chose as that
+   slot's representative name (e.g. one overload's leading mandatory 'id'
+   landing in the same lambda-list slot, by index, as another overload's
+   leading defaulted 'fullInstantiation'), reusing that slot's variable
+   here would silently pass CM the WRONG overload's value. KEY-PARAMS (the
+   same list threaded through the lambda list and format-master-overload-
+   condition) is consulted to detect this: only when CM's own parameter
+   name is actually among KEY-PARAMS' bound names is the ordinary
+   supplied-p-guarded variable reference used; otherwise (excluded by that
+   collision) the bare default literal is emitted unconditionally, since no
+   binding exists through which a caller could ever supply a different
+   value for this specific occurrence -- correct, if narrower, for this
+   narrow, self-colliding edge case."
   (cl:let* ((cm-params (cl:getf cm :parameters))
             (prefix-len (cl:length prefix))
-            (max-mand-len (+ prefix-len (cl:length opt-params))))
+            (max-mand-len (+ prefix-len (cl:length opt-params)))
+            (key-param-names (cl:mapcar (cl:lambda (kp) (map-param-name (cl:getf kp :name))) key-params)))
     (cl:loop for p in cm-params
              for idx from 0
              collect (cl:cond
                        ((cl:< idx prefix-len)
                         (map-param-name (cl:getf (cl:nth idx prefix) :name)))
                        ((cl:< idx max-mand-len)
-                        (map-param-name (cl:getf (cl:nth (- idx prefix-len) opt-params) :name)))
+                        (cl:let ((var (map-param-name (cl:getf (cl:nth (- idx prefix-len) opt-params) :name))))
+                          (cl:if (usable-default-p p)
+                              (cl:format nil "(cl:if supplied-~A ~A ~A)" var var (format-default-literal p))
+                              var)))
                        (cl:t
-                        (map-param-name (cl:getf p :name)))))))
+                        (cl:let ((var (map-param-name (cl:getf p :name))))
+                          (cl:cond
+                            ((cl:not (cl:member var key-param-names :test #'cl:string=))
+                             (format-default-literal p))
+                            ((usable-default-p p)
+                             (cl:format nil "(cl:if supplied-~A ~A ~A)" var var (format-default-literal p)))
+                            (cl:t var))))))))
 
 (cl:defun format-invocation-expr (fq-name dotnet-method-name static-p is-generic-p generic-type-args-str param-names
                                    &optional static-typed-args)
@@ -330,13 +429,13 @@
     (cl:t
      (cl:format nil "(dotnet:invoke (cl:the (dotnet \"~A\") obj!) \"~A\"~@[ ~{~A~^ ~}~])" fq-name dotnet-method-name param-names))))
 
-(cl:defun format-master-overload-action (cm fq-name name static-p is-generic-p generic-type-names prefix opt-params)
+(cl:defun format-master-overload-action (cm fq-name name static-p is-generic-p generic-type-names prefix opt-params key-params)
   "Generates C# invocation code for cm, mapping parameter names to the
    master wrapper's bound variables. GENERIC-TYPE-NAMES (from
    generic-type-param-names) is the ordered list of Lisp type-argument
    variable names bound by the wrapper's own lambda list; ignored unless
    IS-GENERIC-P."
-  (cl:let* ((param-names (master-overload-param-names cm prefix opt-params))
+  (cl:let* ((param-names (master-overload-param-names cm prefix opt-params key-params))
             (dotnet-method-name (cl:or (cl:getf cm :mangled-name) name))
             (type-args-str (cl:format nil "~{~A~^ ~}" generic-type-names)))
     (format-invocation-expr fq-name dotnet-method-name static-p is-generic-p type-args-str param-names)))
@@ -372,7 +471,8 @@
             (prefix (cl:subseq uniquified 0 prefix-len))
             (opt-params (cl:nthcdr prefix-len uniquified))
             (prefix-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) prefix))
-            (key-params (collect-key-params methods max-mand-len))
+            (opt-param-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) opt-params))
+            (key-params (collect-key-params methods max-mand-len (cl:append prefix-names opt-param-names)))
             (args-list nil))
     (cl:when is-generic-p
       (cl:setf args-list (cl:append args-list generic-type-names)))
@@ -404,7 +504,7 @@
     (cl:let ((sorted-methods (cl:sort (cl:copy-list methods) #'> :key (cl:lambda (m) (cl:length (cl:getf m :parameters))))))
       (cl:dolist (cm sorted-methods)
         (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
-              (action-str (format-master-overload-action cm fq-name name static-p is-generic-p generic-type-names prefix opt-params)))
+              (action-str (format-master-overload-action cm fq-name name static-p is-generic-p generic-type-names prefix opt-params key-params)))
           (cl:format stream "    (~A~%" cond-str)
           (cl:format stream "     ~A)~%" action-str))))
 
@@ -415,10 +515,10 @@
       (cl:format stream "                    :method-name \"~A\"~%" name)
       (cl:format stream "                    :supplied-args ~A))))~%~%" supplied-args-expr))))
 
-(cl:defun format-constructor-master-overload-action (cm prefix opt-params)
+(cl:defun format-constructor-master-overload-action (cm prefix opt-params key-params)
   "Generates C# constructor invocation code for cm (a constructor plist),
    mapping parameter names to the master wrapper's bound variables."
-  (cl:let ((param-names (master-overload-param-names cm prefix opt-params)))
+  (cl:let ((param-names (master-overload-param-names cm prefix opt-params key-params)))
     (cl:format nil "(dotnet:new <type-str>~@[ ~{~A~^ ~}~])" param-names)))
 
 (cl:defun generate-constructor-master-wrapper (stream ctors fq-name)
@@ -434,7 +534,8 @@
             (prefix (cl:subseq uniquified 0 prefix-len))
             (opt-params (cl:nthcdr prefix-len uniquified))
             (prefix-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) prefix))
-            (key-params (collect-key-params ctors max-mand-len))
+            (opt-param-names (cl:mapcar (cl:lambda (p) (map-param-name (cl:getf p :name))) opt-params))
+            (key-params (collect-key-params ctors max-mand-len (cl:append prefix-names opt-param-names)))
             (args-list prefix-names))
     (cl:when opt-params
       (cl:setf args-list (cl:append args-list (cl:list "cl:&optional")))
@@ -461,7 +562,7 @@
     (cl:let ((sorted-ctors (cl:sort (cl:copy-list ctors) #'> :key (cl:lambda (m) (cl:length (cl:getf m :parameters))))))
       (cl:dolist (cm sorted-ctors)
         (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
-                 (action-str (format-constructor-master-overload-action cm prefix opt-params)))
+                 (action-str (format-constructor-master-overload-action cm prefix opt-params key-params)))
           (cl:format stream "    (~A~%" cond-str)
           (cl:format stream "     ~A)~%" action-str))))
 

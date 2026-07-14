@@ -1,16 +1,16 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.StreamReader
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-io-stream-reader)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.StreamReader"))
 (cl:defconstant <type-str> "System.IO.StreamReader")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
-(cl:defun new (stream cl:&optional (detect-encoding-from-byte-order-marks cl:nil supplied-detect-encoding-from-byte-order-marks) (detect-encoding-from-byte-order-marks2 cl:nil supplied-detect-encoding-from-byte-order-marks2) (buffer-size cl:nil supplied-buffer-size))
+(cl:defun new (stream cl:&optional (detect-encoding-from-byte-order-marks cl:nil supplied-detect-encoding-from-byte-order-marks) (detect-encoding-from-byte-order-marks2 cl:nil supplied-detect-encoding-from-byte-order-marks2) (buffer-size cl:nil supplied-buffer-size) cl:&key (leave-open cl:nil supplied-leave-open))
   "Master wrapper for System.IO.StreamReader constructor overloads. Dispatches at runtime.
 
 new(Stream)
@@ -90,42 +90,48 @@ new(String, Encoding, Boolean, FileStreamOptions)
     - encoding (System.Text.Encoding): The character encoding to use.
     - detect-encoding-from-byte-order-marks (System.Boolean): Indicates whether to look for byte order marks at the beginning of the file.
     - options (System.IO.FileStreamOptions): An object that specifies the configuration options for the underlying System.IO.FileStream.
+
+new(Stream, Encoding = null, Boolean = T, Int32 = -1, Boolean = NIL)
+  Summary: Initializes a new instance of the System.IO.StreamReader class for the specified stream based on the specified character encoding, byte order mark detection option, and buffer size, and optionally leaves the stream open.
+  Parameters:
+    - stream (System.IO.Stream): The stream to read.
+    - encoding (System.Text.Encoding): The character encoding to use.
+    - detect-encoding-from-byte-order-marks (System.Boolean): to look for byte order marks at the beginning of the file; otherwise, .
+    - buffer-size (System.Int32): The minimum buffer size, in bytes.
+    - leave-open (System.Boolean): to leave the stream open after the System.IO.StreamReader object is disposed; otherwise, .
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) supplied-buffer-size (cl:numberp buffer-size))
+    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) (cl:or (cl:not supplied-detect-encoding-from-byte-order-marks) (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks))) (cl:or (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean)) (cl:or (cl:not supplied-buffer-size) (cl:numberp buffer-size)) (cl:or (cl:not supplied-leave-open) (cl:typep leave-open 'cl:boolean)))
+     (dotnet:new <type-str> stream (cl:if supplied-detect-encoding-from-byte-order-marks detect-encoding-from-byte-order-marks cl:nil) (cl:if supplied-detect-encoding-from-byte-order-marks2 detect-encoding-from-byte-order-marks2 cl:t) (cl:if supplied-buffer-size buffer-size -1) (cl:if supplied-leave-open leave-open cl:nil)))
+    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) supplied-buffer-size (cl:numberp buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks detect-encoding-from-byte-order-marks2 buffer-size))
-    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) supplied-buffer-size (cl:numberp buffer-size))
+    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) supplied-buffer-size (cl:numberp buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks detect-encoding-from-byte-order-marks2 buffer-size))
-    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) supplied-buffer-size (cl:or (cl:null buffer-size) (dotnet:object-type buffer-size)))
+    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) supplied-buffer-size (cl:or (cl:null buffer-size) (dotnet:object-type buffer-size)) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks detect-encoding-from-byte-order-marks2 buffer-size))
-    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) (cl:not supplied-buffer-size))
+    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) (cl:not supplied-buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks detect-encoding-from-byte-order-marks2))
-    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) (cl:not supplied-buffer-size))
+    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) supplied-detect-encoding-from-byte-order-marks2 (cl:typep detect-encoding-from-byte-order-marks2 'cl:boolean) (cl:not supplied-buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks detect-encoding-from-byte-order-marks2))
-    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) supplied-detect-encoding-from-byte-order-marks (cl:typep detect-encoding-from-byte-order-marks 'cl:boolean) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size))
+    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) supplied-detect-encoding-from-byte-order-marks (cl:typep detect-encoding-from-byte-order-marks 'cl:boolean) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks))
-    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size))
+    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks))
-    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:typep detect-encoding-from-byte-order-marks 'cl:boolean) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size))
+    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:typep detect-encoding-from-byte-order-marks 'cl:boolean) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks))
-    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size))
+    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks))
-    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size))
+    ((cl:and (cl:stringp stream) supplied-detect-encoding-from-byte-order-marks (cl:or (cl:null detect-encoding-from-byte-order-marks) (dotnet:object-type detect-encoding-from-byte-order-marks)) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream detect-encoding-from-byte-order-marks))
-    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) (cl:not supplied-detect-encoding-from-byte-order-marks) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size))
+    ((cl:and (cl:or (cl:null stream) (dotnet:object-type stream)) (cl:not supplied-detect-encoding-from-byte-order-marks) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream))
-    ((cl:and (cl:stringp stream) (cl:not supplied-detect-encoding-from-byte-order-marks) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size))
+    ((cl:and (cl:stringp stream) (cl:not supplied-detect-encoding-from-byte-order-marks) (cl:not supplied-detect-encoding-from-byte-order-marks2) (cl:not supplied-buffer-size) (cl:not supplied-leave-open))
      (dotnet:new <type-str> stream))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM-READER"
                     :class-name <type-str>
                     :method-name "new"
-                    :supplied-args (cl:append (cl:list :stream stream) (cl:when supplied-detect-encoding-from-byte-order-marks (cl:list :detect-encoding-from-byte-order-marks detect-encoding-from-byte-order-marks)) (cl:when supplied-detect-encoding-from-byte-order-marks2 (cl:list :detect-encoding-from-byte-order-marks2 detect-encoding-from-byte-order-marks2)) (cl:when supplied-buffer-size (cl:list :buffer-size buffer-size)))))))
-
-;; Note: System.IO.StreamReader also has the following constructors with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   new(Stream, Encoding, Boolean, Int32, Boolean)
+                    :supplied-args (cl:append (cl:list :stream stream) (cl:when supplied-detect-encoding-from-byte-order-marks (cl:list :detect-encoding-from-byte-order-marks detect-encoding-from-byte-order-marks)) (cl:when supplied-detect-encoding-from-byte-order-marks2 (cl:list :detect-encoding-from-byte-order-marks2 detect-encoding-from-byte-order-marks2)) (cl:when supplied-buffer-size (cl:list :buffer-size buffer-size)) (cl:when supplied-leave-open (cl:list :leave-open leave-open)))))))
 
 (cl:define-symbol-macro null (dotnet:static <type-str> "Null"))
 (cl:setf (cl:documentation (cl:quote null) (cl:quote cl:variable)) "A System.IO.StreamReader object around an empty stream.")
@@ -199,10 +205,10 @@ Read(Char[], Int32, Int32) -> Int32
                     :method-name "Read"
                     :supplied-args (cl:append (cl:when supplied-buffer (cl:list :buffer buffer)) (cl:when supplied-index (cl:list :index index)) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun read-async (obj! buffer cl:&optional (cancellation-token cl:nil supplied-cancellation-token) (count cl:nil supplied-count))
+(cl:defun read-async (obj! buffer cancellation-token cl:&optional (count cl:nil supplied-count))
   "Master wrapper for System.IO.StreamReader.ReadAsync overloads. Dispatches at runtime.
 
-ReadAsync(Char], CancellationToken) -> Int32]
+ReadAsync(Char], CancellationToken = default(System.Threading.CancellationToken) [C# default of type System.Threading.CancellationToken -- not representable in Lisp, must be supplied]) -> Int32]
   Summary: Asynchronously reads the characters from the current stream into a memory block.
   Returns: A value task that represents the asynchronous read operation. The value of the type parameter of the value task contains the number of characters that have been read, or 0 if at the end of the stream and no data was read. The number will be less than or equal to the buffer length, depending on whether the data is available within the stream.
   Parameters:
@@ -218,20 +224,15 @@ ReadAsync(Char[], Int32, Int32) -> Int32]
     - count (System.Int32): The maximum number of characters to read. If the end of the stream is reached before the specified number of characters is written into the buffer, the current method returns.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:numberp cancellation-token) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM-READER"
                     :class-name <type-str>
                     :method-name "ReadAsync"
-                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)) (cl:when supplied-count (cl:list :count count)))))))
-
-;; Note: System.IO.StreamReader.ReadAsync also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ReadAsync(Char], CancellationToken) -> Int32]
+                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:list :cancellation-token cancellation-token) (cl:when supplied-count (cl:list :count count)))))))
 
 (cl:defun read-block (obj! buffer cl:&optional (index cl:nil supplied-index) (count cl:nil supplied-count))
   "Master wrapper for System.IO.StreamReader.ReadBlock overloads. Dispatches at runtime.
@@ -261,10 +262,10 @@ ReadBlock(Char[], Int32, Int32) -> Int32
                     :method-name "ReadBlock"
                     :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-index (cl:list :index index)) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun read-block-async (obj! buffer cl:&optional (cancellation-token cl:nil supplied-cancellation-token) (count cl:nil supplied-count))
+(cl:defun read-block-async (obj! buffer cancellation-token cl:&optional (count cl:nil supplied-count))
   "Master wrapper for System.IO.StreamReader.ReadBlockAsync overloads. Dispatches at runtime.
 
-ReadBlockAsync(Char], CancellationToken) -> Int32]
+ReadBlockAsync(Char], CancellationToken = default(System.Threading.CancellationToken) [C# default of type System.Threading.CancellationToken -- not representable in Lisp, must be supplied]) -> Int32]
   Summary: Asynchronously reads the characters from the current stream and writes the data to a buffer.
   Returns: A value task that represents the asynchronous read operation. The value of the type parameter of the value task contains the total number of characters read into the buffer. The result value can be less than the number of characters requested if the number of characters currently available is less than the requested number, or it can be 0 (zero) if the end of the stream has been reached.
   Parameters:
@@ -280,20 +281,15 @@ ReadBlockAsync(Char[], Int32, Int32) -> Int32]
     - count (System.Int32): The maximum number of characters to read. If the end of the stream is reached before the specified number of characters is written into the buffer, the method returns.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:numberp cancellation-token) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadBlockAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadBlockAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM-READER"
                     :class-name <type-str>
                     :method-name "ReadBlockAsync"
-                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)) (cl:when supplied-count (cl:list :count count)))))))
-
-;; Note: System.IO.StreamReader.ReadBlockAsync also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ReadBlockAsync(Char], CancellationToken) -> Int32]
+                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:list :cancellation-token cancellation-token) (cl:when supplied-count (cl:list :count count)))))))
 
 (cl:defun read-line (obj!)
   "Summary: Reads a line of characters from the current stream and returns the data as a string.

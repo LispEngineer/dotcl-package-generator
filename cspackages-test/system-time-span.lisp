@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-time-span)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new (cl:&optional (ticks cl:nil supplied-ticks) (minutes cl:nil supplied-minutes) (seconds cl:nil supplied-seconds) (seconds2 cl:nil supplied-seconds2) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
   "Master wrapper for System.TimeSpan constructor overloads. Dispatches at runtime.
@@ -609,7 +609,7 @@ Parameters:
 "
   (dotnet:static <type-str> "Equals" (cl:the (dotnet "System.TimeSpan") t1) (cl:the (dotnet "System.TimeSpan") t2)))
 
-(cl:defun from-days (value cl:&key (hours cl:nil supplied-hours) (minutes cl:nil supplied-minutes) (seconds cl:nil supplied-seconds) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
+(cl:defun from-days (value cl:&key (hours 0 supplied-hours) (minutes 0 supplied-minutes) (seconds 0 supplied-seconds) (milliseconds 0 supplied-milliseconds) (microseconds 0 supplied-microseconds))
   "Master wrapper for System.TimeSpan.FromDays overloads. Dispatches at runtime.
 
 FromDays(Double) -> TimeSpan
@@ -624,7 +624,7 @@ FromDays(Int32) -> TimeSpan
   Parameters:
     - days (System.Int32): Number of days.
 
-FromDays(Int32, Int32, Int64, Int64, Int64, Int64) -> TimeSpan
+FromDays(Int32, Int32 = 0, Int64 = 0, Int64 = 0, Int64 = 0, Int64 = 0) -> TimeSpan
   Summary: Initializes a new instance of the System.TimeSpan structure to a specified number of days, hours, minutes, seconds, milliseconds, and microseconds.
   Returns: Returns a System.TimeSpan that represents a specified number of days, hours, minutes, seconds, milliseconds, and microseconds.
   Parameters:
@@ -636,8 +636,8 @@ FromDays(Int32, Int32, Int64, Int64, Int64, Int64) -> TimeSpan
     - microseconds (System.Int64): Number of microseconds.
 "
   (cl:cond
-    ((cl:and (cl:numberp value) (cl:numberp hours) (cl:numberp minutes) (cl:numberp seconds) (cl:numberp milliseconds) (cl:numberp microseconds))
-     (dotnet:static <type-str> "FromDays" value hours minutes seconds milliseconds microseconds))
+    ((cl:and (cl:numberp value) (cl:or (cl:not supplied-hours) (cl:numberp hours)) (cl:or (cl:not supplied-minutes) (cl:numberp minutes)) (cl:or (cl:not supplied-seconds) (cl:numberp seconds)) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
+     (dotnet:static <type-str> "FromDays" value (cl:if supplied-hours hours 0) (cl:if supplied-minutes minutes 0) (cl:if supplied-seconds seconds 0) (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
     ((cl:and (cl:numberp value) (cl:not supplied-hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
      (dotnet:static <type-str> "FromDays" value))
     ((cl:and (cl:numberp value) (cl:not supplied-hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
@@ -648,12 +648,7 @@ FromDays(Int32, Int32, Int64, Int64, Int64, Int64) -> TimeSpan
                     :method-name "FromDays"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-hours (cl:list :hours hours)) (cl:when supplied-minutes (cl:list :minutes minutes)) (cl:when supplied-seconds (cl:list :seconds seconds)) (cl:when supplied-milliseconds (cl:list :milliseconds milliseconds)) (cl:when supplied-microseconds (cl:list :microseconds microseconds)))))))
 
-;; Note: System.TimeSpan.FromDays also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   FromDays(Int32, Int32, Int64, Int64, Int64, Int64) -> TimeSpan
-
-(cl:defun from-hours (hours cl:&key (minutes cl:nil supplied-minutes) (seconds cl:nil supplied-seconds) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
+(cl:defun from-hours (hours cl:&key (minutes 0 supplied-minutes) (seconds 0 supplied-seconds) (milliseconds 0 supplied-milliseconds) (microseconds 0 supplied-microseconds))
   "Master wrapper for System.TimeSpan.FromHours overloads. Dispatches at runtime.
 
 FromHours(Int32) -> TimeSpan
@@ -668,7 +663,7 @@ FromHours(Double) -> TimeSpan
   Parameters:
     - value (System.Double): A number of hours accurate to the nearest millisecond.
 
-FromHours(Int32, Int64, Int64, Int64, Int64) -> TimeSpan
+FromHours(Int32, Int64 = 0, Int64 = 0, Int64 = 0, Int64 = 0) -> TimeSpan
   Summary: Initializes a new instance of the System.TimeSpan structure to a specified number of hours, minutes, seconds, milliseconds, and microseconds.
   Returns: Returns a System.TimeSpan that represents a specified number of hours, minutes, seconds, milliseconds, and microseconds.
   Parameters:
@@ -679,8 +674,8 @@ FromHours(Int32, Int64, Int64, Int64, Int64) -> TimeSpan
     - microseconds (System.Int64): Number of microseconds.
 "
   (cl:cond
-    ((cl:and (cl:numberp hours) (cl:numberp minutes) (cl:numberp seconds) (cl:numberp milliseconds) (cl:numberp microseconds))
-     (dotnet:static <type-str> "FromHours" hours minutes seconds milliseconds microseconds))
+    ((cl:and (cl:numberp hours) (cl:or (cl:not supplied-minutes) (cl:numberp minutes)) (cl:or (cl:not supplied-seconds) (cl:numberp seconds)) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
+     (dotnet:static <type-str> "FromHours" hours (cl:if supplied-minutes minutes 0) (cl:if supplied-seconds seconds 0) (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
     ((cl:and (cl:numberp hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
      (dotnet:static <type-str> "FromHours" hours))
     ((cl:and (cl:numberp hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
@@ -690,11 +685,6 @@ FromHours(Int32, Int64, Int64, Int64, Int64) -> TimeSpan
                     :class-name <type-str>
                     :method-name "FromHours"
                     :supplied-args (cl:append (cl:list :hours hours) (cl:when supplied-minutes (cl:list :minutes minutes)) (cl:when supplied-seconds (cl:list :seconds seconds)) (cl:when supplied-milliseconds (cl:list :milliseconds milliseconds)) (cl:when supplied-microseconds (cl:list :microseconds microseconds)))))))
-
-;; Note: System.TimeSpan.FromHours also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   FromHours(Int32, Int64, Int64, Int64, Int64) -> TimeSpan
 
 (cl:defun from-microseconds (microseconds)
   "Master wrapper for System.TimeSpan.FromMicroseconds overloads. Dispatches at runtime.
@@ -757,7 +747,7 @@ FromMilliseconds(Int64, Int64) -> TimeSpan
                     :method-name "FromMilliseconds"
                     :supplied-args (cl:append (cl:list :milliseconds milliseconds) (cl:when supplied-microseconds (cl:list :microseconds microseconds)))))))
 
-(cl:defun from-minutes (minutes cl:&key (seconds cl:nil supplied-seconds) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
+(cl:defun from-minutes (minutes cl:&key (seconds 0 supplied-seconds) (milliseconds 0 supplied-milliseconds) (microseconds 0 supplied-microseconds))
   "Master wrapper for System.TimeSpan.FromMinutes overloads. Dispatches at runtime.
 
 FromMinutes(Int64) -> TimeSpan
@@ -772,7 +762,7 @@ FromMinutes(Double) -> TimeSpan
   Parameters:
     - value (System.Double): A number of minutes, accurate to the nearest millisecond.
 
-FromMinutes(Int64, Int64, Int64, Int64) -> TimeSpan
+FromMinutes(Int64, Int64 = 0, Int64 = 0, Int64 = 0) -> TimeSpan
   Summary: Initializes a new instance of the System.TimeSpan structure to a specified number of minutes, seconds, milliseconds, and microseconds.
   Returns: Returns a System.TimeSpan that represents a specified number of minutes, seconds, milliseconds, and microseconds.
   Parameters:
@@ -782,8 +772,8 @@ FromMinutes(Int64, Int64, Int64, Int64) -> TimeSpan
     - microseconds (System.Int64): Number of microseconds.
 "
   (cl:cond
-    ((cl:and (cl:numberp minutes) (cl:numberp seconds) (cl:numberp milliseconds) (cl:numberp microseconds))
-     (dotnet:static <type-str> "FromMinutes" minutes seconds milliseconds microseconds))
+    ((cl:and (cl:numberp minutes) (cl:or (cl:not supplied-seconds) (cl:numberp seconds)) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
+     (dotnet:static <type-str> "FromMinutes" minutes (cl:if supplied-seconds seconds 0) (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
     ((cl:and (cl:numberp minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
      (dotnet:static <type-str> "FromMinutes" minutes))
     ((cl:and (cl:numberp minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
@@ -794,12 +784,7 @@ FromMinutes(Int64, Int64, Int64, Int64) -> TimeSpan
                     :method-name "FromMinutes"
                     :supplied-args (cl:append (cl:list :minutes minutes) (cl:when supplied-seconds (cl:list :seconds seconds)) (cl:when supplied-milliseconds (cl:list :milliseconds milliseconds)) (cl:when supplied-microseconds (cl:list :microseconds microseconds)))))))
 
-;; Note: System.TimeSpan.FromMinutes also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   FromMinutes(Int64, Int64, Int64, Int64) -> TimeSpan
-
-(cl:defun from-seconds (seconds cl:&key (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
+(cl:defun from-seconds (seconds cl:&key (milliseconds 0 supplied-milliseconds) (microseconds 0 supplied-microseconds))
   "Master wrapper for System.TimeSpan.FromSeconds overloads. Dispatches at runtime.
 
 FromSeconds(Int64) -> TimeSpan
@@ -814,7 +799,7 @@ FromSeconds(Double) -> TimeSpan
   Parameters:
     - value (System.Double): A number of seconds, accurate to the nearest millisecond.
 
-FromSeconds(Int64, Int64, Int64) -> TimeSpan
+FromSeconds(Int64, Int64 = 0, Int64 = 0) -> TimeSpan
   Summary: Initializes a new instance of the System.TimeSpan structure to a specified number of seconds, milliseconds, and microseconds.
   Returns: Returns a System.TimeSpan that represents a specified number of seconds, milliseconds, and microseconds.
   Parameters:
@@ -823,8 +808,8 @@ FromSeconds(Int64, Int64, Int64) -> TimeSpan
     - microseconds (System.Int64): Number of microseconds.
 "
   (cl:cond
-    ((cl:and (cl:numberp seconds) (cl:numberp milliseconds) (cl:numberp microseconds))
-     (dotnet:static <type-str> "FromSeconds" seconds milliseconds microseconds))
+    ((cl:and (cl:numberp seconds) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
+     (dotnet:static <type-str> "FromSeconds" seconds (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
     ((cl:and (cl:numberp seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
      (dotnet:static <type-str> "FromSeconds" seconds))
     ((cl:and (cl:numberp seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
@@ -834,11 +819,6 @@ FromSeconds(Int64, Int64, Int64) -> TimeSpan
                     :class-name <type-str>
                     :method-name "FromSeconds"
                     :supplied-args (cl:append (cl:list :seconds seconds) (cl:when supplied-milliseconds (cl:list :milliseconds milliseconds)) (cl:when supplied-microseconds (cl:list :microseconds microseconds)))))))
-
-;; Note: System.TimeSpan.FromSeconds also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   FromSeconds(Int64, Int64, Int64) -> TimeSpan
 
 (cl:defun from-ticks (value)
   "Summary: Returns a System.TimeSpan that represents a specified time, where the specification is in units of ticks.
@@ -893,7 +873,7 @@ Parse(String, IFormatProvider) -> TimeSpan
     - input (System.String): A string that specifies the time interval to convert.
     - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
 
-Parse(Char], IFormatProvider) -> TimeSpan
+Parse(Char], IFormatProvider = null) -> TimeSpan
   Summary: Converts the span representation of a time interval to its System.TimeSpan equivalent by using the specified culture-specific format information.
   Returns: A time interval that corresponds to input, as specified by formatProvider.
   Parameters:
@@ -903,8 +883,8 @@ Parse(Char], IFormatProvider) -> TimeSpan
   (cl:cond
     ((cl:and (cl:stringp s) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:object-type format-provider)))
      (dotnet:static <type-str> "Parse" s format-provider))
-    ((cl:and (cl:or (cl:null s) (dotnet:object-type s)) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:object-type format-provider)))
-     (dotnet:static <type-str> "Parse" s format-provider))
+    ((cl:and (cl:or (cl:null s) (dotnet:object-type s)) (cl:or (cl:not supplied-format-provider) (cl:or (cl:null format-provider) (dotnet:object-type format-provider))))
+     (dotnet:static <type-str> "Parse" s (cl:if supplied-format-provider format-provider cl:nil)))
     ((cl:and (cl:stringp s) (cl:not supplied-format-provider))
      (dotnet:static <type-str> "Parse" s))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -912,11 +892,6 @@ Parse(Char], IFormatProvider) -> TimeSpan
                     :class-name <type-str>
                     :method-name "Parse"
                     :supplied-args (cl:append (cl:list :s s) (cl:when supplied-format-provider (cl:list :format-provider format-provider)))))))
-
-;; Note: System.TimeSpan.Parse also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   Parse(Char], IFormatProvider) -> TimeSpan
 
 (cl:defun parse-exact (input format format-provider cl:&optional (styles cl:nil supplied-styles))
   "Master wrapper for System.TimeSpan.ParseExact overloads. Dispatches at runtime.
@@ -946,7 +921,7 @@ ParseExact(String, String, IFormatProvider, TimeSpanStyles) -> TimeSpan
     - format-provider (System.IFormatProvider): An object that provides culture-specific formatting information.
     - styles (System.Globalization.TimeSpanStyles): A bitwise combination of enumeration values that defines the style elements that may be present in input.
 
-ParseExact(Char], Char], IFormatProvider, TimeSpanStyles) -> TimeSpan
+ParseExact(Char], Char], IFormatProvider, TimeSpanStyles = None) -> TimeSpan
   Summary: Converts the char span of a time interval to its System.TimeSpan equivalent by using the specified format and culture-specific format information. The format of the string representation must match the specified format exactly.
   Returns: A time interval that corresponds to input, as specified by format and formatProvider.
   Parameters:
@@ -964,7 +939,7 @@ ParseExact(String, String[], IFormatProvider, TimeSpanStyles) -> TimeSpan
     - format-provider (System.IFormatProvider): An object that provides culture-specific formatting information.
     - styles (System.Globalization.TimeSpanStyles): A bitwise combination of enumeration values that defines the style elements that may be present in input.
 
-ParseExact(Char], String[], IFormatProvider, TimeSpanStyles) -> TimeSpan
+ParseExact(Char], String[], IFormatProvider, TimeSpanStyles = None) -> TimeSpan
   Summary: Converts the string representation of a time interval to its System.TimeSpan equivalent by using the specified formats, culture-specific format information, and styles. The format of the string representation must match one of the specified formats exactly.
   Returns: A time interval that corresponds to input, as specified by formats, formatProvider, and styles.
   Parameters:
@@ -976,12 +951,12 @@ ParseExact(Char], String[], IFormatProvider, TimeSpanStyles) -> TimeSpan
   (cl:cond
     ((cl:and (cl:stringp input) (cl:stringp format) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) supplied-styles (cl:or (cl:null styles) (dotnet:object-type styles)))
      (dotnet:static <type-str> "ParseExact" input format format-provider styles))
-    ((cl:and (cl:or (cl:null input) (dotnet:object-type input)) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) supplied-styles (cl:or (cl:null styles) (dotnet:object-type styles)))
-     (dotnet:static <type-str> "ParseExact" input format format-provider styles))
+    ((cl:and (cl:or (cl:null input) (dotnet:object-type input)) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:object-type styles))))
+     (dotnet:static <type-str> "ParseExact" input format format-provider (cl:if supplied-styles styles (dotnet:enum-or "System.Globalization.TimeSpanStyles" "None"))))
     ((cl:and (cl:stringp input) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) supplied-styles (cl:or (cl:null styles) (dotnet:object-type styles)))
      (dotnet:static <type-str> "ParseExact" input format format-provider styles))
-    ((cl:and (cl:or (cl:null input) (dotnet:object-type input)) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) supplied-styles (cl:or (cl:null styles) (dotnet:object-type styles)))
-     (dotnet:static <type-str> "ParseExact" input format format-provider styles))
+    ((cl:and (cl:or (cl:null input) (dotnet:object-type input)) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:object-type styles))))
+     (dotnet:static <type-str> "ParseExact" input format format-provider (cl:if supplied-styles styles (dotnet:enum-or "System.Globalization.TimeSpanStyles" "None"))))
     ((cl:and (cl:stringp input) (cl:stringp format) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) (cl:not supplied-styles))
      (dotnet:static <type-str> "ParseExact" input format format-provider))
     ((cl:and (cl:stringp input) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) (cl:not supplied-styles))
@@ -991,12 +966,6 @@ ParseExact(Char], String[], IFormatProvider, TimeSpanStyles) -> TimeSpan
                     :class-name <type-str>
                     :method-name "ParseExact"
                     :supplied-args (cl:append (cl:list :input input) (cl:list :format format) (cl:list :format-provider format-provider) (cl:when supplied-styles (cl:list :styles styles)))))))
-
-;; Note: System.TimeSpan.ParseExact also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ParseExact(Char], Char], IFormatProvider, TimeSpanStyles) -> TimeSpan
-;;   ParseExact(Char], String[], IFormatProvider, TimeSpanStyles) -> TimeSpan
 
 (cl:defun subtract (obj! ts)
   "Summary: Returns a new System.TimeSpan object whose value is the difference between the specified System.TimeSpan object and this instance.
@@ -1040,19 +1009,19 @@ ToString(String, IFormatProvider) -> String
                     :supplied-args (cl:append (cl:when supplied-format (cl:list :format format)) (cl:when supplied-format-provider (cl:list :format-provider format-provider)))))))
 
 ;; The following C# System.TimeSpan.TryFormat overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
-;;   TryFormat(Char], out Int32&, Char], IFormatProvider) -> Boolean
-;;   TryFormat(Byte], out Int32&, Char], IFormatProvider) -> Boolean
+;; (ref, out, or params) and are not yet supported:
+;;   TryFormat(Char], out Int32&, Char] = default(System.ReadOnlySpan`1[System.Char]) [C# default of type System.ReadOnlySpan`1[System.Char] -- not representable in Lisp, must be supplied], IFormatProvider = null) -> Boolean
+;;   TryFormat(Byte], out Int32&, Char] = default(System.ReadOnlySpan`1[System.Char]) [C# default of type System.ReadOnlySpan`1[System.Char] -- not representable in Lisp, must be supplied], IFormatProvider = null) -> Boolean
 
 ;; The following C# System.TimeSpan.TryParse overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryParse(String, out TimeSpan&) -> Boolean
 ;;   TryParse(Char], out TimeSpan&) -> Boolean
 ;;   TryParse(String, IFormatProvider, out TimeSpan&) -> Boolean
 ;;   TryParse(Char], IFormatProvider, out TimeSpan&) -> Boolean
 
 ;; The following C# System.TimeSpan.TryParseExact overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryParseExact(String, String, IFormatProvider, out TimeSpan&) -> Boolean
 ;;   TryParseExact(Char], Char], IFormatProvider, out TimeSpan&) -> Boolean
 ;;   TryParseExact(String, String[], IFormatProvider, out TimeSpan&) -> Boolean

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IEquatable`1
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-i-equatable-1)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IEquatable`1"))
 (cl:defconstant <type-str> "System.IEquatable`1")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun equals (obj! other)
   "Summary: Indicates whether the current object is equal to another object of the same type.

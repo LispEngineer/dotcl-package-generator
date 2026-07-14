@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Threading.Thread
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-threading-thread)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Threading.Thread"))
 (cl:defconstant <type-str> "System.Threading.Thread")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new (start cl:&optional (max-stack-size cl:nil supplied-max-stack-size))
   "Master wrapper for System.Threading.Thread constructor overloads. Dispatches at runtime.
@@ -415,7 +415,7 @@ UnsafeStart(Object) -> Void
                     :supplied-args (cl:append (cl:when supplied-parameter (cl:list :parameter parameter)))))))
 
 ;; The following C# System.Threading.Thread.VolatileRead overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   VolatileRead(ref Byte&) -> Byte
 ;;   VolatileRead(ref Double&) -> Double
 ;;   VolatileRead(ref Int16&) -> Int16
@@ -431,7 +431,7 @@ UnsafeStart(Object) -> Void
 ;;   VolatileRead(ref UIntPtr&) -> UIntPtr
 
 ;; The following C# System.Threading.Thread.VolatileWrite overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   VolatileWrite(ref Byte&, Byte) -> Void
 ;;   VolatileWrite(ref Double&, Double) -> Void
 ;;   VolatileWrite(ref Int16&, Int16) -> Void

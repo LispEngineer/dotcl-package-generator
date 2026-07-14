@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.TextReader
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-io-text-reader)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.TextReader"))
 (cl:defconstant <type-str> "System.IO.TextReader")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.IO.TextReader class.
@@ -85,10 +85,10 @@ Read(Char[], Int32, Int32) -> Int32
                     :method-name "Read"
                     :supplied-args (cl:append (cl:when supplied-buffer (cl:list :buffer buffer)) (cl:when supplied-index (cl:list :index index)) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun read-async (obj! buffer cl:&optional (cancellation-token cl:nil supplied-cancellation-token) (count cl:nil supplied-count))
+(cl:defun read-async (obj! buffer cancellation-token cl:&optional (count cl:nil supplied-count))
   "Master wrapper for System.IO.TextReader.ReadAsync overloads. Dispatches at runtime.
 
-ReadAsync(Char], CancellationToken) -> Int32]
+ReadAsync(Char], CancellationToken = default(System.Threading.CancellationToken) [C# default of type System.Threading.CancellationToken -- not representable in Lisp, must be supplied]) -> Int32]
   Summary: Asynchronously reads the characters from the current stream into a memory block.
   Returns: A value task that represents the asynchronous read operation. The value of the type parameter contains the number of characters that have been read, or 0 if at the end of the stream and no data was read. The number will be less than or equal to the buffer length, depending on whether the data is available within the stream.
   Parameters:
@@ -104,20 +104,15 @@ ReadAsync(Char[], Int32, Int32) -> Int32]
     - count (System.Int32): The maximum number of characters to read. If the end of the text is reached before the specified number of characters is read into the buffer, the current method returns.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:numberp cancellation-token) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-TEXT-READER"
                     :class-name <type-str>
                     :method-name "ReadAsync"
-                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)) (cl:when supplied-count (cl:list :count count)))))))
-
-;; Note: System.IO.TextReader.ReadAsync also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ReadAsync(Char], CancellationToken) -> Int32]
+                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:list :cancellation-token cancellation-token) (cl:when supplied-count (cl:list :count count)))))))
 
 (cl:defun read-block (obj! buffer cl:&optional (index cl:nil supplied-index) (count cl:nil supplied-count))
   "Master wrapper for System.IO.TextReader.ReadBlock overloads. Dispatches at runtime.
@@ -147,10 +142,10 @@ ReadBlock(Char[], Int32, Int32) -> Int32
                     :method-name "ReadBlock"
                     :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-index (cl:list :index index)) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun read-block-async (obj! buffer cl:&optional (cancellation-token cl:nil supplied-cancellation-token) (count cl:nil supplied-count))
+(cl:defun read-block-async (obj! buffer cancellation-token cl:&optional (count cl:nil supplied-count))
   "Master wrapper for System.IO.TextReader.ReadBlockAsync overloads. Dispatches at runtime.
 
-ReadBlockAsync(Char], CancellationToken) -> Int32]
+ReadBlockAsync(Char], CancellationToken = default(System.Threading.CancellationToken) [C# default of type System.Threading.CancellationToken -- not representable in Lisp, must be supplied]) -> Int32]
   Summary: Asynchronously reads the characters from the current stream and writes the data to a buffer.
   Returns: A value task that represents the asynchronous read operation. The value of the type parameter contains the total number of characters read into the buffer. The result value can be less than the number of characters requested if the number of characters currently available is less than the requested number, or it can be 0 (zero) if the end of the stream has been reached.
   Parameters:
@@ -166,20 +161,15 @@ ReadBlockAsync(Char[], Int32, Int32) -> Int32]
     - count (System.Int32): The maximum number of characters to read. If the end of the text is reached before the specified number of characters is read into the buffer, the current method returns.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:numberp cancellation-token) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadBlockAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadBlockAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-TEXT-READER"
                     :class-name <type-str>
                     :method-name "ReadBlockAsync"
-                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)) (cl:when supplied-count (cl:list :count count)))))))
-
-;; Note: System.IO.TextReader.ReadBlockAsync also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ReadBlockAsync(Char], CancellationToken) -> Int32]
+                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:list :cancellation-token cancellation-token) (cl:when supplied-count (cl:list :count count)))))))
 
 (cl:defun read-line (obj!)
   "Summary: Reads a line of characters from the text reader and returns the data as a string.

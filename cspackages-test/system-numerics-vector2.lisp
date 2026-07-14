@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector2
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-numerics-vector2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector2"))
 (cl:defconstant <type-str> "System.Numerics.Vector2")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new (cl:&optional (value cl:nil supplied-value) (y cl:nil supplied-y))
   "Master wrapper for System.Numerics.Vector2 constructor overloads. Dispatches at runtime.
@@ -1101,7 +1101,7 @@ Lerp(Vector2, Vector2, Vector2) -> Vector2
   (dotnet:static <type-str> "LoadAlignedNonTemporal" (cl:the (dotnet "System.Single*") source)))
 
 ;; The following C# System.Numerics.Vector2.LoadUnsafe overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   LoadUnsafe(ref Single&) -> Vector2
 ;;   LoadUnsafe(ref Single&, UIntPtr) -> Vector2
 

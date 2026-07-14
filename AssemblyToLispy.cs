@@ -723,10 +723,66 @@ namespace PackageGenerator {
 
             if (param.HasDefaultValue) {
                 parts.Add(":has-default t");
-                parts.Add($":default-value {FormatDefaultValue(param.DefaultValue)}");
+                var (kind, valueLiteral, defaultType) = FormatDefaultValueWithKind(param.ParameterType, param.DefaultValue);
+                parts.Add($":default-kind {kind}");
+                parts.Add($":default-type {EscapeLispString(defaultType)}");
+                parts.Add($":default-value {valueLiteral}");
             }
 
             return "(" + string.Join(" ", parts) + ")";
+        }
+
+        /// <summary>
+        ///   Formats a parameter's default value plus its Lisp-facing kind/type tags. The
+        ///   parameter's declared type is needed alongside the raw default because reflection
+        ///   reports a struct default (e.g. <c>CancellationToken token = default</c>) as a null
+        ///   value indistinguishable, by value alone, from a real nullable-reference/value-type
+        ///   null default -- the former cannot be represented as Lisp <c>nil</c> (that would mean
+        ///   a null reference, not a zeroed struct) and is tagged <c>:unrepresentable</c> instead.
+        ///   An enum default's own type is UNDERLYINGTYPE (paramType with any
+        ///   Nullable&lt;T&gt; unwrapped), not val's own runtime type: for a
+        ///   Nullable&lt;TEnum&gt; parameter, reflection reports DefaultValue as a
+        ///   raw boxed value of the enum's underlying integral type (e.g. Byte),
+        ///   not a boxed TEnum, so val.GetType().IsEnum would miss it entirely --
+        ///   UNDERLYINGTYPE.IsEnum is checked instead, with val converted to that
+        ///   enum type via Enum.ToObject first when it isn't already one.
+        /// </summary>
+        /// <param name="paramType">The parameter's declared (possibly nullable) type.</param>
+        /// <param name="val">The default value object.</param>
+        /// <returns>A tuple of the Lisp keyword kind, the formatted value literal, and the formatted default type name.</returns>
+        internal static (string Kind, string ValueLiteral, string DefaultType) FormatDefaultValueWithKind(Type paramType, object? val) {
+            Type underlyingType = Nullable.GetUnderlyingType(paramType) ?? paramType;
+
+            if (val == null) {
+                if (paramType.IsValueType && Nullable.GetUnderlyingType(paramType) == null) {
+                    // default(SomeStruct) reported as null by reflection: not representable as Lisp nil.
+                    return (":unrepresentable", EscapeLispString("default(" + GetFriendlyTypeName(paramType) + ")"), GetFriendlyTypeName(paramType));
+                }
+                return (":null", "nil", GetFriendlyTypeName(underlyingType));
+            }
+
+            if (val is bool) {
+                return (":bool", FormatDefaultValue(val), GetFriendlyTypeName(underlyingType));
+            }
+            if (underlyingType.IsEnum) {
+                object enumVal = underlyingType.IsInstanceOfType(val) ? val : Enum.ToObject(underlyingType, val);
+                return (":enum", EscapeLispString(enumVal.ToString() ?? ""), GetFriendlyTypeName(underlyingType));
+            }
+            if (val is char) {
+                return (":char", FormatDefaultValue(val), GetFriendlyTypeName(underlyingType));
+            }
+            if (val is string) {
+                return (":string", FormatDefaultValue(val), GetFriendlyTypeName(underlyingType));
+            }
+            if (val is float || val is double || val is decimal ||
+                val is int || val is uint || val is long || val is ulong ||
+                val is short || val is ushort || val is byte || val is sbyte) {
+                return (":number", FormatDefaultValue(val), GetFriendlyTypeName(underlyingType));
+            }
+
+            // Structs/objects with a non-null default value: reflection can't represent these
+            // faithfully as a Lisp literal, so surface the type/value for a docstring instead.
+            return (":unrepresentable", FormatDefaultValue(val), GetFriendlyTypeName(underlyingType));
         }
 
         /// <summary>
@@ -1234,6 +1290,20 @@ namespace PackageGenerator {
                 AssertDefaultValue(-0.05m, "-1/20");
                 AssertDefaultValue(System.IO.FileMode.Create, "\"Create\""); // Enum fallback
 
+                // Verify FormatDefaultValueWithKind's kind/type tagging
+                AssertDefaultValueWithKind(typeof(string), null, ":null", "nil", "System.String");
+                AssertDefaultValueWithKind(typeof(bool?), null, ":null", "nil", "System.Boolean");
+                AssertDefaultValueWithKind(typeof(System.Threading.CancellationToken), null, ":unrepresentable", null, "System.Threading.CancellationToken");
+                AssertDefaultValueWithKind(typeof(bool), true, ":bool", "t", "System.Boolean");
+                AssertDefaultValueWithKind(typeof(int), 42, ":number", "42", "System.Int32");
+                AssertDefaultValueWithKind(typeof(string), "hi", ":string", "\"hi\"", "System.String");
+                AssertDefaultValueWithKind(typeof(char), 'A', ":char", "#\\LATIN_CAPITAL_LETTER_A", "System.Char");
+                AssertDefaultValueWithKind(typeof(System.IO.FileMode), System.IO.FileMode.Create, ":enum", "\"Create\"", "System.IO.FileMode");
+                AssertDefaultValueWithKind(typeof(System.IO.FileMode?), System.IO.FileMode.Create, ":enum", "\"Create\"", "System.IO.FileMode");
+                // Nullable<TEnum> reflection quirk: DefaultValue arrives as the raw
+                // underlying integral type, not a boxed FileMode.
+                AssertDefaultValueWithKind(typeof(System.IO.FileMode?), (int)System.IO.FileMode.Create, ":enum", "\"Create\"", "System.IO.FileMode");
+
                 Console.WriteLine("[AssemblyToLispyTest] All tests PASSED successfully!");
 
             } catch (Exception ex) {
@@ -1311,6 +1381,19 @@ namespace PackageGenerator {
             string actual = AssemblyToLispy.FormatDefaultValue(value);
             if (actual != expected) {
                 throw new Exception($"FormatDefaultValue assertion failed. Value: {value ?? "null"}, Expected: {expected}, Actual: {actual}");
+            }
+        }
+
+        /// <summary>
+        ///   Asserts that FormatDefaultValueWithKind's kind/value/type tuple matches expectations.
+        ///   EXPECTEDVALUELITERAL may be null to skip checking the (descriptive, non-literal)
+        ///   value of an :unrepresentable default.
+        /// </summary>
+        private static void AssertDefaultValueWithKind(Type paramType, object? value, string expectedKind, string? expectedValueLiteral, string expectedDefaultType) {
+            var (kind, valueLiteral, defaultType) = AssemblyToLispy.FormatDefaultValueWithKind(paramType, value);
+            if (kind != expectedKind || defaultType != expectedDefaultType || (expectedValueLiteral != null && valueLiteral != expectedValueLiteral)) {
+                throw new Exception($"FormatDefaultValueWithKind assertion failed. ParamType: {paramType}, Value: {value ?? "null"}, " +
+                    $"Expected: ({expectedKind}, {expectedValueLiteral ?? "<any>"}, {expectedDefaultType}), Actual: ({kind}, {valueLiteral}, {defaultType})");
             }
         }
     }

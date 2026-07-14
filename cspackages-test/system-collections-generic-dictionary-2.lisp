@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Generic.Dictionary`2 constructor overloads. Dispatches at runtime.
@@ -184,7 +184,7 @@ Parameters:
   (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "Remove" key))
 
 ;; Note: System.Collections.Generic.Dictionary`2.Remove also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   Remove(TKey, out TValue&) -> Boolean
 
@@ -220,10 +220,10 @@ Parameters:
   (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "TryAdd" key value))
 
 ;; The following C# System.Collections.Generic.Dictionary`2.TryGetAlternateLookup overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryGetAlternateLookup(out AlternateLookup) -> Boolean
 
 ;; The following C# System.Collections.Generic.Dictionary`2.TryGetValue overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryGetValue(TKey, out TValue&) -> Boolean
 

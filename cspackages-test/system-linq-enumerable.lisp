@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-linq-enumerable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun aggregate-arity-1 (type source func)
   "Summary: Applies an accumulator function over a sequence.
@@ -60,7 +60,7 @@ Parameters:
 (cl:defun aggregate-by (type-1 type-2 type-3 source key-selector seed func cl:&key (key-comparer cl:nil supplied-key-comparer))
   "Master wrapper for System.Linq.Enumerable.AggregateBy overloads. Dispatches at runtime.
 
-AggregateBy(IEnumerable, Func, TAccumulate, Func, IEqualityComparer) -> KeyValuePair
+AggregateBy(IEnumerable, Func, TAccumulate, Func, IEqualityComparer = null) -> KeyValuePair
   Summary: Applies an accumulator function over a sequence, grouping results by key.
   Returns: An enumerable containing the aggregates corresponding to each key deriving from source.
   Parameters:
@@ -70,7 +70,7 @@ AggregateBy(IEnumerable, Func, TAccumulate, Func, IEqualityComparer) -> KeyValue
     - func (System.Func`3[TAccumulate, TSource, TAccumulate]): An accumulator function to be invoked on each element.
     - key-comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
 
-AggregateBy(IEnumerable, Func, Func, Func, IEqualityComparer) -> KeyValuePair
+AggregateBy(IEnumerable, Func, Func, Func, IEqualityComparer = null) -> KeyValuePair
   Summary: Applies an accumulator function over a sequence, grouping results by key.
   Returns: An enumerable containing the aggregates corresponding to each key deriving from source.
   Parameters:
@@ -81,21 +81,15 @@ AggregateBy(IEnumerable, Func, Func, Func, IEqualityComparer) -> KeyValuePair
     - key-comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null seed) (dotnet:object-type seed)) (cl:or (cl:null func) (dotnet:object-type func)) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer)))
-     (dotnet:static-generic <type-str> "AggregateBy" (cl:list type-1 type-2 type-3) source key-selector seed func key-comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null seed) (dotnet:object-type seed)) (cl:or (cl:null func) (dotnet:object-type func)) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer)))
-     (dotnet:static-generic <type-str> "AggregateBy" (cl:list type-1 type-2 type-3) source key-selector seed func key-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null seed) (dotnet:object-type seed)) (cl:or (cl:null func) (dotnet:object-type func)) (cl:or (cl:not supplied-key-comparer) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer))))
+     (dotnet:static-generic <type-str> "AggregateBy" (cl:list type-1 type-2 type-3) source key-selector seed func (cl:if supplied-key-comparer key-comparer cl:nil)))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null seed) (dotnet:object-type seed)) (cl:or (cl:null func) (dotnet:object-type func)) (cl:or (cl:not supplied-key-comparer) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer))))
+     (dotnet:static-generic <type-str> "AggregateBy" (cl:list type-1 type-2 type-3) source key-selector seed func (cl:if supplied-key-comparer key-comparer cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "AggregateBy"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:list :seed seed) (cl:list :func func) (cl:when supplied-key-comparer (cl:list :key-comparer key-comparer)))))))
-
-;; Note: System.Linq.Enumerable.AggregateBy also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   AggregateBy(IEnumerable, Func, TAccumulate, Func, IEqualityComparer) -> KeyValuePair
-;;   AggregateBy(IEnumerable, Func, Func, Func, IEqualityComparer) -> KeyValuePair
 
 (cl:defun all (type source predicate)
   "Summary: Determines whether all elements of a sequence satisfy a condition.
@@ -442,7 +436,7 @@ Count(IEnumerable, Boolean]) -> Int32
 (cl:defun count-by (type-1 type-2 source key-selector cl:&key (key-comparer cl:nil supplied-key-comparer))
   "Master wrapper for System.Linq.Enumerable.CountBy overloads. Dispatches at runtime.
 
-CountBy(IEnumerable, Func, IEqualityComparer) -> Int32]]
+CountBy(IEnumerable, Func, IEqualityComparer = null) -> Int32]]
   Summary: Returns the count of elements in the source sequence grouped by key.
   Returns: An enumerable containing the frequencies of each key occurrence in source.
   Parameters:
@@ -451,18 +445,13 @@ CountBy(IEnumerable, Func, IEqualityComparer) -> Int32]]
     - key-comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer)))
-     (dotnet:static-generic <type-str> "CountBy" (cl:list type-1 type-2) source key-selector key-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:not supplied-key-comparer) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer))))
+     (dotnet:static-generic <type-str> "CountBy" (cl:list type-1 type-2) source key-selector (cl:if supplied-key-comparer key-comparer cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
                     :class-name <type-str>
                     :method-name "CountBy"
                     :supplied-args (cl:append (cl:list :source source) (cl:list :key-selector key-selector) (cl:when supplied-key-comparer (cl:list :key-comparer key-comparer)))))))
-
-;; Note: System.Linq.Enumerable.CountBy also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   CountBy(IEnumerable, Func, IEqualityComparer) -> Int32]]
 
 (cl:defun default-if-empty (type source cl:&optional (default-value cl:nil supplied-default-value))
   "Master wrapper for System.Linq.Enumerable.DefaultIfEmpty overloads. Dispatches at runtime.
@@ -2715,7 +2704,7 @@ ToLookup(IEnumerable, Func, Func, IEqualityComparer) -> ILookup
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; The following C# System.Linq.Enumerable.TryGetNonEnumeratedCount overloads have special parameter types
-;; (ref, out, params, or defaults) and are not yet supported:
+;; (ref, out, or params) and are not yet supported:
 ;;   TryGetNonEnumeratedCount(IEnumerable, out Int32&) -> Boolean
 
 (cl:defun union (type first second cl:&optional (comparer cl:nil supplied-comparer))

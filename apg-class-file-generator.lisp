@@ -80,13 +80,16 @@
       ;; Case 1: No clean constructors - all are dirty
       ((and (> dirty-ctor-count 0) (= clean-ctor-count 0))
        (format stream ";; The following C# ~A constructors have special parameter types~%" fq-name)
-       (format stream ";; (ref, out, params, or defaults) and are not yet supported:~%")
+       (format stream ";; (ref, out, or params) and are not yet supported:~%")
        (dolist (dc dirty-ctors)
          (format stream ";;   ~A~%" (constructor-signature-str dc)))
        (format stream "~%"))
 
-      ;; Case 2: Single clean constructor
-      ((= clean-ctor-count 1)
+      ;; Case 2: Single clean constructor with no usable-default parameter
+      ;; (complex-group-p is nil -- a plain positional defun suffices; a
+      ;; usable default falls through to Case 3's Master Wrapper below,
+      ;; since a plain defun has no way to make a parameter optional).
+      ((and (= clean-ctor-count 1) (not (complex-group-p clean-ctors)))
        (let* ((c (first clean-ctors))
               (c-doc (getf c :documentation))
               (summary (getf c-doc :summary))
@@ -103,21 +106,24 @@
          ;; Emit dirty constructor doc-comments if any
          (when (> dirty-ctor-count 0)
            (format stream ";; Note: ~A also has the following constructors with special~%" fq-name)
-           (format stream ";; parameter types (ref, out, params, or defaults) that are not~%")
+           (format stream ";; parameter types (ref, out, or params) that are not~%")
            (format stream ";; yet supported:~%")
            (dolist (dc dirty-ctors)
              (format stream ";;   ~A~%" (constructor-signature-str dc)))
            (format stream "~%"))))
 
-      ;; Case 3: Multiple clean constructors
-      ((>= clean-ctor-count 2)
+      ;; Case 3: Multiple clean constructors, or a single clean constructor
+      ;; with a usable-default parameter (needs the Master Wrapper's
+      ;; &optional/&key dispatch to make that parameter optional).
+      ((or (>= clean-ctor-count 2)
+           (and (= clean-ctor-count 1) (complex-group-p clean-ctors)))
        ;; Generate a single Master Wrapper 'new' dispatching precisely
        ;; across every clean constructor overload.
        (generate-constructor-master-wrapper stream clean-ctors fq-name)
        ;; Emit dirty constructor doc-comments if any
        (when (> dirty-ctor-count 0)
          (format stream ";; Note: ~A also has the following constructors with special~%" fq-name)
-         (format stream ";; parameter types (ref, out, params, or defaults) that are not~%")
+         (format stream ";; parameter types (ref, out, or params) that are not~%")
          (format stream ";; yet supported:~%")
          (dolist (dc dirty-ctors)
            (format stream ";;   ~A~%" (constructor-signature-str dc)))
@@ -365,10 +371,10 @@
            (mixed-mode-p (and (> static-count 0) (> instance-count 0))))
 
       (cond
-        ;; Case 1: No clean overloads - all are dirty (ref/out/params/defaults)
+        ;; Case 1: No clean overloads - all are dirty (ref/out/params)
         ((= clean-count 0)
          (format stream ";; The following C# ~A.~A overloads have special parameter types~%" fq-name name)
-         (format stream ";; (ref, out, params, or defaults) and are not yet supported:~%")
+         (format stream ";; (ref, out, or params) and are not yet supported:~%")
          (dolist (dm dirty-methods)
            (format stream ";;   ~A~%" (method-signature-str dm)))
          (format stream "~%"))
@@ -394,7 +400,7 @@
          ;; Emit dirty overload doc-comment if any
          (when (> dirty-count 0)
            (format stream ";; Note: ~A.~A also has the following overloads with special~%" fq-name name)
-           (format stream ";; parameter types (ref, out, params, or defaults) that are not~%")
+           (format stream ";; parameter types (ref, out, or params) that are not~%")
            (format stream ";; yet supported:~%")
            (dolist (dm dirty-methods)
              (format stream ";;   ~A~%" (method-signature-str dm)))

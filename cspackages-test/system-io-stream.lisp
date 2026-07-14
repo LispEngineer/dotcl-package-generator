@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.Stream
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-io-stream)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.Stream"))
 (cl:defconstant <type-str> "System.IO.Stream")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.IO.Stream class.
@@ -273,10 +273,10 @@ Read(Byte[], Int32, Int32) -> Int32
                     :method-name "Read"
                     :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-offset (cl:list :offset offset)) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun read-async (obj! buffer cl:&optional (cancellation-token cl:nil supplied-cancellation-token) (count cl:nil supplied-count) (cancellation-token2 cl:nil supplied-cancellation-token2))
+(cl:defun read-async (obj! buffer cancellation-token cl:&optional (count cl:nil supplied-count) (cancellation-token2 cl:nil supplied-cancellation-token2))
   "Master wrapper for System.IO.Stream.ReadAsync overloads. Dispatches at runtime.
 
-ReadAsync(Byte], CancellationToken) -> Int32]
+ReadAsync(Byte], CancellationToken = default(System.Threading.CancellationToken) [C# default of type System.Threading.CancellationToken -- not representable in Lisp, must be supplied]) -> Int32]
   Summary: Asynchronously reads a sequence of bytes from the current stream, advances the position within the stream by the number of bytes read, and monitors cancellation requests.
   Returns: A task that represents the asynchronous read operation. The value of its System.Threading.Tasks.ValueTask`1.Result property contains the total number of bytes read into the buffer. The result value can be less than the length of the buffer if that many bytes are not currently available, or it can be 0 (zero) if the length of the buffer is 0 or if the end of the stream has been reached.
   Parameters:
@@ -301,27 +301,22 @@ ReadAsync(Byte[], Int32, Int32, CancellationToken) -> Int32]
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests. The default value is System.Threading.CancellationToken.None.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAsync" buffer cancellation-token count cancellation-token2))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:numberp cancellation-token) supplied-count (cl:numberp count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
                     :class-name <type-str>
                     :method-name "ReadAsync"
-                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)) (cl:when supplied-count (cl:list :count count)) (cl:when supplied-cancellation-token2 (cl:list :cancellation-token2 cancellation-token2)))))))
+                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:list :cancellation-token cancellation-token) (cl:when supplied-count (cl:list :count count)) (cl:when supplied-cancellation-token2 (cl:list :cancellation-token2 cancellation-token2)))))))
 
-;; Note: System.IO.Stream.ReadAsync also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ReadAsync(Byte], CancellationToken) -> Int32]
-
-(cl:defun read-at-least (obj! buffer minimum-bytes cl:&key (throw-on-end-of-stream cl:nil supplied-throw-on-end-of-stream))
+(cl:defun read-at-least (obj! buffer minimum-bytes cl:&key (throw-on-end-of-stream cl:t supplied-throw-on-end-of-stream))
   "Master wrapper for System.IO.Stream.ReadAtLeast overloads. Dispatches at runtime.
 
-ReadAtLeast(Byte], Int32, Boolean) -> Int32
+ReadAtLeast(Byte], Int32, Boolean = T) -> Int32
   Summary: Reads at least a minimum number of bytes from the current stream and advances the position within the stream by the number of bytes read.
   Returns: The total number of bytes read into the buffer. This is guaranteed to be greater than or equal to minimumBytes when throwOnEndOfStream is . This will be less than minimumBytes when the end of the stream is reached and throwOnEndOfStream is . This can be less than the number of bytes allocated in the buffer if that many bytes are not currently available.
   Parameters:
@@ -330,23 +325,18 @@ ReadAtLeast(Byte], Int32, Boolean) -> Int32
     - throw-on-end-of-stream (System.Boolean): to throw an exception if the end of the stream is reached before reading minimumBytes of bytes; to return less than minimumBytes when the end of the stream is reached. The default is .
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp minimum-bytes) (cl:typep throw-on-end-of-stream 'cl:boolean))
-     (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAtLeast" buffer minimum-bytes throw-on-end-of-stream))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp minimum-bytes) (cl:or (cl:not supplied-throw-on-end-of-stream) (cl:typep throw-on-end-of-stream 'cl:boolean)))
+     (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAtLeast" buffer minimum-bytes (cl:if supplied-throw-on-end-of-stream throw-on-end-of-stream cl:t)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
                     :class-name <type-str>
                     :method-name "ReadAtLeast"
                     :supplied-args (cl:append (cl:list :buffer buffer) (cl:list :minimum-bytes minimum-bytes) (cl:when supplied-throw-on-end-of-stream (cl:list :throw-on-end-of-stream throw-on-end-of-stream)))))))
 
-;; Note: System.IO.Stream.ReadAtLeast also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ReadAtLeast(Byte], Int32, Boolean) -> Int32
-
-(cl:defun read-at-least-async (obj! buffer minimum-bytes cl:&key (throw-on-end-of-stream cl:nil supplied-throw-on-end-of-stream) (cancellation-token cl:nil supplied-cancellation-token))
+(cl:defun read-at-least-async (obj! buffer minimum-bytes cl:&key (throw-on-end-of-stream cl:t supplied-throw-on-end-of-stream) (cancellation-token cl:nil supplied-cancellation-token))
   "Master wrapper for System.IO.Stream.ReadAtLeastAsync overloads. Dispatches at runtime.
 
-ReadAtLeastAsync(Byte], Int32, Boolean, CancellationToken) -> Int32]
+ReadAtLeastAsync(Byte], Int32, Boolean = T, CancellationToken = default(System.Threading.CancellationToken) [C# default of type System.Threading.CancellationToken -- not representable in Lisp, must be supplied]) -> Int32]
   Summary: Asynchronously reads at least a minimum number of bytes from the current stream, advances the position within the stream by the number of bytes read, and monitors cancellation requests.
   Returns: A task that represents the asynchronous read operation. The value of its System.Threading.Tasks.ValueTask`1.Result property contains the total number of bytes read into the buffer. This is guaranteed to be greater than or equal to minimumBytes when throwOnEndOfStream is . This will be less than minimumBytes when the end of the stream is reached and throwOnEndOfStream is . This can be less than the number of bytes allocated in the buffer if that many bytes are not currently available.
   Parameters:
@@ -356,18 +346,13 @@ ReadAtLeastAsync(Byte], Int32, Boolean, CancellationToken) -> Int32]
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp minimum-bytes) (cl:typep throw-on-end-of-stream 'cl:boolean) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)))
-     (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAtLeastAsync" buffer minimum-bytes throw-on-end-of-stream cancellation-token))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp minimum-bytes) (cl:or (cl:not supplied-throw-on-end-of-stream) (cl:typep throw-on-end-of-stream 'cl:boolean)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)))
+     (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAtLeastAsync" buffer minimum-bytes (cl:if supplied-throw-on-end-of-stream throw-on-end-of-stream cl:t) cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
                     :class-name <type-str>
                     :method-name "ReadAtLeastAsync"
                     :supplied-args (cl:append (cl:list :buffer buffer) (cl:list :minimum-bytes minimum-bytes) (cl:when supplied-throw-on-end-of-stream (cl:list :throw-on-end-of-stream throw-on-end-of-stream)) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)))))))
-
-;; Note: System.IO.Stream.ReadAtLeastAsync also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ReadAtLeastAsync(Byte], Int32, Boolean, CancellationToken) -> Int32]
 
 (cl:defun read-byte (obj!)
   "Summary: Reads a byte from the stream and advances the position within the stream by one byte, or returns -1 if at the end of the stream.
@@ -401,17 +386,17 @@ ReadExactly(Byte[], Int32, Int32) -> Void
                     :method-name "ReadExactly"
                     :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-offset (cl:list :offset offset)) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun read-exactly-async (obj! buffer cl:&optional (cancellation-token cl:nil supplied-cancellation-token) (count cl:nil supplied-count) cl:&key (cancellation-token cl:nil supplied-cancellation-token))
+(cl:defun read-exactly-async (obj! buffer cancellation-token cl:&optional (count cl:nil supplied-count) (cancellation-token2 cl:nil supplied-cancellation-token2))
   "Master wrapper for System.IO.Stream.ReadExactlyAsync overloads. Dispatches at runtime.
 
-ReadExactlyAsync(Byte], CancellationToken) -> ValueTask
+ReadExactlyAsync(Byte], CancellationToken = default(System.Threading.CancellationToken) [C# default of type System.Threading.CancellationToken -- not representable in Lisp, must be supplied]) -> ValueTask
   Summary: Asynchronously reads bytes from the current stream, advances the position within the stream until the buffer is filled, and monitors cancellation requests.
   Returns: A task that represents the asynchronous read operation.
   Parameters:
     - buffer (System.Memory`1[System.Byte]): The buffer to write the data into.
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests.
 
-ReadExactlyAsync(Byte[], Int32, Int32, CancellationToken) -> ValueTask
+ReadExactlyAsync(Byte[], Int32, Int32, CancellationToken = default(System.Threading.CancellationToken) [C# default of type System.Threading.CancellationToken -- not representable in Lisp, must be supplied]) -> ValueTask
   Summary: Asynchronously reads count number of bytes from the current stream, advances the position within the stream, and monitors cancellation requests.
   Returns: A task that represents the asynchronous read operation.
   Parameters:
@@ -421,21 +406,15 @@ ReadExactlyAsync(Byte[], Int32, Int32, CancellationToken) -> ValueTask
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:numberp cancellation-token) supplied-count (cl:numberp count) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)))
-     (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadExactlyAsync" buffer cancellation-token count cancellation-token))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
+     (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadExactlyAsync" buffer cancellation-token count cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadExactlyAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
                     :class-name <type-str>
                     :method-name "ReadExactlyAsync"
-                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)) (cl:when supplied-count (cl:list :count count)) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)))))))
-
-;; Note: System.IO.Stream.ReadExactlyAsync also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ReadExactlyAsync(Byte], CancellationToken) -> ValueTask
-;;   ReadExactlyAsync(Byte[], Int32, Int32, CancellationToken) -> ValueTask
+                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:list :cancellation-token cancellation-token) (cl:when supplied-count (cl:list :count count)) (cl:when supplied-cancellation-token2 (cl:list :cancellation-token2 cancellation-token2)))))))
 
 (cl:defun seek (obj! offset origin)
   "Summary: When overridden in a derived class, sets the position within the current stream.
@@ -504,10 +483,10 @@ Write(Byte[], Int32, Int32) -> Void
                     :method-name "Write"
                     :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-offset (cl:list :offset offset)) (cl:when supplied-count (cl:list :count count)))))))
 
-(cl:defun write-async (obj! buffer cl:&optional (cancellation-token cl:nil supplied-cancellation-token) (count cl:nil supplied-count) (cancellation-token2 cl:nil supplied-cancellation-token2))
+(cl:defun write-async (obj! buffer cancellation-token cl:&optional (count cl:nil supplied-count) (cancellation-token2 cl:nil supplied-cancellation-token2))
   "Master wrapper for System.IO.Stream.WriteAsync overloads. Dispatches at runtime.
 
-WriteAsync(Byte], CancellationToken) -> ValueTask
+WriteAsync(Byte], CancellationToken = default(System.Threading.CancellationToken) [C# default of type System.Threading.CancellationToken -- not representable in Lisp, must be supplied]) -> ValueTask
   Summary: Asynchronously writes a sequence of bytes to the current stream, advances the current position within this stream by the number of bytes written, and monitors cancellation requests.
   Returns: A task that represents the asynchronous write operation.
   Parameters:
@@ -532,22 +511,17 @@ WriteAsync(Byte[], Int32, Int32, CancellationToken) -> Task
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests. The default value is System.Threading.CancellationToken.None.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "WriteAsync" buffer cancellation-token count cancellation-token2))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:numberp cancellation-token) supplied-count (cl:numberp count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "WriteAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "WriteAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
                     :class-name <type-str>
                     :method-name "WriteAsync"
-                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)) (cl:when supplied-count (cl:list :count count)) (cl:when supplied-cancellation-token2 (cl:list :cancellation-token2 cancellation-token2)))))))
-
-;; Note: System.IO.Stream.WriteAsync also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   WriteAsync(Byte], CancellationToken) -> ValueTask
+                    :supplied-args (cl:append (cl:list :buffer buffer) (cl:list :cancellation-token cancellation-token) (cl:when supplied-count (cl:list :count count)) (cl:when supplied-cancellation-token2 (cl:list :cancellation-token2 cancellation-token2)))))))
 
 (cl:defun write-byte (obj! value)
   "Summary: Writes a byte to the current position in the stream and advances the position within the stream by one byte.

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-string)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new (value cl:&optional (count cl:nil supplied-count) (length cl:nil supplied-length) (enc cl:nil supplied-enc))
   "Master wrapper for System.String constructor overloads. Dispatches at runtime.
@@ -449,7 +449,7 @@ Parameters:
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.String.Concat also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   Concat(params Object[]) -> String
 ;;   Concat(params String[]) -> String
@@ -544,7 +544,7 @@ Parameters:
   (dotnet:static-generic <type-str> "Create" (cl:list type) length state action))
 
 ;; Note: System.String.Create also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   Create(IFormatProvider, ref DefaultInterpolatedStringHandler&) -> String
 ;;   Create(IFormatProvider, Char], ref DefaultInterpolatedStringHandler&) -> String
@@ -819,7 +819,7 @@ Parameters:
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.String.Format also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   Format(String, params Object[]) -> String
 ;;   Format(IFormatProvider, String, params Object[]) -> String
@@ -1225,7 +1225,7 @@ Join(String, IEnumerable) -> String
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.String.Join also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   Join(Char, params String[]) -> String
 ;;   Join(String, params String[]) -> String
@@ -1559,7 +1559,7 @@ Split(Char]) -> String[]
   Parameters:
     - separator (System.ReadOnlySpan`1[System.Char]): A span of delimiting characters, or an empty span that contains no delimiters.
 
-Split(Char, StringSplitOptions) -> String[]
+Split(Char, StringSplitOptions = None) -> String[]
   Summary: Splits a string into substrings based on a specified delimiting character and, optionally, options.
   Returns: An array whose elements contain the substrings from this instance that are delimited by separator.
   Parameters:
@@ -1580,7 +1580,7 @@ Split(Char[], StringSplitOptions) -> String[]
     - separator (System.Char[]): An array of characters that delimit the substrings in this string, an empty array that contains no delimiters, or .
     - options (System.StringSplitOptions): A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.
 
-Split(String, StringSplitOptions) -> String[]
+Split(String, StringSplitOptions = None) -> String[]
   Summary: Splits a string into substrings that are based on the provided string separator.
   Returns: An array whose elements contain the substrings from this instance that are delimited by separator.
   Parameters:
@@ -1594,7 +1594,7 @@ Split(String[], StringSplitOptions) -> String[]
     - separator (System.String[]): An array of strings that delimit the substrings in this string, an empty array that contains no delimiters, or .
     - options (System.StringSplitOptions): A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.
 
-Split(Char, Int32, StringSplitOptions) -> String[]
+Split(Char, Int32, StringSplitOptions = None) -> String[]
   Summary: Splits a string into a maximum number of substrings based on the provided character separator, optionally omitting empty substrings from the result.
   Returns: An array that contains at most count substrings from this instance that are delimited by separator.
   Parameters:
@@ -1610,7 +1610,7 @@ Split(Char[], Int32, StringSplitOptions) -> String[]
     - count (System.Int32): The maximum number of substrings to return.
     - options (System.StringSplitOptions): A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.
 
-Split(String, Int32, StringSplitOptions) -> String[]
+Split(String, Int32, StringSplitOptions = None) -> String[]
   Summary: Splits a string into a maximum number of substrings based on a specified delimiting string and, optionally, options.
   Returns: An array that contains at most count substrings from this instance that are delimited by separator.
   Parameters:
@@ -1627,22 +1627,22 @@ Split(String[], Int32, StringSplitOptions) -> String[]
     - options (System.StringSplitOptions): A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.
 "
   (cl:cond
+    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) (cl:or (cl:not supplied-options2) (cl:or (cl:null options2) (dotnet:object-type options2))))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options (cl:if supplied-options2 options2 (dotnet:enum-or "System.StringSplitOptions" "None"))))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
+    ((cl:and (cl:stringp separator) supplied-options (cl:numberp options) (cl:or (cl:not supplied-options2) (cl:or (cl:null options2) (dotnet:object-type options2))))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options (cl:if supplied-options2 options2 (dotnet:enum-or "System.StringSplitOptions" "None"))))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
-    ((cl:and (cl:stringp separator) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
+    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:object-type options))) (cl:not supplied-options2))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator (cl:if supplied-options options (dotnet:enum-or "System.StringSplitOptions" "None"))))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) (cl:not supplied-options2))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
-    ((cl:and (cl:stringp separator) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
+    ((cl:and (cl:stringp separator) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:object-type options))) (cl:not supplied-options2))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator (cl:if supplied-options options (dotnet:enum-or "System.StringSplitOptions" "None"))))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
     ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:not supplied-options) (cl:not supplied-options2))
@@ -1654,13 +1654,9 @@ Split(String[], Int32, StringSplitOptions) -> String[]
                     :supplied-args (cl:append (cl:list :separator separator) (cl:when supplied-options (cl:list :options options)) (cl:when supplied-options2 (cl:list :options2 options2)))))))
 
 ;; Note: System.String.Split also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   Split(params Char[]) -> String[]
-;;   Split(Char, StringSplitOptions) -> String[]
-;;   Split(String, StringSplitOptions) -> String[]
-;;   Split(Char, Int32, StringSplitOptions) -> String[]
-;;   Split(String, Int32, StringSplitOptions) -> String[]
 
 (cl:defun starts-with (obj! value cl:&optional (comparison-type cl:nil supplied-comparison-type) (culture cl:nil supplied-culture))
   "Master wrapper for System.String.StartsWith overloads. Dispatches at runtime.
@@ -1872,7 +1868,7 @@ Trim(Char]) -> String
                     :supplied-args (cl:append (cl:when supplied-trim-char (cl:list :trim-char trim-char)))))))
 
 ;; Note: System.String.Trim also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   Trim(params Char[]) -> String
 
@@ -1905,7 +1901,7 @@ TrimEnd(Char]) -> String
                     :supplied-args (cl:append (cl:when supplied-trim-char (cl:list :trim-char trim-char)))))))
 
 ;; Note: System.String.TrimEnd also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   TrimEnd(params Char[]) -> String
 
@@ -1938,7 +1934,7 @@ TrimStart(Char]) -> String
                     :supplied-args (cl:append (cl:when supplied-trim-char (cl:list :trim-char trim-char)))))))
 
 ;; Note: System.String.TrimStart also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
+;; parameter types (ref, out, or params) that are not
 ;; yet supported:
 ;;   TrimStart(params Char[]) -> String
 

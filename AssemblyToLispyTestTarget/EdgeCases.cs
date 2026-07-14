@@ -295,6 +295,62 @@ namespace AssemblyToLispyTestTarget
     }
 
     /// <summary>
+    /// A class exercising the various :default-kind shapes a defaulted parameter can take,
+    /// including a constructor whose every parameter has a default (the MonoGameGum
+    /// TextRuntime shape that motivated this test class), an enum default, an
+    /// unrepresentable default(struct) default, and defaults mixed with an overload whose
+    /// own trailing parameters are mandatory.
+    /// </summary>
+    public class DefaultParameterTestClass
+    {
+        /// <summary>
+        /// A constructor with no default-free overload at all: every parameter defaults.
+        /// </summary>
+        /// <param name="fullInstantiation">A bool default.</param>
+        /// <param name="label">A string default.</param>
+        public DefaultParameterTestClass(bool fullInstantiation = true, string label = "")
+        {
+        }
+
+        /// <summary>
+        /// An overload of the same constructor with one mandatory leading parameter, so the
+        /// two overloads together exercise a mixed mandatory/defaulted Master Wrapper.
+        /// </summary>
+        /// <param name="id">A mandatory parameter.</param>
+        /// <param name="fullInstantiation">A bool default.</param>
+        public DefaultParameterTestClass(int id, bool fullInstantiation = true)
+        {
+        }
+
+        /// <summary>
+        /// A method with an enum-typed default parameter.
+        /// </summary>
+        /// <param name="mode">An enum default.</param>
+        public void EnumDefaultMethod(ByteEnum mode = ByteEnum.Second)
+        {
+        }
+
+        /// <summary>
+        /// A method with a nullable-enum-typed default parameter.
+        /// </summary>
+        /// <param name="mode">A nullable enum default.</param>
+        public void NullableEnumDefaultMethod(ByteEnum? mode = ByteEnum.First)
+        {
+        }
+
+        /// <summary>
+        /// A method with a non-nullable value-type parameter defaulting to
+        /// <c>default(EdgeCaseStruct)</c> -- reflection reports this as a null
+        /// DefaultValue indistinguishable, by value alone, from a real reference-type
+        /// null default; must be tagged :unrepresentable, not :null.
+        /// </summary>
+        /// <param name="value">An unrepresentable struct default.</param>
+        public void StructDefaultMethod(EdgeCaseStruct value = default)
+        {
+        }
+    }
+
+    /// <summary>
     /// A class containing generic methods of one or more type arguments for testing.
     /// </summary>
     public class GenericMethodTestClass

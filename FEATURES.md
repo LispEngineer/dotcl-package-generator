@@ -266,19 +266,26 @@ file is excluded from the `.asd`. See `doc/generator-design-notes.md`'s Version 
 
 * **No usable ("clean" — see below) constructor**: no `new` is generated; every
   constructor's signature is instead listed in a comment.
-* **Exactly one clean constructor**: `new` takes its parameters positionally, e.g.
-  `(cl:defun new (value y) ... (dotnet:new <type-str> value y))`.
-* **Two or more clean constructors**: a single Master Wrapper `new` (see "Method
-  Overloads" below for the dispatch mechanism) covers all of them, e.g.
-  `System.TimeSpan`'s six constructor overloads collapse into one `new` with
-  `&optional (ticks) (minutes) (seconds) (seconds2) (milliseconds) (microseconds)` slots,
-  each `cond` clause dispatching on which optional args were actually supplied.
+* **Exactly one clean constructor with no default-valued parameter**: `new` takes its
+  parameters positionally, e.g. `(cl:defun new (value y) ... (dotnet:new <type-str> value
+  y))`.
+* **Two or more clean constructors, or one clean constructor with a default-valued
+  parameter**: a single Master Wrapper `new` (see "Method Overloads" below for the
+  dispatch mechanism, and "Default Parameter Values" for how a default itself is handled)
+  covers all of them, e.g. `System.TimeSpan`'s six constructor overloads collapse into one
+  `new` with `&optional (ticks) (minutes) (seconds) (seconds2) (milliseconds)
+  (microseconds)` slots, each `cond` clause dispatching on which optional args were
+  actually supplied; `MonoGameGum.GueDeriving.TextRuntime`'s single constructor
+  `TextRuntime(bool fullInstantiation = true, SystemManagers systemManagers = null)`
+  collapses to `(cl:defun new (&key (full-instantiation t) (system-managers nil)) ...)`.
 * **Structs' implicit parameterless constructor**: .NET reflection never returns a
   struct's implicit default constructor via `GetConstructors()`. If a struct (`:kind
   :struct`) has no explicit zero-parameter constructor in its metadata, the generator
   injects one, so `(new)` always works for a struct.
-* A constructor with `ref`/`out`/`ref readonly`/`params`/default-valued parameters is
-  "dirty" (see "Method Overloads") and is documented in a comment rather than generated.
+* A constructor with `ref`/`out`/`ref readonly`/`params` parameters is "dirty" (see
+  "Method Overloads") and is documented in a comment rather than generated. A
+  default-valued parameter no longer makes a constructor dirty — see "Default Parameter
+  Values" below.
 
 Constructor visibility (public/protected) is not itself checked by the generator — any
 constructor present in the reflected metadata gets a wrapper, including a protected one
@@ -598,11 +605,12 @@ with no receiver object) are not reflected at all — see "Unsupported Features"
 ## Methods and Method Overloads
 
 **Summary:** a method with no overloads (of any kind) generates a single typed function;
-a name with two or more usable overloads collapses into one runtime-dispatching "Master
-Wrapper"; methods using `ref`/`out`/`ref readonly`/`params`/default parameters, or the
-declaring generic type's own (as opposed to the method's own) unresolved type parameter,
-are not generated at all — only documented in a comment (or, for the latter, silently
-excluded — see Unsupported Features).
+a name with two or more usable overloads, or one overload with a default parameter value,
+collapses into one runtime-dispatching "Master Wrapper" (see "Default Parameter Values"
+below); methods using `ref`/`out`/`ref readonly`/`params`, or the declaring generic type's
+own (as opposed to the method's own) unresolved type parameter, are not generated at all —
+only documented in a comment (or, for the latter, silently excluded — see Unsupported
+Features).
 
 * **Single clean overload**: a direct typed wrapper, e.g.
   `(cl:defun dispose (obj!) (dotnet:invoke (the (dotnet "...") obj!) "Dispose"))`. For a
@@ -632,6 +640,39 @@ excluded — see Unsupported Features).
 * Every Master Wrapper's docstring enumerates every overload it covers — its
   human-readable signature plus that overload's own XML-doc Summary/Returns/Parameters —
   so the full set of available overloads stays documented on the one function.
+
+
+
+## Default Parameter Values
+
+**Summary:** a C# default-valued parameter (`Foo(int a, bool b = true)`) becomes an
+`&optional`/`&key` slot whose value, when the caller omits it, is the parameter's *actual*
+C# default — not the ordinary `nil` a bare `&optional`/`&key` slot would otherwise supply.
+This applies uniformly to constructors and methods, sharing the same Master Wrapper
+machinery as overload dispatch (see "Constructors" and "Method Overloads" above); a single
+overload/constructor with only default-valued parameters (no separate overload at all, and
+no other reason to need a Master Wrapper) still gets one, since a plain `defun` has no way
+to make a parameter optional.
+
+* **Which parameters get a real default**: `AssemblyToLispy.cs` tags every default with a
+  `:default-kind` (`:null`, `:bool`, `:number`, `:char`, `:string`, or `:enum`) — see
+  `doc/assembly-to-lispy.md`'s Parameter Plist Details. An enum default constructs a boxed
+  value via `(dotnet:enum-or "<enum type>" "<member name>" ...)` at the point it's actually
+  needed (never at load time), splitting a `[Flags]` combination's comma-separated member
+  names into multiple arguments.
+* **`:unrepresentable` defaults**: some C# defaults cannot be represented as a Lisp literal
+  at all — a non-nullable value-type parameter's `= default` (e.g. `CancellationToken
+  token = default`), or a non-null struct/object default. Such a parameter is simply
+  treated as *mandatory* in the generated wrapper (the caller must supply it explicitly);
+  its real C# default and type are still shown in the wrapper's docstring (via the
+  human-readable signature, e.g. `Foo(CancellationToken = default(System.Threading.
+  CancellationToken))`) for reference.
+* **Two overloads that disagree on a shared slot's default** (rare, but possible when a
+  defaulted overload's parameter shares a lambda-list slot, by position, with a different,
+  unrelated parameter from another overload — see `doc/generator-design-notes.md`'s
+  Version 48 section) each still receive their own correct default at the point of
+  invocation: the value actually passed to a specific overload is computed per-overload,
+  never the shared slot's generic `nil` init form.
 
 
 
@@ -907,9 +948,10 @@ function's Lisp docstring (or, for constants/symbol-macros, a `(cl:documentation
   indexers).
 
 * **Dirty method/constructor/indexer overloads** — any overload using `ref`, `out`,
-  `ref readonly`/`in`, `params`, or a default parameter value — is not generated; its
-  signature is documented in a comment. (Explicitly planned future work per `PLAN.md`:
-  a `-ref` suffix naming convention with `out` → multiple Lisp return values.)
+  `ref readonly`/`in`, or `params` — is not generated; its signature is documented in a
+  comment. (Explicitly planned future work per `PLAN.md`: a `-ref` suffix naming
+  convention with `out` → multiple Lisp return values.) A default parameter value is
+  *not* in this category — see "Default Parameter Values" above.
 
 * **Static events** (raised via a static `add_X`/`remove_X` pair with no receiver object)
   are not reflected — `AssemblyToLispy.cs`'s `:events` collection explicitly excludes

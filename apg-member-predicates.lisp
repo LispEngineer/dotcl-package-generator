@@ -80,6 +80,17 @@
   (or (not is-generic)
       (and (integerp arity) (> arity 0))))
 
+(defun usable-default-p (param)
+  "Returns t if parameter plist PARAM has a default value the generator can
+   actually emit as a Lisp literal (see :default-kind in
+   doc/assembly-to-lispy.md). An :unrepresentable default -- reflection
+   reporting a non-nullable value-type parameter's default(SomeStruct) as
+   null, or a non-null struct/object default -- cannot be spliced into a
+   lambda list, so such a parameter is treated everywhere as if it had no
+   default at all, i.e. mandatory in the generated wrapper."
+  (and (getf param :has-default)
+       (not (eq (getf param :default-kind) :unrepresentable))))
+
 (defun simple-method-p (method all-methods)
   "Returns t if the method qualifies for Phase 1 compilation.
    Criteria:
@@ -141,24 +152,31 @@
                 params))))
 
 (defun dirty-method-p (method)
-  "Returns t if the method has any special parameter modifiers (ref, out, params, or defaults).
-   Complement to clean-method-p; a method may be neither clean nor dirty
-   if it is an operator or accessor."
+  "Returns t if the method has any special parameter modifiers (ref, out, or
+   params). Complement to clean-method-p; a method may be neither clean nor
+   dirty if it is an operator or accessor. A defaulted parameter no longer
+   makes a method dirty (regardless of usable-default-p): a usable default
+   is fully handled by the Master Wrapper's &optional/&key dispatch, and an
+   unrepresentable one is simply treated as mandatory -- clean-method-p
+   already accepts both, so flagging :has-default here would only produce
+   the same method listed as both clean (with a real wrapper) and dirty
+   (in the 'not yet supported' comment)."
   (let ((params (getf method :parameters)))
     (some (lambda (p)
-            (or (getf p :has-default)
-                (getf p :out)
+            (or (getf p :out)
                 (getf p :ref)
                 (getf p :ref-readonly)
                 (getf p :params)))
           params)))
 
 (defun clean-constructor-p (ctor)
-  "Returns t if the constructor is 'clean' (no ref/out/params/defaults/generics)."
+  "Returns t if the constructor is 'clean' (no ref/out/params/generics).
+   A defaulted parameter (usable or :unrepresentable) does not disqualify a
+   constructor -- see usable-default-p and dirty-method-p's docstring for
+   why this mirrors clean-method-p's existing treatment of defaults."
   (let ((params (getf ctor :parameters)))
     (every (lambda (p)
-             (and (not (getf p :has-default))
-                  (not (getf p :out))
+             (and (not (getf p :out))
                   (not (getf p :ref))
                   (not (getf p :ref-readonly))
                   (not (getf p :params))
@@ -166,11 +184,10 @@
            params)))
 
 (defun dirty-constructor-p (ctor)
-  "Returns t if the constructor has any special parameter modifiers (ref, out, params, or defaults)."
+  "Returns t if the constructor has any special parameter modifiers (ref, out, or params)."
   (let ((params (getf ctor :parameters)))
     (some (lambda (p)
-            (or (getf p :has-default)
-                (getf p :out)
+            (or (getf p :out)
                 (getf p :ref)
                 (getf p :ref-readonly)
                 (getf p :params)))

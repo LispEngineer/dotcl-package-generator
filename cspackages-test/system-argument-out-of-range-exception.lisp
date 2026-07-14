@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ArgumentOutOfRangeException
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-argument-out-of-range-exception)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ArgumentOutOfRangeException"))
 (cl:defconstant <type-str> "System.ArgumentOutOfRangeException")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new (cl:&optional (param-name cl:nil supplied-param-name) (message cl:nil supplied-message) (message2 cl:nil supplied-message2))
   "Master wrapper for System.ArgumentOutOfRangeException constructor overloads. Dispatches at runtime.
@@ -84,7 +84,7 @@ Parameters:
 (cl:defun throw-if-equal (type value other cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentOutOfRangeException.ThrowIfEqual overloads. Dispatches at runtime.
 
-ThrowIfEqual(T, T, String) -> Void
+ThrowIfEqual(T, T, String = null) -> Void
   Summary: Throws an System.ArgumentOutOfRangeException if value is equal to other.
   Parameters:
     - value (T): The argument to validate as not equal to other.
@@ -92,23 +92,18 @@ ThrowIfEqual(T, T, String) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:stringp param-name))
-     (dotnet:static-generic <type-str> "ThrowIfEqual" (cl:list type) value other param-name))
+    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static-generic <type-str> "ThrowIfEqual" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfEqual"
                     :supplied-args (cl:append (cl:list :value value) (cl:list :other other) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
 
-;; Note: System.ArgumentOutOfRangeException.ThrowIfEqual also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfEqual(T, T, String) -> Void
-
 (cl:defun throw-if-greater-than (type value other cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentOutOfRangeException.ThrowIfGreaterThan overloads. Dispatches at runtime.
 
-ThrowIfGreaterThan(T, T, String) -> Void
+ThrowIfGreaterThan(T, T, String = null) -> Void
   Summary: Throws an System.ArgumentOutOfRangeException if value is greater than other.
   Parameters:
     - value (T): The argument to validate as less than or equal to other.
@@ -116,23 +111,18 @@ ThrowIfGreaterThan(T, T, String) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:stringp param-name))
-     (dotnet:static-generic <type-str> "ThrowIfGreaterThan" (cl:list type) value other param-name))
+    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static-generic <type-str> "ThrowIfGreaterThan" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfGreaterThan"
                     :supplied-args (cl:append (cl:list :value value) (cl:list :other other) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
 
-;; Note: System.ArgumentOutOfRangeException.ThrowIfGreaterThan also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfGreaterThan(T, T, String) -> Void
-
 (cl:defun throw-if-greater-than-or-equal (type value other cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual overloads. Dispatches at runtime.
 
-ThrowIfGreaterThanOrEqual(T, T, String) -> Void
+ThrowIfGreaterThanOrEqual(T, T, String = null) -> Void
   Summary: Throws an System.ArgumentOutOfRangeException if value is greater than or equal to other.
   Parameters:
     - value (T): The argument to validate as less than other.
@@ -140,23 +130,18 @@ ThrowIfGreaterThanOrEqual(T, T, String) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:stringp param-name))
-     (dotnet:static-generic <type-str> "ThrowIfGreaterThanOrEqual" (cl:list type) value other param-name))
+    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static-generic <type-str> "ThrowIfGreaterThanOrEqual" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfGreaterThanOrEqual"
                     :supplied-args (cl:append (cl:list :value value) (cl:list :other other) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
 
-;; Note: System.ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfGreaterThanOrEqual(T, T, String) -> Void
-
 (cl:defun throw-if-less-than (type value other cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentOutOfRangeException.ThrowIfLessThan overloads. Dispatches at runtime.
 
-ThrowIfLessThan(T, T, String) -> Void
+ThrowIfLessThan(T, T, String = null) -> Void
   Summary: Throws an System.ArgumentOutOfRangeException if value is less than other.
   Parameters:
     - value (T): The argument to validate as greater than or equal to other.
@@ -164,23 +149,18 @@ ThrowIfLessThan(T, T, String) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:stringp param-name))
-     (dotnet:static-generic <type-str> "ThrowIfLessThan" (cl:list type) value other param-name))
+    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static-generic <type-str> "ThrowIfLessThan" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfLessThan"
                     :supplied-args (cl:append (cl:list :value value) (cl:list :other other) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
 
-;; Note: System.ArgumentOutOfRangeException.ThrowIfLessThan also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfLessThan(T, T, String) -> Void
-
 (cl:defun throw-if-less-than-or-equal (type value other cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentOutOfRangeException.ThrowIfLessThanOrEqual overloads. Dispatches at runtime.
 
-ThrowIfLessThanOrEqual(T, T, String) -> Void
+ThrowIfLessThanOrEqual(T, T, String = null) -> Void
   Summary: Throws an System.ArgumentOutOfRangeException if value is less than or equal to other.
   Parameters:
     - value (T): The argument to validate as greater than other.
@@ -188,69 +168,54 @@ ThrowIfLessThanOrEqual(T, T, String) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:stringp param-name))
-     (dotnet:static-generic <type-str> "ThrowIfLessThanOrEqual" (cl:list type) value other param-name))
+    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static-generic <type-str> "ThrowIfLessThanOrEqual" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfLessThanOrEqual"
                     :supplied-args (cl:append (cl:list :value value) (cl:list :other other) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
 
-;; Note: System.ArgumentOutOfRangeException.ThrowIfLessThanOrEqual also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfLessThanOrEqual(T, T, String) -> Void
-
 (cl:defun throw-if-negative (type value cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentOutOfRangeException.ThrowIfNegative overloads. Dispatches at runtime.
 
-ThrowIfNegative(T, String) -> Void
+ThrowIfNegative(T, String = null) -> Void
   Summary: Throws an System.ArgumentOutOfRangeException if value is negative.
   Parameters:
     - value (T): The argument to validate as non-negative.
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:stringp param-name))
-     (dotnet:static-generic <type-str> "ThrowIfNegative" (cl:list type) value param-name))
+    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static-generic <type-str> "ThrowIfNegative" (cl:list type) value (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfNegative"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
 
-;; Note: System.ArgumentOutOfRangeException.ThrowIfNegative also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfNegative(T, String) -> Void
-
 (cl:defun throw-if-negative-or-zero (type value cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentOutOfRangeException.ThrowIfNegativeOrZero overloads. Dispatches at runtime.
 
-ThrowIfNegativeOrZero(T, String) -> Void
+ThrowIfNegativeOrZero(T, String = null) -> Void
   Summary: Throws an System.ArgumentOutOfRangeException if value is negative or zero.
   Parameters:
     - value (T): The argument to validate as non-zero and non-negative.
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:stringp param-name))
-     (dotnet:static-generic <type-str> "ThrowIfNegativeOrZero" (cl:list type) value param-name))
+    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static-generic <type-str> "ThrowIfNegativeOrZero" (cl:list type) value (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfNegativeOrZero"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
 
-;; Note: System.ArgumentOutOfRangeException.ThrowIfNegativeOrZero also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfNegativeOrZero(T, String) -> Void
-
 (cl:defun throw-if-not-equal (type value other cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentOutOfRangeException.ThrowIfNotEqual overloads. Dispatches at runtime.
 
-ThrowIfNotEqual(T, T, String) -> Void
+ThrowIfNotEqual(T, T, String = null) -> Void
   Summary: Throws an System.ArgumentOutOfRangeException if value is not equal to other.
   Parameters:
     - value (T): The argument to validate as equal to other.
@@ -258,39 +223,29 @@ ThrowIfNotEqual(T, T, String) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:stringp param-name))
-     (dotnet:static-generic <type-str> "ThrowIfNotEqual" (cl:list type) value other param-name))
+    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static-generic <type-str> "ThrowIfNotEqual" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfNotEqual"
                     :supplied-args (cl:append (cl:list :value value) (cl:list :other other) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
 
-;; Note: System.ArgumentOutOfRangeException.ThrowIfNotEqual also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfNotEqual(T, T, String) -> Void
-
 (cl:defun throw-if-zero (type value cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentOutOfRangeException.ThrowIfZero overloads. Dispatches at runtime.
 
-ThrowIfZero(T, String) -> Void
+ThrowIfZero(T, String = null) -> Void
   Summary: Throws an System.ArgumentOutOfRangeException if value is zero.
   Parameters:
     - value (T): The argument to validate as non-zero.
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:stringp param-name))
-     (dotnet:static-generic <type-str> "ThrowIfZero" (cl:list type) value param-name))
+    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static-generic <type-str> "ThrowIfZero" (cl:list type) value (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfZero"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
-
-;; Note: System.ArgumentOutOfRangeException.ThrowIfZero also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfZero(T, String) -> Void
 

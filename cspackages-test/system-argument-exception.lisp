@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ArgumentException
-;;; Generator Version: 47
-;;; Creation Date: 2026-07-11T23:06:47Z
+;;; Generator Version: 48
+;;; Creation Date: 2026-07-14T16:26:13Z
 
 (cl:in-package :system-argument-exception)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ArgumentException"))
 (cl:defconstant <type-str> "System.ArgumentException")
-(cl:defconstant <creation> "2026-07-11T23:06:47Z")
-(cl:defconstant <version> 47)
+(cl:defconstant <creation> "2026-07-14T16:26:13Z")
+(cl:defconstant <version> 48)
 
 (cl:defun new (cl:&optional (message cl:nil supplied-message) (inner-exception cl:nil supplied-inner-exception) (inner-exception2 cl:nil supplied-inner-exception2))
   "Master wrapper for System.ArgumentException constructor overloads. Dispatches at runtime.
@@ -84,46 +84,36 @@ Parameters:
 (cl:defun throw-if-null-or-empty (argument cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentException.ThrowIfNullOrEmpty overloads. Dispatches at runtime.
 
-ThrowIfNullOrEmpty(String, String) -> Void
+ThrowIfNullOrEmpty(String, String = null) -> Void
   Summary: Throws an exception if argument is or empty.
   Parameters:
     - argument (System.String): The string argument to validate as non- and non-empty.
     - param-name (System.String): The name of the parameter with which argument corresponds.
 "
   (cl:cond
-    ((cl:and (cl:stringp argument) (cl:stringp param-name))
-     (dotnet:static <type-str> "ThrowIfNullOrEmpty" argument param-name))
+    ((cl:and (cl:stringp argument) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static <type-str> "ThrowIfNullOrEmpty" argument (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfNullOrEmpty"
                     :supplied-args (cl:append (cl:list :argument argument) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
 
-;; Note: System.ArgumentException.ThrowIfNullOrEmpty also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfNullOrEmpty(String, String) -> Void
-
 (cl:defun throw-if-null-or-white-space (argument cl:&key (param-name cl:nil supplied-param-name))
   "Master wrapper for System.ArgumentException.ThrowIfNullOrWhiteSpace overloads. Dispatches at runtime.
 
-ThrowIfNullOrWhiteSpace(String, String) -> Void
+ThrowIfNullOrWhiteSpace(String, String = null) -> Void
   Summary: Throws an exception if argument is , empty, or consists only of white-space characters.
   Parameters:
     - argument (System.String): The string argument to validate.
     - param-name (System.String): The name of the parameter with which argument corresponds.
 "
   (cl:cond
-    ((cl:and (cl:stringp argument) (cl:stringp param-name))
-     (dotnet:static <type-str> "ThrowIfNullOrWhiteSpace" argument param-name))
+    ((cl:and (cl:stringp argument) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+     (dotnet:static <type-str> "ThrowIfNullOrWhiteSpace" argument (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-EXCEPTION"
                     :class-name <type-str>
                     :method-name "ThrowIfNullOrWhiteSpace"
                     :supplied-args (cl:append (cl:list :argument argument) (cl:when supplied-param-name (cl:list :param-name param-name)))))))
-
-;; Note: System.ArgumentException.ThrowIfNullOrWhiteSpace also has the following overloads with special
-;; parameter types (ref, out, params, or defaults) that are not
-;; yet supported:
-;;   ThrowIfNullOrWhiteSpace(String, String) -> Void
 

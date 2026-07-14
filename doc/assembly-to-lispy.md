@@ -295,8 +295,31 @@ Each parameter plist contains:
 * `:params` (Keyword `t` or omitted): Omitted if the parameter is not a `params` array; otherwise `t`.
 * `:has-default` (Keyword `t` or omitted): Omitted if the parameter has no
   default value; otherwise `t`.
-* `:default-value` (Lisp value or omitted): Omitted if `:has-default` is omitted;
-  otherwise the formatted default value as a valid Common Lisp literal.
+* `:default-kind` (Keyword or omitted): Omitted if `:has-default` is omitted; otherwise one
+  of `:null`, `:bool`, `:number`, `:char`, `:string`, `:enum`, or `:unrepresentable`. Tells a
+  consumer how to interpret `:default-value` without re-deriving it from `:type`:
+  * `:null` -- the default is a null reference or a null nullable value type.
+  * `:bool`/`:number`/`:char`/`:string` -- `:default-value` is a literal of that kind.
+  * `:enum` -- the parameter's type (or, if `Nullable<TEnum>`, its underlying type) is an enum;
+    `:default-value` is the enum member's name as a string (comma-separated for a `[Flags]`
+    combination, e.g. `"AllowThousands, Float"`), and `:default-type` is that enum's own fully
+    qualified name (not the possibly-nullable parameter type).
+  * `:unrepresentable` -- reflection could not report a default value faithfully representable
+    as a Lisp literal. This covers two distinct C# shapes that both surface as a null
+    `ParameterInfo.DefaultValue`: a genuine null default on a non-nullable value-type parameter
+    (`SomeMethod(CancellationToken token = default)`) as well as non-null struct/object defaults.
+    `:default-value` is a human-readable description (not a valid Lisp literal to pass as-is);
+    consumers should treat the parameter as having no usable default (i.e. require the caller to
+    supply it) and may surface `:default-value`/`:default-type` for documentation purposes.
+* `:default-type` (String or omitted): Omitted if `:has-default` is omitted; otherwise the
+  fully qualified type of the default value (using simplified backtick notation for generic
+  types) -- normally the parameter's own type with `Nullable<T>` unwrapped, except for
+  `:default-kind :enum` where it is the enum's own type (see above).
+* `:default-value` (Lisp value, or descriptive string for `:unrepresentable`, or omitted):
+  Omitted if `:has-default` is omitted; otherwise the formatted default value. For every kind
+  except `:unrepresentable` this is a valid Common Lisp literal (or, for `:enum`, an escaped
+  Lisp string naming the enum member(s) -- not itself a literal of the enum's type; construct
+  the enum value via e.g. `dotnet:enum-or` using `:default-type` and this name).
 
 
 ### Documentation Plist Details
@@ -444,6 +467,8 @@ This sub-phase extracts detailed signatures for methods, constructors, and param
   * `:name`: Parameter name.
   * `:type`: Fully qualified parameter type.
   * `:has-default`: `t` or `nil`.
+  * `:default-kind`: `:null`, `:bool`, `:number`, `:char`, `:string`, `:enum`, or `:unrepresentable`.
+  * `:default-type`: Fully qualified type of the default value.
   * `:default-value`: Formatted default value representation (e.g. string, number, or `:nil`).
 
 Continue the "omit `nil`s" convention from Phase 2B.
@@ -478,9 +503,14 @@ Continue the "omit `nil`s" convention from Phase 2B.
       `#\Newline`, or `#\LATIN_CAPITAL_LETTER_A` -- DotCL 0.1.17+ prints UCD
       character names with underscores, not spaces, so the literal reads back
       as a single reader token) leveraging DotCL's `LispChar` definition.
-    * Enums, structs, and custom objects: Formatted as escaped Lisp strings
-      (e.g. `"AllowThousands, Float"`), ensuring they parse as valid Lisp string
-      literals.
+    * Enums: Formatted as escaped Lisp strings naming the member(s) (e.g.
+      `"AllowThousands, Float"`), tagged `:default-kind :enum` with `:default-type` set to the
+      enum's own fully qualified type (unwrapping `Nullable<TEnum>` first).
+    * Structs and custom objects, and non-nullable value-type parameters whose default
+      reflects as null (e.g. `SomeMethod(CancellationToken token = default)`): not
+      representable as a Lisp literal or as `nil` (a real value-type default is not the same
+      thing as a null reference); tagged `:default-kind :unrepresentable` with `:default-value`
+      set to a human-readable description rather than a literal. See `:default-kind` above.
   * **Simplified Generic Type Formatting**: Closed generic types are formatted
     using Option 2 (simplified backtick syntax: `Name`Arity[Args...]`),
     recursively omitting assembly name, version, culture, and token attributes
