@@ -373,4 +373,48 @@
               (assert-test (not (null (search "(dotnet:invoke (cl:the (dotnet \"Fixture.DispatchOrder\") obj!) \"Go\" a (cl:if supplied-extra extra 0))" contents))) t
                           "Master Wrapper for Go emits a clause invoking the defaulted Go(TypeB, Int32=0) overload with its own default")))
         (when (probe-file out-dir)
+          (uiop:delete-directory-tree out-dir :validate t))))
+
+    ;; 3.10 Regression test for doc/bug-in-nullable-value-type-dispatch.md: a
+    ;; Master Wrapper's non-primitive type-check guard for a closed
+    ;; Nullable<T> parameter must check against the underlying type T (via
+    ;; the metadata's :nullable-underlying-type key), never Nullable<T>
+    ;; itself -- a boxed Nullable<T> with HasValue==true is always really a
+    ;; boxed T, so dotnet:is-instance-of against Nullable<T> could never
+    ;; match any real argument. Also covers a nullable numeric PRIMITIVE
+    ;; (int?), which must still get a null-tolerant cl:numberp check, not the
+    ;; non-primitive is-instance-of fallback (its unwrapped :type,
+    ;; "System.Int32", doesn't itself signal nullability the way a plain,
+    ;; genuinely-non-nullable int parameter's identical :type would).
+  (let* ((class-plist
+             '(:fully-qualified-name "Fixture.NullableDispatch"
+               :kind :class
+               :fields nil
+               :properties nil
+               :constructors nil
+               :methods ((:name "NullableStructParamMethod" :is-static nil :return-type "System.Void"
+                          :parameters ((:name "nullableStruct" :type "System.Nullable`1[Fixture.SomeStruct]"
+                                        :nullable-underlying-type "Fixture.SomeStruct")
+                                       (:name "extra" :type "System.Int32"
+                                        :has-default t :default-kind :number :default-value 0)))
+                         (:name "NullableIntParamMethod" :is-static nil :return-type "System.Void"
+                          :parameters ((:name "nullableInt" :type "System.Nullable`1[System.Int32]"
+                                        :nullable-underlying-type "System.Int32")
+                                       (:name "extra" :type "System.Int32"
+                                        :has-default t :default-kind :number :default-value 0))))))
+           (out-dir (merge-pathnames "package-generator-tests-nullable-dispatch-out/"
+                                      (uiop:temporary-directory))))
+      (unwind-protect
+          (progn
+            (ensure-directories-exist out-dir)
+            (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+            (let* ((class-file (merge-pathnames "fixture-nullable-dispatch.lisp" out-dir))
+                   (contents (uiop:read-file-string class-file)))
+              (assert-test (not (null (search "(dotnet:is-instance-of nullable-struct \"Fixture.SomeStruct\")" contents))) t
+                          "NullableStructParamMethod's guard checks dotnet:is-instance-of against the underlying type Fixture.SomeStruct")
+              (assert-test (null (search "Nullable`1" contents)) t
+                          "No generated guard ever checks dotnet:is-instance-of against a closed Nullable`1[...] type name itself")
+              (assert-test (not (null (search "(cl:or (cl:null nullable-int) (cl:numberp nullable-int))" contents))) t
+                          "NullableIntParamMethod's guard for a nullable primitive (int?) uses a null-tolerant cl:numberp check, not dotnet:is-instance-of")))
+        (when (probe-file out-dir)
           (uiop:delete-directory-tree out-dir :validate t)))))

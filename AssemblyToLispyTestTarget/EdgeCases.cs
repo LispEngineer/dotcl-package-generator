@@ -292,6 +292,38 @@ namespace AssemblyToLispyTestTarget
         /// only a set-name function (no getter, no setf) for it.
         /// </summary>
         public static int StaticWriteOnlyProperty { set { } }
+
+        /// <summary>
+        /// A method taking a nullable (<c>Nullable&lt;T&gt;</c>) parameter for a
+        /// non-primitive value type, with a usable default on a trailing parameter so
+        /// this single (non-overloaded) method still reaches the Master Wrapper
+        /// dispatch/type-check path (complex-group-p) rather than generate-single-
+        /// overload's untyped passthrough. Regression fixture for
+        /// doc/bug-in-nullable-value-type-dispatch.md: a boxed EdgeCaseStruct?'s
+        /// HasValue==true value is always really a boxed EdgeCaseStruct, never a boxed
+        /// Nullable&lt;EdgeCaseStruct&gt;, so the generated guard must check against
+        /// EdgeCaseStruct, not the closed Nullable`1[...] type name.
+        /// </summary>
+        /// <param name="nullableStruct">A nullable EdgeCaseStruct argument.</param>
+        /// <param name="extra">A usable default, forcing this method through the Master Wrapper's dispatch/type-check path.</param>
+        public void NullableStructParamMethod(EdgeCaseStruct? nullableStruct, int extra = 0)
+        {
+        }
+
+        /// <summary>
+        /// Same shape as <see cref="NullableStructParamMethod"/>, but for a nullable
+        /// numeric primitive (<c>int?</c>): its :type is
+        /// "System.Nullable`1[System.Int32]", which does not string-match the plain
+        /// "System.Int32" primitive check, so without unwrapping to the underlying
+        /// type first, this would wrongly fall into the non-primitive
+        /// dotnet:is-instance-of fallback (against the wrong, never-matching
+        /// Nullable&lt;Int32&gt; type) instead of the correct cl:numberp check.
+        /// </summary>
+        /// <param name="nullableInt">A nullable int argument.</param>
+        /// <param name="extra">A usable default, forcing this method through the Master Wrapper's dispatch/type-check path.</param>
+        public void NullableIntParamMethod(int? nullableInt, int extra = 0)
+        {
+        }
     }
 
     /// <summary>

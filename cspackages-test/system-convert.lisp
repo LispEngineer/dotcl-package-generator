@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Convert
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-convert)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Convert"))
 (cl:defconstant <type-str> "System.Convert")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:define-symbol-macro db-null (dotnet:static <type-str> "DBNull"))
 (cl:setf (cl:documentation (cl:quote db-null) (cl:quote cl:variable)) "A constant that represents a database column that is absent of data; that is, database null.")
@@ -103,9 +103,9 @@ FromHexString(Byte]) -> Byte[]
   (cl:cond
     ((cl:and (cl:stringp s))
      (dotnet:static <type-str> "FromHexString" s))
-    ((cl:and (cl:or (cl:null s) (dotnet:is-instance-of s "System.ReadOnlySpan`1[System.Char]")))
+    ((cl:and (cl:or (cl:null s) (dotnet:is-instance-of s "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "FromHexString" s))
-    ((cl:and (cl:or (cl:null s) (dotnet:is-instance-of s "System.ReadOnlySpan`1[System.Byte]")))
+    ((cl:and (cl:or (cl:null s) (dotnet:is-instance-of s "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "FromHexString" s))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-CONVERT"
@@ -220,7 +220,7 @@ ToBase64String(Byte[], Int32, Int32, Base64FormattingOptions) -> String
      (dotnet:static <type-str> "ToBase64String" in-array options))
     ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.Byte[]")) (cl:not supplied-options) (cl:not supplied-length) (cl:not supplied-options2))
      (dotnet:static <type-str> "ToBase64String" in-array))
-    ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.ReadOnlySpan`1[System.Byte]")) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:is-instance-of options "System.Base64FormattingOptions"))) (cl:not supplied-length) (cl:not supplied-options2))
+    ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:is-instance-of options "System.Base64FormattingOptions"))) (cl:not supplied-length) (cl:not supplied-options2))
      (dotnet:static <type-str> "ToBase64String" in-array (cl:if supplied-options options (dotnet:enum-or "System.Base64FormattingOptions" "None"))))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-CONVERT"
@@ -1199,7 +1199,7 @@ ToHexString(Byte[], Int32, Int32) -> String
   (cl:cond
     ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.Byte[]")) supplied-offset (cl:numberp offset) supplied-length (cl:numberp length))
      (dotnet:static <type-str> "ToHexString" in-array offset length))
-    ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.ReadOnlySpan`1[System.Byte]")) (cl:not supplied-offset) (cl:not supplied-length))
+    ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-offset) (cl:not supplied-length))
      (dotnet:static <type-str> "ToHexString" in-array))
     ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.Byte[]")) (cl:not supplied-offset) (cl:not supplied-length))
      (dotnet:static <type-str> "ToHexString" in-array))
@@ -1235,7 +1235,7 @@ ToHexStringLower(Byte[], Int32, Int32) -> String
   (cl:cond
     ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.Byte[]")) supplied-offset (cl:numberp offset) supplied-length (cl:numberp length))
      (dotnet:static <type-str> "ToHexStringLower" in-array offset length))
-    ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.ReadOnlySpan`1[System.Byte]")) (cl:not supplied-offset) (cl:not supplied-length))
+    ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-offset) (cl:not supplied-length))
      (dotnet:static <type-str> "ToHexStringLower" in-array))
     ((cl:and (cl:or (cl:null in-array) (dotnet:is-instance-of in-array "System.Byte[]")) (cl:not supplied-offset) (cl:not supplied-length))
      (dotnet:static <type-str> "ToHexStringLower" in-array))

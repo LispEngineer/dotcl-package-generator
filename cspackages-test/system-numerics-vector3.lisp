@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector3
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-numerics-vector3)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector3"))
 (cl:defconstant <type-str> "System.Numerics.Vector3")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun new (cl:&optional (value cl:nil supplied-value) (z cl:nil supplied-z) (z2 cl:nil supplied-z2))
   "Master wrapper for System.Numerics.Vector3 constructor overloads. Dispatches at runtime.
@@ -45,7 +45,7 @@ new(Single, Single, Single)
      (dotnet:new <type-str> value z))
     ((cl:and supplied-value (cl:numberp value) (cl:not supplied-z) (cl:not supplied-z2))
      (dotnet:new <type-str> value))
-    ((cl:and supplied-value (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Single]")) (cl:not supplied-z) (cl:not supplied-z2))
+    ((cl:and supplied-value (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-z) (cl:not supplied-z2))
      (dotnet:new <type-str> value))
     ((cl:and (cl:not supplied-value) (cl:not supplied-z) (cl:not supplied-z2))
      (dotnet:new <type-str>))
@@ -672,7 +672,7 @@ CopyTo(Single[], Int32) -> Void
   (cl:cond
     ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Single[]")) supplied-index (cl:numberp index))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector3") obj!) "CopyTo" array index))
-    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Span`1[System.Single]")) (cl:not supplied-index))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Span`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-index))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector3") obj!) "CopyTo" array))
     ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Single[]")) (cl:not supplied-index))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector3") obj!) "CopyTo" array))
@@ -738,7 +738,7 @@ Create(Single, Single, Single) -> Vector3
      (dotnet:static <type-str> "Create" value z))
     ((cl:and (cl:numberp value) (cl:not supplied-z) (cl:not supplied-z2))
      (dotnet:static <type-str> "Create" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Single]")) (cl:not supplied-z) (cl:not supplied-z2))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-z) (cl:not supplied-z2))
      (dotnet:static <type-str> "Create" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR3"

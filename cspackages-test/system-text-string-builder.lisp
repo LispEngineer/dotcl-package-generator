@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Text.StringBuilder
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-text-string-builder)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Text.StringBuilder"))
 (cl:defconstant <type-str> "System.Text.StringBuilder")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (capacity2 cl:nil supplied-capacity2) (length cl:nil supplied-length) (capacity3 cl:nil supplied-capacity3))
   "Master wrapper for System.Text.StringBuilder constructor overloads. Dispatches at runtime.
@@ -257,9 +257,9 @@ Append(StringBuilder, Int32, Int32) -> StringBuilder
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value repeat-count))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-repeat-count (cl:numberp repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value repeat-count))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlyMemory`1[System.Char]")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlyMemory`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
@@ -395,13 +395,13 @@ AppendFormat(IFormatProvider, String, Object, Object, Object) -> StringBuilder
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1))
     ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Text.CompositeFormat")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Text.CompositeFormat")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1))
     ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"
@@ -500,13 +500,13 @@ AppendJoin(Char, String]) -> StringBuilder
     - values (System.ReadOnlySpan`1[System.String]): A span that contains the strings to concatenate and append to the current instance of the string builder.
 "
   (cl:cond
-    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[System.Object]")))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" separator values))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[System.String]")))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" separator values))
-    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[System.Object]")))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" separator values))
-    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[System.String]")))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" separator values))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"
@@ -624,7 +624,7 @@ CopyTo(Int32, Char[], Int32, Int32) -> Void
   (cl:cond
     ((cl:and (cl:numberp source-index) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Char[]")) (cl:numberp count) supplied-count2 (cl:numberp count2))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "CopyTo" source-index destination count count2))
-    ((cl:and (cl:numberp source-index) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[System.Char]")) (cl:numberp count) (cl:not supplied-count2))
+    ((cl:and (cl:numberp source-index) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:numberp count) (cl:not supplied-count2))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "CopyTo" source-index destination count))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"
@@ -658,7 +658,7 @@ Equals(Char]) -> Boolean
   (cl:cond
     ((cl:and (cl:or (cl:null sb) (dotnet:is-instance-of sb "System.Text.StringBuilder")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Equals" sb))
-    ((cl:and (cl:or (cl:null sb) (dotnet:is-instance-of sb "System.ReadOnlySpan`1[System.Char]")))
+    ((cl:and (cl:or (cl:null sb) (dotnet:is-instance-of sb "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Equals" sb))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"
@@ -816,7 +816,7 @@ Insert(Int32, Char[], Int32, Int32) -> StringBuilder
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value count char-count))
     ((cl:and (cl:numberp index) (cl:stringp value) supplied-count (cl:numberp count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value count))
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
@@ -919,13 +919,13 @@ Replace(Char, Char, Int32, Int32) -> StringBuilder
   (cl:cond
     ((cl:and (cl:stringp old-value) (cl:stringp new-value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value start-index count))
-    ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.ReadOnlySpan`1[System.Char]")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value start-index count))
     ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.Char")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.Char")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value start-index count))
     ((cl:and (cl:stringp old-value) (cl:stringp new-value) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value))
-    ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value))
     ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.Char")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.Char")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value))

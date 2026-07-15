@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2+ValueCollection
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-collections-generic-dictionary-2-value-collection)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2+ValueCollection"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2+ValueCollection")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun new (dictionary)
   "Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2.ValueCollection class that reflects the values in the specified System.Collections.Generic.Dictionary`2.

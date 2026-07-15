@@ -147,24 +147,72 @@
       (:split-with-plain (list base-name (concatenate 'string base-name "<>")))
       (t (list base-name)))))
 
-(defun format-param-type-check (param-type arg-str)
-  "Returns a Lisp type checking expression string for the given C# parameter
-   type. The fallback branch (any type but the numeric primitives, Boolean,
-   or String) uses dotnet:is-instance-of (DotCL >= 0.1.18, dotcl/dotcl#45) to
-   check ARG-STR is actually an instance of PARAM-TYPE specifically, rather
-   than merely 'is some wrapped .NET object at all' -- the latter can't
-   distinguish two overloads differing only by a non-primitive parameter type
-   (e.g. Song vs. SongCollection) at the same position; see
-   doc/bug-in-dispatching.md."
-  (cond
-    ((member param-type '("System.Double" "System.Single" "System.Int32" "System.Int64" "System.Int16" "System.Byte" "System.Decimal") :test #'string=)
-     (format nil "(cl:numberp ~A)" arg-str))
-    ((string= param-type "System.Boolean")
-     (format nil "(cl:typep ~A 'cl:boolean)" arg-str))
-    ((string= param-type "System.String")
-     (format nil "(cl:stringp ~A)" arg-str))
-    (t
-     (format nil "(cl:or (cl:null ~A) (dotnet:is-instance-of ~A ~S))" arg-str arg-str param-type))))
+(defun resolvable-type-name-for-check (p &optional (type-key :type) (nullable-key :nullable-underlying-type) (aq-key :assembly-qualified-type))
+  "Returns the type-name string a runtime type check/hint against parameter
+   (or return-value) plist P should actually resolve, preferring, in order:
+   NULLABLE-KEY (P's :nullable-underlying-type -- present only for a closed
+   Nullable<T>, whose own name is never a usable check target: a boxed
+   Nullable<T> with HasValue==true is never anything but a boxed T, so
+   Type.IsInstanceOfType against Nullable<T> itself can never be true, no
+   matter how its name resolves -- see
+   doc/bug-in-nullable-value-type-dispatch.md); then AQ-KEY (P's
+   :assembly-qualified-type -- present for any closed generic type, whose
+   plain friendly :type name can fail to resolve at all when a type argument
+   lives in a different assembly than the generic definition, e.g.
+   System.Nullable`1[Some.Other.Assembly.Foo]); then TYPE-KEY (P's plain
+   :type) as the final fallback. TYPE-KEY/NULLABLE-KEY/AQ-KEY are overridable
+   for the :return-type family (:nullable-underlying-return-type/
+   :assembly-qualified-return-type)."
+  (or (getf p nullable-key) (getf p aq-key) (getf p type-key)))
+
+(defparameter *numeric-primitive-check-types*
+  '("System.Double" "System.Single" "System.Int32" "System.Int64" "System.Int16" "System.Byte" "System.Decimal")
+  "Parameter type names format-param-type-check checks with a bare cl:numberp,
+   never wrapped in a (cl:or (cl:null ...) ...) unless the parameter is itself
+   a closed Nullable<T> -- an ordinary (non-nullable) System.Int32 etc. can
+   never actually be C# null at runtime, so no null-tolerance is needed for
+   it. Shared between format-param-type-check's branch dispatch and its
+   nullable-wrapping decision so the two can never disagree on which types
+   count as 'bare primitive.'")
+
+(defun format-param-type-check (p arg-str)
+  "Returns a Lisp type checking expression string for parameter plist P.
+   Unwraps a closed Nullable<T> to T first (resolvable-type-name-for-check),
+   since T -- never Nullable<T> itself -- is P's only possible non-null
+   runtime type; only then dispatches on that effective type name exactly as
+   before. The fallback branch (any effective type but the numeric
+   primitives, Boolean, or String) uses dotnet:is-instance-of (DotCL >=
+   0.1.18, dotcl/dotcl#45) to check ARG-STR is actually an instance of that
+   type specifically, rather than merely 'is some wrapped .NET object at
+   all' -- the latter can't distinguish two overloads differing only by a
+   non-primitive parameter type (e.g. Song vs. SongCollection) at the same
+   position; see doc/bug-in-dispatching.md and
+   doc/bug-in-nullable-value-type-dispatch.md -- and already null-tolerant
+   unconditionally, matching a reference type's own real C# nullability.
+   The three bare-primitive branches (numeric/Boolean/String), by contrast,
+   never null-guard by default, since an ordinary (non-nullable) primitive
+   parameter can never actually be C# null -- but when P was itself a closed
+   Nullable<T> (e.g. int?/bool?), the unwrapped EFFECTIVE-TYPE can land in
+   one of these branches while the argument genuinely can still be null
+   (HasValue == false), so that case gets the same null-tolerant wrapping the
+   fallback branch always has."
+  (let* ((nullable-p (and (getf p :nullable-underlying-type) t))
+         (effective-type (resolvable-type-name-for-check p))
+         (bare-check
+           (cond
+             ((member effective-type *numeric-primitive-check-types* :test #'string=)
+              (format nil "(cl:numberp ~A)" arg-str))
+             ((string= effective-type "System.Boolean")
+              (format nil "(cl:typep ~A 'cl:boolean)" arg-str))
+             ((string= effective-type "System.String")
+              (format nil "(cl:stringp ~A)" arg-str))
+             (t nil))))
+    (cond
+      ((and bare-check nullable-p)
+       (format nil "(cl:or (cl:null ~A) ~A)" arg-str bare-check))
+      (bare-check bare-check)
+      (t
+       (format nil "(cl:or (cl:null ~A) (dotnet:is-instance-of ~A ~S))" arg-str arg-str effective-type)))))
 
 (cl:defun complex-group-p (clean-methods)
   "Returns t if the group of clean methods requires a master wrapper dispatch (either multiple overloads or presence of a usable default argument)."
@@ -333,7 +381,7 @@
              for idx from 0 do
       (cl:let* ((lpname (map-param-name (cl:getf pp :name)))
                 (cm-p (cl:nth idx cm-params))
-                (type-check (format-param-type-check (cl:getf cm-p :type) lpname)))
+                (type-check (format-param-type-check cm-p lpname)))
         (cl:push type-check cond-parts)))
     ;; 2. Check optional positional parameters presence and types. When CM's
     ;;    own parameter at this slot has a usable default, this clause may
@@ -351,10 +399,10 @@
           ((cl:null cm-p)
            (cl:push (cl:format nil "(cl:not ~A)" supplied-var) cond-parts))
           ((usable-default-p cm-p)
-           (cl:push (cl:format nil "(cl:or (cl:not ~A) ~A)" supplied-var (format-param-type-check (cl:getf cm-p :type) op-name)) cond-parts))
+           (cl:push (cl:format nil "(cl:or (cl:not ~A) ~A)" supplied-var (format-param-type-check cm-p op-name)) cond-parts))
           (cl:t
            (cl:push supplied-var cond-parts)
-           (cl:push (format-param-type-check (cl:getf cm-p :type) op-name) cond-parts)))))
+           (cl:push (format-param-type-check cm-p op-name) cond-parts)))))
     ;; 3. Check keyword parameters presence and types. Same usable-default-p
     ;;    softening as (2) above, keyed to CM's own parameter, not the
     ;;    slot's arbitrarily-chosen representative KP.
@@ -367,10 +415,10 @@
           ((cl:null cm-p)
            (cl:push (cl:format nil "(cl:not ~A)" supplied-var) cond-parts))
           ((usable-default-p cm-p)
-           (cl:push (cl:format nil "(cl:or (cl:not ~A) ~A)" supplied-var (format-param-type-check (cl:getf cm-p :type) lpname)) cond-parts))
+           (cl:push (cl:format nil "(cl:or (cl:not ~A) ~A)" supplied-var (format-param-type-check cm-p lpname)) cond-parts))
           (cl:t
            (cl:push supplied-var cond-parts)
-           (cl:push (format-param-type-check (cl:getf cm-p :type) lpname) cond-parts)))))
+           (cl:push (format-param-type-check cm-p lpname) cond-parts)))))
     (cl:format nil "(cl:and ~{~A~^ ~})" (cl:nreverse cond-parts))))
 
 (cl:defun master-overload-param-names (cm prefix opt-params key-params)
@@ -623,13 +671,20 @@
             (docstring (build-docstring summary returns params m-doc))
             (escaped-docstring (escape-lisp-string docstring))
             (dotnet-method-name (cl:or (cl:getf m :mangled-name) (cl:getf m :name)))
-            ;; For static method params, add (the (dotnet "Type") arg) hints
+            ;; For static method params, add (the (dotnet "Type") arg) hints.
+            ;; Uses resolvable-type-name-for-check (not the bare :type) for the
+            ;; same reason format-param-type-check does: a closed Nullable<T>'s
+            ;; own name is never actually resolvable/meaningful as a type hint
+            ;; (a boxed Nullable<T> is always really a boxed T), and any other
+            ;; closed generic parameter type can likewise fail to resolve when
+            ;; a type argument lives in a different assembly than the generic
+            ;; definition -- see doc/bug-in-nullable-value-type-dispatch.md.
             (static-typed-args
               (cl:if static-p
                   (cl:mapcar (cl:lambda (pn pt)
                             (cl:format nil "(cl:the (dotnet \"~A\") ~A)" pt pn))
                           param-names
-                          (cl:mapcar (cl:lambda (p) (cl:getf p :type)) params))
+                          (cl:mapcar #'resolvable-type-name-for-check params))
                   nil)))
        
        (cl:format stream "(cl:defun ~A (~A)~%" (safe-symbol-token mname) args-str)

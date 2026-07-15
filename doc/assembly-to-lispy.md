@@ -187,6 +187,13 @@ Each type entry plist contains the following entries, by key:
     backtick notation for generic types).
   * `:assembly-qualified-type` (String or omitted): The full assembly-qualified name
     of the property type. Omitted unless the type is assembly-qualified.
+  * `:nullable-underlying-type` (String or omitted): Present only when the property
+    type is a closed `Nullable<T>`; the fully qualified name of `T` itself (using
+    simplified backtick notation). A boxed `Nullable<T>` with `HasValue == true` is
+    never anything but a boxed `T` -- `Nullable<T>` itself can never be a runtime
+    type -- so a consumer needing an actual instance-of check against this property's
+    value should use this key, not `:type`/`:assembly-qualified-type`, both of which
+    still name `Nullable<T>` itself. See `doc/bug-in-nullable-value-type-dispatch.md`.
   * `:readable` (Keyword `t` or omitted): Omitted if the property is not
     readable; otherwise `t`.
   * `:writeable` (Keyword `t` or omitted): Omitted if the property is not
@@ -211,6 +218,10 @@ Each type entry plist contains the following entries, by key:
     backtick notation for generic types).
   * `:assembly-qualified-type` (String or omitted): The full assembly-qualified name
     of the field type. Omitted unless the type is assembly-qualified.
+  * `:nullable-underlying-type` (String or omitted): Present only when the field type
+    is a closed `Nullable<T>`; the fully qualified name of `T` itself. See the
+    identical key on Property Plists above, and
+    `doc/bug-in-nullable-value-type-dispatch.md`.
   * `:static` (Keyword `t` or omitted): Omitted if the field is not static;
     otherwise `t`.
   * `:literal` (Keyword `t` or omitted): Omitted if the field is not a
@@ -254,6 +265,10 @@ Each type entry plist contains the following entries, by key:
     simplified backtick notation for generic types).
   * `:assembly-qualified-return-type` (String or omitted): The full assembly-qualified
     name of the return type. Omitted unless the type is assembly-qualified.
+  * `:nullable-underlying-return-type` (String or omitted): Present only when the
+    return type is a closed `Nullable<T>`; the fully qualified name of `T` itself.
+    See the identical key on Property Plists above, and
+    `doc/bug-in-nullable-value-type-dispatch.md`.
   * `:parameters` (List of Parameter Plists or omitted): An ordered list of plists
     for each parameter. If the method takes no parameters, this key is omitted.
   * `:documentation` (Documentation Plist or omitted): Omitted if no documentation is
@@ -286,6 +301,15 @@ Each parameter plist contains:
   backtick notation for generic types).
 * `:assembly-qualified-type` (String or omitted): The full assembly-qualified
   name of the parameter type. Omitted unless the type is assembly-qualified.
+* `:nullable-underlying-type` (String or omitted): Present only when the parameter
+  type is a closed `Nullable<T>` (C#'s `T?` for a value type `T`); the fully
+  qualified name of `T` itself (using simplified backtick notation). A boxed
+  `Nullable<T>` with `HasValue == true` is never anything but a boxed `T` --
+  `Nullable<T>` itself can never be a runtime type -- so `format-param-type-check`
+  (`apg-overload-dispatch.lisp`) checks a Master Wrapper dispatch guard's argument
+  against this key, not `:type`/`:assembly-qualified-type` (both of which still name
+  `Nullable<T>` itself), whenever it is present. See
+  `doc/bug-in-nullable-value-type-dispatch.md`.
 * `:extension-this` (Keyword `t` or omitted): Omitted if this is not the `this` parameter
   of an extension method; otherwise `t`.
 * `:out` (Keyword `t` or omitted): Omitted if the parameter is not an `out` parameter; otherwise `t`.

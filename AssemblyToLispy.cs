@@ -997,7 +997,14 @@ namespace PackageGenerator {
         }
 
         /// <summary>
-        ///   Formats a type field key-value pair, appending the assembly-qualified sibling if the type is programmatically assembly-qualified.
+        ///   Formats a type field key-value pair, appending the assembly-qualified sibling if
+        ///   the type is programmatically assembly-qualified, and a nullable-underlying-type
+        ///   sibling if the type is a closed <c>Nullable&lt;T&gt;</c>. The latter exists because
+        ///   a boxed <c>Nullable&lt;T&gt;</c> with <c>HasValue == true</c> is never anything but
+        ///   a boxed <c>T</c> -- <c>Nullable&lt;T&gt;</c> itself can never be a runtime type --
+        ///   so any consumer doing an actual instance-of check (dotcl-packagegen's
+        ///   <c>format-param-type-check</c>) needs T's own name, not Nullable&lt;T&gt;'s; see
+        ///   doc/bug-in-nullable-value-type-dispatch.md.
         /// </summary>
         /// <param name="key">The plist key (e.g. :type or :return-type).</param>
         /// <param name="type">The type to format.</param>
@@ -1010,6 +1017,13 @@ namespace PackageGenerator {
                 string aqKey = key == ":return-type" ? ":assembly-qualified-return-type" : ":assembly-qualified-type";
                 result += $" {aqKey} {EscapeLispString(type.AssemblyQualifiedName)}";
             }
+
+            Type? nullableUnderlyingType = Nullable.GetUnderlyingType(type);
+            if (nullableUnderlyingType != null) {
+                string nutKey = key == ":return-type" ? ":nullable-underlying-return-type" : ":nullable-underlying-type";
+                result += $" {nutKey} {EscapeLispString(GetFriendlyTypeName(nullableUnderlyingType))}";
+            }
+
             return result;
         }
 

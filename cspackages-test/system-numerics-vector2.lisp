@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector2
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-numerics-vector2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector2"))
 (cl:defconstant <type-str> "System.Numerics.Vector2")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun new (cl:&optional (value cl:nil supplied-value) (y cl:nil supplied-y))
   "Master wrapper for System.Numerics.Vector2 constructor overloads. Dispatches at runtime.
@@ -36,7 +36,7 @@ new(Single, Single)
      (dotnet:new <type-str> value y))
     ((cl:and supplied-value (cl:numberp value) (cl:not supplied-y))
      (dotnet:new <type-str> value))
-    ((cl:and supplied-value (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Single]")) (cl:not supplied-y))
+    ((cl:and supplied-value (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-y))
      (dotnet:new <type-str> value))
     ((cl:and (cl:not supplied-value) (cl:not supplied-y))
      (dotnet:new <type-str>))
@@ -630,7 +630,7 @@ CopyTo(Single[], Int32) -> Void
   (cl:cond
     ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Single[]")) supplied-index (cl:numberp index))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "CopyTo" array index))
-    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Span`1[System.Single]")) (cl:not supplied-index))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Span`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-index))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "CopyTo" array))
     ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Single[]")) (cl:not supplied-index))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "CopyTo" array))
@@ -684,7 +684,7 @@ Create(Single, Single) -> Vector2
   (cl:cond
     ((cl:and (cl:numberp value) supplied-y (cl:numberp y))
      (dotnet:static <type-str> "Create" value y))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Single]")) (cl:not supplied-y))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-y))
      (dotnet:static <type-str> "Create" value))
     ((cl:and (cl:numberp value) (cl:not supplied-y))
      (dotnet:static <type-str> "Create" value))

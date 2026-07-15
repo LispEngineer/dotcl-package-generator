@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Specialized.NameValueCollection
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-collections-specialized-name-value-collection)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Specialized.NameValueCollection"))
 (cl:defconstant <type-str> "System.Collections.Specialized.NameValueCollection")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun new (cl:&optional (col cl:nil supplied-col) (comparer cl:nil supplied-comparer) (comparer2 cl:nil supplied-comparer2))
   "Master wrapper for System.Collections.Specialized.NameValueCollection constructor overloads. Dispatches at runtime.

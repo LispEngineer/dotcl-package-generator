@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Console
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-console)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Console"))
 (cl:defconstant <type-str> "System.Console")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:define-symbol-macro caps-lock (dotnet:static <type-str> "CapsLock"))
 (cl:setf (cl:documentation (cl:quote caps-lock) (cl:quote cl:variable)) "Gets a value indicating whether the CAPS LOCK keyboard toggle is turned on or turned off.")
@@ -516,11 +516,11 @@ Write(String, Object, Object, Object) -> Void
      (dotnet:static <type-str> "Write" value arg0 arg1))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) supplied-arg0 (cl:numberp arg0) supplied-arg1 (cl:numberp arg1) (cl:not supplied-arg2))
      (dotnet:static <type-str> "Write" value arg0 arg1))
-    ((cl:and (cl:stringp value) supplied-arg0 (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg1) (cl:not supplied-arg2))
+    ((cl:and (cl:stringp value) supplied-arg0 (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg1) (cl:not supplied-arg2))
      (dotnet:static <type-str> "Write" value arg0))
     ((cl:and (cl:stringp value) supplied-arg0 (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) (cl:not supplied-arg1) (cl:not supplied-arg2))
      (dotnet:static <type-str> "Write" value arg0))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
      (dotnet:static <type-str> "Write" value))
     ((cl:and (cl:stringp value) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
      (dotnet:static <type-str> "Write" value))
@@ -668,11 +668,11 @@ WriteLine(String, Object, Object, Object) -> Void
      (dotnet:static <type-str> "WriteLine" value arg0 count))
     ((cl:and supplied-value (cl:stringp value) supplied-arg0 (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) supplied-count (cl:or (cl:null count) (dotnet:is-instance-of count "System.Object")) (cl:not supplied-arg2))
      (dotnet:static <type-str> "WriteLine" value arg0 count))
-    ((cl:and supplied-value (cl:stringp value) supplied-arg0 (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-count) (cl:not supplied-arg2))
+    ((cl:and supplied-value (cl:stringp value) supplied-arg0 (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-count) (cl:not supplied-arg2))
      (dotnet:static <type-str> "WriteLine" value arg0))
     ((cl:and supplied-value (cl:stringp value) supplied-arg0 (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) (cl:not supplied-count) (cl:not supplied-arg2))
      (dotnet:static <type-str> "WriteLine" value arg0))
-    ((cl:and supplied-value (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
+    ((cl:and supplied-value (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
      (dotnet:static <type-str> "WriteLine" value))
     ((cl:and supplied-value (cl:stringp value) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
      (dotnet:static <type-str> "WriteLine" value))

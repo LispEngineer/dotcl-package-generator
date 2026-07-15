@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Runtime.Serialization.ISerializable
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-runtime-serialization-i-serializable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Runtime.Serialization.ISerializable"))
 (cl:defconstant <type-str> "System.Runtime.Serialization.ISerializable")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun get-object-data (obj! info context)
   "Summary: Populates a System.Runtime.Serialization.SerializationInfo with the data needed to serialize the target object.

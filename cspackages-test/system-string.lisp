@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-string)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun new (value cl:&optional (count cl:nil supplied-count) (length cl:nil supplied-length) (enc cl:nil supplied-enc))
   "Master wrapper for System.String constructor overloads. Dispatches at runtime.
@@ -85,7 +85,7 @@ new(SByte*, Int32, Int32, Encoding)
      (dotnet:new <type-str> value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte*")) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
      (dotnet:new <type-str> value))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
      (dotnet:new <type-str> value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -395,27 +395,27 @@ Concat(Char], Char], Char], Char]) -> String
   (cl:cond
     ((cl:and (cl:stringp arg0) supplied-arg1 (cl:stringp arg1) supplied-arg2 (cl:stringp arg2) supplied-str3 (cl:stringp str3))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2 str3))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Char]")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Char]")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.ReadOnlySpan`1[System.Char]")) supplied-str3 (cl:or (cl:null str3) (dotnet:is-instance-of str3 "System.ReadOnlySpan`1[System.Char]")))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-str3 (cl:or (cl:null str3) (dotnet:is-instance-of str3 "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2 str3))
     ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.Object")) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2))
     ((cl:and (cl:stringp arg0) supplied-arg1 (cl:stringp arg1) supplied-arg2 (cl:stringp arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Char]")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Char]")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2))
     ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1))
     ((cl:and (cl:stringp arg0) supplied-arg1 (cl:stringp arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Char]")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1))
     ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Collections.Generic.IEnumerable`1[System.String]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Collections.Generic.IEnumerable`1[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.String]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -525,7 +525,7 @@ CopyTo(Int32, Char[], Int32, Int32) -> Void
   (cl:cond
     ((cl:and (cl:numberp destination) supplied-destination2 (cl:or (cl:null destination2) (dotnet:is-instance-of destination2 "System.Char[]")) supplied-destination-index (cl:numberp destination-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CopyTo" destination destination2 destination-index count))
-    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[System.Char]")) (cl:not supplied-destination2) (cl:not supplied-destination-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-destination2) (cl:not supplied-destination-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CopyTo" destination))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -752,13 +752,13 @@ Format(IFormatProvider, String, Object, Object, Object) -> String
      (dotnet:static <type-str> "Format" format arg0 arg1))
     ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Text.CompositeFormat")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Text.CompositeFormat")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1))
     ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -872,9 +872,9 @@ GetHashCode(Char], StringComparison) -> Int32
     - comparison-type (System.StringComparison): One of the enumeration values that specifies the rules to use in the comparison.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
      (dotnet:static <type-str> "GetHashCode" value comparison-type))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-comparison-type))
      (dotnet:static <type-str> "GetHashCode" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -1163,15 +1163,15 @@ Join(String, String[], Int32, Int32) -> String
      (dotnet:static <type-str> "Join" separator value start-index count))
     ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.String[]")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:static <type-str> "Join" separator value start-index count))
-    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.String]")) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.String]")) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Collections.Generic.IEnumerable`1[System.String]")) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Collections.Generic.IEnumerable`1[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -1641,7 +1641,7 @@ Split(String[], Int32, StringSplitOptions) -> String[]
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options (cl:if supplied-options2 options2 (dotnet:enum-or "System.StringSplitOptions" "None"))))
     ((cl:and (cl:stringp separator) supplied-options (cl:numberp options) (cl:or (cl:not supplied-options2) (cl:or (cl:null options2) (dotnet:is-instance-of options2 "System.StringSplitOptions"))))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options (cl:if supplied-options2 options2 (dotnet:enum-or "System.StringSplitOptions" "None"))))
-    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-options) (cl:not supplied-options2))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-options) (cl:not supplied-options2))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator))
     ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:is-instance-of options "System.StringSplitOptions"))) (cl:not supplied-options2))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator (cl:if supplied-options options (dotnet:enum-or "System.StringSplitOptions" "None"))))
@@ -1857,7 +1857,7 @@ Trim(Char]) -> String
   (cl:cond
     ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.Char")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Trim" trim-char))
-    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.ReadOnlySpan`1[System.Char]")))
+    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Trim" trim-char))
     ((cl:and (cl:not supplied-trim-char))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Trim"))
@@ -1890,7 +1890,7 @@ TrimEnd(Char]) -> String
   (cl:cond
     ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.Char")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimEnd" trim-char))
-    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.ReadOnlySpan`1[System.Char]")))
+    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimEnd" trim-char))
     ((cl:and (cl:not supplied-trim-char))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimEnd"))
@@ -1923,7 +1923,7 @@ TrimStart(Char]) -> String
   (cl:cond
     ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.Char")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimStart" trim-char))
-    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.ReadOnlySpan`1[System.Char]")))
+    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimStart" trim-char))
     ((cl:and (cl:not supplied-trim-char))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimStart"))

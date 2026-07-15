@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-time-span)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun new (cl:&optional (ticks cl:nil supplied-ticks) (minutes cl:nil supplied-minutes) (seconds cl:nil supplied-seconds) (seconds2 cl:nil supplied-seconds2) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
   "Master wrapper for System.TimeSpan constructor overloads. Dispatches at runtime.
@@ -885,7 +885,7 @@ Parse(Char], IFormatProvider = null) -> TimeSpan
      (dotnet:static <type-str> "Parse" s format-provider))
     ((cl:and (cl:stringp s) (cl:not supplied-format-provider))
      (dotnet:static <type-str> "Parse" s))
-    ((cl:and (cl:or (cl:null s) (dotnet:is-instance-of s "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:not supplied-format-provider) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider"))))
+    ((cl:and (cl:or (cl:null s) (dotnet:is-instance-of s "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:not supplied-format-provider) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider"))))
      (dotnet:static <type-str> "Parse" s (cl:if supplied-format-provider format-provider cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
@@ -957,9 +957,9 @@ ParseExact(Char], String[], IFormatProvider, TimeSpanStyles = None) -> TimeSpan
      (dotnet:static <type-str> "ParseExact" input format format-provider))
     ((cl:and (cl:stringp input) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:not supplied-styles))
      (dotnet:static <type-str> "ParseExact" input format format-provider))
-    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles"))))
+    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles"))))
      (dotnet:static <type-str> "ParseExact" input format format-provider (cl:if supplied-styles styles (dotnet:enum-or "System.Globalization.TimeSpanStyles" "None"))))
-    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles"))))
+    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles"))))
      (dotnet:static <type-str> "ParseExact" input format format-provider (cl:if supplied-styles styles (dotnet:enum-or "System.Globalization.TimeSpanStyles" "None"))))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"

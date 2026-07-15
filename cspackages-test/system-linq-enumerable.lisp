@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-linq-enumerable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun aggregate-arity-1 (type source func)
   "Summary: Applies an accumulator function over a sequence.
@@ -208,25 +208,25 @@ Average(Decimal]]) -> Decimal]
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to calculate the average of.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int32]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int64]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Single]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Double]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Double, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Decimal]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Decimal, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int32]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int64]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Single]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Double]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Double, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Decimal, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Average" source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1208,25 +1208,25 @@ Max(Decimal]]) -> Decimal]
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to determine the maximum value of.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int32]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int64]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int32]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int64]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Double]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Double, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Double]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Double, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Single]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Single]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Decimal]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Decimal, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Decimal, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Max" source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1471,25 +1471,25 @@ Min(Decimal]]) -> Decimal]
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to determine the minimum value of.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int32]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int64]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int32]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int64]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Single]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Single]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Double]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Double, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Double]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Double, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Decimal]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Decimal, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Decimal, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Min" source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2208,25 +2208,25 @@ Sum(Decimal]]) -> Decimal]
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to calculate the sum of.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int32]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int64]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Single]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Double]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Double, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Decimal]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Decimal, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int32]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int64]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Int64, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Single]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Single, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Double]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Double, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]")))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[[System.Nullable`1[[System.Decimal, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
      (dotnet:static <type-str> "Sum" source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"

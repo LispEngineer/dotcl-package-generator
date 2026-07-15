@@ -1,6 +1,16 @@
 # Bug: Master overload dispatch's non-primitive type check is unusable for
 # `Nullable<T>` (`T?`) parameters — regression surfaced by Version 49's fix
 
+**Status: fixed in Generator Version 50.** See
+`doc/generator-design-notes.md`'s "Fixing `Nullable<T>` (and Other
+Closed-Generic) Type-Check Guards (Version 50)" section for the fix actually
+applied (a new `:nullable-underlying-type`/`:nullable-underlying-return-type`
+metadata key, consumed by `format-param-type-check` via a new
+`resolvable-type-name-for-check` helper) — generalized beyond this doc's own
+`Rectangle?` repro to cover nullable *primitives* too (`int?`, `bool?`,
+etc.), which turned out to be broken the same way. The rest of this document
+is kept as the original bug report/analysis for historical reference.
+
 ## Context
 
 This is a follow-on from `doc/bug-in-dispatching.md` ("Master overload

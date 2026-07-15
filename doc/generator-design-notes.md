@@ -2973,3 +2973,98 @@ and that the fallback guard now includes `dotnet:is-instance-of`. Regenerating
 a defaulted trailing parameter (dispatch order and/or non-primitive guards) — reviewed for
 sanity, not just presence, since this touches a large fraction of already-shipped generated
 code.
+
+## Fixing `Nullable<T>` (and Other Closed-Generic) Type-Check Guards (Version 50)
+
+Version 49's `dotnet:is-instance-of` guard fix was itself a regression source for
+`Nullable<T>` (C#'s `T?`) parameters — `doc/bug-in-nullable-value-type-dispatch.md`
+documents a real downstream failure (`dotcl-dungeonslime`'s generated `sprite-batch:draw`
+wrapper throwing `DOTNET: type not found: System.Nullable\`1[Microsoft.Xna.Framework.Rectangle]`
+every frame when actually passed a non-null `Rectangle? sourceRectangle` — the common,
+correct-usage case, not an edge case). Two compounding root causes:
+
+1. **The closed generic type string isn't independently resolvable.** .NET's
+   `Type.GetType` (what `dotnet:resolve-type`/`dotnet:is-instance-of` resolve through)
+   requires a closed generic type's argument(s) to be assembly-qualified whenever the
+   argument's assembly differs from the generic definition's own — `System.Nullable\`1`
+   lives in `System.Private.CoreLib`, but e.g. `Microsoft.Xna.Framework.Rectangle` lives in
+   `MonoGame.Framework`. This is standard, documented .NET reflection behavior, not a DotCL
+   bug.
+2. **Even resolved, it's the wrong type to check regardless.** A boxed `Nullable<T>` with
+   `HasValue == true` is never anything but a boxed `T` — `Nullable<T>` itself can never be
+   a real runtime type. `Type.IsInstanceOfType`/`dotnet:is-instance-of` against
+   `Nullable<T>` can therefore never return true for any actual argument, however its name
+   resolves.
+
+This generalizes well beyond the doc's literal `Rectangle?` repro: it affects **every**
+`Nullable<T>` parameter, including nullable *primitives* (`int?`, `bool?`, etc.), whose
+`:type` (`"System.Nullable\`1[System.Int32]"`) never string-matches
+`format-param-type-check`'s existing bare-primitive list either — so a nullable primitive
+silently fell into the same broken non-primitive fallback as `Rectangle?` did, even though
+its closed generic string happens to *resolve* (both `Nullable\`1` and `Int32` live in
+`System.Private.CoreLib`).
+
+### Metadata: `:nullable-underlying-type` / `:nullable-underlying-return-type`
+
+`AssemblyToLispy.cs`'s `FormatTypeField` (used for every `:type`/`:return-type` emission —
+parameters, properties, fields, events, and method return types alike) now also emits a
+`:nullable-underlying-type` (or `:nullable-underlying-return-type` for the `:return-type`
+family) sibling key, populated only when the type is a closed `Nullable<T>`
+(`Nullable.GetUnderlyingType(type) != null`), holding `T`'s own friendly name — reusing the
+identical `Nullable.GetUnderlyingType` pattern Version 48's `FormatDefaultValueWithKind`
+already established a few lines away. This sits alongside the pre-existing
+`:assembly-qualified-type`/`:assembly-qualified-return-type` (already correctly populated
+for `Nullable<T>` today, since `IsAssemblyQualified`'s definition — any closed generic —
+already covers it; insufficient alone, per root cause 2 above, but still useful as the
+general fallback preference described below). `doc/assembly-to-lispy.md`'s Parameter/
+Property/Field/Method/Event plist sections, and `tests/framework.lisp`'s schema
+validators, were updated for the new key(s).
+
+### Lisp: unwrap before dispatching, not just in the fallback branch
+
+New `resolvable-type-name-for-check` (`apg-overload-dispatch.lisp`) centralizes the 3-way
+preference a runtime type check/hint should resolve: `:nullable-underlying-type` (or
+`-return-type`), then `:assembly-qualified-type` (or `-return-type` — addressing the
+original Version 49 doc's own observation that *any* cross-assembly closed generic, not
+just `Nullable<T>`, could hit the same unresolvable-`:type` problem in the general
+fallback branch), then plain `:type` as the final fallback.
+
+`format-param-type-check` now calls this helper to compute an *effective type* **before**
+its primitive/`Boolean`/`String`/fallback dispatch — not only inside the fallback branch —
+so a nullable primitive (`int?`) correctly lands in the `cl:numberp` branch instead of the
+non-primitive `dotnet:is-instance-of` fallback. Doing this introduced one subtlety a purely
+mechanical unwrap would have missed: an ordinary, genuinely non-nullable `System.Int32`
+parameter can never be C# `null`, so its bare `(cl:numberp arg)` check has never needed
+null-tolerance — but once `int?` is unwrapped to the same `"System.Int32"` effective type,
+the argument legitimately *can* still be `nil` (`HasValue == false`). The three
+bare-primitive branches (numeric/`Boolean`/`String`) now check whether the *original*
+parameter was itself a closed `Nullable<T>` (`:nullable-underlying-type` present) and, only
+then, wrap with the same `(cl:or (cl:null arg) ...)` the fallback branch already had
+unconditionally (harmless/redundant there for an ordinary already-nullable reference type,
+required and previously missing for a nullable primitive). New
+`*numeric-primitive-check-types*` factors the shared primitive-type list out of what were
+two separate `member` tests, so the branch-dispatch and the null-wrapping decision can never
+disagree on what counts as "bare primitive."
+
+The same `resolvable-type-name-for-check` preference also replaced `generate-single-
+overload`'s `static-typed-args` construction's bare `:type` read — an independent site
+found while auditing for other instances of this bug class, with the same root-cause-1
+exposure: a single, non-overloaded *static* method's `(cl:the (dotnet "...") ...)` type
+hint, built directly from a parameter's raw `:type`, can hit the identical "type not found"
+failure for any cross-assembly closed generic parameter (`Nullable<T>` included), independent
+of the Master Wrapper entirely. No other latent instances of this bug class were found:
+ordinary arrays of non-generic types are not "assembly-qualified" by `IsAssemblyQualified`'s
+own definition and don't need to be (a bare `"Foo.Bar[]"` resolves fine once the declaring
+assembly is loaded), and `:superclass`/`:interfaces` feed no runtime type-check at all, only
+re-export/ancestor-resolution logic.
+
+### Verification
+
+`make check-parens` on `apg-overload-dispatch.lisp`, then `make build test` — the full
+Lisp + C# suite, plus two new fixtures in `AssemblyToLispyTestTarget/EdgeCases.cs`
+(`NullableStructParamMethod`, a nullable non-primitive struct parameter; `NullableInt
+ParamMethod`, a nullable primitive) each with a usable-default trailing parameter so they
+reach the Master Wrapper dispatch path at all, plus mock-plist-based assertions in
+`package-generator-tests-overload-classification.lisp` confirming the generated guard
+checks `dotnet:is-instance-of` against the underlying struct type (never a `Nullable\`1[...]`
+string), and that the nullable-int case emits a null-tolerant `cl:numberp` check instead.

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Type
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-type)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Type"))
 (cl:defconstant <type-str> "System.Type")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.Type class.
@@ -1201,13 +1201,13 @@ GetType(String, Assembly], Type], Boolean, Boolean) -> Type
     - ignore-case (System.Boolean): to perform a case-insensitive search for typeName, to perform a case-sensitive search for typeName.
 "
   (cl:cond
-    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:is-instance-of throw-on-error "System.Func`2[System.Reflection.AssemblyName, System.Reflection.Assembly]")) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Func`4[System.Reflection.Assembly, System.String, System.Boolean, System.Type]")) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean) supplied-ignore-case2 (cl:typep ignore-case2 'cl:boolean))
+    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:is-instance-of throw-on-error "System.Func`2[[System.Reflection.AssemblyName, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Reflection.Assembly, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Func`4[[System.Reflection.Assembly, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Boolean, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Type, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean) supplied-ignore-case2 (cl:typep ignore-case2 'cl:boolean))
      (dotnet:static <type-str> "GetType" type-name throw-on-error ignore-case throw-on-error2 ignore-case2))
-    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:is-instance-of throw-on-error "System.Func`2[System.Reflection.AssemblyName, System.Reflection.Assembly]")) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Func`4[System.Reflection.Assembly, System.String, System.Boolean, System.Type]")) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean) (cl:not supplied-ignore-case2))
+    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:is-instance-of throw-on-error "System.Func`2[[System.Reflection.AssemblyName, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Reflection.Assembly, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Func`4[[System.Reflection.Assembly, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Boolean, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Type, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean) (cl:not supplied-ignore-case2))
      (dotnet:static <type-str> "GetType" type-name throw-on-error ignore-case throw-on-error2))
     ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:typep throw-on-error 'cl:boolean) supplied-ignore-case (cl:typep ignore-case 'cl:boolean) (cl:not supplied-throw-on-error2) (cl:not supplied-ignore-case2))
      (dotnet:static <type-str> "GetType" type-name throw-on-error ignore-case))
-    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:is-instance-of throw-on-error "System.Func`2[System.Reflection.AssemblyName, System.Reflection.Assembly]")) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Func`4[System.Reflection.Assembly, System.String, System.Boolean, System.Type]")) (cl:not supplied-throw-on-error2) (cl:not supplied-ignore-case2))
+    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:is-instance-of throw-on-error "System.Func`2[[System.Reflection.AssemblyName, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Reflection.Assembly, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Func`4[[System.Reflection.Assembly, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Boolean, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Type, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-throw-on-error2) (cl:not supplied-ignore-case2))
      (dotnet:static <type-str> "GetType" type-name throw-on-error ignore-case))
     ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:typep throw-on-error 'cl:boolean) (cl:not supplied-ignore-case) (cl:not supplied-throw-on-error2) (cl:not supplied-ignore-case2))
      (dotnet:static <type-str> "GetType" type-name throw-on-error))

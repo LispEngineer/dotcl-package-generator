@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.StreamReader
-;;; Generator Version: 49
-;;; Creation Date: 2026-07-15T02:38:57Z
+;;; Generator Version: 50
+;;; Creation Date: 2026-07-15T12:15:32Z
 
 (cl:in-package :system-io-stream-reader)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.StreamReader"))
 (cl:defconstant <type-str> "System.IO.StreamReader")
-(cl:defconstant <creation> "2026-07-15T02:38:57Z")
-(cl:defconstant <version> 49)
+(cl:defconstant <creation> "2026-07-15T12:15:32Z")
+(cl:defconstant <version> 50)
 
 (cl:defun new (stream cl:&optional (detect-encoding-from-byte-order-marks cl:nil supplied-detect-encoding-from-byte-order-marks) (detect-encoding-from-byte-order-marks2 cl:nil supplied-detect-encoding-from-byte-order-marks2) (buffer-size cl:nil supplied-buffer-size) cl:&key (leave-open cl:nil supplied-leave-open))
   "Master wrapper for System.IO.StreamReader constructor overloads. Dispatches at runtime.
@@ -195,7 +195,7 @@ Read(Char[], Int32, Int32) -> Int32
   (cl:cond
     ((cl:and supplied-buffer (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Char[]")) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "Read" buffer index count))
-    ((cl:and supplied-buffer (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[System.Char]")) (cl:not supplied-index) (cl:not supplied-count))
+    ((cl:and supplied-buffer (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "Read" buffer))
     ((cl:and (cl:not supplied-buffer) (cl:not supplied-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "Read"))
@@ -226,7 +226,7 @@ ReadAsync(Char[], Int32, Int32) -> Int32]
   (cl:cond
     ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Char[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[System.Char]")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM-READER"
@@ -254,7 +254,7 @@ ReadBlock(Char[], Int32, Int32) -> Int32
   (cl:cond
     ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Char[]")) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadBlock" buffer index count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[System.Char]")) (cl:not supplied-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadBlock" buffer))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM-READER"
@@ -283,7 +283,7 @@ ReadBlockAsync(Char[], Int32, Int32) -> Int32]
   (cl:cond
     ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Char[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadBlockAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[System.Char]")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.StreamReader") obj!) "ReadBlockAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM-READER"
