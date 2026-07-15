@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-time-zone-info)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeZoneInfo"))
 (cl:defconstant <type-str> "System.TimeZoneInfo")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:define-symbol-macro local (dotnet:static <type-str> "Local"))
 (cl:setf (cl:documentation (cl:quote local) (cl:quote cl:variable)) "Gets a System.TimeZoneInfo object that represents the local time zone.")
@@ -75,11 +75,11 @@ ConvertTime(DateTime, TimeZoneInfo, TimeZoneInfo) -> DateTime
     - destination-time-zone (System.TimeZoneInfo): The time zone to convert dateTime to.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)) (cl:or (cl:null destination-time-zone) (dotnet:object-type destination-time-zone)) supplied-destination-time-zone2 (cl:or (cl:null destination-time-zone2) (dotnet:object-type destination-time-zone2)))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTime")) (cl:or (cl:null destination-time-zone) (dotnet:is-instance-of destination-time-zone "System.TimeZoneInfo")) supplied-destination-time-zone2 (cl:or (cl:null destination-time-zone2) (dotnet:is-instance-of destination-time-zone2 "System.TimeZoneInfo")))
      (dotnet:static <type-str> "ConvertTime" date-time-offset destination-time-zone destination-time-zone2))
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)) (cl:or (cl:null destination-time-zone) (dotnet:object-type destination-time-zone)) (cl:not supplied-destination-time-zone2))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTime")) (cl:or (cl:null destination-time-zone) (dotnet:is-instance-of destination-time-zone "System.TimeZoneInfo")) (cl:not supplied-destination-time-zone2))
      (dotnet:static <type-str> "ConvertTime" date-time-offset destination-time-zone))
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)) (cl:or (cl:null destination-time-zone) (dotnet:object-type destination-time-zone)) (cl:not supplied-destination-time-zone2))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTimeOffset")) (cl:or (cl:null destination-time-zone) (dotnet:is-instance-of destination-time-zone "System.TimeZoneInfo")) (cl:not supplied-destination-time-zone2))
      (dotnet:static <type-str> "ConvertTime" date-time-offset destination-time-zone))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
@@ -113,11 +113,11 @@ ConvertTimeBySystemTimeZoneId(DateTime, String, String) -> DateTime
     - destination-time-zone-id (System.String): The identifier of the destination time zone.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)) (cl:stringp destination-time-zone-id) supplied-destination-time-zone-id2 (cl:stringp destination-time-zone-id2))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTime")) (cl:stringp destination-time-zone-id) supplied-destination-time-zone-id2 (cl:stringp destination-time-zone-id2))
      (dotnet:static <type-str> "ConvertTimeBySystemTimeZoneId" date-time-offset destination-time-zone-id destination-time-zone-id2))
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)) (cl:stringp destination-time-zone-id) (cl:not supplied-destination-time-zone-id2))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTime")) (cl:stringp destination-time-zone-id) (cl:not supplied-destination-time-zone-id2))
      (dotnet:static <type-str> "ConvertTimeBySystemTimeZoneId" date-time-offset destination-time-zone-id))
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)) (cl:stringp destination-time-zone-id) (cl:not supplied-destination-time-zone-id2))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTimeOffset")) (cl:stringp destination-time-zone-id) (cl:not supplied-destination-time-zone-id2))
      (dotnet:static <type-str> "ConvertTimeBySystemTimeZoneId" date-time-offset destination-time-zone-id))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
@@ -151,9 +151,9 @@ ConvertTimeToUtc(DateTime, TimeZoneInfo) -> DateTime
     - source-time-zone (System.TimeZoneInfo): The time zone of dateTime.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null date-time) (dotnet:object-type date-time)) supplied-source-time-zone (cl:or (cl:null source-time-zone) (dotnet:object-type source-time-zone)))
+    ((cl:and (cl:or (cl:null date-time) (dotnet:is-instance-of date-time "System.DateTime")) supplied-source-time-zone (cl:or (cl:null source-time-zone) (dotnet:is-instance-of source-time-zone "System.TimeZoneInfo")))
      (dotnet:static <type-str> "ConvertTimeToUtc" date-time source-time-zone))
-    ((cl:and (cl:or (cl:null date-time) (dotnet:object-type date-time)) (cl:not supplied-source-time-zone))
+    ((cl:and (cl:or (cl:null date-time) (dotnet:is-instance-of date-time "System.DateTime")) (cl:not supplied-source-time-zone))
      (dotnet:static <type-str> "ConvertTimeToUtc" date-time))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
@@ -197,11 +197,11 @@ CreateCustomTimeZone(String, TimeSpan, String, String, String, TimeZoneInfo+Adju
     - disable-daylight-saving-time (System.Boolean): to discard any daylight saving time-related information present in adjustmentRules with the new object; otherwise, .
 "
   (cl:cond
-    ((cl:and (cl:stringp id) (cl:or (cl:null base-utc-offset) (dotnet:object-type base-utc-offset)) (cl:stringp display-name) (cl:stringp standard-display-name) supplied-daylight-display-name (cl:stringp daylight-display-name) supplied-adjustment-rules (cl:or (cl:null adjustment-rules) (dotnet:object-type adjustment-rules)) supplied-disable-daylight-saving-time (cl:typep disable-daylight-saving-time 'cl:boolean))
+    ((cl:and (cl:stringp id) (cl:or (cl:null base-utc-offset) (dotnet:is-instance-of base-utc-offset "System.TimeSpan")) (cl:stringp display-name) (cl:stringp standard-display-name) supplied-daylight-display-name (cl:stringp daylight-display-name) supplied-adjustment-rules (cl:or (cl:null adjustment-rules) (dotnet:is-instance-of adjustment-rules "System.TimeZoneInfo+AdjustmentRule[]")) supplied-disable-daylight-saving-time (cl:typep disable-daylight-saving-time 'cl:boolean))
      (dotnet:static <type-str> "CreateCustomTimeZone" id base-utc-offset display-name standard-display-name daylight-display-name adjustment-rules disable-daylight-saving-time))
-    ((cl:and (cl:stringp id) (cl:or (cl:null base-utc-offset) (dotnet:object-type base-utc-offset)) (cl:stringp display-name) (cl:stringp standard-display-name) supplied-daylight-display-name (cl:stringp daylight-display-name) supplied-adjustment-rules (cl:or (cl:null adjustment-rules) (dotnet:object-type adjustment-rules)) (cl:not supplied-disable-daylight-saving-time))
+    ((cl:and (cl:stringp id) (cl:or (cl:null base-utc-offset) (dotnet:is-instance-of base-utc-offset "System.TimeSpan")) (cl:stringp display-name) (cl:stringp standard-display-name) supplied-daylight-display-name (cl:stringp daylight-display-name) supplied-adjustment-rules (cl:or (cl:null adjustment-rules) (dotnet:is-instance-of adjustment-rules "System.TimeZoneInfo+AdjustmentRule[]")) (cl:not supplied-disable-daylight-saving-time))
      (dotnet:static <type-str> "CreateCustomTimeZone" id base-utc-offset display-name standard-display-name daylight-display-name adjustment-rules))
-    ((cl:and (cl:stringp id) (cl:or (cl:null base-utc-offset) (dotnet:object-type base-utc-offset)) (cl:stringp display-name) (cl:stringp standard-display-name) (cl:not supplied-daylight-display-name) (cl:not supplied-adjustment-rules) (cl:not supplied-disable-daylight-saving-time))
+    ((cl:and (cl:stringp id) (cl:or (cl:null base-utc-offset) (dotnet:is-instance-of base-utc-offset "System.TimeSpan")) (cl:stringp display-name) (cl:stringp standard-display-name) (cl:not supplied-daylight-display-name) (cl:not supplied-adjustment-rules) (cl:not supplied-disable-daylight-saving-time))
      (dotnet:static <type-str> "CreateCustomTimeZone" id base-utc-offset display-name standard-display-name))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
@@ -225,9 +225,9 @@ Equals(Object) -> Boolean
     - obj (System.Object): A second object to compare with the current object.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null other) (dotnet:object-type other)))
+    ((cl:and (cl:or (cl:null other) (dotnet:is-instance-of other "System.TimeZoneInfo")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "Equals" other))
-    ((cl:and (cl:or (cl:null other) (dotnet:object-type other)))
+    ((cl:and (cl:or (cl:null other) (dotnet:is-instance-of other "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "Equals" other))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
@@ -273,9 +273,9 @@ GetAmbiguousTimeOffsets(DateTime) -> TimeSpan[]
     - date-time (System.DateTime): A date and time.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTimeOffset")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetAmbiguousTimeOffsets" date-time-offset))
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTime")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetAmbiguousTimeOffsets" date-time-offset))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
@@ -328,9 +328,9 @@ GetUtcOffset(DateTime) -> TimeSpan
     - date-time (System.DateTime): The date and time to determine the offset for.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTimeOffset")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetUtcOffset" date-time-offset))
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTime")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "GetUtcOffset" date-time-offset))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
@@ -362,9 +362,9 @@ IsAmbiguousTime(DateTime) -> Boolean
     - date-time (System.DateTime): A date and time value.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTimeOffset")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "IsAmbiguousTime" date-time-offset))
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTime")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "IsAmbiguousTime" date-time-offset))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"
@@ -388,9 +388,9 @@ IsDaylightSavingTime(DateTime) -> Boolean
     - date-time (System.DateTime): A date and time value.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTimeOffset")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "IsDaylightSavingTime" date-time-offset))
-    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:object-type date-time-offset)))
+    ((cl:and (cl:or (cl:null date-time-offset) (dotnet:is-instance-of date-time-offset "System.DateTime")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "IsDaylightSavingTime" date-time-offset))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO"

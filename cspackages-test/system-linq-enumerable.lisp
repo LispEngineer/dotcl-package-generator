@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-linq-enumerable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun aggregate-arity-1 (type source func)
   "Summary: Applies an accumulator function over a sequence.
@@ -81,9 +81,9 @@ AggregateBy(IEnumerable, Func, Func, Func, IEqualityComparer = null) -> KeyValue
     - key-comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null seed) (dotnet:object-type seed)) (cl:or (cl:null func) (dotnet:object-type func)) (cl:or (cl:not supplied-key-comparer) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer))))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null seed) (dotnet:is-instance-of seed "TAccumulate")) (cl:or (cl:null func) (dotnet:is-instance-of func "System.Func`3[TAccumulate, TSource, TAccumulate]")) (cl:or (cl:not supplied-key-comparer) (cl:or (cl:null key-comparer) (dotnet:is-instance-of key-comparer "System.Collections.Generic.IEqualityComparer`1[TKey]"))))
      (dotnet:static-generic <type-str> "AggregateBy" (cl:list type-1 type-2 type-3) source key-selector seed func (cl:if supplied-key-comparer key-comparer cl:nil)))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null seed) (dotnet:object-type seed)) (cl:or (cl:null func) (dotnet:object-type func)) (cl:or (cl:not supplied-key-comparer) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer))))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null seed) (dotnet:is-instance-of seed "System.Func`2[TKey, TAccumulate]")) (cl:or (cl:null func) (dotnet:is-instance-of func "System.Func`3[TAccumulate, TSource, TAccumulate]")) (cl:or (cl:not supplied-key-comparer) (cl:or (cl:null key-comparer) (dotnet:is-instance-of key-comparer "System.Collections.Generic.IEqualityComparer`1[TKey]"))))
      (dotnet:static-generic <type-str> "AggregateBy" (cl:list type-1 type-2 type-3) source key-selector seed func (cl:if supplied-key-comparer key-comparer cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -117,9 +117,9 @@ Any(IEnumerable, Boolean]) -> Boolean
     - predicate (System.Func`2[TSource, System.Boolean]): A function to test each element for a condition.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-predicate (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`2[TSource, System.Boolean]")))
      (dotnet:static-generic <type-str> "Any" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "Any" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -208,25 +208,25 @@ Average(Decimal]]) -> Decimal]
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to calculate the average of.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int32]")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int64]")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Single]")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Double]")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Decimal]")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int32]]")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int64]]")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Single]]")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Double]]")))
      (dotnet:static <type-str> "Average" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]")))
      (dotnet:static <type-str> "Average" source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -308,25 +308,25 @@ Average(IEnumerable, Decimal]]) -> Decimal]
     - selector (System.Func`2[TSource, System.Nullable`1[System.Decimal]]): A transform function to apply to each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Int32]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Int64]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Single]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Double]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Decimal]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Int32]]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Int64]]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Single]]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Double]]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Decimal]]")))
      (dotnet:static-generic <type-str> "Average" (cl:list type) source selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -396,9 +396,9 @@ Contains(IEnumerable, TSource, IEqualityComparer) -> Boolean
     - comparer (System.Collections.Generic.IEqualityComparer`1[TSource]): An equality comparer to compare values.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null value) (dotnet:is-instance-of value "TSource")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TSource]")))
      (dotnet:static-generic <type-str> "Contains" (cl:list type) source value comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null value) (dotnet:is-instance-of value "TSource")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Contains" (cl:list type) source value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -423,9 +423,9 @@ Count(IEnumerable, Boolean]) -> Int32
     - predicate (System.Func`2[TSource, System.Boolean]): A function to test each element for a condition.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-predicate (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`2[TSource, System.Boolean]")))
      (dotnet:static-generic <type-str> "Count" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "Count" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -445,7 +445,7 @@ CountBy(IEnumerable, Func, IEqualityComparer = null) -> Int32]]
     - key-comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:not supplied-key-comparer) (cl:or (cl:null key-comparer) (dotnet:object-type key-comparer))))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:not supplied-key-comparer) (cl:or (cl:null key-comparer) (dotnet:is-instance-of key-comparer "System.Collections.Generic.IEqualityComparer`1[TKey]"))))
      (dotnet:static-generic <type-str> "CountBy" (cl:list type-1 type-2) source key-selector (cl:if supplied-key-comparer key-comparer cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -470,9 +470,9 @@ DefaultIfEmpty(IEnumerable, TSource) -> IEnumerable
     - default-value (TSource): The value to return if the sequence is empty.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "TSource")))
      (dotnet:static-generic <type-str> "DefaultIfEmpty" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-default-value))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-default-value))
      (dotnet:static-generic <type-str> "DefaultIfEmpty" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -497,9 +497,9 @@ Distinct(IEnumerable, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TSource]): An System.Collections.Generic.IEqualityComparer`1 to compare values.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TSource]")))
      (dotnet:static-generic <type-str> "Distinct" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Distinct" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -526,9 +526,9 @@ DistinctBy(IEnumerable, Func, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "DistinctBy" (cl:list type-1 type-2) source key-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "DistinctBy" (cl:list type-1 type-2) source key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -554,9 +554,9 @@ ElementAt(IEnumerable, Index) -> TSource
     - index (System.Index): The index of the element to retrieve, which is either from the beginning or the end of the sequence.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:numberp index))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:numberp index))
      (dotnet:static-generic <type-str> "ElementAt" (cl:list type) source index))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null index) (dotnet:object-type index)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null index) (dotnet:is-instance-of index "System.Index")))
      (dotnet:static-generic <type-str> "ElementAt" (cl:list type) source index))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -582,9 +582,9 @@ ElementAtOrDefault(IEnumerable, Index) -> TSource
     - index (System.Index): The index of the element to retrieve, which is either from the beginning or the end of the sequence.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:numberp index))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:numberp index))
      (dotnet:static-generic <type-str> "ElementAtOrDefault" (cl:list type) source index))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null index) (dotnet:object-type index)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null index) (dotnet:is-instance-of index "System.Index")))
      (dotnet:static-generic <type-str> "ElementAtOrDefault" (cl:list type) source index))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -617,9 +617,9 @@ Except(IEnumerable, IEnumerable, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TSource]): An System.Collections.Generic.IEqualityComparer`1 to compare values.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TSource]")))
      (dotnet:static-generic <type-str> "Except" (cl:list type) first second comparer))
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Except" (cl:list type) first second))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -648,9 +648,9 @@ ExceptBy(IEnumerable, IEnumerable, Func, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 to compare values.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TKey]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "ExceptBy" (cl:list type-1 type-2) first second key-selector comparer))
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TKey]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "ExceptBy" (cl:list type-1 type-2) first second key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -675,9 +675,9 @@ First(IEnumerable, Boolean]) -> TSource
     - predicate (System.Func`2[TSource, System.Boolean]): A function to test each element for a condition.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-predicate (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`2[TSource, System.Boolean]")))
      (dotnet:static-generic <type-str> "First" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "First" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -717,13 +717,13 @@ FirstOrDefault(IEnumerable, Boolean], TSource) -> TSource
     - default-value (TSource): The default value to return if the sequence is empty.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) supplied-default-value2 (cl:or (cl:null default-value2) (dotnet:object-type default-value2)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "System.Func`2[TSource, System.Boolean]")) supplied-default-value2 (cl:or (cl:null default-value2) (dotnet:is-instance-of default-value2 "TSource")))
      (dotnet:static-generic <type-str> "FirstOrDefault" (cl:list type) source default-value default-value2))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "TSource")) (cl:not supplied-default-value2))
      (dotnet:static-generic <type-str> "FirstOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "System.Func`2[TSource, System.Boolean]")) (cl:not supplied-default-value2))
      (dotnet:static-generic <type-str> "FirstOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-default-value) (cl:not supplied-default-value2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-default-value) (cl:not supplied-default-value2))
      (dotnet:static-generic <type-str> "FirstOrDefault" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -750,9 +750,9 @@ GroupBy(IEnumerable, Func, IEqualityComparer) -> IGrouping
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2) source key-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2) source key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -798,13 +798,13 @@ GroupBy(IEnumerable, Func, IEnumerable, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`2[TSource, TElement]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3) source key-selector element-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`3[TKey, System.Collections.Generic.IEnumerable`1[TSource], TResult]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3) source key-selector element-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`2[TSource, TElement]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3) source key-selector element-selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`3[TKey, System.Collections.Generic.IEnumerable`1[TSource], TResult]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3) source key-selector element-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -835,9 +835,9 @@ GroupBy(IEnumerable, Func, Func, IEnumerable, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys with.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`2[TSource, TElement]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TKey, System.Collections.Generic.IEnumerable`1[TElement], TResult]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3 type-4) source key-selector element-selector result-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`2[TSource, TElement]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TKey, System.Collections.Generic.IEnumerable`1[TElement], TResult]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "GroupBy" (cl:list type-1 type-2 type-3 type-4) source key-selector element-selector result-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -887,9 +887,9 @@ GroupJoin(IEnumerable, IEnumerable, Func, Func, IEnumerable, IEqualityComparer) 
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to hash and compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null outer) (dotnet:is-instance-of outer "System.Collections.Generic.IEnumerable`1[TOuter]")) (cl:or (cl:null inner) (dotnet:is-instance-of inner "System.Collections.Generic.IEnumerable`1[TInner]")) (cl:or (cl:null outer-key-selector) (dotnet:is-instance-of outer-key-selector "System.Func`2[TOuter, TKey]")) (cl:or (cl:null inner-key-selector) (dotnet:is-instance-of inner-key-selector "System.Func`2[TInner, TKey]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TOuter, System.Collections.Generic.IEnumerable`1[TInner], TResult]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "GroupJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector comparer))
-    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null outer) (dotnet:is-instance-of outer "System.Collections.Generic.IEnumerable`1[TOuter]")) (cl:or (cl:null inner) (dotnet:is-instance-of inner "System.Collections.Generic.IEnumerable`1[TInner]")) (cl:or (cl:null outer-key-selector) (dotnet:is-instance-of outer-key-selector "System.Func`2[TOuter, TKey]")) (cl:or (cl:null inner-key-selector) (dotnet:is-instance-of inner-key-selector "System.Func`2[TInner, TKey]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TOuter, System.Collections.Generic.IEnumerable`1[TInner], TResult]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "GroupJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -933,9 +933,9 @@ Intersect(IEnumerable, IEnumerable, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TSource]): An System.Collections.Generic.IEqualityComparer`1 to compare values.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TSource]")))
      (dotnet:static-generic <type-str> "Intersect" (cl:list type) first second comparer))
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Intersect" (cl:list type) first second))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -964,9 +964,9 @@ IntersectBy(IEnumerable, IEnumerable, Func, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TKey]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "IntersectBy" (cl:list type-1 type-2) first second key-selector comparer))
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TKey]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "IntersectBy" (cl:list type-1 type-2) first second key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -999,9 +999,9 @@ Join(IEnumerable, IEnumerable, Func, Func, Func, IEqualityComparer) -> IEnumerab
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to hash and compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null outer) (dotnet:is-instance-of outer "System.Collections.Generic.IEnumerable`1[TOuter]")) (cl:or (cl:null inner) (dotnet:is-instance-of inner "System.Collections.Generic.IEnumerable`1[TInner]")) (cl:or (cl:null outer-key-selector) (dotnet:is-instance-of outer-key-selector "System.Func`2[TOuter, TKey]")) (cl:or (cl:null inner-key-selector) (dotnet:is-instance-of inner-key-selector "System.Func`2[TInner, TKey]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TOuter, TInner, TResult]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "Join" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector comparer))
-    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null outer) (dotnet:is-instance-of outer "System.Collections.Generic.IEnumerable`1[TOuter]")) (cl:or (cl:null inner) (dotnet:is-instance-of inner "System.Collections.Generic.IEnumerable`1[TInner]")) (cl:or (cl:null outer-key-selector) (dotnet:is-instance-of outer-key-selector "System.Func`2[TOuter, TKey]")) (cl:or (cl:null inner-key-selector) (dotnet:is-instance-of inner-key-selector "System.Func`2[TInner, TKey]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TOuter, TInner, TResult]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Join" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1026,9 +1026,9 @@ Last(IEnumerable, Boolean]) -> TSource
     - predicate (System.Func`2[TSource, System.Boolean]): A function to test each element for a condition.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-predicate (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`2[TSource, System.Boolean]")))
      (dotnet:static-generic <type-str> "Last" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "Last" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1068,13 +1068,13 @@ LastOrDefault(IEnumerable, Boolean], TSource) -> TSource
     - default-value (TSource): The default value to return if the sequence is empty.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) supplied-default-value2 (cl:or (cl:null default-value2) (dotnet:object-type default-value2)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "System.Func`2[TSource, System.Boolean]")) supplied-default-value2 (cl:or (cl:null default-value2) (dotnet:is-instance-of default-value2 "TSource")))
      (dotnet:static-generic <type-str> "LastOrDefault" (cl:list type) source default-value default-value2))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "TSource")) (cl:not supplied-default-value2))
      (dotnet:static-generic <type-str> "LastOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "System.Func`2[TSource, System.Boolean]")) (cl:not supplied-default-value2))
      (dotnet:static-generic <type-str> "LastOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-default-value) (cl:not supplied-default-value2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-default-value) (cl:not supplied-default-value2))
      (dotnet:static-generic <type-str> "LastOrDefault" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1107,9 +1107,9 @@ LeftJoin(IEnumerable, IEnumerable, Func, Func, Func, IEqualityComparer) -> IEnum
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to hash and compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null outer) (dotnet:is-instance-of outer "System.Collections.Generic.IEnumerable`1[TOuter]")) (cl:or (cl:null inner) (dotnet:is-instance-of inner "System.Collections.Generic.IEnumerable`1[TInner]")) (cl:or (cl:null outer-key-selector) (dotnet:is-instance-of outer-key-selector "System.Func`2[TOuter, TKey]")) (cl:or (cl:null inner-key-selector) (dotnet:is-instance-of inner-key-selector "System.Func`2[TInner, TKey]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TOuter, TInner, TResult]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "LeftJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector comparer))
-    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null outer) (dotnet:is-instance-of outer "System.Collections.Generic.IEnumerable`1[TOuter]")) (cl:or (cl:null inner) (dotnet:is-instance-of inner "System.Collections.Generic.IEnumerable`1[TInner]")) (cl:or (cl:null outer-key-selector) (dotnet:is-instance-of outer-key-selector "System.Func`2[TOuter, TKey]")) (cl:or (cl:null inner-key-selector) (dotnet:is-instance-of inner-key-selector "System.Func`2[TInner, TKey]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TOuter, TInner, TResult]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "LeftJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1134,9 +1134,9 @@ LongCount(IEnumerable, Boolean]) -> Int64
     - predicate (System.Func`2[TSource, System.Boolean]): A function to test each element for a condition.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-predicate (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`2[TSource, System.Boolean]")))
      (dotnet:static-generic <type-str> "LongCount" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "LongCount" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1208,25 +1208,25 @@ Max(Decimal]]) -> Decimal]
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to determine the maximum value of.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int32]")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int64]")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int32]]")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int64]]")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Double]")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Double]]")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Single]")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Single]]")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Decimal]")))
      (dotnet:static <type-str> "Max" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]")))
      (dotnet:static <type-str> "Max" source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1321,29 +1321,29 @@ Max(IEnumerable, Decimal]]) -> Decimal]
     - selector (System.Func`2[TSource, System.Nullable`1[System.Decimal]]): A transform function to apply to each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TSource]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Int32]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Int32]]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Int64]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Int64]]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Single]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Single]]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Double]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Double]]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Decimal]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Decimal]]")))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Max" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1397,9 +1397,9 @@ MaxBy(IEnumerable, Func, IComparer) -> TSource
     - comparer (System.Collections.Generic.IComparer`1[TKey]): The System.Collections.Generic.IComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "MaxBy" (cl:list type-1 type-2) source key-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "MaxBy" (cl:list type-1 type-2) source key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1471,25 +1471,25 @@ Min(Decimal]]) -> Decimal]
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to determine the minimum value of.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int32]")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int64]")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int32]]")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int64]]")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Single]")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Single]]")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Double]")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Double]]")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Decimal]")))
      (dotnet:static <type-str> "Min" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]")))
      (dotnet:static <type-str> "Min" source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1584,29 +1584,29 @@ Min(IEnumerable, Decimal]]) -> Decimal]
     - selector (System.Func`2[TSource, System.Nullable`1[System.Decimal]]): A transform function to apply to each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TSource]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Int32]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Int32]]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Int64]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Int64]]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Single]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Single]]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Double]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Double]]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Decimal]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, System.Nullable`1[System.Decimal]]")))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Min" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1660,9 +1660,9 @@ MinBy(IEnumerable, Func, IComparer) -> TSource
     - comparer (System.Collections.Generic.IComparer`1[TKey]): The System.Collections.Generic.IComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "MinBy" (cl:list type-1 type-2) source key-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "MinBy" (cl:list type-1 type-2) source key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1695,9 +1695,9 @@ Order(IEnumerable, IComparer) -> IOrderedEnumerable
     - comparer (System.Collections.Generic.IComparer`1[T]): An System.Collections.Generic.IComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[T]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[T]")))
      (dotnet:static-generic <type-str> "Order" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[T]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Order" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1724,9 +1724,9 @@ OrderBy(IEnumerable, Func, IComparer) -> IOrderedEnumerable
     - comparer (System.Collections.Generic.IComparer`1[TKey]): An System.Collections.Generic.IComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "OrderBy" (cl:list type-1 type-2) source key-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "OrderBy" (cl:list type-1 type-2) source key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1753,9 +1753,9 @@ OrderByDescending(IEnumerable, Func, IComparer) -> IOrderedEnumerable
     - comparer (System.Collections.Generic.IComparer`1[TKey]): An System.Collections.Generic.IComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "OrderByDescending" (cl:list type-1 type-2) source key-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "OrderByDescending" (cl:list type-1 type-2) source key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1780,9 +1780,9 @@ OrderDescending(IEnumerable, IComparer) -> IOrderedEnumerable
     - comparer (System.Collections.Generic.IComparer`1[T]): An System.Collections.Generic.IComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[T]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[T]")))
      (dotnet:static-generic <type-str> "OrderDescending" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[T]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "OrderDescending" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1831,9 +1831,9 @@ Reverse(TSource[]) -> IEnumerable
     - source (TSource[]): 
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")))
      (dotnet:static-generic <type-str> "Reverse" (cl:list type) source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "TSource[]")))
      (dotnet:static-generic <type-str> "Reverse" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1866,9 +1866,9 @@ RightJoin(IEnumerable, IEnumerable, Func, Func, Func, IEqualityComparer) -> IEnu
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to hash and compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null outer) (dotnet:is-instance-of outer "System.Collections.Generic.IEnumerable`1[TOuter]")) (cl:or (cl:null inner) (dotnet:is-instance-of inner "System.Collections.Generic.IEnumerable`1[TInner]")) (cl:or (cl:null outer-key-selector) (dotnet:is-instance-of outer-key-selector "System.Func`2[TOuter, TKey]")) (cl:or (cl:null inner-key-selector) (dotnet:is-instance-of inner-key-selector "System.Func`2[TInner, TKey]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TOuter, TInner, TResult]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "RightJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector comparer))
-    ((cl:and (cl:or (cl:null outer) (dotnet:object-type outer)) (cl:or (cl:null inner) (dotnet:object-type inner)) (cl:or (cl:null outer-key-selector) (dotnet:object-type outer-key-selector)) (cl:or (cl:null inner-key-selector) (dotnet:object-type inner-key-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null outer) (dotnet:is-instance-of outer "System.Collections.Generic.IEnumerable`1[TOuter]")) (cl:or (cl:null inner) (dotnet:is-instance-of inner "System.Collections.Generic.IEnumerable`1[TInner]")) (cl:or (cl:null outer-key-selector) (dotnet:is-instance-of outer-key-selector "System.Func`2[TOuter, TKey]")) (cl:or (cl:null inner-key-selector) (dotnet:is-instance-of inner-key-selector "System.Func`2[TInner, TKey]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TOuter, TInner, TResult]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "RightJoin" (cl:list type-1 type-2 type-3 type-4) outer inner outer-key-selector inner-key-selector result-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1894,9 +1894,9 @@ Select(IEnumerable, Int32, TResult]) -> IEnumerable
     - selector (System.Func`3[TSource, System.Int32, TResult]): A transform function to apply to each source element; the second parameter of the function represents the index of the source element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, TResult]")))
      (dotnet:static-generic <type-str> "Select" (cl:list type-1 type-2) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`3[TSource, System.Int32, TResult]")))
      (dotnet:static-generic <type-str> "Select" (cl:list type-1 type-2) source selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1922,9 +1922,9 @@ SelectMany(IEnumerable, IEnumerable) -> IEnumerable
     - selector (System.Func`3[TSource, System.Int32, System.Collections.Generic.IEnumerable`1[TResult]]): A transform function to apply to each source element; the second parameter of the function represents the index of the source element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Collections.Generic.IEnumerable`1[TResult]]")))
      (dotnet:static-generic <type-str> "SelectMany" (cl:list type-1 type-2) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`3[TSource, System.Int32, System.Collections.Generic.IEnumerable`1[TResult]]")))
      (dotnet:static-generic <type-str> "SelectMany" (cl:list type-1 type-2) source selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -1952,9 +1952,9 @@ SelectMany(IEnumerable, IEnumerable, Func) -> IEnumerable
     - result-selector (System.Func`3[TSource, TCollection, TResult]): A transform function to apply to each element of the intermediate sequence.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null collection-selector) (dotnet:object-type collection-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null collection-selector) (dotnet:is-instance-of collection-selector "System.Func`3[TSource, System.Int32, System.Collections.Generic.IEnumerable`1[TCollection]]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TSource, TCollection, TResult]")))
      (dotnet:static-generic <type-str> "SelectMany" (cl:list type-1 type-2 type-3) source collection-selector result-selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null collection-selector) (dotnet:object-type collection-selector)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null collection-selector) (dotnet:is-instance-of collection-selector "System.Func`2[TSource, System.Collections.Generic.IEnumerable`1[TCollection]]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TSource, TCollection, TResult]")))
      (dotnet:static-generic <type-str> "SelectMany" (cl:list type-1 type-2 type-3) source collection-selector result-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2007,9 +2007,9 @@ SequenceEqual(IEnumerable, IEnumerable, IEqualityComparer) -> Boolean
     - comparer (System.Collections.Generic.IEqualityComparer`1[TSource]): An System.Collections.Generic.IEqualityComparer`1 to use to compare elements.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TSource]")))
      (dotnet:static-generic <type-str> "SequenceEqual" (cl:list type) first second comparer))
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "SequenceEqual" (cl:list type) first second))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2042,9 +2042,9 @@ Single(IEnumerable, Boolean]) -> TSource
     - predicate (System.Func`2[TSource, System.Boolean]): A function to test an element for a condition.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-predicate (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-predicate (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`2[TSource, System.Boolean]")))
      (dotnet:static-generic <type-str> "Single" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-predicate))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-predicate))
      (dotnet:static-generic <type-str> "Single" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2084,13 +2084,13 @@ SingleOrDefault(IEnumerable, Boolean], TSource) -> TSource
     - default-value (TSource): The default value to return if the sequence is empty.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) supplied-default-value2 (cl:or (cl:null default-value2) (dotnet:object-type default-value2)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "System.Func`2[TSource, System.Boolean]")) supplied-default-value2 (cl:or (cl:null default-value2) (dotnet:is-instance-of default-value2 "TSource")))
      (dotnet:static-generic <type-str> "SingleOrDefault" (cl:list type) source default-value default-value2))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "TSource")) (cl:not supplied-default-value2))
      (dotnet:static-generic <type-str> "SingleOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-default-value (cl:or (cl:null default-value) (dotnet:object-type default-value)) (cl:not supplied-default-value2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-default-value (cl:or (cl:null default-value) (dotnet:is-instance-of default-value "System.Func`2[TSource, System.Boolean]")) (cl:not supplied-default-value2))
      (dotnet:static-generic <type-str> "SingleOrDefault" (cl:list type) source default-value))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-default-value) (cl:not supplied-default-value2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-default-value) (cl:not supplied-default-value2))
      (dotnet:static-generic <type-str> "SingleOrDefault" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2134,9 +2134,9 @@ SkipWhile(IEnumerable, Boolean]) -> IEnumerable
     - predicate (System.Func`3[TSource, System.Int32, System.Boolean]): A function to test each source element for a condition; the second parameter of the function represents the index of the source element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`2[TSource, System.Boolean]")))
      (dotnet:static-generic <type-str> "SkipWhile" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`3[TSource, System.Int32, System.Boolean]")))
      (dotnet:static-generic <type-str> "SkipWhile" (cl:list type) source predicate))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2208,25 +2208,25 @@ Sum(Decimal]]) -> Decimal]
     - source (System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]): A sequence of nullable System.Decimal values to calculate the sum of.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int32]")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Int64]")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Single]")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Double]")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Decimal]")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int32]]")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Int64]]")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Single]]")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Double]]")))
      (dotnet:static <type-str> "Sum" source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Nullable`1[System.Decimal]]")))
      (dotnet:static <type-str> "Sum" source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2308,25 +2308,25 @@ Sum(IEnumerable, Decimal]]) -> Decimal]
     - selector (System.Func`2[TSource, System.Nullable`1[System.Decimal]]): A transform function to apply to each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Int32]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Int64]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Single]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Double]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Decimal]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Int32]]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Int64]]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Single]]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Double]]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null selector) (dotnet:object-type selector)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null selector) (dotnet:is-instance-of selector "System.Func`2[TSource, System.Nullable`1[System.Decimal]]")))
      (dotnet:static-generic <type-str> "Sum" (cl:list type) source selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2369,9 +2369,9 @@ Take(IEnumerable, Range) -> IEnumerable
     - range (System.Range): The range of elements to return, which has start and end indexes either from the beginning or the end of the sequence.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:numberp count))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:numberp count))
      (dotnet:static-generic <type-str> "Take" (cl:list type) source count))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null count) (dotnet:object-type count)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null count) (dotnet:is-instance-of count "System.Range")))
      (dotnet:static-generic <type-str> "Take" (cl:list type) source count))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2406,9 +2406,9 @@ TakeWhile(IEnumerable, Boolean]) -> IEnumerable
     - predicate (System.Func`3[TSource, System.Int32, System.Boolean]): A function to test each source element for a condition; the second parameter of the function represents the index of the source element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`2[TSource, System.Boolean]")))
      (dotnet:static-generic <type-str> "TakeWhile" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`3[TSource, System.Int32, System.Boolean]")))
      (dotnet:static-generic <type-str> "TakeWhile" (cl:list type) source predicate))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2435,9 +2435,9 @@ ThenBy(IOrderedEnumerable, Func, IComparer) -> IOrderedEnumerable
     - comparer (System.Collections.Generic.IComparer`1[TKey]): An System.Collections.Generic.IComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Linq.IOrderedEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "ThenBy" (cl:list type-1 type-2) source key-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Linq.IOrderedEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "ThenBy" (cl:list type-1 type-2) source key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2464,9 +2464,9 @@ ThenByDescending(IOrderedEnumerable, Func, IComparer) -> IOrderedEnumerable
     - comparer (System.Collections.Generic.IComparer`1[TKey]): An System.Collections.Generic.IComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Linq.IOrderedEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "ThenByDescending" (cl:list type-1 type-2) source key-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Linq.IOrderedEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "ThenByDescending" (cl:list type-1 type-2) source key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2527,17 +2527,17 @@ ToDictionary(IEnumerable, Func, IEqualityComparer) -> Dictionary
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:object-type comparer2)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, TKey]")) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:is-instance-of comparer2 "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source comparer comparer2))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.ValueTuple`2[TKey, TValue]]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]")) (cl:not supplied-comparer) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[System.ValueTuple`2[TKey, TValue]]")) (cl:not supplied-comparer) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2566,9 +2566,9 @@ ToDictionary(IEnumerable, Func, Func, IEqualityComparer) -> Dictionary
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`2[TSource, TElement]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2 type-3) source key-selector element-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`2[TSource, TElement]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "ToDictionary" (cl:list type-1 type-2 type-3) source key-selector element-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2609,9 +2609,9 @@ ToHashSet(IEnumerable, IEqualityComparer) -> HashSet
     - comparer (System.Collections.Generic.IEqualityComparer`1[TSource]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TSource]")))
      (dotnet:static-generic <type-str> "ToHashSet" (cl:list type) source comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "ToHashSet" (cl:list type) source))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2646,9 +2646,9 @@ ToLookup(IEnumerable, Func, IEqualityComparer) -> ILookup
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "ToLookup" (cl:list type-1 type-2) source key-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "ToLookup" (cl:list type-1 type-2) source key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2677,9 +2677,9 @@ ToLookup(IEnumerable, Func, Func, IEqualityComparer) -> ILookup
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): An System.Collections.Generic.IEqualityComparer`1 to compare keys.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`2[TSource, TElement]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "ToLookup" (cl:list type-1 type-2 type-3) source key-selector element-selector comparer))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:or (cl:null element-selector) (dotnet:object-type element-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:or (cl:null element-selector) (dotnet:is-instance-of element-selector "System.Func`2[TSource, TElement]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "ToLookup" (cl:list type-1 type-2 type-3) source key-selector element-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2726,9 +2726,9 @@ Union(IEnumerable, IEnumerable, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TSource]): The System.Collections.Generic.IEqualityComparer`1 to compare values.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TSource]")))
      (dotnet:static-generic <type-str> "Union" (cl:list type) first second comparer))
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "Union" (cl:list type) first second))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2757,9 +2757,9 @@ UnionBy(IEnumerable, IEnumerable, Func, IEqualityComparer) -> IEnumerable
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 to compare values.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "UnionBy" (cl:list type-1 type-2) first second key-selector comparer))
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null key-selector) (dotnet:object-type key-selector)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null key-selector) (dotnet:is-instance-of key-selector "System.Func`2[TSource, TKey]")) (cl:not supplied-comparer))
      (dotnet:static-generic <type-str> "UnionBy" (cl:list type-1 type-2) first second key-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2785,9 +2785,9 @@ Where(IEnumerable, Boolean]) -> IEnumerable
     - predicate (System.Func`3[TSource, System.Int32, System.Boolean]): A function to test each source element for a condition; the second parameter of the function represents the index of the source element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`2[TSource, System.Boolean]")))
      (dotnet:static-generic <type-str> "Where" (cl:list type) source predicate))
-    ((cl:and (cl:or (cl:null source) (dotnet:object-type source)) (cl:or (cl:null predicate) (dotnet:object-type predicate)))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.Collections.Generic.IEnumerable`1[TSource]")) (cl:or (cl:null predicate) (dotnet:is-instance-of predicate "System.Func`3[TSource, System.Int32, System.Boolean]")))
      (dotnet:static-generic <type-str> "Where" (cl:list type) source predicate))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"
@@ -2824,9 +2824,9 @@ Zip(IEnumerable, IEnumerable, IEnumerable) -> ValueTuple
     - third (System.Collections.Generic.IEnumerable`1[TThird]): The third sequence to merge.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TFirst]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSecond]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Func`3[TFirst, TSecond, TResult]")))
      (dotnet:static-generic <type-str> "Zip" (cl:list type-1 type-2 type-3) first second result-selector))
-    ((cl:and (cl:or (cl:null first) (dotnet:object-type first)) (cl:or (cl:null second) (dotnet:object-type second)) (cl:or (cl:null result-selector) (dotnet:object-type result-selector)))
+    ((cl:and (cl:or (cl:null first) (dotnet:is-instance-of first "System.Collections.Generic.IEnumerable`1[TFirst]")) (cl:or (cl:null second) (dotnet:is-instance-of second "System.Collections.Generic.IEnumerable`1[TSecond]")) (cl:or (cl:null result-selector) (dotnet:is-instance-of result-selector "System.Collections.Generic.IEnumerable`1[TThird]")))
      (dotnet:static-generic <type-str> "Zip" (cl:list type-1 type-2 type-3) first second result-selector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-LINQ-ENUMERABLE"

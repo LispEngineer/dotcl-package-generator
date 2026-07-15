@@ -327,4 +327,50 @@
                     "compute-package-exports-and-shadows no longer exports type-suffixed constructor names")
         (assert-test (and (member "foo-single" exports :test #'string=) t)
                     nil
-                    "compute-package-exports-and-shadows no longer exports type-suffixed method names"))))
+                    "compute-package-exports-and-shadows no longer exports type-suffixed method names")))
+
+    ;; 3.9 Regression test for doc/bug-in-dispatching.md: a Master Wrapper
+    ;; must not let an overload with a defaulted trailing parameter
+    ;; permanently shadow a shorter, fully-required overload tied at the
+    ;; same effective (mandatory) arity, and its non-primitive type-check
+    ;; guards must actually discriminate between the two overloads' distinct
+    ;; parameter types rather than accepting "any .NET object."
+  (let* ((class-plist
+             '(:fully-qualified-name "Fixture.DispatchOrder"
+               :kind :class
+               :fields nil
+               :properties nil
+               :constructors nil
+               :methods ((:name "Go" :is-static nil :return-type "System.Void"
+                          :parameters ((:name "a" :type "Fixture.TypeA")))
+                         (:name "Go" :is-static nil :return-type "System.Void"
+                          :parameters ((:name "b" :type "Fixture.TypeB")
+                                       (:name "extra" :type "System.Int32"
+                                        :has-default t :default-kind :number :default-value 0))))))
+           (out-dir (merge-pathnames "package-generator-tests-dispatch-order-out/"
+                                     (uiop:temporary-directory))))
+      (unwind-protect
+          (progn
+            (ensure-directories-exist out-dir)
+            (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+            (let* ((class-file (merge-pathnames "fixture-dispatch-order.lisp" out-dir))
+                   (contents (uiop:read-file-string class-file))
+                   ;; Both overloads share the same single positional dispatch
+                   ;; slot (uniquify-positional-params picks its representative
+                   ;; name arbitrarily from the first overload -- "a" here),
+                   ;; so the two clauses are distinguished by their guard's
+                   ;; type string, not by the action's argument name.
+                   (guard-a-pos (search "(dotnet:is-instance-of a \"Fixture.TypeA\")" contents))
+                   (guard-b-pos (search "(dotnet:is-instance-of a \"Fixture.TypeB\")" contents)))
+              (assert-test (not (null guard-a-pos)) t
+                          "Go(TypeA)'s guard uses dotnet:is-instance-of to check the argument is actually a Fixture.TypeA")
+              (assert-test (not (null guard-b-pos)) t
+                          "Go(TypeB, Int32=0)'s guard uses dotnet:is-instance-of to check the argument is actually a Fixture.TypeB")
+              (assert-test (and guard-a-pos guard-b-pos (< guard-a-pos guard-b-pos)) t
+                          "Go(TypeA)'s cond clause is tried before Go(TypeB, Int32=0)'s -- the fully-required, tied-effective-arity overload must not be shadowed")
+              (assert-test (not (null (search "(dotnet:invoke (cl:the (dotnet \"Fixture.DispatchOrder\") obj!) \"Go\" a)" contents))) t
+                          "Master Wrapper for Go emits a clause invoking the 1-parameter Go(TypeA) overload with no trailing argument")
+              (assert-test (not (null (search "(dotnet:invoke (cl:the (dotnet \"Fixture.DispatchOrder\") obj!) \"Go\" a (cl:if supplied-extra extra 0))" contents))) t
+                          "Master Wrapper for Go emits a clause invoking the defaulted Go(TypeB, Int32=0) overload with its own default")))
+        (when (probe-file out-dir)
+          (uiop:delete-directory-tree out-dir :validate t)))))

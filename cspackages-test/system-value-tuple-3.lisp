@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ValueTuple`3
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-value-tuple-3)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ValueTuple`3"))
 (cl:defconstant <type-str> "System.ValueTuple`3")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (item1 cl:nil supplied-item1) (item2 cl:nil supplied-item2) (item3 cl:nil supplied-item3))
   "Master wrapper for System.ValueTuple`3 constructor overloads. Dispatches at runtime.
@@ -23,7 +23,7 @@ new(T1, T2, T3)
     - item3 (T3): The value tuple's third element.
 "
   (cl:cond
-    ((cl:and supplied-item1 (cl:or (cl:null item1) (dotnet:object-type item1)) supplied-item2 (cl:or (cl:null item2) (dotnet:object-type item2)) supplied-item3 (cl:or (cl:null item3) (dotnet:object-type item3)))
+    ((cl:and supplied-item1 (cl:or (cl:null item1) (dotnet:is-instance-of item1 "T1")) supplied-item2 (cl:or (cl:null item2) (dotnet:is-instance-of item2 "T2")) supplied-item3 (cl:or (cl:null item3) (dotnet:is-instance-of item3 "T3")))
      (dotnet:new <type-str> item1 item2 item3))
     ((cl:and (cl:not supplied-item1) (cl:not supplied-item2) (cl:not supplied-item3))
      (dotnet:new <type-str>))
@@ -99,9 +99,9 @@ Equals(ValueTuple) -> Boolean
     - other (System.ValueTuple`3[T1, T2, T3]): The value tuple to compare with this instance.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null obj) (dotnet:object-type obj)))
+    ((cl:and (cl:or (cl:null obj) (dotnet:is-instance-of obj "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.ValueTuple`3") obj!) "Equals" obj))
-    ((cl:and (cl:or (cl:null obj) (dotnet:object-type obj)))
+    ((cl:and (cl:or (cl:null obj) (dotnet:is-instance-of obj "System.ValueTuple`3[T1, T2, T3]")))
      (dotnet:invoke (cl:the (dotnet "System.ValueTuple`3") obj!) "Equals" obj))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-VALUE-TUPLE-3"

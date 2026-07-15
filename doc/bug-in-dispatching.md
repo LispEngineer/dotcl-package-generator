@@ -2,6 +2,15 @@
 # defaulted/optional trailing parameter ties in declared arity with a
 # shorter, fully-required overload
 
+**Status: fixed in Generator Version 49.** See
+`doc/generator-design-notes.md`'s "Fixing Master Wrapper Dispatch Ordering and
+Non-Primitive Type Checks (Version 49)" section for the fix actually applied
+(`mandatory-param-count`/`master-wrapper-more-specific-p` for root cause 1;
+DotCL 0.1.18's `dotnet:is-instance-of` for root cause 2 — a simpler single-call
+alternative to the `dotnet:resolve-type` + manual `IsInstanceOfType` sketch
+this doc originally proposed below). The rest of this document is kept as the
+original bug report/analysis for historical reference.
+
 ## Symptom
 
 Discovered downstream in `dotcl-dungeonslime` (a consumer of this

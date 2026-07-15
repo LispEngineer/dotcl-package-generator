@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Threading.Thread
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-threading-thread)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Threading.Thread"))
 (cl:defconstant <type-str> "System.Threading.Thread")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (start cl:&optional (max-stack-size cl:nil supplied-max-stack-size))
   "Master wrapper for System.Threading.Thread constructor overloads. Dispatches at runtime.
@@ -36,13 +36,13 @@ new(ParameterizedThreadStart, Int32)
     - max-stack-size (System.Int32): The maximum stack size, in bytes, to be used by the thread, or 0 to use the default maximum stack size specified in the header for the executable. Important For partially trusted code, maxStackSize is ignored if it is greater than the default stack size. No exception is thrown.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null start) (dotnet:object-type start)) supplied-max-stack-size (cl:numberp max-stack-size))
+    ((cl:and (cl:or (cl:null start) (dotnet:is-instance-of start "System.Threading.ThreadStart")) supplied-max-stack-size (cl:numberp max-stack-size))
      (dotnet:new <type-str> start max-stack-size))
-    ((cl:and (cl:or (cl:null start) (dotnet:object-type start)) supplied-max-stack-size (cl:numberp max-stack-size))
+    ((cl:and (cl:or (cl:null start) (dotnet:is-instance-of start "System.Threading.ParameterizedThreadStart")) supplied-max-stack-size (cl:numberp max-stack-size))
      (dotnet:new <type-str> start max-stack-size))
-    ((cl:and (cl:or (cl:null start) (dotnet:object-type start)) (cl:not supplied-max-stack-size))
+    ((cl:and (cl:or (cl:null start) (dotnet:is-instance-of start "System.Threading.ThreadStart")) (cl:not supplied-max-stack-size))
      (dotnet:new <type-str> start))
-    ((cl:and (cl:or (cl:null start) (dotnet:object-type start)) (cl:not supplied-max-stack-size))
+    ((cl:and (cl:or (cl:null start) (dotnet:is-instance-of start "System.Threading.ParameterizedThreadStart")) (cl:not supplied-max-stack-size))
      (dotnet:new <type-str> start))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-THREADING-THREAD"
@@ -141,7 +141,7 @@ Abort(Object) -> Void
     - state-info (System.Object): An object that contains application-specific information, such as state, which can be used by the thread being aborted.
 "
   (cl:cond
-    ((cl:and supplied-state-info (cl:or (cl:null state-info) (dotnet:object-type state-info)))
+    ((cl:and supplied-state-info (cl:or (cl:null state-info) (dotnet:is-instance-of state-info "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "Abort" state-info))
     ((cl:and (cl:not supplied-state-info))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "Abort"))
@@ -279,7 +279,7 @@ Join(TimeSpan) -> Boolean
   (cl:cond
     ((cl:and supplied-milliseconds-timeout (cl:numberp milliseconds-timeout))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "Join" milliseconds-timeout))
-    ((cl:and supplied-milliseconds-timeout (cl:or (cl:null milliseconds-timeout) (dotnet:object-type milliseconds-timeout)))
+    ((cl:and supplied-milliseconds-timeout (cl:or (cl:null milliseconds-timeout) (dotnet:is-instance-of milliseconds-timeout "System.TimeSpan")))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "Join" milliseconds-timeout))
     ((cl:and (cl:not supplied-milliseconds-timeout))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "Join"))
@@ -342,7 +342,7 @@ Sleep(TimeSpan) -> Void
   (cl:cond
     ((cl:and (cl:numberp milliseconds-timeout))
      (dotnet:static <type-str> "Sleep" milliseconds-timeout))
-    ((cl:and (cl:or (cl:null milliseconds-timeout) (dotnet:object-type milliseconds-timeout)))
+    ((cl:and (cl:or (cl:null milliseconds-timeout) (dotnet:is-instance-of milliseconds-timeout "System.TimeSpan")))
      (dotnet:static <type-str> "Sleep" milliseconds-timeout))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-THREADING-THREAD"
@@ -369,7 +369,7 @@ Start(Object) -> Void
     - parameter (System.Object): An object that contains data to be used by the method the thread executes.
 "
   (cl:cond
-    ((cl:and supplied-parameter (cl:or (cl:null parameter) (dotnet:object-type parameter)))
+    ((cl:and supplied-parameter (cl:or (cl:null parameter) (dotnet:is-instance-of parameter "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "Start" parameter))
     ((cl:and (cl:not supplied-parameter))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "Start"))
@@ -404,7 +404,7 @@ UnsafeStart(Object) -> Void
     - parameter (System.Object): An object that contains data to be used by the method the thread executes.
 "
   (cl:cond
-    ((cl:and supplied-parameter (cl:or (cl:null parameter) (dotnet:object-type parameter)))
+    ((cl:and supplied-parameter (cl:or (cl:null parameter) (dotnet:is-instance-of parameter "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "UnsafeStart" parameter))
     ((cl:and (cl:not supplied-parameter))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "UnsafeStart"))

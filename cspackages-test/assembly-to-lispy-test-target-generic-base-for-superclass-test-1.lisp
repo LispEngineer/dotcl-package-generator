@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :assembly-to-lispy-test-target-generic-base-for-superclass-test-1)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1"))
 (cl:defconstant <type-str> "AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new ()
   (dotnet:new <type-str>))

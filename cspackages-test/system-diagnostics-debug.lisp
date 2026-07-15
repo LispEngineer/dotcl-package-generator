@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Diagnostics.Debug
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-diagnostics-debug)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Diagnostics.Debug"))
 (cl:defconstant <type-str> "System.Diagnostics.Debug")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun auto-flush ()
   (dotnet:static <type-str> "AutoFlush"))
@@ -40,10 +40,10 @@ Assert(Boolean, String, String) -> Void
   (cl:cond
     ((cl:and (cl:typep condition 'cl:boolean) supplied-message (cl:stringp message) supplied-detail-message (cl:stringp detail-message))
      (dotnet:static <type-str> "Assert" condition message detail-message))
-    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:not supplied-message) (cl:stringp message)) (cl:not supplied-detail-message))
-     (dotnet:static <type-str> "Assert" condition (cl:if supplied-message message cl:nil)))
     ((cl:and (cl:typep condition 'cl:boolean) (cl:not supplied-message) (cl:not supplied-detail-message))
      (dotnet:static <type-str> "Assert" condition))
+    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:not supplied-message) (cl:stringp message)) (cl:not supplied-detail-message))
+     (dotnet:static <type-str> "Assert" condition (cl:if supplied-message message cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-DIAGNOSTICS-DEBUG"
                     :class-name <type-str>
@@ -112,11 +112,11 @@ Write(Object, String) -> Void
   (cl:cond
     ((cl:and (cl:stringp message) supplied-category (cl:stringp category))
      (dotnet:static <type-str> "Write" message category))
-    ((cl:and (cl:or (cl:null message) (dotnet:object-type message)) supplied-category (cl:stringp category))
+    ((cl:and (cl:or (cl:null message) (dotnet:is-instance-of message "System.Object")) supplied-category (cl:stringp category))
      (dotnet:static <type-str> "Write" message category))
     ((cl:and (cl:stringp message) (cl:not supplied-category))
      (dotnet:static <type-str> "Write" message))
-    ((cl:and (cl:or (cl:null message) (dotnet:object-type message)) (cl:not supplied-category))
+    ((cl:and (cl:or (cl:null message) (dotnet:is-instance-of message "System.Object")) (cl:not supplied-category))
      (dotnet:static <type-str> "Write" message))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-DIAGNOSTICS-DEBUG"
@@ -138,11 +138,11 @@ WriteIf(Boolean, Object, String) -> Void
   (cl:cond
     ((cl:and (cl:typep condition 'cl:boolean) (cl:stringp message) supplied-category (cl:stringp category))
      (dotnet:static <type-str> "WriteIf" condition message category))
-    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:null message) (dotnet:object-type message)) supplied-category (cl:stringp category))
+    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:null message) (dotnet:is-instance-of message "System.Object")) supplied-category (cl:stringp category))
      (dotnet:static <type-str> "WriteIf" condition message category))
     ((cl:and (cl:typep condition 'cl:boolean) (cl:stringp message) (cl:not supplied-category))
      (dotnet:static <type-str> "WriteIf" condition message))
-    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:null message) (dotnet:object-type message)) (cl:not supplied-category))
+    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:null message) (dotnet:is-instance-of message "System.Object")) (cl:not supplied-category))
      (dotnet:static <type-str> "WriteIf" condition message))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-DIAGNOSTICS-DEBUG"
@@ -168,13 +168,13 @@ WriteLine(Object, String) -> Void
 WriteLine(String, String) -> Void
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null message) (dotnet:object-type message)) supplied-category (cl:stringp category))
+    ((cl:and (cl:or (cl:null message) (dotnet:is-instance-of message "System.Object")) supplied-category (cl:stringp category))
      (dotnet:static <type-str> "WriteLine" message category))
     ((cl:and (cl:stringp message) supplied-category (cl:stringp category))
      (dotnet:static <type-str> "WriteLine" message category))
     ((cl:and (cl:stringp message) (cl:not supplied-category))
      (dotnet:static <type-str> "WriteLine" message))
-    ((cl:and (cl:or (cl:null message) (dotnet:object-type message)) (cl:not supplied-category))
+    ((cl:and (cl:or (cl:null message) (dotnet:is-instance-of message "System.Object")) (cl:not supplied-category))
      (dotnet:static <type-str> "WriteLine" message))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-DIAGNOSTICS-DEBUG"
@@ -199,11 +199,11 @@ WriteLineIf(Boolean, Object, String) -> Void
 WriteLineIf(Boolean, String, String) -> Void
 "
   (cl:cond
-    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:null value) (dotnet:object-type value)) supplied-category (cl:stringp category))
+    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) supplied-category (cl:stringp category))
      (dotnet:static <type-str> "WriteLineIf" condition value category))
     ((cl:and (cl:typep condition 'cl:boolean) (cl:stringp value) supplied-category (cl:stringp category))
      (dotnet:static <type-str> "WriteLineIf" condition value category))
-    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-category))
+    ((cl:and (cl:typep condition 'cl:boolean) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-category))
      (dotnet:static <type-str> "WriteLineIf" condition value))
     ((cl:and (cl:typep condition 'cl:boolean) (cl:stringp value) (cl:not supplied-category))
      (dotnet:static <type-str> "WriteLineIf" condition value))

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.Stream
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-io-stream)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.Stream"))
 (cl:defconstant <type-str> "System.IO.Stream")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.IO.Stream class.
@@ -106,9 +106,9 @@ CopyTo(Stream, Int32) -> Void
     - buffer-size (System.Int32): The size of the buffer. This value must be greater than zero. The default size is 81920.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null destination) (dotnet:object-type destination)) supplied-buffer-size (cl:numberp buffer-size))
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.IO.Stream")) supplied-buffer-size (cl:numberp buffer-size))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "CopyTo" destination buffer-size))
-    ((cl:and (cl:or (cl:null destination) (dotnet:object-type destination)) (cl:not supplied-buffer-size))
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.IO.Stream")) (cl:not supplied-buffer-size))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "CopyTo" destination))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
@@ -148,13 +148,13 @@ CopyToAsync(Stream, Int32, CancellationToken) -> Task
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests. The default value is System.Threading.CancellationToken.None.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null destination) (dotnet:object-type destination)) supplied-buffer-size (cl:numberp buffer-size) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)))
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.IO.Stream")) supplied-buffer-size (cl:numberp buffer-size) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "CopyToAsync" destination buffer-size cancellation-token))
-    ((cl:and (cl:or (cl:null destination) (dotnet:object-type destination)) supplied-buffer-size (cl:numberp buffer-size) (cl:not supplied-cancellation-token))
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.IO.Stream")) supplied-buffer-size (cl:numberp buffer-size) (cl:not supplied-cancellation-token))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "CopyToAsync" destination buffer-size))
-    ((cl:and (cl:or (cl:null destination) (dotnet:object-type destination)) supplied-buffer-size (cl:or (cl:null buffer-size) (dotnet:object-type buffer-size)) (cl:not supplied-cancellation-token))
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.IO.Stream")) supplied-buffer-size (cl:or (cl:null buffer-size) (dotnet:is-instance-of buffer-size "System.Threading.CancellationToken")) (cl:not supplied-cancellation-token))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "CopyToAsync" destination buffer-size))
-    ((cl:and (cl:or (cl:null destination) (dotnet:object-type destination)) (cl:not supplied-buffer-size) (cl:not supplied-cancellation-token))
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.IO.Stream")) (cl:not supplied-buffer-size) (cl:not supplied-cancellation-token))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "CopyToAsync" destination))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
@@ -230,7 +230,7 @@ FlushAsync(CancellationToken) -> Task
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests. The default value is System.Threading.CancellationToken.None.
 "
   (cl:cond
-    ((cl:and supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)))
+    ((cl:and supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "FlushAsync" cancellation-token))
     ((cl:and (cl:not supplied-cancellation-token))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "FlushAsync"))
@@ -263,9 +263,9 @@ Read(Byte[], Int32, Int32) -> Int32
     - count (System.Int32): The maximum number of bytes to be read from the current stream.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "Read" buffer offset count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:not supplied-offset) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[System.Byte]")) (cl:not supplied-offset) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "Read" buffer))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
@@ -301,11 +301,11 @@ ReadAsync(Byte[], Int32, Int32, CancellationToken) -> Int32]
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests. The default value is System.Threading.CancellationToken.None.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:is-instance-of cancellation-token2 "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAsync" buffer cancellation-token count cancellation-token2))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[System.Byte]")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
@@ -325,7 +325,7 @@ ReadAtLeast(Byte], Int32, Boolean = T) -> Int32
     - throw-on-end-of-stream (System.Boolean): to throw an exception if the end of the stream is reached before reading minimumBytes of bytes; to return less than minimumBytes when the end of the stream is reached. The default is .
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp minimum-bytes) (cl:or (cl:not supplied-throw-on-end-of-stream) (cl:typep throw-on-end-of-stream 'cl:boolean)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[System.Byte]")) (cl:numberp minimum-bytes) (cl:or (cl:not supplied-throw-on-end-of-stream) (cl:typep throw-on-end-of-stream 'cl:boolean)))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAtLeast" buffer minimum-bytes (cl:if supplied-throw-on-end-of-stream throw-on-end-of-stream cl:t)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
@@ -346,7 +346,7 @@ ReadAtLeastAsync(Byte], Int32, Boolean = T, CancellationToken = default(System.T
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp minimum-bytes) (cl:or (cl:not supplied-throw-on-end-of-stream) (cl:typep throw-on-end-of-stream 'cl:boolean)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[System.Byte]")) (cl:numberp minimum-bytes) (cl:or (cl:not supplied-throw-on-end-of-stream) (cl:typep throw-on-end-of-stream 'cl:boolean)) supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadAtLeastAsync" buffer minimum-bytes (cl:if supplied-throw-on-end-of-stream throw-on-end-of-stream cl:t) cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
@@ -376,9 +376,9 @@ ReadExactly(Byte[], Int32, Int32) -> Void
     - count (System.Int32): The number of bytes to be read from the current stream.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadExactly" buffer offset count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:not supplied-offset) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[System.Byte]")) (cl:not supplied-offset) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadExactly" buffer))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
@@ -406,9 +406,9 @@ ReadExactlyAsync(Byte[], Int32, Int32, CancellationToken = default(System.Thread
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:is-instance-of cancellation-token2 "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadExactlyAsync" buffer cancellation-token count cancellation-token2))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[System.Byte]")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ReadExactlyAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
@@ -473,9 +473,9 @@ Write(Byte[], Int32, Int32) -> Void
     - count (System.Int32): The number of bytes to be written to the current stream.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "Write" buffer offset count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:not supplied-offset) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.ReadOnlySpan`1[System.Byte]")) (cl:not supplied-offset) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "Write" buffer))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"
@@ -511,11 +511,11 @@ WriteAsync(Byte[], Int32, Int32, CancellationToken) -> Task
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests. The default value is System.Threading.CancellationToken.None.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:is-instance-of cancellation-token2 "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "WriteAsync" buffer cancellation-token count cancellation-token2))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "WriteAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.ReadOnlyMemory`1[System.Byte]")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "WriteAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-STREAM"

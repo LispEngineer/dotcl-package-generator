@@ -148,7 +148,14 @@
       (t (list base-name)))))
 
 (defun format-param-type-check (param-type arg-str)
-  "Returns a Lisp type checking expression string for the given C# parameter type."
+  "Returns a Lisp type checking expression string for the given C# parameter
+   type. The fallback branch (any type but the numeric primitives, Boolean,
+   or String) uses dotnet:is-instance-of (DotCL >= 0.1.18, dotcl/dotcl#45) to
+   check ARG-STR is actually an instance of PARAM-TYPE specifically, rather
+   than merely 'is some wrapped .NET object at all' -- the latter can't
+   distinguish two overloads differing only by a non-primitive parameter type
+   (e.g. Song vs. SongCollection) at the same position; see
+   doc/bug-in-dispatching.md."
   (cond
     ((member param-type '("System.Double" "System.Single" "System.Int32" "System.Int64" "System.Int16" "System.Byte" "System.Decimal") :test #'string=)
      (format nil "(cl:numberp ~A)" arg-str))
@@ -157,7 +164,7 @@
     ((string= param-type "System.String")
      (format nil "(cl:stringp ~A)" arg-str))
     (t
-     (format nil "(cl:or (cl:null ~A) (dotnet:object-type ~A))" arg-str arg-str))))
+     (format nil "(cl:or (cl:null ~A) (dotnet:is-instance-of ~A ~S))" arg-str arg-str param-type))))
 
 (cl:defun complex-group-p (clean-methods)
   "Returns t if the group of clean methods requires a master wrapper dispatch (either multiple overloads or presence of a usable default argument)."
@@ -247,18 +254,37 @@
             (cl:loop-finish))))
     (cl:nreverse prefix)))
 
+(cl:defun mandatory-param-count (m)
+  "Returns the number of leading parameters of method/constructor plist M
+   with no usable default (usable-default-p) -- M's effective minimum call
+   arity. Used both by max-mandatory-parameter-len (across a whole group)
+   and by master-wrapper-more-specific-p (per overload, for Master Wrapper
+   cond-clause ordering)."
+  (cl:loop for p in (cl:getf m :parameters)
+           while (cl:not (usable-default-p p))
+           count t))
+
 (cl:defun max-mandatory-parameter-len (methods)
   "Returns the maximum number of mandatory parameters (parameters without a usable default) in any single overload."
-  (cl:let ((max-len 0))
-    (cl:dolist (m methods)
-      (cl:let* ((params (cl:getf m :parameters))
-                (mandatory-count
-                  (cl:loop for p in params
-                           for idx from 0
-                           while (cl:not (usable-default-p p))
-                           count t)))
-        (cl:setf max-len (cl:max max-len mandatory-count))))
-    max-len))
+  (cl:reduce #'cl:max (cl:mapcar #'mandatory-param-count methods) :initial-value 0))
+
+(cl:defun master-wrapper-more-specific-p (a b)
+  "Returns t if overload/constructor plist A's Master Wrapper cond clause
+   must be tried before B's. Sorts by effective minimum (mandatory) arity
+   descending first, so a call supplying fewer arguments only ever matches
+   an overload whose mandatory arity is at most that many; among overloads
+   tied on mandatory arity, sorts by raw parameter count ascending, so an
+   overload with no trailing default (an exact match for a call that omits
+   the tied slot(s) entirely) is tried before one whose tied slot(s) are
+   filled by a defaulted trailing parameter instead. Fixes the bug documented
+   in doc/bug-in-dispatching.md, where sorting by raw parameter count alone
+   let a same-effective-arity overload with a defaulted trailing parameter
+   permanently shadow a shorter, fully-required overload's cond clause."
+  (cl:let ((ma (mandatory-param-count a))
+           (mb (mandatory-param-count b)))
+    (cl:if (cl:/= ma mb)
+        (cl:> ma mb)
+        (cl:< (cl:length (cl:getf a :parameters)) (cl:length (cl:getf b :parameters))))))
 
 (cl:defun collect-optional-positional-params (methods prefix-len max-mand-len)
   "Collects parameter descriptors for optional positional parameters from index prefix-len to max-mand-len."
@@ -500,8 +526,9 @@
       (cl:format stream "  \"~A\"~%" escaped-docstring))
     (cl:format stream "  (cl:cond~%")
 
-    ;; Sort methods by parameter count descending for specificity
-    (cl:let ((sorted-methods (cl:sort (cl:copy-list methods) #'> :key (cl:lambda (m) (cl:length (cl:getf m :parameters))))))
+    ;; Sort methods by effective (mandatory) arity for specificity -- see
+    ;; master-wrapper-more-specific-p.
+    (cl:let ((sorted-methods (cl:sort (cl:copy-list methods) #'master-wrapper-more-specific-p)))
       (cl:dolist (cm sorted-methods)
         (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
               (action-str (format-master-overload-action cm fq-name name static-p is-generic-p generic-type-names prefix opt-params key-params)))
@@ -558,8 +585,9 @@
       (cl:format stream "  \"~A\"~%" escaped-docstring))
     (cl:format stream "  (cl:cond~%")
 
-    ;; Sort constructors by parameter count descending for specificity
-    (cl:let ((sorted-ctors (cl:sort (cl:copy-list ctors) #'> :key (cl:lambda (m) (cl:length (cl:getf m :parameters))))))
+    ;; Sort constructors by effective (mandatory) arity for specificity --
+    ;; see master-wrapper-more-specific-p.
+    (cl:let ((sorted-ctors (cl:sort (cl:copy-list ctors) #'master-wrapper-more-specific-p)))
       (cl:dolist (cm sorted-ctors)
         (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
                  (action-str (format-constructor-master-overload-action cm prefix opt-params key-params)))

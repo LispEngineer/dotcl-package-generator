@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Array
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-array)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Array"))
 (cl:defconstant <type-str> "System.Array")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defvar %max-length-cache% csharp-assembly-utils:+unbound-marker+)
 (cl:define-symbol-macro +max-length+
@@ -91,13 +91,13 @@ BinarySearch(Array, Int32, Int32, Object, IComparer) -> Int32
     - comparer (System.Collections.IComparer): The System.Collections.IComparer implementation to use when comparing elements. -or- to use the System.IComparable implementation of each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp value) supplied-comparer (cl:numberp comparer) supplied-value2 (cl:or (cl:null value2) (dotnet:object-type value2)) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:object-type comparer2)))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:numberp value) supplied-comparer (cl:numberp comparer) supplied-value2 (cl:or (cl:null value2) (dotnet:is-instance-of value2 "System.Object")) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:is-instance-of comparer2 "System.Collections.IComparer")))
      (dotnet:static <type-str> "BinarySearch" array value comparer value2 comparer2))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp value) supplied-comparer (cl:numberp comparer) supplied-value2 (cl:or (cl:null value2) (dotnet:object-type value2)) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:numberp value) supplied-comparer (cl:numberp comparer) supplied-value2 (cl:or (cl:null value2) (dotnet:is-instance-of value2 "System.Object")) (cl:not supplied-comparer2))
      (dotnet:static <type-str> "BinarySearch" array value comparer value2))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-value2) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.IComparer")) (cl:not supplied-value2) (cl:not supplied-comparer2))
      (dotnet:static <type-str> "BinarySearch" array value comparer))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparer) (cl:not supplied-value2) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-comparer) (cl:not supplied-value2) (cl:not supplied-comparer2))
      (dotnet:static <type-str> "BinarySearch" array value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -143,13 +143,13 @@ BinarySearch(T[], Int32, Int32, T, IComparer) -> Int32
     - comparer (System.Collections.Generic.IComparer`1[T]): The System.Collections.Generic.IComparer`1 implementation to use when comparing elements. -or- to use the System.IComparable`1 implementation of each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp value) supplied-comparer (cl:numberp comparer) supplied-value2 (cl:or (cl:null value2) (dotnet:object-type value2)) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:object-type comparer2)))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:numberp value) supplied-comparer (cl:numberp comparer) supplied-value2 (cl:or (cl:null value2) (dotnet:is-instance-of value2 "T")) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:is-instance-of comparer2 "System.Collections.Generic.IComparer`1[T]")))
      (dotnet:static-generic <type-str> "BinarySearch" (cl:list type) array value comparer value2 comparer2))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp value) supplied-comparer (cl:numberp comparer) supplied-value2 (cl:or (cl:null value2) (dotnet:object-type value2)) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:numberp value) supplied-comparer (cl:numberp comparer) supplied-value2 (cl:or (cl:null value2) (dotnet:is-instance-of value2 "T")) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "BinarySearch" (cl:list type) array value comparer value2))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-value2) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[T]")) (cl:not supplied-value2) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "BinarySearch" (cl:list type) array value comparer))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparer) (cl:not supplied-value2) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:not supplied-comparer) (cl:not supplied-value2) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "BinarySearch" (cl:list type) array value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -190,9 +190,9 @@ Clear(Array, Int32, Int32) -> Void
     - length (System.Int32): The number of elements to clear.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-index (cl:numberp index) supplied-length (cl:numberp length))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) supplied-index (cl:numberp index) supplied-length (cl:numberp length))
      (dotnet:static <type-str> "Clear" array index length))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:not supplied-index) (cl:not supplied-length))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:not supplied-index) (cl:not supplied-length))
      (dotnet:static <type-str> "Clear" array))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -262,13 +262,13 @@ Copy(Array, Int32, Array, Int32, Int32) -> Void
     - length (System.Int32): A 32-bit integer that represents the number of elements to copy.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null source-array) (dotnet:object-type source-array)) (cl:numberp destination-array) (cl:or (cl:null length) (dotnet:object-type length)) supplied-destination-index (cl:numberp destination-index) supplied-length2 (cl:numberp length2))
+    ((cl:and (cl:or (cl:null source-array) (dotnet:is-instance-of source-array "System.Array")) (cl:numberp destination-array) (cl:or (cl:null length) (dotnet:is-instance-of length "System.Array")) supplied-destination-index (cl:numberp destination-index) supplied-length2 (cl:numberp length2))
      (dotnet:static <type-str> "Copy" source-array destination-array length destination-index length2))
-    ((cl:and (cl:or (cl:null source-array) (dotnet:object-type source-array)) (cl:numberp destination-array) (cl:or (cl:null length) (dotnet:object-type length)) supplied-destination-index (cl:numberp destination-index) supplied-length2 (cl:numberp length2))
+    ((cl:and (cl:or (cl:null source-array) (dotnet:is-instance-of source-array "System.Array")) (cl:numberp destination-array) (cl:or (cl:null length) (dotnet:is-instance-of length "System.Array")) supplied-destination-index (cl:numberp destination-index) supplied-length2 (cl:numberp length2))
      (dotnet:static <type-str> "Copy" source-array destination-array length destination-index length2))
-    ((cl:and (cl:or (cl:null source-array) (dotnet:object-type source-array)) (cl:or (cl:null destination-array) (dotnet:object-type destination-array)) (cl:numberp length) (cl:not supplied-destination-index) (cl:not supplied-length2))
+    ((cl:and (cl:or (cl:null source-array) (dotnet:is-instance-of source-array "System.Array")) (cl:or (cl:null destination-array) (dotnet:is-instance-of destination-array "System.Array")) (cl:numberp length) (cl:not supplied-destination-index) (cl:not supplied-length2))
      (dotnet:static <type-str> "Copy" source-array destination-array length))
-    ((cl:and (cl:or (cl:null source-array) (dotnet:object-type source-array)) (cl:or (cl:null destination-array) (dotnet:object-type destination-array)) (cl:numberp length) (cl:not supplied-destination-index) (cl:not supplied-length2))
+    ((cl:and (cl:or (cl:null source-array) (dotnet:is-instance-of source-array "System.Array")) (cl:or (cl:null destination-array) (dotnet:is-instance-of destination-array "System.Array")) (cl:numberp length) (cl:not supplied-destination-index) (cl:not supplied-length2))
      (dotnet:static <type-str> "Copy" source-array destination-array length))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -292,9 +292,9 @@ CopyTo(Array, Int64) -> Void
     - index (System.Int64): A 64-bit integer that represents the index in the destination array at which copying begins.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp index))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:numberp index))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "CopyTo" array index))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp index))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:numberp index))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "CopyTo" array index))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -338,13 +338,13 @@ CreateInstance(Type, Int32, Int32, Int32) -> Array
     - length3 (System.Int32): The size of the third dimension of the System.Array to create.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null element-type) (dotnet:object-type element-type)) (cl:numberp length) supplied-length2 (cl:numberp length2) supplied-length3 (cl:numberp length3))
+    ((cl:and (cl:or (cl:null element-type) (dotnet:is-instance-of element-type "System.Type")) (cl:numberp length) supplied-length2 (cl:numberp length2) supplied-length3 (cl:numberp length3))
      (dotnet:static <type-str> "CreateInstance" element-type length length2 length3))
-    ((cl:and (cl:or (cl:null element-type) (dotnet:object-type element-type)) (cl:numberp length) supplied-length2 (cl:numberp length2) (cl:not supplied-length3))
+    ((cl:and (cl:or (cl:null element-type) (dotnet:is-instance-of element-type "System.Type")) (cl:numberp length) supplied-length2 (cl:numberp length2) (cl:not supplied-length3))
      (dotnet:static <type-str> "CreateInstance" element-type length length2))
-    ((cl:and (cl:or (cl:null element-type) (dotnet:object-type element-type)) (cl:or (cl:null length) (dotnet:object-type length)) supplied-length2 (cl:or (cl:null length2) (dotnet:object-type length2)) (cl:not supplied-length3))
+    ((cl:and (cl:or (cl:null element-type) (dotnet:is-instance-of element-type "System.Type")) (cl:or (cl:null length) (dotnet:is-instance-of length "System.Int32[]")) supplied-length2 (cl:or (cl:null length2) (dotnet:is-instance-of length2 "System.Int32[]")) (cl:not supplied-length3))
      (dotnet:static <type-str> "CreateInstance" element-type length length2))
-    ((cl:and (cl:or (cl:null element-type) (dotnet:object-type element-type)) (cl:numberp length) (cl:not supplied-length2) (cl:not supplied-length3))
+    ((cl:and (cl:or (cl:null element-type) (dotnet:is-instance-of element-type "System.Type")) (cl:numberp length) (cl:not supplied-length2) (cl:not supplied-length3))
      (dotnet:static <type-str> "CreateInstance" element-type length))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -377,9 +377,9 @@ CreateInstanceFromArrayType(Type, Int32[], Int32[]) -> Array
     - lower-bounds (System.Int32[]): A one-dimensional array that contains the lower bound (starting index) of each dimension of the System.Array to create.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array-type) (dotnet:object-type array-type)) (cl:or (cl:null length) (dotnet:object-type length)) supplied-lower-bounds (cl:or (cl:null lower-bounds) (dotnet:object-type lower-bounds)))
+    ((cl:and (cl:or (cl:null array-type) (dotnet:is-instance-of array-type "System.Type")) (cl:or (cl:null length) (dotnet:is-instance-of length "System.Int32[]")) supplied-lower-bounds (cl:or (cl:null lower-bounds) (dotnet:is-instance-of lower-bounds "System.Int32[]")))
      (dotnet:static <type-str> "CreateInstanceFromArrayType" array-type length lower-bounds))
-    ((cl:and (cl:or (cl:null array-type) (dotnet:object-type array-type)) (cl:numberp length) (cl:not supplied-lower-bounds))
+    ((cl:and (cl:or (cl:null array-type) (dotnet:is-instance-of array-type "System.Type")) (cl:numberp length) (cl:not supplied-lower-bounds))
      (dotnet:static <type-str> "CreateInstanceFromArrayType" array-type length))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -425,9 +425,9 @@ Fill(T[], T, Int32, Int32) -> Void
     - count (System.Int32): The number of elements to copy.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:static-generic <type-str> "Fill" (cl:list type) array value start-index count))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static-generic <type-str> "Fill" (cl:list type) array value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -481,11 +481,11 @@ FindIndex(T[], Int32, Int32, Predicate) -> Int32
     - match (System.Predicate`1[T]): The System.Predicate`1 that defines the conditions of the element to search for.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp match) supplied-match2 (cl:numberp match2) supplied-match3 (cl:or (cl:null match3) (dotnet:object-type match3)))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:numberp match) supplied-match2 (cl:numberp match2) supplied-match3 (cl:or (cl:null match3) (dotnet:is-instance-of match3 "System.Predicate`1[T]")))
      (dotnet:static-generic <type-str> "FindIndex" (cl:list type) array match match2 match3))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp match) supplied-match2 (cl:or (cl:null match2) (dotnet:object-type match2)) (cl:not supplied-match3))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:numberp match) supplied-match2 (cl:or (cl:null match2) (dotnet:is-instance-of match2 "System.Predicate`1[T]")) (cl:not supplied-match3))
      (dotnet:static-generic <type-str> "FindIndex" (cl:list type) array match match2))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null match) (dotnet:object-type match)) (cl:not supplied-match2) (cl:not supplied-match3))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null match) (dotnet:is-instance-of match "System.Predicate`1[T]")) (cl:not supplied-match2) (cl:not supplied-match3))
      (dotnet:static-generic <type-str> "FindIndex" (cl:list type) array match))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -530,11 +530,11 @@ FindLastIndex(T[], Int32, Int32, Predicate) -> Int32
     - match (System.Predicate`1[T]): The System.Predicate`1 that defines the conditions of the element to search for.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp match) supplied-match2 (cl:numberp match2) supplied-match3 (cl:or (cl:null match3) (dotnet:object-type match3)))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:numberp match) supplied-match2 (cl:numberp match2) supplied-match3 (cl:or (cl:null match3) (dotnet:is-instance-of match3 "System.Predicate`1[T]")))
      (dotnet:static-generic <type-str> "FindLastIndex" (cl:list type) array match match2 match3))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:numberp match) supplied-match2 (cl:or (cl:null match2) (dotnet:object-type match2)) (cl:not supplied-match3))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:numberp match) supplied-match2 (cl:or (cl:null match2) (dotnet:is-instance-of match2 "System.Predicate`1[T]")) (cl:not supplied-match3))
      (dotnet:static-generic <type-str> "FindLastIndex" (cl:list type) array match match2))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null match) (dotnet:object-type match)) (cl:not supplied-match2) (cl:not supplied-match3))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null match) (dotnet:is-instance-of match "System.Predicate`1[T]")) (cl:not supplied-match2) (cl:not supplied-match3))
      (dotnet:static-generic <type-str> "FindLastIndex" (cl:list type) array match))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -686,11 +686,11 @@ IndexOf(Array, Object, Int32, Int32) -> Int32
     - count (System.Int32): The number of elements to search.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:static <type-str> "IndexOf" array value start-index count))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "IndexOf" array value start-index))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "IndexOf" array value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -726,11 +726,11 @@ IndexOf(T[], T, Int32, Int32) -> Int32
     - count (System.Int32): The number of elements in the section to search.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:static-generic <type-str> "IndexOf" (cl:list type) array value start-index count))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
      (dotnet:static-generic <type-str> "IndexOf" (cl:list type) array value start-index))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static-generic <type-str> "IndexOf" (cl:list type) array value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -788,11 +788,11 @@ LastIndexOf(Array, Object, Int32, Int32) -> Int32
     - count (System.Int32): The number of elements in the section to search.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:static <type-str> "LastIndexOf" array value start-index count))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "LastIndexOf" array value start-index))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "LastIndexOf" array value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -828,11 +828,11 @@ LastIndexOf(T[], T, Int32, Int32) -> Int32
     - count (System.Int32): The number of elements in the section to search.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:static-generic <type-str> "LastIndexOf" (cl:list type) array value start-index count))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
      (dotnet:static-generic <type-str> "LastIndexOf" (cl:list type) array value start-index))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static-generic <type-str> "LastIndexOf" (cl:list type) array value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -877,9 +877,9 @@ Reverse(Array, Int32, Int32) -> Void
     - length (System.Int32): The number of elements in the section to reverse.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-index (cl:numberp index) supplied-length (cl:numberp length))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) supplied-index (cl:numberp index) supplied-length (cl:numberp length))
      (dotnet:static <type-str> "Reverse" array index length))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:not supplied-index) (cl:not supplied-length))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:not supplied-index) (cl:not supplied-length))
      (dotnet:static <type-str> "Reverse" array))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -903,9 +903,9 @@ Reverse(T[], Int32, Int32) -> Void
     - length (System.Int32): The number of elements in the section to reverse.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-index (cl:numberp index) supplied-length (cl:numberp length))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) supplied-index (cl:numberp index) supplied-length (cl:numberp length))
      (dotnet:static-generic <type-str> "Reverse" (cl:list type) array index length))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:not supplied-index) (cl:not supplied-length))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:not supplied-index) (cl:not supplied-length))
      (dotnet:static-generic <type-str> "Reverse" (cl:list type) array))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -976,17 +976,17 @@ SetValue(Object, Int64, Int64, Int64) -> Void
     - index3 (System.Int64): A 64-bit integer that represents the third-dimension index of the System.Array element to set.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:numberp index) supplied-index2 (cl:numberp index2) supplied-index3 (cl:numberp index3))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) supplied-index2 (cl:numberp index2) supplied-index3 (cl:numberp index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index index2 index3))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:numberp index) supplied-index2 (cl:numberp index2) supplied-index3 (cl:numberp index3))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) supplied-index2 (cl:numberp index2) supplied-index3 (cl:numberp index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index index2 index3))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:numberp index) supplied-index2 (cl:numberp index2) (cl:not supplied-index3))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) supplied-index2 (cl:numberp index2) (cl:not supplied-index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index index2))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:numberp index) supplied-index2 (cl:numberp index2) (cl:not supplied-index3))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) supplied-index2 (cl:numberp index2) (cl:not supplied-index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index index2))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:numberp index) (cl:not supplied-index2) (cl:not supplied-index3))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) (cl:not supplied-index2) (cl:not supplied-index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:numberp index) (cl:not supplied-index2) (cl:not supplied-index3))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) (cl:not supplied-index2) (cl:not supplied-index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -1060,21 +1060,21 @@ Sort(Array, Array, Int32, Int32, IComparer) -> Void
     - comparer (System.Collections.IComparer): The System.Collections.IComparer implementation to use when comparing elements. -or- to use the System.IComparable implementation of each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-items (cl:or (cl:null items) (dotnet:object-type items)) supplied-length (cl:numberp length) supplied-length2 (cl:numberp length2) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) supplied-items (cl:or (cl:null items) (dotnet:is-instance-of items "System.Array")) supplied-length (cl:numberp length) supplied-length2 (cl:numberp length2) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.IComparer")))
      (dotnet:static <type-str> "Sort" array items length length2 comparer))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-items (cl:or (cl:null items) (dotnet:object-type items)) supplied-length (cl:numberp length) supplied-length2 (cl:numberp length2) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) supplied-items (cl:or (cl:null items) (dotnet:is-instance-of items "System.Array")) supplied-length (cl:numberp length) supplied-length2 (cl:numberp length2) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Sort" array items length length2))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-items (cl:numberp items) supplied-length (cl:numberp length) supplied-length2 (cl:or (cl:null length2) (dotnet:object-type length2)) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) supplied-items (cl:numberp items) supplied-length (cl:numberp length) supplied-length2 (cl:or (cl:null length2) (dotnet:is-instance-of length2 "System.Collections.IComparer")) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Sort" array items length length2))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-items (cl:numberp items) supplied-length (cl:numberp length) (cl:not supplied-length2) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) supplied-items (cl:numberp items) supplied-length (cl:numberp length) (cl:not supplied-length2) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Sort" array items length))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-items (cl:or (cl:null items) (dotnet:object-type items)) supplied-length (cl:or (cl:null length) (dotnet:object-type length)) (cl:not supplied-length2) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) supplied-items (cl:or (cl:null items) (dotnet:is-instance-of items "System.Array")) supplied-length (cl:or (cl:null length) (dotnet:is-instance-of length "System.Collections.IComparer")) (cl:not supplied-length2) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Sort" array items length))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-items (cl:or (cl:null items) (dotnet:object-type items)) (cl:not supplied-length) (cl:not supplied-length2) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) supplied-items (cl:or (cl:null items) (dotnet:is-instance-of items "System.Array")) (cl:not supplied-length) (cl:not supplied-length2) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Sort" array items))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-items (cl:or (cl:null items) (dotnet:object-type items)) (cl:not supplied-length) (cl:not supplied-length2) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) supplied-items (cl:or (cl:null items) (dotnet:is-instance-of items "System.Collections.IComparer")) (cl:not supplied-length) (cl:not supplied-length2) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Sort" array items))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:not supplied-items) (cl:not supplied-length) (cl:not supplied-length2) (cl:not supplied-comparer))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:not supplied-items) (cl:not supplied-length) (cl:not supplied-length2) (cl:not supplied-comparer))
      (dotnet:static <type-str> "Sort" array))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -1118,15 +1118,15 @@ Sort(T[], Int32, Int32, IComparer) -> Void
     - comparer (System.Collections.Generic.IComparer`1[T]): The System.Collections.Generic.IComparer`1 generic interface implementation to use when comparing elements, or to use the System.IComparable`1 generic interface implementation of each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-comparer (cl:numberp comparer) supplied-length (cl:numberp length) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:object-type comparer2)))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) supplied-comparer (cl:numberp comparer) supplied-length (cl:numberp length) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:is-instance-of comparer2 "System.Collections.Generic.IComparer`1[T]")))
      (dotnet:static-generic <type-str> "Sort" (cl:list type) array comparer length comparer2))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-comparer (cl:numberp comparer) supplied-length (cl:numberp length) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) supplied-comparer (cl:numberp comparer) supplied-length (cl:numberp length) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "Sort" (cl:list type) array comparer length))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-length) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[T]")) (cl:not supplied-length) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "Sort" (cl:list type) array comparer))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-length) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Comparison`1[T]")) (cl:not supplied-length) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "Sort" (cl:list type) array comparer))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:not supplied-comparer) (cl:not supplied-length) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:not supplied-comparer) (cl:not supplied-length) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "Sort" (cl:list type) array))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
@@ -1168,13 +1168,13 @@ Sort(TKey[], TValue[], Int32, Int32, IComparer) -> Void
     - comparer (System.Collections.Generic.IComparer`1[TKey]): The System.Collections.Generic.IComparer`1 generic interface implementation to use when comparing elements, or to use the System.IComparable`1 generic interface implementation of each element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null keys) (dotnet:object-type keys)) (cl:or (cl:null items) (dotnet:object-type items)) supplied-comparer (cl:numberp comparer) supplied-length (cl:numberp length) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:object-type comparer2)))
+    ((cl:and (cl:or (cl:null keys) (dotnet:is-instance-of keys "TKey[]")) (cl:or (cl:null items) (dotnet:is-instance-of items "TValue[]")) supplied-comparer (cl:numberp comparer) supplied-length (cl:numberp length) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:is-instance-of comparer2 "System.Collections.Generic.IComparer`1[TKey]")))
      (dotnet:static-generic <type-str> "Sort" (cl:list type-1 type-2) keys items comparer length comparer2))
-    ((cl:and (cl:or (cl:null keys) (dotnet:object-type keys)) (cl:or (cl:null items) (dotnet:object-type items)) supplied-comparer (cl:numberp comparer) supplied-length (cl:numberp length) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null keys) (dotnet:is-instance-of keys "TKey[]")) (cl:or (cl:null items) (dotnet:is-instance-of items "TValue[]")) supplied-comparer (cl:numberp comparer) supplied-length (cl:numberp length) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "Sort" (cl:list type-1 type-2) keys items comparer length))
-    ((cl:and (cl:or (cl:null keys) (dotnet:object-type keys)) (cl:or (cl:null items) (dotnet:object-type items)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-length) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null keys) (dotnet:is-instance-of keys "TKey[]")) (cl:or (cl:null items) (dotnet:is-instance-of items "TValue[]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TKey]")) (cl:not supplied-length) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "Sort" (cl:list type-1 type-2) keys items comparer))
-    ((cl:and (cl:or (cl:null keys) (dotnet:object-type keys)) (cl:or (cl:null items) (dotnet:object-type items)) (cl:not supplied-comparer) (cl:not supplied-length) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null keys) (dotnet:is-instance-of keys "TKey[]")) (cl:or (cl:null items) (dotnet:is-instance-of items "TValue[]")) (cl:not supplied-comparer) (cl:not supplied-length) (cl:not supplied-comparer2))
      (dotnet:static-generic <type-str> "Sort" (cl:list type-1 type-2) keys items))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IAsyncDisposable
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-i-async-disposable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IAsyncDisposable"))
 (cl:defconstant <type-str> "System.IAsyncDisposable")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun dispose-async (obj!)
   "Summary: Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources asynchronously.

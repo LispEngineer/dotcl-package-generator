@@ -351,6 +351,58 @@ namespace AssemblyToLispyTestTarget
     }
 
     /// <summary>
+    /// Two unrelated reference types used only by
+    /// <see cref="MasterWrapperDispatchOrderTestClass"/>, to exercise a Master Wrapper's
+    /// dispatch order/type-check guards without either type carrying any other meaning.
+    /// </summary>
+    public class DispatchOrderTestTypeA
+    {
+    }
+
+    /// <summary>
+    /// See <see cref="DispatchOrderTestTypeA"/>.
+    /// </summary>
+    public class DispatchOrderTestTypeB
+    {
+    }
+
+    /// <summary>
+    /// Reproduces the exact shape of the real-world bug documented in
+    /// doc/bug-in-dispatching.md (Microsoft.Xna.Framework.Media.MediaPlayer.Play): two
+    /// overloads of one method name share a 1-parameter required prefix, but one overload
+    /// is fully required at that arity while the other has a defaulted trailing parameter,
+    /// and the discriminating parameter type in both cases is a non-primitive reference
+    /// type (exercising format-param-type-check's weak fallback branch, not one of the
+    /// numeric/Boolean/String types it special-cases). A correct Master Wrapper must route
+    /// a single-argument call to Go(DispatchOrderTestTypeA), never
+    /// Go(DispatchOrderTestTypeB, 0) -- the bug this class exists to catch.
+    /// </summary>
+    public class MasterWrapperDispatchOrderTestClass
+    {
+        /// <summary>
+        /// The fully-required, 1-parameter overload -- the one the caller actually wants
+        /// when calling with a single DispatchOrderTestTypeA argument.
+        /// </summary>
+        /// <param name="a">A DispatchOrderTestTypeA argument.</param>
+        public void Go(DispatchOrderTestTypeA a)
+        {
+        }
+
+        /// <summary>
+        /// A 2-parameter overload whose trailing parameter has a usable default, so its
+        /// effective minimum arity (1) ties with the overload above's raw arity. Its own
+        /// discriminating parameter is a DIFFERENT reference type, so a call passing a
+        /// DispatchOrderTestTypeA must never match this overload at all.
+        /// </summary>
+        /// <param name="b">A DispatchOrderTestTypeB argument.</param>
+        /// <param name="extra">A usable int default, making this overload's effective
+        /// minimum arity 1, tied with the overload above.</param>
+        public void Go(DispatchOrderTestTypeB b, int extra = 0)
+        {
+        }
+    }
+
+    /// <summary>
     /// A class containing generic methods of one or more type arguments for testing.
     /// </summary>
     public class GenericMethodTestClass

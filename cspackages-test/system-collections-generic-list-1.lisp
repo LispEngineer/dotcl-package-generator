@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.List`1
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-collections-generic-list-1)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.List`1"))
 (cl:defconstant <type-str> "System.Collections.Generic.List`1")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity))
   "Master wrapper for System.Collections.Generic.List`1 constructor overloads. Dispatches at runtime.
@@ -29,7 +29,7 @@ new(IEnumerable)
   (cl:cond
     ((cl:and supplied-capacity (cl:numberp capacity))
      (dotnet:new <type-str> capacity))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.Generic.IEnumerable`1[T]")))
      (dotnet:new <type-str> capacity))
     ((cl:and (cl:not supplied-capacity))
      (dotnet:new <type-str>))
@@ -103,11 +103,11 @@ BinarySearch(Int32, Int32, T, IComparer) -> Int32
     - comparer (System.Collections.Generic.IComparer`1[T]): The System.Collections.Generic.IComparer`1 implementation to use when comparing elements, or to use the default comparer System.Collections.Generic.Comparer`1.Default.
 "
   (cl:cond
-    ((cl:and (cl:numberp item) supplied-comparer (cl:numberp comparer) supplied-item2 (cl:or (cl:null item2) (dotnet:object-type item2)) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:object-type comparer2)))
+    ((cl:and (cl:numberp item) supplied-comparer (cl:numberp comparer) supplied-item2 (cl:or (cl:null item2) (dotnet:is-instance-of item2 "T")) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:is-instance-of comparer2 "System.Collections.Generic.IComparer`1[T]")))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "BinarySearch" item comparer item2 comparer2))
-    ((cl:and (cl:or (cl:null item) (dotnet:object-type item)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-item2) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null item) (dotnet:is-instance-of item "T")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[T]")) (cl:not supplied-item2) (cl:not supplied-comparer2))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "BinarySearch" item comparer))
-    ((cl:and (cl:or (cl:null item) (dotnet:object-type item)) (cl:not supplied-comparer) (cl:not supplied-item2) (cl:not supplied-comparer2))
+    ((cl:and (cl:or (cl:null item) (dotnet:is-instance-of item "T")) (cl:not supplied-comparer) (cl:not supplied-item2) (cl:not supplied-comparer2))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "BinarySearch" item))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-COLLECTIONS-GENERIC-LIST-1"
@@ -159,11 +159,11 @@ CopyTo(Int32, T[], Int32, Int32) -> Void
     - count (System.Int32): The number of elements to copy.
 "
   (cl:cond
-    ((cl:and (cl:numberp array) supplied-array-index (cl:or (cl:null array-index) (dotnet:object-type array-index)) supplied-array-index2 (cl:numberp array-index2) supplied-count (cl:numberp count))
+    ((cl:and (cl:numberp array) supplied-array-index (cl:or (cl:null array-index) (dotnet:is-instance-of array-index "T[]")) supplied-array-index2 (cl:numberp array-index2) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "CopyTo" array array-index array-index2 count))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-array-index (cl:numberp array-index) (cl:not supplied-array-index2) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) supplied-array-index (cl:numberp array-index) (cl:not supplied-array-index2) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "CopyTo" array array-index))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:not supplied-array-index) (cl:not supplied-array-index2) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "T[]")) (cl:not supplied-array-index) (cl:not supplied-array-index2) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "CopyTo" array))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-COLLECTIONS-GENERIC-LIST-1"
@@ -228,11 +228,11 @@ FindIndex(Int32, Int32, Predicate) -> Int32
     - match (System.Predicate`1[T]): The System.Predicate`1 delegate that defines the conditions of the element to search for.
 "
   (cl:cond
-    ((cl:and (cl:numberp match) supplied-match2 (cl:numberp match2) supplied-match3 (cl:or (cl:null match3) (dotnet:object-type match3)))
+    ((cl:and (cl:numberp match) supplied-match2 (cl:numberp match2) supplied-match3 (cl:or (cl:null match3) (dotnet:is-instance-of match3 "System.Predicate`1[T]")))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "FindIndex" match match2 match3))
-    ((cl:and (cl:numberp match) supplied-match2 (cl:or (cl:null match2) (dotnet:object-type match2)) (cl:not supplied-match3))
+    ((cl:and (cl:numberp match) supplied-match2 (cl:or (cl:null match2) (dotnet:is-instance-of match2 "System.Predicate`1[T]")) (cl:not supplied-match3))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "FindIndex" match match2))
-    ((cl:and (cl:or (cl:null match) (dotnet:object-type match)) (cl:not supplied-match2) (cl:not supplied-match3))
+    ((cl:and (cl:or (cl:null match) (dotnet:is-instance-of match "System.Predicate`1[T]")) (cl:not supplied-match2) (cl:not supplied-match3))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "FindIndex" match))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-COLLECTIONS-GENERIC-LIST-1"
@@ -273,11 +273,11 @@ FindLastIndex(Int32, Int32, Predicate) -> Int32
     - match (System.Predicate`1[T]): The System.Predicate`1 delegate that defines the conditions of the element to search for.
 "
   (cl:cond
-    ((cl:and (cl:numberp match) supplied-match2 (cl:numberp match2) supplied-match3 (cl:or (cl:null match3) (dotnet:object-type match3)))
+    ((cl:and (cl:numberp match) supplied-match2 (cl:numberp match2) supplied-match3 (cl:or (cl:null match3) (dotnet:is-instance-of match3 "System.Predicate`1[T]")))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "FindLastIndex" match match2 match3))
-    ((cl:and (cl:numberp match) supplied-match2 (cl:or (cl:null match2) (dotnet:object-type match2)) (cl:not supplied-match3))
+    ((cl:and (cl:numberp match) supplied-match2 (cl:or (cl:null match2) (dotnet:is-instance-of match2 "System.Predicate`1[T]")) (cl:not supplied-match3))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "FindLastIndex" match match2))
-    ((cl:and (cl:or (cl:null match) (dotnet:object-type match)) (cl:not supplied-match2) (cl:not supplied-match3))
+    ((cl:and (cl:or (cl:null match) (dotnet:is-instance-of match "System.Predicate`1[T]")) (cl:not supplied-match2) (cl:not supplied-match3))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "FindLastIndex" match))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-COLLECTIONS-GENERIC-LIST-1"
@@ -332,11 +332,11 @@ IndexOf(T, Int32, Int32) -> Int32
     - count (System.Int32): The number of elements in the section to search.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null item) (dotnet:object-type item)) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null item) (dotnet:is-instance-of item "T")) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "IndexOf" item index count))
-    ((cl:and (cl:or (cl:null item) (dotnet:object-type item)) supplied-index (cl:numberp index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null item) (dotnet:is-instance-of item "T")) supplied-index (cl:numberp index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "IndexOf" item index))
-    ((cl:and (cl:or (cl:null item) (dotnet:object-type item)) (cl:not supplied-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null item) (dotnet:is-instance-of item "T")) (cl:not supplied-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "IndexOf" item))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-COLLECTIONS-GENERIC-LIST-1"
@@ -385,11 +385,11 @@ LastIndexOf(T, Int32, Int32) -> Int32
     - count (System.Int32): The number of elements in the section to search.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null item) (dotnet:object-type item)) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null item) (dotnet:is-instance-of item "T")) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "LastIndexOf" item index count))
-    ((cl:and (cl:or (cl:null item) (dotnet:object-type item)) supplied-index (cl:numberp index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null item) (dotnet:is-instance-of item "T")) supplied-index (cl:numberp index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "LastIndexOf" item index))
-    ((cl:and (cl:or (cl:null item) (dotnet:object-type item)) (cl:not supplied-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null item) (dotnet:is-instance-of item "T")) (cl:not supplied-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "LastIndexOf" item))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-COLLECTIONS-GENERIC-LIST-1"
@@ -484,11 +484,11 @@ Sort(Int32, Int32, IComparer) -> Void
     - comparer (System.Collections.Generic.IComparer`1[T]): The System.Collections.Generic.IComparer`1 implementation to use when comparing elements, or to use the default comparer System.Collections.Generic.Comparer`1.Default.
 "
   (cl:cond
-    ((cl:and supplied-comparer (cl:numberp comparer) supplied-count (cl:numberp count) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:object-type comparer2)))
+    ((cl:and supplied-comparer (cl:numberp comparer) supplied-count (cl:numberp count) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:is-instance-of comparer2 "System.Collections.Generic.IComparer`1[T]")))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "Sort" comparer count comparer2))
-    ((cl:and supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-count) (cl:not supplied-comparer2))
+    ((cl:and supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[T]")) (cl:not supplied-count) (cl:not supplied-comparer2))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "Sort" comparer))
-    ((cl:and supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-count) (cl:not supplied-comparer2))
+    ((cl:and supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Comparison`1[T]")) (cl:not supplied-count) (cl:not supplied-comparer2))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "Sort" comparer))
     ((cl:and (cl:not supplied-comparer) (cl:not supplied-count) (cl:not supplied-comparer2))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.List`1") obj!) "Sort"))

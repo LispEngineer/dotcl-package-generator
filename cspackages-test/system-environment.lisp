@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Environment
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-environment)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Environment"))
 (cl:defconstant <type-str> "System.Environment")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:define-symbol-macro command-line (dotnet:static <type-str> "CommandLine"))
 
@@ -82,7 +82,7 @@ FailFast(String) -> Void
 FailFast(String, Exception) -> Void
 "
   (cl:cond
-    ((cl:and (cl:stringp message) supplied-exception (cl:or (cl:null exception) (dotnet:object-type exception)))
+    ((cl:and (cl:stringp message) supplied-exception (cl:or (cl:null exception) (dotnet:is-instance-of exception "System.Exception")))
      (dotnet:static <type-str> "FailFast" message exception))
     ((cl:and (cl:stringp message) (cl:not supplied-exception))
      (dotnet:static <type-str> "FailFast" message))
@@ -103,7 +103,7 @@ GetEnvironmentVariable(String) -> String
 GetEnvironmentVariable(String, EnvironmentVariableTarget) -> String
 "
   (cl:cond
-    ((cl:and (cl:stringp variable) supplied-target (cl:or (cl:null target) (dotnet:object-type target)))
+    ((cl:and (cl:stringp variable) supplied-target (cl:or (cl:null target) (dotnet:is-instance-of target "System.EnvironmentVariableTarget")))
      (dotnet:static <type-str> "GetEnvironmentVariable" variable target))
     ((cl:and (cl:stringp variable) (cl:not supplied-target))
      (dotnet:static <type-str> "GetEnvironmentVariable" variable))
@@ -121,7 +121,7 @@ GetEnvironmentVariables() -> IDictionary
 GetEnvironmentVariables(EnvironmentVariableTarget) -> IDictionary
 "
   (cl:cond
-    ((cl:and supplied-target (cl:or (cl:null target) (dotnet:object-type target)))
+    ((cl:and supplied-target (cl:or (cl:null target) (dotnet:is-instance-of target "System.EnvironmentVariableTarget")))
      (dotnet:static <type-str> "GetEnvironmentVariables" target))
     ((cl:and (cl:not supplied-target))
      (dotnet:static <type-str> "GetEnvironmentVariables"))
@@ -139,9 +139,9 @@ GetFolderPath(Environment+SpecialFolder) -> String
 GetFolderPath(Environment+SpecialFolder, Environment+SpecialFolderOption) -> String
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null folder) (dotnet:object-type folder)) supplied-option (cl:or (cl:null option) (dotnet:object-type option)))
+    ((cl:and (cl:or (cl:null folder) (dotnet:is-instance-of folder "System.Environment+SpecialFolder")) supplied-option (cl:or (cl:null option) (dotnet:is-instance-of option "System.Environment+SpecialFolderOption")))
      (dotnet:static <type-str> "GetFolderPath" folder option))
-    ((cl:and (cl:or (cl:null folder) (dotnet:object-type folder)) (cl:not supplied-option))
+    ((cl:and (cl:or (cl:null folder) (dotnet:is-instance-of folder "System.Environment+SpecialFolder")) (cl:not supplied-option))
      (dotnet:static <type-str> "GetFolderPath" folder))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ENVIRONMENT"
@@ -160,7 +160,7 @@ SetEnvironmentVariable(String, String) -> Void
 SetEnvironmentVariable(String, String, EnvironmentVariableTarget) -> Void
 "
   (cl:cond
-    ((cl:and (cl:stringp variable) (cl:stringp value) supplied-target (cl:or (cl:null target) (dotnet:object-type target)))
+    ((cl:and (cl:stringp variable) (cl:stringp value) supplied-target (cl:or (cl:null target) (dotnet:is-instance-of target "System.EnvironmentVariableTarget")))
      (dotnet:static <type-str> "SetEnvironmentVariable" variable value target))
     ((cl:and (cl:stringp variable) (cl:stringp value) (cl:not supplied-target))
      (dotnet:static <type-str> "SetEnvironmentVariable" variable value))

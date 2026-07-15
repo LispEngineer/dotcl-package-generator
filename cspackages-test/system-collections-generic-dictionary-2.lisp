@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Generic.Dictionary`2 constructor overloads. Dispatches at runtime.
@@ -61,21 +61,21 @@ new(SerializationInfo, StreamingContext)
     - context (System.Runtime.Serialization.StreamingContext): A System.Runtime.Serialization.StreamingContext structure containing the source and destination of the serialized stream associated with the System.Collections.Generic.Dictionary`2.
 "
   (cl:cond
-    ((cl:and supplied-capacity (cl:numberp capacity) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and supplied-capacity (cl:numberp capacity) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:new <type-str> capacity comparer))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.Generic.IDictionary`2[TKey, TValue]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:new <type-str> capacity comparer))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IEqualityComparer`1[TKey]")))
      (dotnet:new <type-str> capacity comparer))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Runtime.Serialization.SerializationInfo")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Runtime.Serialization.StreamingContext")))
      (dotnet:new <type-str> capacity comparer))
     ((cl:and supplied-capacity (cl:numberp capacity) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.Generic.IEqualityComparer`1[TKey]")) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.Generic.IDictionary`2[TKey, TValue]")) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[TKey, TValue]]")) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
     ((cl:and (cl:not supplied-capacity) (cl:not supplied-comparer))
      (dotnet:new <type-str>))

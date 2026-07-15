@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Xml.XmlReader
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-xml-xml-reader)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Xml.XmlReader"))
 (cl:defconstant <type-str> "System.Xml.XmlReader")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the class.
@@ -216,29 +216,29 @@ Create(TextReader, XmlReaderSettings, XmlParserContext) -> XmlReader
     - input-context (System.Xml.XmlParserContext): The context information required to parse the XML fragment. The context information can include the System.Xml.XmlNameTable to use, encoding, namespace scope, the current xml:lang and xml:space scope, base URI, and document type definition. This value can be .
 "
   (cl:cond
-    ((cl:and (cl:stringp input-uri) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:or (cl:null input-context) (dotnet:object-type input-context)))
+    ((cl:and (cl:stringp input-uri) supplied-settings (cl:or (cl:null settings) (dotnet:is-instance-of settings "System.Xml.XmlReaderSettings")) supplied-input-context (cl:or (cl:null input-context) (dotnet:is-instance-of input-context "System.Xml.XmlParserContext")))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:stringp input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:is-instance-of input-uri "System.IO.Stream")) supplied-settings (cl:or (cl:null settings) (dotnet:is-instance-of settings "System.Xml.XmlReaderSettings")) supplied-input-context (cl:stringp input-context))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:or (cl:null input-context) (dotnet:object-type input-context)))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:is-instance-of input-uri "System.IO.Stream")) supplied-settings (cl:or (cl:null settings) (dotnet:is-instance-of settings "System.Xml.XmlReaderSettings")) supplied-input-context (cl:or (cl:null input-context) (dotnet:is-instance-of input-context "System.Xml.XmlParserContext")))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:stringp input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:is-instance-of input-uri "System.IO.TextReader")) supplied-settings (cl:or (cl:null settings) (dotnet:is-instance-of settings "System.Xml.XmlReaderSettings")) supplied-input-context (cl:stringp input-context))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) supplied-input-context (cl:or (cl:null input-context) (dotnet:object-type input-context)))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:is-instance-of input-uri "System.IO.TextReader")) supplied-settings (cl:or (cl:null settings) (dotnet:is-instance-of settings "System.Xml.XmlReaderSettings")) supplied-input-context (cl:or (cl:null input-context) (dotnet:is-instance-of input-context "System.Xml.XmlParserContext")))
      (dotnet:static <type-str> "Create" input-uri settings input-context))
-    ((cl:and (cl:stringp input-uri) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) (cl:not supplied-input-context))
+    ((cl:and (cl:stringp input-uri) supplied-settings (cl:or (cl:null settings) (dotnet:is-instance-of settings "System.Xml.XmlReaderSettings")) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri settings))
-    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:is-instance-of input-uri "System.IO.Stream")) supplied-settings (cl:or (cl:null settings) (dotnet:is-instance-of settings "System.Xml.XmlReaderSettings")) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri settings))
-    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:is-instance-of input-uri "System.IO.TextReader")) supplied-settings (cl:or (cl:null settings) (dotnet:is-instance-of settings "System.Xml.XmlReaderSettings")) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri settings))
-    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) supplied-settings (cl:or (cl:null settings) (dotnet:object-type settings)) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:is-instance-of input-uri "System.Xml.XmlReader")) supplied-settings (cl:or (cl:null settings) (dotnet:is-instance-of settings "System.Xml.XmlReaderSettings")) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri settings))
     ((cl:and (cl:stringp input-uri) (cl:not supplied-settings) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri))
-    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) (cl:not supplied-settings) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:is-instance-of input-uri "System.IO.Stream")) (cl:not supplied-settings) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri))
-    ((cl:and (cl:or (cl:null input-uri) (dotnet:object-type input-uri)) (cl:not supplied-settings) (cl:not supplied-input-context))
+    ((cl:and (cl:or (cl:null input-uri) (dotnet:is-instance-of input-uri "System.IO.TextReader")) (cl:not supplied-settings) (cl:not supplied-input-context))
      (dotnet:static <type-str> "Create" input-uri))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"
@@ -598,9 +598,9 @@ ReadElementContentAs(Type, IXmlNamespaceResolver, String, String) -> Object
     - namespace-uri (System.String): The namespace URI of the element.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null return-type) (dotnet:object-type return-type)) (cl:or (cl:null namespace-resolver) (dotnet:object-type namespace-resolver)) supplied-local-name (cl:stringp local-name) supplied-namespace-uri (cl:stringp namespace-uri))
+    ((cl:and (cl:or (cl:null return-type) (dotnet:is-instance-of return-type "System.Type")) (cl:or (cl:null namespace-resolver) (dotnet:is-instance-of namespace-resolver "System.Xml.IXmlNamespaceResolver")) supplied-local-name (cl:stringp local-name) supplied-namespace-uri (cl:stringp namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj!) "ReadElementContentAs" return-type namespace-resolver local-name namespace-uri))
-    ((cl:and (cl:or (cl:null return-type) (dotnet:object-type return-type)) (cl:or (cl:null namespace-resolver) (dotnet:object-type namespace-resolver)) (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
+    ((cl:and (cl:or (cl:null return-type) (dotnet:is-instance-of return-type "System.Type")) (cl:or (cl:null namespace-resolver) (dotnet:is-instance-of namespace-resolver "System.Xml.IXmlNamespaceResolver")) (cl:not supplied-local-name) (cl:not supplied-namespace-uri))
      (dotnet:invoke (cl:the (dotnet "System.Xml.XmlReader") obj!) "ReadElementContentAs" return-type namespace-resolver))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-XML-XML-READER"

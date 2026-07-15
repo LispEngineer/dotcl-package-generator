@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.SortedList`2
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-collections-generic-sorted-list-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.SortedList`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.SortedList`2")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Generic.SortedList`2 constructor overloads. Dispatches at runtime.
@@ -44,15 +44,15 @@ new(IDictionary, IComparer)
     - comparer (System.Collections.Generic.IComparer`1[TKey]): The System.Collections.Generic.IComparer`1 implementation to use when comparing keys. -or- to use the default System.Collections.Generic.Comparer`1 for the type of the key.
 "
   (cl:cond
-    ((cl:and supplied-capacity (cl:numberp capacity) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and supplied-capacity (cl:numberp capacity) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TKey]")))
      (dotnet:new <type-str> capacity comparer))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.Generic.IDictionary`2[TKey, TValue]")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Generic.IComparer`1[TKey]")))
      (dotnet:new <type-str> capacity comparer))
     ((cl:and supplied-capacity (cl:numberp capacity) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.Generic.IComparer`1[TKey]")) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.Generic.IDictionary`2[TKey, TValue]")) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
     ((cl:and (cl:not supplied-capacity) (cl:not supplied-comparer))
      (dotnet:new <type-str>))

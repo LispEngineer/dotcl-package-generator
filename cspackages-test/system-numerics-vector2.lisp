@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector2
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-numerics-vector2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector2"))
 (cl:defconstant <type-str> "System.Numerics.Vector2")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (value cl:nil supplied-value) (y cl:nil supplied-y))
   "Master wrapper for System.Numerics.Vector2 constructor overloads. Dispatches at runtime.
@@ -36,7 +36,7 @@ new(Single, Single)
      (dotnet:new <type-str> value y))
     ((cl:and supplied-value (cl:numberp value) (cl:not supplied-y))
      (dotnet:new <type-str> value))
-    ((cl:and supplied-value (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-y))
+    ((cl:and supplied-value (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Single]")) (cl:not supplied-y))
      (dotnet:new <type-str> value))
     ((cl:and (cl:not supplied-value) (cl:not supplied-y))
      (dotnet:new <type-str>))
@@ -350,9 +350,9 @@ new(Single, Single)
     - right (System.Numerics.Vector2): The second vector.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-right (cl:or (cl:null right) (dotnet:object-type right)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Numerics.Vector2")) supplied-right (cl:or (cl:null right) (dotnet:is-instance-of right "System.Numerics.Vector2")))
      (dotnet:static <type-str> "op_Subtraction" value right))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-right))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Numerics.Vector2")) (cl:not supplied-right))
      (dotnet:static <type-str> "op_UnaryNegation" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -385,11 +385,11 @@ new(Single, Single)
     - right (System.Numerics.Vector2): The scalar value.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null left) (dotnet:object-type left)) (cl:or (cl:null right) (dotnet:object-type right)))
+    ((cl:and (cl:or (cl:null left) (dotnet:is-instance-of left "System.Numerics.Vector2")) (cl:or (cl:null right) (dotnet:is-instance-of right "System.Numerics.Vector2")))
      (dotnet:static <type-str> "op_Multiply" left right))
-    ((cl:and (cl:or (cl:null left) (dotnet:object-type left)) (cl:numberp right))
+    ((cl:and (cl:or (cl:null left) (dotnet:is-instance-of left "System.Numerics.Vector2")) (cl:numberp right))
      (dotnet:static <type-str> "op_Multiply" left right))
-    ((cl:and (cl:numberp left) (cl:or (cl:null right) (dotnet:object-type right)))
+    ((cl:and (cl:numberp left) (cl:or (cl:null right) (dotnet:is-instance-of right "System.Numerics.Vector2")))
      (dotnet:static <type-str> "op_Multiply" left right))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -415,9 +415,9 @@ new(Single, Single)
     - value2 (System.Single): The scalar value.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null left) (dotnet:object-type left)) (cl:or (cl:null right) (dotnet:object-type right)))
+    ((cl:and (cl:or (cl:null left) (dotnet:is-instance-of left "System.Numerics.Vector2")) (cl:or (cl:null right) (dotnet:is-instance-of right "System.Numerics.Vector2")))
      (dotnet:static <type-str> "op_Division" left right))
-    ((cl:and (cl:or (cl:null left) (dotnet:object-type left)) (cl:numberp right))
+    ((cl:and (cl:or (cl:null left) (dotnet:is-instance-of left "System.Numerics.Vector2")) (cl:numberp right))
      (dotnet:static <type-str> "op_Division" left right))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -454,9 +454,9 @@ new(Single, Single)
     - right (System.Numerics.Vector2): The second vector to add.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-right (cl:or (cl:null right) (dotnet:object-type right)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Numerics.Vector2")) supplied-right (cl:or (cl:null right) (dotnet:is-instance-of right "System.Numerics.Vector2")))
      (dotnet:static <type-str> "op_Addition" value right))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-right))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Numerics.Vector2")) (cl:not supplied-right))
      (dotnet:static <type-str> "op_UnaryPlus" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -628,11 +628,11 @@ CopyTo(Single[], Int32) -> Void
     - index (System.Int32): The index at which to copy the first element of the vector.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) supplied-index (cl:numberp index))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Single[]")) supplied-index (cl:numberp index))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "CopyTo" array index))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:not supplied-index))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Span`1[System.Single]")) (cl:not supplied-index))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "CopyTo" array))
-    ((cl:and (cl:or (cl:null array) (dotnet:object-type array)) (cl:not supplied-index))
+    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Single[]")) (cl:not supplied-index))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "CopyTo" array))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -684,7 +684,7 @@ Create(Single, Single) -> Vector2
   (cl:cond
     ((cl:and (cl:numberp value) supplied-y (cl:numberp y))
      (dotnet:static <type-str> "Create" value y))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-y))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Single]")) (cl:not supplied-y))
      (dotnet:static <type-str> "Create" value))
     ((cl:and (cl:numberp value) (cl:not supplied-y))
      (dotnet:static <type-str> "Create" value))
@@ -761,9 +761,9 @@ Divide(Vector2, Single) -> Vector2
     - divisor (System.Single): The scalar value.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null left) (dotnet:object-type left)) (cl:or (cl:null right) (dotnet:object-type right)))
+    ((cl:and (cl:or (cl:null left) (dotnet:is-instance-of left "System.Numerics.Vector2")) (cl:or (cl:null right) (dotnet:is-instance-of right "System.Numerics.Vector2")))
      (dotnet:static <type-str> "Divide" left right))
-    ((cl:and (cl:or (cl:null left) (dotnet:object-type left)) (cl:numberp right))
+    ((cl:and (cl:or (cl:null left) (dotnet:is-instance-of left "System.Numerics.Vector2")) (cl:numberp right))
      (dotnet:static <type-str> "Divide" left right))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -796,9 +796,9 @@ Equals(Vector2) -> Boolean
     - other (System.Numerics.Vector2): The other vector.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null obj) (dotnet:object-type obj)))
+    ((cl:and (cl:or (cl:null obj) (dotnet:is-instance-of obj "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "Equals" obj))
-    ((cl:and (cl:or (cl:null obj) (dotnet:object-type obj)))
+    ((cl:and (cl:or (cl:null obj) (dotnet:is-instance-of obj "System.Numerics.Vector2")))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "Equals" obj))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -1030,9 +1030,9 @@ Lerp(Vector2, Vector2, Vector2) -> Vector2
     - amount (System.Numerics.Vector2): 
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value1) (dotnet:object-type value1)) (cl:or (cl:null value2) (dotnet:object-type value2)) (cl:numberp amount))
+    ((cl:and (cl:or (cl:null value1) (dotnet:is-instance-of value1 "System.Numerics.Vector2")) (cl:or (cl:null value2) (dotnet:is-instance-of value2 "System.Numerics.Vector2")) (cl:numberp amount))
      (dotnet:static <type-str> "Lerp" value1 value2 amount))
-    ((cl:and (cl:or (cl:null value1) (dotnet:object-type value1)) (cl:or (cl:null value2) (dotnet:object-type value2)) (cl:or (cl:null amount) (dotnet:object-type amount)))
+    ((cl:and (cl:or (cl:null value1) (dotnet:is-instance-of value1 "System.Numerics.Vector2")) (cl:or (cl:null value2) (dotnet:is-instance-of value2 "System.Numerics.Vector2")) (cl:or (cl:null amount) (dotnet:is-instance-of amount "System.Numerics.Vector2")))
      (dotnet:static <type-str> "Lerp" value1 value2 amount))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -1232,11 +1232,11 @@ Multiply(Single, Vector2) -> Vector2
     - right (System.Numerics.Vector2): The vector.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null left) (dotnet:object-type left)) (cl:or (cl:null right) (dotnet:object-type right)))
+    ((cl:and (cl:or (cl:null left) (dotnet:is-instance-of left "System.Numerics.Vector2")) (cl:or (cl:null right) (dotnet:is-instance-of right "System.Numerics.Vector2")))
      (dotnet:static <type-str> "Multiply" left right))
-    ((cl:and (cl:or (cl:null left) (dotnet:object-type left)) (cl:numberp right))
+    ((cl:and (cl:or (cl:null left) (dotnet:is-instance-of left "System.Numerics.Vector2")) (cl:numberp right))
      (dotnet:static <type-str> "Multiply" left right))
-    ((cl:and (cl:numberp left) (cl:or (cl:null right) (dotnet:object-type right)))
+    ((cl:and (cl:numberp left) (cl:or (cl:null right) (dotnet:is-instance-of right "System.Numerics.Vector2")))
      (dotnet:static <type-str> "Multiply" left right))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -1324,9 +1324,9 @@ Round(Vector2, MidpointRounding) -> Vector2
     - mode (System.MidpointRounding): 
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null vector) (dotnet:object-type vector)) supplied-mode (cl:or (cl:null mode) (dotnet:object-type mode)))
+    ((cl:and (cl:or (cl:null vector) (dotnet:is-instance-of vector "System.Numerics.Vector2")) supplied-mode (cl:or (cl:null mode) (dotnet:is-instance-of mode "System.MidpointRounding")))
      (dotnet:static <type-str> "Round" vector mode))
-    ((cl:and (cl:or (cl:null vector) (dotnet:object-type vector)) (cl:not supplied-mode))
+    ((cl:and (cl:or (cl:null vector) (dotnet:is-instance-of vector "System.Numerics.Vector2")) (cl:not supplied-mode))
      (dotnet:static <type-str> "Round" vector))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -1400,7 +1400,7 @@ ToString(String, IFormatProvider) -> String
     - format-provider (System.IFormatProvider): A format provider that supplies culture-specific formatting information.
 "
   (cl:cond
-    ((cl:and supplied-format (cl:stringp format) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:object-type format-provider)))
+    ((cl:and supplied-format (cl:stringp format) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "ToString" format format-provider))
     ((cl:and supplied-format (cl:stringp format) (cl:not supplied-format-provider))
      (dotnet:invoke (cl:the (dotnet "System.Numerics.Vector2") obj!) "ToString" format))
@@ -1437,11 +1437,11 @@ Transform(Vector2, Quaternion) -> Vector2
     - rotation (System.Numerics.Quaternion): The rotation to apply.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null position) (dotnet:object-type position)) (cl:or (cl:null matrix) (dotnet:object-type matrix)))
+    ((cl:and (cl:or (cl:null position) (dotnet:is-instance-of position "System.Numerics.Vector2")) (cl:or (cl:null matrix) (dotnet:is-instance-of matrix "System.Numerics.Matrix3x2")))
      (dotnet:static <type-str> "Transform" position matrix))
-    ((cl:and (cl:or (cl:null position) (dotnet:object-type position)) (cl:or (cl:null matrix) (dotnet:object-type matrix)))
+    ((cl:and (cl:or (cl:null position) (dotnet:is-instance-of position "System.Numerics.Vector2")) (cl:or (cl:null matrix) (dotnet:is-instance-of matrix "System.Numerics.Matrix4x4")))
      (dotnet:static <type-str> "Transform" position matrix))
-    ((cl:and (cl:or (cl:null position) (dotnet:object-type position)) (cl:or (cl:null matrix) (dotnet:object-type matrix)))
+    ((cl:and (cl:or (cl:null position) (dotnet:is-instance-of position "System.Numerics.Vector2")) (cl:or (cl:null matrix) (dotnet:is-instance-of matrix "System.Numerics.Quaternion")))
      (dotnet:static <type-str> "Transform" position matrix))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"
@@ -1467,9 +1467,9 @@ TransformNormal(Vector2, Matrix4x4) -> Vector2
     - matrix (System.Numerics.Matrix4x4): The matrix.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null normal) (dotnet:object-type normal)) (cl:or (cl:null matrix) (dotnet:object-type matrix)))
+    ((cl:and (cl:or (cl:null normal) (dotnet:is-instance-of normal "System.Numerics.Vector2")) (cl:or (cl:null matrix) (dotnet:is-instance-of matrix "System.Numerics.Matrix3x2")))
      (dotnet:static <type-str> "TransformNormal" normal matrix))
-    ((cl:and (cl:or (cl:null normal) (dotnet:object-type normal)) (cl:or (cl:null matrix) (dotnet:object-type matrix)))
+    ((cl:and (cl:or (cl:null normal) (dotnet:is-instance-of normal "System.Numerics.Vector2")) (cl:or (cl:null matrix) (dotnet:is-instance-of matrix "System.Numerics.Matrix4x4")))
      (dotnet:static <type-str> "TransformNormal" normal matrix))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NUMERICS-VECTOR2"

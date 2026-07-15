@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Timers.Timer
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-timers-timer)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Timers.Timer"))
 (cl:defconstant <type-str> "System.Timers.Timer")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (interval cl:nil supplied-interval))
   "Master wrapper for System.Timers.Timer constructor overloads. Dispatches at runtime.
@@ -29,7 +29,7 @@ new(TimeSpan)
   (cl:cond
     ((cl:and supplied-interval (cl:numberp interval))
      (dotnet:new <type-str> interval))
-    ((cl:and supplied-interval (cl:or (cl:null interval) (dotnet:object-type interval)))
+    ((cl:and supplied-interval (cl:or (cl:null interval) (dotnet:is-instance-of interval "System.TimeSpan")))
      (dotnet:new <type-str> interval))
     ((cl:and (cl:not supplied-interval))
      (dotnet:new <type-str>))

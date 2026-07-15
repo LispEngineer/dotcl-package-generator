@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.AppDomain
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-app-domain)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.AppDomain"))
 (cl:defconstant <type-str> "System.AppDomain")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:define-symbol-macro current-domain (dotnet:static <type-str> "CurrentDomain"))
 
@@ -147,9 +147,9 @@ CreateInstance(String, String, Object[]) -> ObjectHandle
 CreateInstance(String, String, Boolean, BindingFlags, Binder, Object[], CultureInfo, Object[]) -> ObjectHandle
 "
   (cl:cond
-    ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) supplied-activation-attributes (cl:typep activation-attributes 'cl:boolean) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-binder (cl:or (cl:null binder) (dotnet:object-type binder)) supplied-args (cl:or (cl:null args) (dotnet:object-type args)) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)) supplied-activation-attributes2 (cl:or (cl:null activation-attributes2) (dotnet:object-type activation-attributes2)))
+    ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) supplied-activation-attributes (cl:typep activation-attributes 'cl:boolean) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) supplied-binder (cl:or (cl:null binder) (dotnet:is-instance-of binder "System.Reflection.Binder")) supplied-args (cl:or (cl:null args) (dotnet:is-instance-of args "System.Object[]")) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")) supplied-activation-attributes2 (cl:or (cl:null activation-attributes2) (dotnet:is-instance-of activation-attributes2 "System.Object[]")))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstance" assembly-name type-name activation-attributes binding-attr binder args culture activation-attributes2))
-    ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) supplied-activation-attributes (cl:or (cl:null activation-attributes) (dotnet:object-type activation-attributes)) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
+    ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) supplied-activation-attributes (cl:or (cl:null activation-attributes) (dotnet:is-instance-of activation-attributes "System.Object[]")) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstance" assembly-name type-name activation-attributes))
     ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) (cl:not supplied-activation-attributes) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstance" assembly-name type-name))
@@ -169,9 +169,9 @@ CreateInstanceAndUnwrap(String, String, Object[]) -> Object
 CreateInstanceAndUnwrap(String, String, Boolean, BindingFlags, Binder, Object[], CultureInfo, Object[]) -> Object
 "
   (cl:cond
-    ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) supplied-activation-attributes (cl:typep activation-attributes 'cl:boolean) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-binder (cl:or (cl:null binder) (dotnet:object-type binder)) supplied-args (cl:or (cl:null args) (dotnet:object-type args)) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)) supplied-activation-attributes2 (cl:or (cl:null activation-attributes2) (dotnet:object-type activation-attributes2)))
+    ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) supplied-activation-attributes (cl:typep activation-attributes 'cl:boolean) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) supplied-binder (cl:or (cl:null binder) (dotnet:is-instance-of binder "System.Reflection.Binder")) supplied-args (cl:or (cl:null args) (dotnet:is-instance-of args "System.Object[]")) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")) supplied-activation-attributes2 (cl:or (cl:null activation-attributes2) (dotnet:is-instance-of activation-attributes2 "System.Object[]")))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstanceAndUnwrap" assembly-name type-name activation-attributes binding-attr binder args culture activation-attributes2))
-    ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) supplied-activation-attributes (cl:or (cl:null activation-attributes) (dotnet:object-type activation-attributes)) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
+    ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) supplied-activation-attributes (cl:or (cl:null activation-attributes) (dotnet:is-instance-of activation-attributes "System.Object[]")) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstanceAndUnwrap" assembly-name type-name activation-attributes))
     ((cl:and (cl:stringp assembly-name) (cl:stringp type-name) (cl:not supplied-activation-attributes) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstanceAndUnwrap" assembly-name type-name))
@@ -191,9 +191,9 @@ CreateInstanceFrom(String, String, Object[]) -> ObjectHandle
 CreateInstanceFrom(String, String, Boolean, BindingFlags, Binder, Object[], CultureInfo, Object[]) -> ObjectHandle
 "
   (cl:cond
-    ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) supplied-activation-attributes (cl:typep activation-attributes 'cl:boolean) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-binder (cl:or (cl:null binder) (dotnet:object-type binder)) supplied-args (cl:or (cl:null args) (dotnet:object-type args)) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)) supplied-activation-attributes2 (cl:or (cl:null activation-attributes2) (dotnet:object-type activation-attributes2)))
+    ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) supplied-activation-attributes (cl:typep activation-attributes 'cl:boolean) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) supplied-binder (cl:or (cl:null binder) (dotnet:is-instance-of binder "System.Reflection.Binder")) supplied-args (cl:or (cl:null args) (dotnet:is-instance-of args "System.Object[]")) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")) supplied-activation-attributes2 (cl:or (cl:null activation-attributes2) (dotnet:is-instance-of activation-attributes2 "System.Object[]")))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstanceFrom" assembly-file type-name activation-attributes binding-attr binder args culture activation-attributes2))
-    ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) supplied-activation-attributes (cl:or (cl:null activation-attributes) (dotnet:object-type activation-attributes)) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
+    ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) supplied-activation-attributes (cl:or (cl:null activation-attributes) (dotnet:is-instance-of activation-attributes "System.Object[]")) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstanceFrom" assembly-file type-name activation-attributes))
     ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) (cl:not supplied-activation-attributes) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstanceFrom" assembly-file type-name))
@@ -213,9 +213,9 @@ CreateInstanceFromAndUnwrap(String, String, Object[]) -> Object
 CreateInstanceFromAndUnwrap(String, String, Boolean, BindingFlags, Binder, Object[], CultureInfo, Object[]) -> Object
 "
   (cl:cond
-    ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) supplied-activation-attributes (cl:typep activation-attributes 'cl:boolean) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-binder (cl:or (cl:null binder) (dotnet:object-type binder)) supplied-args (cl:or (cl:null args) (dotnet:object-type args)) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)) supplied-activation-attributes2 (cl:or (cl:null activation-attributes2) (dotnet:object-type activation-attributes2)))
+    ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) supplied-activation-attributes (cl:typep activation-attributes 'cl:boolean) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) supplied-binder (cl:or (cl:null binder) (dotnet:is-instance-of binder "System.Reflection.Binder")) supplied-args (cl:or (cl:null args) (dotnet:is-instance-of args "System.Object[]")) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")) supplied-activation-attributes2 (cl:or (cl:null activation-attributes2) (dotnet:is-instance-of activation-attributes2 "System.Object[]")))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstanceFromAndUnwrap" assembly-file type-name activation-attributes binding-attr binder args culture activation-attributes2))
-    ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) supplied-activation-attributes (cl:or (cl:null activation-attributes) (dotnet:object-type activation-attributes)) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
+    ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) supplied-activation-attributes (cl:or (cl:null activation-attributes) (dotnet:is-instance-of activation-attributes "System.Object[]")) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstanceFromAndUnwrap" assembly-file type-name activation-attributes))
     ((cl:and (cl:stringp assembly-file) (cl:stringp type-name) (cl:not supplied-activation-attributes) (cl:not supplied-binding-attr) (cl:not supplied-binder) (cl:not supplied-args) (cl:not supplied-culture) (cl:not supplied-activation-attributes2))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "CreateInstanceFromAndUnwrap" assembly-file type-name))
@@ -235,9 +235,9 @@ ExecuteAssembly(String, String[]) -> Int32
 ExecuteAssembly(String, String[], Byte[], AssemblyHashAlgorithm) -> Int32
 "
   (cl:cond
-    ((cl:and (cl:stringp assembly-file) supplied-args (cl:or (cl:null args) (dotnet:object-type args)) supplied-hash-value (cl:or (cl:null hash-value) (dotnet:object-type hash-value)) supplied-hash-algorithm (cl:or (cl:null hash-algorithm) (dotnet:object-type hash-algorithm)))
+    ((cl:and (cl:stringp assembly-file) supplied-args (cl:or (cl:null args) (dotnet:is-instance-of args "System.String[]")) supplied-hash-value (cl:or (cl:null hash-value) (dotnet:is-instance-of hash-value "System.Byte[]")) supplied-hash-algorithm (cl:or (cl:null hash-algorithm) (dotnet:is-instance-of hash-algorithm "System.Configuration.Assemblies.AssemblyHashAlgorithm")))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "ExecuteAssembly" assembly-file args hash-value hash-algorithm))
-    ((cl:and (cl:stringp assembly-file) supplied-args (cl:or (cl:null args) (dotnet:object-type args)) (cl:not supplied-hash-value) (cl:not supplied-hash-algorithm))
+    ((cl:and (cl:stringp assembly-file) supplied-args (cl:or (cl:null args) (dotnet:is-instance-of args "System.String[]")) (cl:not supplied-hash-value) (cl:not supplied-hash-algorithm))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "ExecuteAssembly" assembly-file args))
     ((cl:and (cl:stringp assembly-file) (cl:not supplied-args) (cl:not supplied-hash-value) (cl:not supplied-hash-algorithm))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "ExecuteAssembly" assembly-file))
@@ -286,11 +286,11 @@ Load(String) -> Assembly
 Load(Byte[], Byte[]) -> Assembly
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null raw-assembly) (dotnet:object-type raw-assembly)) supplied-raw-symbol-store (cl:or (cl:null raw-symbol-store) (dotnet:object-type raw-symbol-store)))
+    ((cl:and (cl:or (cl:null raw-assembly) (dotnet:is-instance-of raw-assembly "System.Byte[]")) supplied-raw-symbol-store (cl:or (cl:null raw-symbol-store) (dotnet:is-instance-of raw-symbol-store "System.Byte[]")))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "Load" raw-assembly raw-symbol-store))
-    ((cl:and (cl:or (cl:null raw-assembly) (dotnet:object-type raw-assembly)) (cl:not supplied-raw-symbol-store))
+    ((cl:and (cl:or (cl:null raw-assembly) (dotnet:is-instance-of raw-assembly "System.Byte[]")) (cl:not supplied-raw-symbol-store))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "Load" raw-assembly))
-    ((cl:and (cl:or (cl:null raw-assembly) (dotnet:object-type raw-assembly)) (cl:not supplied-raw-symbol-store))
+    ((cl:and (cl:or (cl:null raw-assembly) (dotnet:is-instance-of raw-assembly "System.Reflection.AssemblyName")) (cl:not supplied-raw-symbol-store))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "Load" raw-assembly))
     ((cl:and (cl:stringp raw-assembly) (cl:not supplied-raw-symbol-store))
      (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "Load" raw-assembly))

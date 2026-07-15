@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Threading.Timer
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-threading-timer)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Threading.Timer"))
 (cl:defconstant <type-str> "System.Threading.Timer")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:load-toplevel :execute)
@@ -29,15 +29,15 @@ new(TimerCallback, Object, UInt32, UInt32)
 new(TimerCallback, Object, Int64, Int64)
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null callback) (dotnet:object-type callback)) supplied-state (cl:or (cl:null state) (dotnet:object-type state)) supplied-due-time (cl:numberp due-time) supplied-period (cl:numberp period))
+    ((cl:and (cl:or (cl:null callback) (dotnet:is-instance-of callback "System.Threading.TimerCallback")) supplied-state (cl:or (cl:null state) (dotnet:is-instance-of state "System.Object")) supplied-due-time (cl:numberp due-time) supplied-period (cl:numberp period))
      (dotnet:new <type-str> callback state due-time period))
-    ((cl:and (cl:or (cl:null callback) (dotnet:object-type callback)) supplied-state (cl:or (cl:null state) (dotnet:object-type state)) supplied-due-time (cl:or (cl:null due-time) (dotnet:object-type due-time)) supplied-period (cl:or (cl:null period) (dotnet:object-type period)))
+    ((cl:and (cl:or (cl:null callback) (dotnet:is-instance-of callback "System.Threading.TimerCallback")) supplied-state (cl:or (cl:null state) (dotnet:is-instance-of state "System.Object")) supplied-due-time (cl:or (cl:null due-time) (dotnet:is-instance-of due-time "System.TimeSpan")) supplied-period (cl:or (cl:null period) (dotnet:is-instance-of period "System.TimeSpan")))
      (dotnet:new <type-str> callback state due-time period))
-    ((cl:and (cl:or (cl:null callback) (dotnet:object-type callback)) supplied-state (cl:or (cl:null state) (dotnet:object-type state)) supplied-due-time (cl:or (cl:null due-time) (dotnet:object-type due-time)) supplied-period (cl:or (cl:null period) (dotnet:object-type period)))
+    ((cl:and (cl:or (cl:null callback) (dotnet:is-instance-of callback "System.Threading.TimerCallback")) supplied-state (cl:or (cl:null state) (dotnet:is-instance-of state "System.Object")) supplied-due-time (cl:or (cl:null due-time) (dotnet:is-instance-of due-time "System.UInt32")) supplied-period (cl:or (cl:null period) (dotnet:is-instance-of period "System.UInt32")))
      (dotnet:new <type-str> callback state due-time period))
-    ((cl:and (cl:or (cl:null callback) (dotnet:object-type callback)) supplied-state (cl:or (cl:null state) (dotnet:object-type state)) supplied-due-time (cl:numberp due-time) supplied-period (cl:numberp period))
+    ((cl:and (cl:or (cl:null callback) (dotnet:is-instance-of callback "System.Threading.TimerCallback")) supplied-state (cl:or (cl:null state) (dotnet:is-instance-of state "System.Object")) supplied-due-time (cl:numberp due-time) supplied-period (cl:numberp period))
      (dotnet:new <type-str> callback state due-time period))
-    ((cl:and (cl:or (cl:null callback) (dotnet:object-type callback)) (cl:not supplied-state) (cl:not supplied-due-time) (cl:not supplied-period))
+    ((cl:and (cl:or (cl:null callback) (dotnet:is-instance-of callback "System.Threading.TimerCallback")) (cl:not supplied-state) (cl:not supplied-due-time) (cl:not supplied-period))
      (dotnet:new <type-str> callback))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-THREADING-TIMER"
@@ -61,9 +61,9 @@ Change(Int64, Int64) -> Boolean
   (cl:cond
     ((cl:and (cl:numberp due-time) (cl:numberp period))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Timer") obj!) "Change" due-time period))
-    ((cl:and (cl:or (cl:null due-time) (dotnet:object-type due-time)) (cl:or (cl:null period) (dotnet:object-type period)))
+    ((cl:and (cl:or (cl:null due-time) (dotnet:is-instance-of due-time "System.TimeSpan")) (cl:or (cl:null period) (dotnet:is-instance-of period "System.TimeSpan")))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Timer") obj!) "Change" due-time period))
-    ((cl:and (cl:or (cl:null due-time) (dotnet:object-type due-time)) (cl:or (cl:null period) (dotnet:object-type period)))
+    ((cl:and (cl:or (cl:null due-time) (dotnet:is-instance-of due-time "System.UInt32")) (cl:or (cl:null period) (dotnet:is-instance-of period "System.UInt32")))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Timer") obj!) "Change" due-time period))
     ((cl:and (cl:numberp due-time) (cl:numberp period))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Timer") obj!) "Change" due-time period))
@@ -81,7 +81,7 @@ Dispose() -> Void
 Dispose(WaitHandle) -> Boolean
 "
   (cl:cond
-    ((cl:and supplied-notify-object (cl:or (cl:null notify-object) (dotnet:object-type notify-object)))
+    ((cl:and supplied-notify-object (cl:or (cl:null notify-object) (dotnet:is-instance-of notify-object "System.Threading.WaitHandle")))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Timer") obj!) "Dispose" notify-object))
     ((cl:and (cl:not supplied-notify-object))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Timer") obj!) "Dispose"))

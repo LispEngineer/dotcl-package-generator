@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.SystemException
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-system-exception)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.SystemException"))
 (cl:defconstant <type-str> "System.SystemException")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (message cl:nil supplied-message) (inner-exception cl:nil supplied-inner-exception))
   "Master wrapper for System.SystemException constructor overloads. Dispatches at runtime.
@@ -34,9 +34,9 @@ new(SerializationInfo, StreamingContext)
     - context (System.Runtime.Serialization.StreamingContext): The contextual information about the source or destination.
 "
   (cl:cond
-    ((cl:and supplied-message (cl:stringp message) supplied-inner-exception (cl:or (cl:null inner-exception) (dotnet:object-type inner-exception)))
+    ((cl:and supplied-message (cl:stringp message) supplied-inner-exception (cl:or (cl:null inner-exception) (dotnet:is-instance-of inner-exception "System.Exception")))
      (dotnet:new <type-str> message inner-exception))
-    ((cl:and supplied-message (cl:or (cl:null message) (dotnet:object-type message)) supplied-inner-exception (cl:or (cl:null inner-exception) (dotnet:object-type inner-exception)))
+    ((cl:and supplied-message (cl:or (cl:null message) (dotnet:is-instance-of message "System.Runtime.Serialization.SerializationInfo")) supplied-inner-exception (cl:or (cl:null inner-exception) (dotnet:is-instance-of inner-exception "System.Runtime.Serialization.StreamingContext")))
      (dotnet:new <type-str> message inner-exception))
     ((cl:and supplied-message (cl:stringp message) (cl:not supplied-inner-exception))
      (dotnet:new <type-str> message))

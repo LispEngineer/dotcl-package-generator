@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.TextReader
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-io-text-reader)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.TextReader"))
 (cl:defconstant <type-str> "System.IO.TextReader")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.IO.TextReader class.
@@ -73,9 +73,9 @@ Read(Char[], Int32, Int32) -> Int32
     - count (System.Int32): The maximum number of characters to read. If the end of the reader is reached before the specified number of characters is read into the buffer, the method returns.
 "
   (cl:cond
-    ((cl:and supplied-buffer (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
+    ((cl:and supplied-buffer (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Char[]")) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "Read" buffer index count))
-    ((cl:and supplied-buffer (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:not supplied-index) (cl:not supplied-count))
+    ((cl:and supplied-buffer (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[System.Char]")) (cl:not supplied-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "Read" buffer))
     ((cl:and (cl:not supplied-buffer) (cl:not supplied-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "Read"))
@@ -104,9 +104,9 @@ ReadAsync(Char[], Int32, Int32) -> Int32]
     - count (System.Int32): The maximum number of characters to read. If the end of the text is reached before the specified number of characters is read into the buffer, the current method returns.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Char[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[System.Char]")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-TEXT-READER"
@@ -132,9 +132,9 @@ ReadBlock(Char[], Int32, Int32) -> Int32
     - count (System.Int32): The maximum number of characters to read.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Char[]")) supplied-index (cl:numberp index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadBlock" buffer index count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:not supplied-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[System.Char]")) (cl:not supplied-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadBlock" buffer))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-TEXT-READER"
@@ -161,9 +161,9 @@ ReadBlockAsync(Char[], Int32, Int32) -> Int32]
     - count (System.Int32): The maximum number of characters to read. If the end of the text is reached before the specified number of characters is read into the buffer, the current method returns.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Char[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadBlockAsync" buffer cancellation-token count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[System.Char]")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadBlockAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-TEXT-READER"
@@ -191,7 +191,7 @@ ReadLineAsync(CancellationToken) -> String]
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests.
 "
   (cl:cond
-    ((cl:and supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)))
+    ((cl:and supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadLineAsync" cancellation-token))
     ((cl:and (cl:not supplied-cancellation-token))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadLineAsync"))
@@ -221,7 +221,7 @@ ReadToEndAsync(CancellationToken) -> String]
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests.
 "
   (cl:cond
-    ((cl:and supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)))
+    ((cl:and supplied-cancellation-token (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadToEndAsync" cancellation-token))
     ((cl:and (cl:not supplied-cancellation-token))
      (dotnet:invoke (cl:the (dotnet "System.IO.TextReader") obj!) "ReadToEndAsync"))

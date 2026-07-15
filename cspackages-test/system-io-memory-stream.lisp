@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.MemoryStream
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-io-memory-stream)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.MemoryStream"))
 (cl:defconstant <type-str> "System.IO.MemoryStream")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (writable cl:nil supplied-writable) (count cl:nil supplied-count) (writable2 cl:nil supplied-writable2) (publicly-visible cl:nil supplied-publicly-visible))
   "Master wrapper for System.IO.MemoryStream constructor overloads. Dispatches at runtime.
@@ -57,17 +57,17 @@ new(Byte[], Int32, Int32, Boolean, Boolean)
     - publicly-visible (System.Boolean): to enable System.IO.MemoryStream.GetBuffer, which returns the unsigned byte array from which the stream was created; otherwise, .
 "
   (cl:cond
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-writable (cl:numberp writable) supplied-count (cl:numberp count) supplied-writable2 (cl:typep writable2 'cl:boolean) supplied-publicly-visible (cl:typep publicly-visible 'cl:boolean))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Byte[]")) supplied-writable (cl:numberp writable) supplied-count (cl:numberp count) supplied-writable2 (cl:typep writable2 'cl:boolean) supplied-publicly-visible (cl:typep publicly-visible 'cl:boolean))
      (dotnet:new <type-str> capacity writable count writable2 publicly-visible))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-writable (cl:numberp writable) supplied-count (cl:numberp count) supplied-writable2 (cl:typep writable2 'cl:boolean) (cl:not supplied-publicly-visible))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Byte[]")) supplied-writable (cl:numberp writable) supplied-count (cl:numberp count) supplied-writable2 (cl:typep writable2 'cl:boolean) (cl:not supplied-publicly-visible))
      (dotnet:new <type-str> capacity writable count writable2))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-writable (cl:numberp writable) supplied-count (cl:numberp count) (cl:not supplied-writable2) (cl:not supplied-publicly-visible))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Byte[]")) supplied-writable (cl:numberp writable) supplied-count (cl:numberp count) (cl:not supplied-writable2) (cl:not supplied-publicly-visible))
      (dotnet:new <type-str> capacity writable count))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-writable (cl:typep writable 'cl:boolean) (cl:not supplied-count) (cl:not supplied-writable2) (cl:not supplied-publicly-visible))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Byte[]")) supplied-writable (cl:typep writable 'cl:boolean) (cl:not supplied-count) (cl:not supplied-writable2) (cl:not supplied-publicly-visible))
      (dotnet:new <type-str> capacity writable))
     ((cl:and supplied-capacity (cl:numberp capacity) (cl:not supplied-writable) (cl:not supplied-count) (cl:not supplied-writable2) (cl:not supplied-publicly-visible))
      (dotnet:new <type-str> capacity))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-writable) (cl:not supplied-count) (cl:not supplied-writable2) (cl:not supplied-publicly-visible))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Byte[]")) (cl:not supplied-writable) (cl:not supplied-count) (cl:not supplied-writable2) (cl:not supplied-publicly-visible))
      (dotnet:new <type-str> capacity))
     ((cl:and (cl:not supplied-capacity) (cl:not supplied-writable) (cl:not supplied-count) (cl:not supplied-writable2) (cl:not supplied-publicly-visible))
      (dotnet:new <type-str>))
@@ -171,9 +171,9 @@ Read(Byte[], Int32, Int32) -> Int32
     - count (System.Int32): The maximum number of bytes to read.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "Read" buffer offset count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:not supplied-offset) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Span`1[System.Byte]")) (cl:not supplied-offset) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "Read" buffer))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-MEMORY-STREAM"
@@ -201,9 +201,9 @@ ReadAsync(Byte[], Int32, Int32, CancellationToken) -> Int32]
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests. The default value is System.Threading.CancellationToken.None.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:is-instance-of cancellation-token2 "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "ReadAsync" buffer cancellation-token count cancellation-token2))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Memory`1[System.Byte]")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "ReadAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-MEMORY-STREAM"
@@ -259,9 +259,9 @@ Write(Byte[], Int32, Int32) -> Void
     - count (System.Int32): The maximum number of bytes to write.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) supplied-offset (cl:numberp offset) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "Write" buffer offset count))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:not supplied-offset) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.ReadOnlySpan`1[System.Byte]")) (cl:not supplied-offset) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "Write" buffer))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-MEMORY-STREAM"
@@ -289,9 +289,9 @@ WriteAsync(Byte[], Int32, Int32, CancellationToken) -> Task
     - cancellation-token (System.Threading.CancellationToken): The token to monitor for cancellation requests. The default value is System.Threading.CancellationToken.None.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:object-type cancellation-token2)))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.Byte[]")) (cl:numberp cancellation-token) supplied-count (cl:numberp count) supplied-cancellation-token2 (cl:or (cl:null cancellation-token2) (dotnet:is-instance-of cancellation-token2 "System.Threading.CancellationToken")))
      (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "WriteAsync" buffer cancellation-token count cancellation-token2))
-    ((cl:and (cl:or (cl:null buffer) (dotnet:object-type buffer)) (cl:or (cl:null cancellation-token) (dotnet:object-type cancellation-token)) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
+    ((cl:and (cl:or (cl:null buffer) (dotnet:is-instance-of buffer "System.ReadOnlyMemory`1[System.Byte]")) (cl:or (cl:null cancellation-token) (dotnet:is-instance-of cancellation-token "System.Threading.CancellationToken")) (cl:not supplied-count) (cl:not supplied-cancellation-token2))
      (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "WriteAsync" buffer cancellation-token))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-IO-MEMORY-STREAM"

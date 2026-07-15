@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ArgumentException
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-argument-exception)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ArgumentException"))
 (cl:defconstant <type-str> "System.ArgumentException")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (message cl:nil supplied-message) (inner-exception cl:nil supplied-inner-exception) (inner-exception2 cl:nil supplied-inner-exception2))
   "Master wrapper for System.ArgumentException constructor overloads. Dispatches at runtime.
@@ -47,13 +47,13 @@ new(String, String, Exception)
     - inner-exception (System.Exception): The exception that is the cause of the current exception. If the innerException parameter is not a null reference, the current exception is raised in a block that handles the inner exception.
 "
   (cl:cond
-    ((cl:and supplied-message (cl:stringp message) supplied-inner-exception (cl:stringp inner-exception) supplied-inner-exception2 (cl:or (cl:null inner-exception2) (dotnet:object-type inner-exception2)))
+    ((cl:and supplied-message (cl:stringp message) supplied-inner-exception (cl:stringp inner-exception) supplied-inner-exception2 (cl:or (cl:null inner-exception2) (dotnet:is-instance-of inner-exception2 "System.Exception")))
      (dotnet:new <type-str> message inner-exception inner-exception2))
-    ((cl:and supplied-message (cl:stringp message) supplied-inner-exception (cl:or (cl:null inner-exception) (dotnet:object-type inner-exception)) (cl:not supplied-inner-exception2))
+    ((cl:and supplied-message (cl:stringp message) supplied-inner-exception (cl:or (cl:null inner-exception) (dotnet:is-instance-of inner-exception "System.Exception")) (cl:not supplied-inner-exception2))
      (dotnet:new <type-str> message inner-exception))
     ((cl:and supplied-message (cl:stringp message) supplied-inner-exception (cl:stringp inner-exception) (cl:not supplied-inner-exception2))
      (dotnet:new <type-str> message inner-exception))
-    ((cl:and supplied-message (cl:or (cl:null message) (dotnet:object-type message)) supplied-inner-exception (cl:or (cl:null inner-exception) (dotnet:object-type inner-exception)) (cl:not supplied-inner-exception2))
+    ((cl:and supplied-message (cl:or (cl:null message) (dotnet:is-instance-of message "System.Runtime.Serialization.SerializationInfo")) supplied-inner-exception (cl:or (cl:null inner-exception) (dotnet:is-instance-of inner-exception "System.Runtime.Serialization.StreamingContext")) (cl:not supplied-inner-exception2))
      (dotnet:new <type-str> message inner-exception))
     ((cl:and supplied-message (cl:stringp message) (cl:not supplied-inner-exception) (cl:not supplied-inner-exception2))
      (dotnet:new <type-str> message))

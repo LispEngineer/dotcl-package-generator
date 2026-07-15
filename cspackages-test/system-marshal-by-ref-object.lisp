@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.MarshalByRefObject
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-marshal-by-ref-object)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.MarshalByRefObject"))
 (cl:defconstant <type-str> "System.MarshalByRefObject")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.MarshalByRefObject class.

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo+AdjustmentRule
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-time-zone-info-adjustment-rule)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeZoneInfo+AdjustmentRule"))
 (cl:defconstant <type-str> "System.TimeZoneInfo+AdjustmentRule")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun base-utc-offset-delta (obj!)
   "Gets the time difference with the base UTC offset for the time zone during the adjustment-rule period."
@@ -59,9 +59,9 @@ CreateAdjustmentRule(DateTime, DateTime, TimeSpan, TimeZoneInfo+TransitionTime, 
     - base-utc-offset-delta (System.TimeSpan): The time difference with the base UTC offset for the time zone during the adjustment-rule period.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null date-start) (dotnet:object-type date-start)) (cl:or (cl:null date-end) (dotnet:object-type date-end)) (cl:or (cl:null daylight-delta) (dotnet:object-type daylight-delta)) (cl:or (cl:null daylight-transition-start) (dotnet:object-type daylight-transition-start)) (cl:or (cl:null daylight-transition-end) (dotnet:object-type daylight-transition-end)) supplied-base-utc-offset-delta (cl:or (cl:null base-utc-offset-delta) (dotnet:object-type base-utc-offset-delta)))
+    ((cl:and (cl:or (cl:null date-start) (dotnet:is-instance-of date-start "System.DateTime")) (cl:or (cl:null date-end) (dotnet:is-instance-of date-end "System.DateTime")) (cl:or (cl:null daylight-delta) (dotnet:is-instance-of daylight-delta "System.TimeSpan")) (cl:or (cl:null daylight-transition-start) (dotnet:is-instance-of daylight-transition-start "System.TimeZoneInfo+TransitionTime")) (cl:or (cl:null daylight-transition-end) (dotnet:is-instance-of daylight-transition-end "System.TimeZoneInfo+TransitionTime")) supplied-base-utc-offset-delta (cl:or (cl:null base-utc-offset-delta) (dotnet:is-instance-of base-utc-offset-delta "System.TimeSpan")))
      (dotnet:static <type-str> "CreateAdjustmentRule" date-start date-end daylight-delta daylight-transition-start daylight-transition-end base-utc-offset-delta))
-    ((cl:and (cl:or (cl:null date-start) (dotnet:object-type date-start)) (cl:or (cl:null date-end) (dotnet:object-type date-end)) (cl:or (cl:null daylight-delta) (dotnet:object-type daylight-delta)) (cl:or (cl:null daylight-transition-start) (dotnet:object-type daylight-transition-start)) (cl:or (cl:null daylight-transition-end) (dotnet:object-type daylight-transition-end)) (cl:not supplied-base-utc-offset-delta))
+    ((cl:and (cl:or (cl:null date-start) (dotnet:is-instance-of date-start "System.DateTime")) (cl:or (cl:null date-end) (dotnet:is-instance-of date-end "System.DateTime")) (cl:or (cl:null daylight-delta) (dotnet:is-instance-of daylight-delta "System.TimeSpan")) (cl:or (cl:null daylight-transition-start) (dotnet:is-instance-of daylight-transition-start "System.TimeZoneInfo+TransitionTime")) (cl:or (cl:null daylight-transition-end) (dotnet:is-instance-of daylight-transition-end "System.TimeZoneInfo+TransitionTime")) (cl:not supplied-base-utc-offset-delta))
      (dotnet:static <type-str> "CreateAdjustmentRule" date-start date-end daylight-delta daylight-transition-start daylight-transition-end))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO-ADJUSTMENT-RULE"
@@ -85,9 +85,9 @@ Equals(Object) -> Boolean
     - obj (System.Object): An instance to compare with this instance.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null other) (dotnet:object-type other)))
+    ((cl:and (cl:or (cl:null other) (dotnet:is-instance-of other "System.TimeZoneInfo+AdjustmentRule")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "Equals" other))
-    ((cl:and (cl:or (cl:null other) (dotnet:object-type other)))
+    ((cl:and (cl:or (cl:null other) (dotnet:is-instance-of other "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo+AdjustmentRule") obj!) "Equals" other))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-ZONE-INFO-ADJUSTMENT-RULE"

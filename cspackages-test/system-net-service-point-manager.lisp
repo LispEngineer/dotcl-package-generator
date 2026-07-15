@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Net.ServicePointManager
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-net-service-point-manager)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Net.ServicePointManager"))
 (cl:defconstant <type-str> "System.Net.ServicePointManager")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defvar %default-non-persistent-connection-limit-cache% csharp-assembly-utils:+unbound-marker+)
 (cl:define-symbol-macro +default-non-persistent-connection-limit+
@@ -100,11 +100,11 @@ FindServicePoint(String, IWebProxy) -> ServicePoint
 FindServicePoint(Uri, IWebProxy) -> ServicePoint
 "
   (cl:cond
-    ((cl:and (cl:stringp address) supplied-proxy (cl:or (cl:null proxy) (dotnet:object-type proxy)))
+    ((cl:and (cl:stringp address) supplied-proxy (cl:or (cl:null proxy) (dotnet:is-instance-of proxy "System.Net.IWebProxy")))
      (dotnet:static <type-str> "FindServicePoint" address proxy))
-    ((cl:and (cl:or (cl:null address) (dotnet:object-type address)) supplied-proxy (cl:or (cl:null proxy) (dotnet:object-type proxy)))
+    ((cl:and (cl:or (cl:null address) (dotnet:is-instance-of address "System.Uri")) supplied-proxy (cl:or (cl:null proxy) (dotnet:is-instance-of proxy "System.Net.IWebProxy")))
      (dotnet:static <type-str> "FindServicePoint" address proxy))
-    ((cl:and (cl:or (cl:null address) (dotnet:object-type address)) (cl:not supplied-proxy))
+    ((cl:and (cl:or (cl:null address) (dotnet:is-instance-of address "System.Uri")) (cl:not supplied-proxy))
      (dotnet:static <type-str> "FindServicePoint" address))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-NET-SERVICE-POINT-MANAGER"

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ArgumentOutOfRangeException
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-argument-out-of-range-exception)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ArgumentOutOfRangeException"))
 (cl:defconstant <type-str> "System.ArgumentOutOfRangeException")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (param-name cl:nil supplied-param-name) (message cl:nil supplied-message) (message2 cl:nil supplied-message2))
   "Master wrapper for System.ArgumentOutOfRangeException constructor overloads. Dispatches at runtime.
@@ -47,13 +47,13 @@ new(String, Object, String)
     - message (System.String): The message that describes the error.
 "
   (cl:cond
-    ((cl:and supplied-param-name (cl:stringp param-name) supplied-message (cl:or (cl:null message) (dotnet:object-type message)) supplied-message2 (cl:stringp message2))
+    ((cl:and supplied-param-name (cl:stringp param-name) supplied-message (cl:or (cl:null message) (dotnet:is-instance-of message "System.Object")) supplied-message2 (cl:stringp message2))
      (dotnet:new <type-str> param-name message message2))
     ((cl:and supplied-param-name (cl:stringp param-name) supplied-message (cl:stringp message) (cl:not supplied-message2))
      (dotnet:new <type-str> param-name message))
-    ((cl:and supplied-param-name (cl:stringp param-name) supplied-message (cl:or (cl:null message) (dotnet:object-type message)) (cl:not supplied-message2))
+    ((cl:and supplied-param-name (cl:stringp param-name) supplied-message (cl:or (cl:null message) (dotnet:is-instance-of message "System.Exception")) (cl:not supplied-message2))
      (dotnet:new <type-str> param-name message))
-    ((cl:and supplied-param-name (cl:or (cl:null param-name) (dotnet:object-type param-name)) supplied-message (cl:or (cl:null message) (dotnet:object-type message)) (cl:not supplied-message2))
+    ((cl:and supplied-param-name (cl:or (cl:null param-name) (dotnet:is-instance-of param-name "System.Runtime.Serialization.SerializationInfo")) supplied-message (cl:or (cl:null message) (dotnet:is-instance-of message "System.Runtime.Serialization.StreamingContext")) (cl:not supplied-message2))
      (dotnet:new <type-str> param-name message))
     ((cl:and supplied-param-name (cl:stringp param-name) (cl:not supplied-message) (cl:not supplied-message2))
      (dotnet:new <type-str> param-name))
@@ -92,7 +92,7 @@ ThrowIfEqual(T, T, String = null) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:or (cl:null other) (dotnet:is-instance-of other "T")) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
      (dotnet:static-generic <type-str> "ThrowIfEqual" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
@@ -111,7 +111,7 @@ ThrowIfGreaterThan(T, T, String = null) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:or (cl:null other) (dotnet:is-instance-of other "T")) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
      (dotnet:static-generic <type-str> "ThrowIfGreaterThan" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
@@ -130,7 +130,7 @@ ThrowIfGreaterThanOrEqual(T, T, String = null) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:or (cl:null other) (dotnet:is-instance-of other "T")) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
      (dotnet:static-generic <type-str> "ThrowIfGreaterThanOrEqual" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
@@ -149,7 +149,7 @@ ThrowIfLessThan(T, T, String = null) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:or (cl:null other) (dotnet:is-instance-of other "T")) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
      (dotnet:static-generic <type-str> "ThrowIfLessThan" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
@@ -168,7 +168,7 @@ ThrowIfLessThanOrEqual(T, T, String = null) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:or (cl:null other) (dotnet:is-instance-of other "T")) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
      (dotnet:static-generic <type-str> "ThrowIfLessThanOrEqual" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
@@ -186,7 +186,7 @@ ThrowIfNegative(T, String = null) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
      (dotnet:static-generic <type-str> "ThrowIfNegative" (cl:list type) value (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
@@ -204,7 +204,7 @@ ThrowIfNegativeOrZero(T, String = null) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
      (dotnet:static-generic <type-str> "ThrowIfNegativeOrZero" (cl:list type) value (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
@@ -223,7 +223,7 @@ ThrowIfNotEqual(T, T, String = null) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:null other) (dotnet:object-type other)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:or (cl:null other) (dotnet:is-instance-of other "T")) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
      (dotnet:static-generic <type-str> "ThrowIfNotEqual" (cl:list type) value other (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"
@@ -241,7 +241,7 @@ ThrowIfZero(T, String = null) -> Void
     - param-name (System.String): The name of the parameter with which value corresponds.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "T")) (cl:or (cl:not supplied-param-name) (cl:stringp param-name)))
      (dotnet:static-generic <type-str> "ThrowIfZero" (cl:list type) value (cl:if supplied-param-name param-name cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARGUMENT-OUT-OF-RANGE-EXCEPTION"

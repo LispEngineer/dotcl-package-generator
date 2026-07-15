@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-string)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (value cl:&optional (count cl:nil supplied-count) (length cl:nil supplied-length) (enc cl:nil supplied-enc))
   "Master wrapper for System.String constructor overloads. Dispatches at runtime.
@@ -69,23 +69,23 @@ new(SByte*, Int32, Int32, Encoding)
     - enc (System.Text.Encoding): An object that specifies how the array referenced by value is encoded. If enc is , ANSI encoding is assumed.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-count (cl:numberp count) supplied-length (cl:numberp length) supplied-enc (cl:or (cl:null enc) (dotnet:object-type enc)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte*")) supplied-count (cl:numberp count) supplied-length (cl:numberp length) supplied-enc (cl:or (cl:null enc) (dotnet:is-instance-of enc "System.Text.Encoding")))
      (dotnet:new <type-str> value count length enc))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-count (cl:numberp count) supplied-length (cl:numberp length) (cl:not supplied-enc))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) supplied-count (cl:numberp count) supplied-length (cl:numberp length) (cl:not supplied-enc))
      (dotnet:new <type-str> value count length))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-count (cl:numberp count) supplied-length (cl:numberp length) (cl:not supplied-enc))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char*")) supplied-count (cl:numberp count) supplied-length (cl:numberp length) (cl:not supplied-enc))
      (dotnet:new <type-str> value count length))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-count (cl:numberp count) supplied-length (cl:numberp length) (cl:not supplied-enc))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte*")) supplied-count (cl:numberp count) supplied-length (cl:numberp length) (cl:not supplied-enc))
      (dotnet:new <type-str> value count length))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-count (cl:numberp count) (cl:not supplied-length) (cl:not supplied-enc))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-count (cl:numberp count) (cl:not supplied-length) (cl:not supplied-enc))
      (dotnet:new <type-str> value count))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
      (dotnet:new <type-str> value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char*")) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
      (dotnet:new <type-str> value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte*")) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
      (dotnet:new <type-str> value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-count) (cl:not supplied-length) (cl:not supplied-enc))
      (dotnet:new <type-str> value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -219,23 +219,23 @@ Compare(String, Int32, String, Int32, Int32, CultureInfo, CompareOptions) -> Int
     - options (System.Globalization.CompareOptions): Options to use when performing the comparison (such as ignoring case or symbols).
 "
   (cl:cond
-    ((cl:and (cl:stringp str-a) (cl:numberp str-b) supplied-ignore-case (cl:stringp ignore-case) supplied-options (cl:numberp options) supplied-length (cl:numberp length) supplied-ignore-case2 (cl:typep ignore-case2 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
+    ((cl:and (cl:stringp str-a) (cl:numberp str-b) supplied-ignore-case (cl:stringp ignore-case) supplied-options (cl:numberp options) supplied-length (cl:numberp length) supplied-ignore-case2 (cl:typep ignore-case2 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")))
      (dotnet:static <type-str> "Compare" str-a str-b ignore-case options length ignore-case2 culture))
-    ((cl:and (cl:stringp str-a) (cl:numberp str-b) supplied-ignore-case (cl:stringp ignore-case) supplied-options (cl:numberp options) supplied-length (cl:numberp length) supplied-ignore-case2 (cl:or (cl:null ignore-case2) (dotnet:object-type ignore-case2)) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
+    ((cl:and (cl:stringp str-a) (cl:numberp str-b) supplied-ignore-case (cl:stringp ignore-case) supplied-options (cl:numberp options) supplied-length (cl:numberp length) supplied-ignore-case2 (cl:or (cl:null ignore-case2) (dotnet:is-instance-of ignore-case2 "System.Globalization.CultureInfo")) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CompareOptions")))
      (dotnet:static <type-str> "Compare" str-a str-b ignore-case options length ignore-case2 culture))
     ((cl:and (cl:stringp str-a) (cl:numberp str-b) supplied-ignore-case (cl:stringp ignore-case) supplied-options (cl:numberp options) supplied-length (cl:numberp length) supplied-ignore-case2 (cl:typep ignore-case2 'cl:boolean) (cl:not supplied-culture))
      (dotnet:static <type-str> "Compare" str-a str-b ignore-case options length ignore-case2))
-    ((cl:and (cl:stringp str-a) (cl:numberp str-b) supplied-ignore-case (cl:stringp ignore-case) supplied-options (cl:numberp options) supplied-length (cl:numberp length) supplied-ignore-case2 (cl:or (cl:null ignore-case2) (dotnet:object-type ignore-case2)) (cl:not supplied-culture))
+    ((cl:and (cl:stringp str-a) (cl:numberp str-b) supplied-ignore-case (cl:stringp ignore-case) supplied-options (cl:numberp options) supplied-length (cl:numberp length) supplied-ignore-case2 (cl:or (cl:null ignore-case2) (dotnet:is-instance-of ignore-case2 "System.StringComparison")) (cl:not supplied-culture))
      (dotnet:static <type-str> "Compare" str-a str-b ignore-case options length ignore-case2))
     ((cl:and (cl:stringp str-a) (cl:numberp str-b) supplied-ignore-case (cl:stringp ignore-case) supplied-options (cl:numberp options) supplied-length (cl:numberp length) (cl:not supplied-ignore-case2) (cl:not supplied-culture))
      (dotnet:static <type-str> "Compare" str-a str-b ignore-case options length))
-    ((cl:and (cl:stringp str-a) (cl:stringp str-b) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:object-type ignore-case)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-length) (cl:not supplied-ignore-case2) (cl:not supplied-culture))
+    ((cl:and (cl:stringp str-a) (cl:stringp str-b) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Globalization.CultureInfo")) supplied-options (cl:or (cl:null options) (dotnet:is-instance-of options "System.Globalization.CompareOptions")) (cl:not supplied-length) (cl:not supplied-ignore-case2) (cl:not supplied-culture))
      (dotnet:static <type-str> "Compare" str-a str-b ignore-case options))
-    ((cl:and (cl:stringp str-a) (cl:stringp str-b) supplied-ignore-case (cl:typep ignore-case 'cl:boolean) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-length) (cl:not supplied-ignore-case2) (cl:not supplied-culture))
+    ((cl:and (cl:stringp str-a) (cl:stringp str-b) supplied-ignore-case (cl:typep ignore-case 'cl:boolean) supplied-options (cl:or (cl:null options) (dotnet:is-instance-of options "System.Globalization.CultureInfo")) (cl:not supplied-length) (cl:not supplied-ignore-case2) (cl:not supplied-culture))
      (dotnet:static <type-str> "Compare" str-a str-b ignore-case options))
     ((cl:and (cl:stringp str-a) (cl:stringp str-b) supplied-ignore-case (cl:typep ignore-case 'cl:boolean) (cl:not supplied-options) (cl:not supplied-length) (cl:not supplied-ignore-case2) (cl:not supplied-culture))
      (dotnet:static <type-str> "Compare" str-a str-b ignore-case))
-    ((cl:and (cl:stringp str-a) (cl:stringp str-b) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:object-type ignore-case)) (cl:not supplied-options) (cl:not supplied-length) (cl:not supplied-ignore-case2) (cl:not supplied-culture))
+    ((cl:and (cl:stringp str-a) (cl:stringp str-b) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.StringComparison")) (cl:not supplied-options) (cl:not supplied-length) (cl:not supplied-ignore-case2) (cl:not supplied-culture))
      (dotnet:static <type-str> "Compare" str-a str-b ignore-case))
     ((cl:and (cl:stringp str-a) (cl:stringp str-b) (cl:not supplied-ignore-case) (cl:not supplied-options) (cl:not supplied-length) (cl:not supplied-ignore-case2) (cl:not supplied-culture))
      (dotnet:static <type-str> "Compare" str-a str-b))
@@ -292,7 +292,7 @@ CompareTo(String) -> Int32
     - str-b (System.String): The string to compare with this instance.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CompareTo" value))
     ((cl:and (cl:stringp value))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CompareTo" value))
@@ -395,27 +395,27 @@ Concat(Char], Char], Char], Char]) -> String
   (cl:cond
     ((cl:and (cl:stringp arg0) supplied-arg1 (cl:stringp arg1) supplied-arg2 (cl:stringp arg2) supplied-str3 (cl:stringp str3))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2 str3))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) supplied-arg2 (cl:or (cl:null arg2) (dotnet:object-type arg2)) supplied-str3 (cl:or (cl:null str3) (dotnet:object-type str3)))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Char]")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Char]")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.ReadOnlySpan`1[System.Char]")) supplied-str3 (cl:or (cl:null str3) (dotnet:is-instance-of str3 "System.ReadOnlySpan`1[System.Char]")))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2 str3))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) supplied-arg2 (cl:or (cl:null arg2) (dotnet:object-type arg2)) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.Object")) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2))
     ((cl:and (cl:stringp arg0) supplied-arg1 (cl:stringp arg1) supplied-arg2 (cl:stringp arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) supplied-arg2 (cl:or (cl:null arg2) (dotnet:object-type arg2)) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Char]")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Char]")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1 arg2))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1))
     ((cl:and (cl:stringp arg0) supplied-arg1 (cl:stringp arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Char]")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0 arg1))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Collections.Generic.IEnumerable`1[System.String]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0))
-    ((cl:and (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
+    ((cl:and (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.String]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-str3))
      (dotnet:static <type-str> "Concat" arg0))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -484,13 +484,13 @@ Contains(Char, StringComparison) -> Boolean
     - comparison-type (System.StringComparison): One of the enumeration values that specifies the rules to use in the comparison.
 "
   (cl:cond
-    ((cl:and (cl:stringp value) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
+    ((cl:and (cl:stringp value) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Contains" value comparison-type))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Contains" value comparison-type))
     ((cl:and (cl:stringp value) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Contains" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Contains" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -523,9 +523,9 @@ CopyTo(Int32, Char[], Int32, Int32) -> Void
     - count (System.Int32): The number of characters in this instance to copy to destination.
 "
   (cl:cond
-    ((cl:and (cl:numberp destination) supplied-destination2 (cl:or (cl:null destination2) (dotnet:object-type destination2)) supplied-destination-index (cl:numberp destination-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:numberp destination) supplied-destination2 (cl:or (cl:null destination2) (dotnet:is-instance-of destination2 "System.Char[]")) supplied-destination-index (cl:numberp destination-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CopyTo" destination destination2 destination-index count))
-    ((cl:and (cl:or (cl:null destination) (dotnet:object-type destination)) (cl:not supplied-destination2) (cl:not supplied-destination-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[System.Char]")) (cl:not supplied-destination2) (cl:not supplied-destination-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "CopyTo" destination))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -580,13 +580,13 @@ EndsWith(String, Boolean, CultureInfo) -> Boolean
     - culture (System.Globalization.CultureInfo): Cultural information that determines how this instance and value are compared. If culture is , the current culture is used.
 "
   (cl:cond
-    ((cl:and (cl:stringp value) supplied-comparison-type (cl:typep comparison-type 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
+    ((cl:and (cl:stringp value) supplied-comparison-type (cl:typep comparison-type 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "EndsWith" value comparison-type culture))
-    ((cl:and (cl:stringp value) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)) (cl:not supplied-culture))
+    ((cl:and (cl:stringp value) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")) (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "EndsWith" value comparison-type))
     ((cl:and (cl:stringp value) (cl:not supplied-comparison-type) (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "EndsWith" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparison-type) (cl:not supplied-culture))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-comparison-type) (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "EndsWith" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -623,11 +623,11 @@ Equals(String, StringComparison) -> Boolean
     - comparison-type (System.StringComparison): One of the enumeration values that specifies how the strings will be compared.
 "
   (cl:cond
-    ((cl:and (cl:stringp obj) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
+    ((cl:and (cl:stringp obj) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Equals" obj comparison-type))
     ((cl:and (cl:stringp obj) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Equals" obj))
-    ((cl:and (cl:or (cl:null obj) (dotnet:object-type obj)) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null obj) (dotnet:is-instance-of obj "System.Object")) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Equals" obj))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -654,7 +654,7 @@ Equals(String, String, StringComparison) -> Boolean
     - comparison-type (System.StringComparison): One of the enumeration values that specifies the rules for the comparison.
 "
   (cl:cond
-    ((cl:and (cl:stringp a) (cl:stringp b) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
+    ((cl:and (cl:stringp a) (cl:stringp b) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
      (dotnet:static <type-str> "Equals" a b comparison-type))
     ((cl:and (cl:stringp a) (cl:stringp b) (cl:not supplied-comparison-type))
      (dotnet:static <type-str> "Equals" a b))
@@ -742,23 +742,23 @@ Format(IFormatProvider, String, Object, Object, Object) -> String
     - arg2 (System.Object): The third object to format.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) supplied-arg2 (cl:or (cl:null arg2) (dotnet:object-type arg2)) supplied-arg22 (cl:or (cl:null arg22) (dotnet:object-type arg22)))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.Object")) supplied-arg22 (cl:or (cl:null arg22) (dotnet:is-instance-of arg22 "System.Object")))
      (dotnet:static <type-str> "Format" format arg0 arg1 arg2 arg22))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) supplied-arg2 (cl:or (cl:null arg2) (dotnet:object-type arg2)) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.Object")) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1 arg2))
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) supplied-arg2 (cl:or (cl:null arg2) (dotnet:object-type arg2)) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.Object")) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1 arg2))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Text.CompositeFormat")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0 arg1))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:static <type-str> "Format" format arg0))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -845,7 +845,7 @@ GetHashCode(StringComparison) -> Int32
     - comparison-type (System.StringComparison): One of the enumeration values that specifies the rules to use in the comparison.
 "
   (cl:cond
-    ((cl:and supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
+    ((cl:and supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "GetHashCode" comparison-type))
     ((cl:and (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "GetHashCode"))
@@ -872,9 +872,9 @@ GetHashCode(Char], StringComparison) -> Int32
     - comparison-type (System.StringComparison): One of the enumeration values that specifies the rules to use in the comparison.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
      (dotnet:static <type-str> "GetHashCode" value comparison-type))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-comparison-type))
      (dotnet:static <type-str> "GetHashCode" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -974,23 +974,23 @@ IndexOf(String, Int32, Int32, StringComparison) -> Int32
     - comparison-type (System.StringComparison): One of the enumeration values that specifies the rules for the search.
 "
   (cl:cond
-    ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
+    ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index count comparison-type))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index count))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index count))
-    ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:or (cl:null count) (dotnet:object-type count)) (cl:not supplied-comparison-type))
+    ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:or (cl:null count) (dotnet:is-instance-of count "System.StringComparison")) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index count))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:or (cl:null start-index) (dotnet:object-type start-index)) (cl:not supplied-count) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-start-index (cl:or (cl:null start-index) (dotnet:is-instance-of start-index "System.StringComparison")) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index))
-    ((cl:and (cl:stringp value) supplied-start-index (cl:or (cl:null start-index) (dotnet:object-type start-index)) (cl:not supplied-count) (cl:not supplied-comparison-type))
+    ((cl:and (cl:stringp value) supplied-start-index (cl:or (cl:null start-index) (dotnet:is-instance-of start-index "System.StringComparison")) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value start-index))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value))
     ((cl:and (cl:stringp value) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOf" value))
@@ -1025,11 +1025,11 @@ IndexOfAny(Char[], Int32, Int32) -> Int32
     - count (System.Int32): The number of character positions to examine.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null any-of) (dotnet:is-instance-of any-of "System.Char[]")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOfAny" any-of start-index count))
-    ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null any-of) (dotnet:is-instance-of any-of "System.Char[]")) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOfAny" any-of start-index))
-    ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null any-of) (dotnet:is-instance-of any-of "System.Char[]")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IndexOfAny" any-of))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -1076,7 +1076,7 @@ IsNormalized(NormalizationForm) -> Boolean
     - normalization-form (System.Text.NormalizationForm): A Unicode normalization form.
 "
   (cl:cond
-    ((cl:and supplied-normalization-form (cl:or (cl:null normalization-form) (dotnet:object-type normalization-form)))
+    ((cl:and supplied-normalization-form (cl:or (cl:null normalization-form) (dotnet:is-instance-of normalization-form "System.Text.NormalizationForm")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IsNormalized" normalization-form))
     ((cl:and (cl:not supplied-normalization-form))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "IsNormalized"))
@@ -1159,19 +1159,19 @@ Join(String, String[], Int32, Int32) -> String
     - count (System.Int32): The number of elements of value to use.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.String[]")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:static <type-str> "Join" separator value start-index count))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.String[]")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:static <type-str> "Join" separator value start-index count))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.String]")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.String]")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Collections.Generic.IEnumerable`1[System.String]")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:static <type-str> "Join" separator value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -1197,9 +1197,9 @@ Join(String, IEnumerable) -> String
     - values (System.Collections.Generic.IEnumerable`1[T]): A collection that contains the objects to concatenate.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:null values) (dotnet:object-type values)))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null values) (dotnet:is-instance-of values "System.Collections.Generic.IEnumerable`1[T]")))
      (dotnet:static-generic <type-str> "Join" (cl:list type) separator values))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:object-type values)))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:is-instance-of values "System.Collections.Generic.IEnumerable`1[T]")))
      (dotnet:static-generic <type-str> "Join" (cl:list type) separator values))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -1302,21 +1302,21 @@ LastIndexOf(String, Int32, Int32, StringComparison) -> Int32
     - comparison-type (System.StringComparison): One of the enumeration values that specifies the rules for the search.
 "
   (cl:cond
-    ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)))
+    ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index count comparison-type))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index count))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index count))
-    ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:or (cl:null count) (dotnet:object-type count)) (cl:not supplied-comparison-type))
+    ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) supplied-count (cl:or (cl:null count) (dotnet:is-instance-of count "System.StringComparison")) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index count))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index))
     ((cl:and (cl:stringp value) supplied-start-index (cl:numberp start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index))
-    ((cl:and (cl:stringp value) supplied-start-index (cl:or (cl:null start-index) (dotnet:object-type start-index)) (cl:not supplied-count) (cl:not supplied-comparison-type))
+    ((cl:and (cl:stringp value) supplied-start-index (cl:or (cl:null start-index) (dotnet:is-instance-of start-index "System.StringComparison")) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value start-index))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value))
     ((cl:and (cl:stringp value) (cl:not supplied-start-index) (cl:not supplied-count) (cl:not supplied-comparison-type))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOf" value))
@@ -1351,11 +1351,11 @@ LastIndexOfAny(Char[], Int32, Int32) -> Int32
     - count (System.Int32): The number of character positions to examine.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null any-of) (dotnet:is-instance-of any-of "System.Char[]")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOfAny" any-of start-index count))
-    ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null any-of) (dotnet:is-instance-of any-of "System.Char[]")) supplied-start-index (cl:numberp start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOfAny" any-of start-index))
-    ((cl:and (cl:or (cl:null any-of) (dotnet:object-type any-of)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null any-of) (dotnet:is-instance-of any-of "System.Char[]")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "LastIndexOfAny" any-of))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -1377,7 +1377,7 @@ Normalize(NormalizationForm) -> String
     - normalization-form (System.Text.NormalizationForm): A Unicode normalization form.
 "
   (cl:cond
-    ((cl:and supplied-normalization-form (cl:or (cl:null normalization-form) (dotnet:object-type normalization-form)))
+    ((cl:and supplied-normalization-form (cl:or (cl:null normalization-form) (dotnet:is-instance-of normalization-form "System.Text.NormalizationForm")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Normalize" normalization-form))
     ((cl:and (cl:not supplied-normalization-form))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Normalize"))
@@ -1413,7 +1413,7 @@ PadLeft(Int32, Char) -> String
     - padding-char (System.Char): A Unicode padding character.
 "
   (cl:cond
-    ((cl:and (cl:numberp total-width) supplied-padding-char (cl:or (cl:null padding-char) (dotnet:object-type padding-char)))
+    ((cl:and (cl:numberp total-width) supplied-padding-char (cl:or (cl:null padding-char) (dotnet:is-instance-of padding-char "System.Char")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "PadLeft" total-width padding-char))
     ((cl:and (cl:numberp total-width) (cl:not supplied-padding-char))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "PadLeft" total-width))
@@ -1440,7 +1440,7 @@ PadRight(Int32, Char) -> String
     - padding-char (System.Char): A Unicode padding character.
 "
   (cl:cond
-    ((cl:and (cl:numberp total-width) supplied-padding-char (cl:or (cl:null padding-char) (dotnet:object-type padding-char)))
+    ((cl:and (cl:numberp total-width) supplied-padding-char (cl:or (cl:null padding-char) (dotnet:is-instance-of padding-char "System.Char")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "PadRight" total-width padding-char))
     ((cl:and (cl:numberp total-width) (cl:not supplied-padding-char))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "PadRight" total-width))
@@ -1512,11 +1512,11 @@ Replace(String, String, Boolean, CultureInfo) -> String
     - culture (System.Globalization.CultureInfo): The culture to use when comparing. If culture is , the current culture is used.
 "
   (cl:cond
-    ((cl:and (cl:stringp old-char) (cl:stringp new-char) supplied-comparison-type (cl:typep comparison-type 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
+    ((cl:and (cl:stringp old-char) (cl:stringp new-char) supplied-comparison-type (cl:typep comparison-type 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Replace" old-char new-char comparison-type culture))
-    ((cl:and (cl:stringp old-char) (cl:stringp new-char) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)) (cl:not supplied-culture))
+    ((cl:and (cl:stringp old-char) (cl:stringp new-char) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")) (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Replace" old-char new-char comparison-type))
-    ((cl:and (cl:or (cl:null old-char) (dotnet:object-type old-char)) (cl:or (cl:null new-char) (dotnet:object-type new-char)) (cl:not supplied-comparison-type) (cl:not supplied-culture))
+    ((cl:and (cl:or (cl:null old-char) (dotnet:is-instance-of old-char "System.Char")) (cl:or (cl:null new-char) (dotnet:is-instance-of new-char "System.Char")) (cl:not supplied-comparison-type) (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Replace" old-char new-char))
     ((cl:and (cl:stringp old-char) (cl:stringp new-char) (cl:not supplied-comparison-type) (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Replace" old-char new-char))
@@ -1627,26 +1627,26 @@ Split(String[], Int32, StringSplitOptions) -> String[]
     - options (System.StringSplitOptions): A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) (cl:or (cl:not supplied-options2) (cl:or (cl:null options2) (dotnet:object-type options2))))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options (cl:if supplied-options2 options2 (dotnet:enum-or "System.StringSplitOptions" "None"))))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char[]")) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:is-instance-of options2 "System.StringSplitOptions")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
-    ((cl:and (cl:stringp separator) supplied-options (cl:numberp options) (cl:or (cl:not supplied-options2) (cl:or (cl:null options2) (dotnet:object-type options2))))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options (cl:if supplied-options2 options2 (dotnet:enum-or "System.StringSplitOptions" "None"))))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:object-type options2)))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.String[]")) supplied-options (cl:numberp options) supplied-options2 (cl:or (cl:null options2) (dotnet:is-instance-of options2 "System.StringSplitOptions")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options options2))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:object-type options))) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator (cl:if supplied-options options (dotnet:enum-or "System.StringSplitOptions" "None"))))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:numberp options) (cl:not supplied-options2))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char[]")) supplied-options (cl:numberp options) (cl:not supplied-options2))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char[]")) supplied-options (cl:or (cl:null options) (dotnet:is-instance-of options "System.StringSplitOptions")) (cl:not supplied-options2))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
-    ((cl:and (cl:stringp separator) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:object-type options))) (cl:not supplied-options2))
-     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator (cl:if supplied-options options (dotnet:enum-or "System.StringSplitOptions" "None"))))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) supplied-options (cl:or (cl:null options) (dotnet:object-type options)) (cl:not supplied-options2))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.String[]")) supplied-options (cl:or (cl:null options) (dotnet:is-instance-of options "System.StringSplitOptions")) (cl:not supplied-options2))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:not supplied-options) (cl:not supplied-options2))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) supplied-options (cl:numberp options) (cl:or (cl:not supplied-options2) (cl:or (cl:null options2) (dotnet:is-instance-of options2 "System.StringSplitOptions"))))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options (cl:if supplied-options2 options2 (dotnet:enum-or "System.StringSplitOptions" "None"))))
+    ((cl:and (cl:stringp separator) supplied-options (cl:numberp options) (cl:or (cl:not supplied-options2) (cl:or (cl:null options2) (dotnet:is-instance-of options2 "System.StringSplitOptions"))))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator options (cl:if supplied-options2 options2 (dotnet:enum-or "System.StringSplitOptions" "None"))))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-options) (cl:not supplied-options2))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:is-instance-of options "System.StringSplitOptions"))) (cl:not supplied-options2))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator (cl:if supplied-options options (dotnet:enum-or "System.StringSplitOptions" "None"))))
+    ((cl:and (cl:stringp separator) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:is-instance-of options "System.StringSplitOptions"))) (cl:not supplied-options2))
+     (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Split" separator (cl:if supplied-options options (dotnet:enum-or "System.StringSplitOptions" "None"))))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
                     :class-name <type-str>
@@ -1689,13 +1689,13 @@ StartsWith(String, Boolean, CultureInfo) -> Boolean
     - culture (System.Globalization.CultureInfo): Cultural information that determines how this string and value are compared. If culture is , the current culture is used.
 "
   (cl:cond
-    ((cl:and (cl:stringp value) supplied-comparison-type (cl:typep comparison-type 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
+    ((cl:and (cl:stringp value) supplied-comparison-type (cl:typep comparison-type 'cl:boolean) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "StartsWith" value comparison-type culture))
-    ((cl:and (cl:stringp value) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:object-type comparison-type)) (cl:not supplied-culture))
+    ((cl:and (cl:stringp value) supplied-comparison-type (cl:or (cl:null comparison-type) (dotnet:is-instance-of comparison-type "System.StringComparison")) (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "StartsWith" value comparison-type))
     ((cl:and (cl:stringp value) (cl:not supplied-comparison-type) (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "StartsWith" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-comparison-type) (cl:not supplied-culture))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-comparison-type) (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "StartsWith" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-STRING"
@@ -1769,7 +1769,7 @@ ToLower(CultureInfo) -> String
     - culture (System.Globalization.CultureInfo): An object that supplies culture-specific casing rules. If culture is , the current culture is used.
 "
   (cl:cond
-    ((cl:and supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
+    ((cl:and supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToLower" culture))
     ((cl:and (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToLower"))
@@ -1799,7 +1799,7 @@ ToString(IFormatProvider) -> String
     - provider (System.IFormatProvider): (Reserved) An object that supplies culture-specific formatting information.
 "
   (cl:cond
-    ((cl:and supplied-provider (cl:or (cl:null provider) (dotnet:object-type provider)))
+    ((cl:and supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToString" provider))
     ((cl:and (cl:not supplied-provider))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToString"))
@@ -1823,7 +1823,7 @@ ToUpper(CultureInfo) -> String
     - culture (System.Globalization.CultureInfo): An object that supplies culture-specific casing rules. If culture is , the current culture is used.
 "
   (cl:cond
-    ((cl:and supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)))
+    ((cl:and supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToUpper" culture))
     ((cl:and (cl:not supplied-culture))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "ToUpper"))
@@ -1855,9 +1855,9 @@ Trim(Char) -> String
 Trim(Char]) -> String
 "
   (cl:cond
-    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
+    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.Char")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Trim" trim-char))
-    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
+    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.ReadOnlySpan`1[System.Char]")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Trim" trim-char))
     ((cl:and (cl:not supplied-trim-char))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "Trim"))
@@ -1888,9 +1888,9 @@ TrimEnd(Char) -> String
 TrimEnd(Char]) -> String
 "
   (cl:cond
-    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
+    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.Char")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimEnd" trim-char))
-    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
+    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.ReadOnlySpan`1[System.Char]")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimEnd" trim-char))
     ((cl:and (cl:not supplied-trim-char))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimEnd"))
@@ -1921,9 +1921,9 @@ TrimStart(Char) -> String
 TrimStart(Char]) -> String
 "
   (cl:cond
-    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
+    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.Char")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimStart" trim-char))
-    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:object-type trim-char)))
+    ((cl:and supplied-trim-char (cl:or (cl:null trim-char) (dotnet:is-instance-of trim-char "System.ReadOnlySpan`1[System.Char]")))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimStart" trim-char))
     ((cl:and (cl:not supplied-trim-char))
      (dotnet:invoke (cl:the (dotnet "System.String") obj!) "TrimStart"))

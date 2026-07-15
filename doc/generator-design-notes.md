@@ -2907,3 +2907,69 @@ confirmed `MonoGameGum.GueDeriving.TextRuntime` now generates
 and `Gum.Forms.Controls.ListBox`'s `scroll-into-view` now defaults
 `scroll-into-view-style` to `(dotnet:enum-or "Gum.Forms.Controls.ScrollIntoViewStyle"
 "BringIntoView")` instead of silently passing `nil`.
+
+## Fixing Master Wrapper Dispatch Ordering and Non-Primitive Type Checks (Version 49)
+
+`doc/bug-in-dispatching.md` documents a real bug found downstream in
+`dotcl-dungeonslime`: calling the generated `media-player:play` wrapper with one argument
+(`(media-player:play song)`) silently invoked `MediaPlayer.Play(song, 0)` — a nonexistent
+overload — instead of the real `Play(Song)` overload, throwing a .NET
+`MissingMethodException` at runtime. Two independent, compounding bugs in
+`apg-overload-dispatch.lisp`, present since the Master Wrapper's introduction (Version 18):
+
+### Root cause 1: `cond` clauses were ordered by raw parameter count, not effective arity
+
+`generate-master-wrapper`/`generate-constructor-master-wrapper` both sorted candidate
+overloads for `cond`-clause order by `(length (getf m :parameters))` descending — treating
+raw declared-parameter count as "specificity." That's only true when every parameter is
+mandatory. An overload with a *usable-default* (`usable-default-p`) trailing parameter has
+an effective minimum arity strictly less than its raw count — e.g. `Play(SongCollection,
+Int32 = 0)`'s raw count is 2, but it can be satisfied by a 1-argument call exactly like the
+genuinely-1-parameter `Play(Song)` can. The old sort ranked the 2-parameter overload first
+regardless, permanently shadowing `Play(Song)`'s `cond` clause as unreachable dead code
+(its guard was a strict subset of the wrongly-earlier clause's).
+
+New `mandatory-param-count` (replacing the equivalent inline loop `max-mandatory-parameter-
+len` used to run once per group) counts one overload's own leading non-defaulted parameters.
+New `master-wrapper-more-specific-p` sorts by that value descending first, then by raw
+parameter count ascending among ties — so a call supplying only the tied number of
+arguments matches the exact, fully-required overload (no trailing default to omit) before
+the same-effective-arity overload whose extra slot(s) are merely defaulted.
+
+### Root cause 2: the non-primitive type-check fallback couldn't discriminate two types
+
+`format-param-type-check`'s fallback branch (any parameter type other than the numeric
+primitives/`Boolean`/`String`) emitted only `(cl:or (cl:null arg) (dotnet:object-type
+arg))` — "is this `nil`, or *any* wrapped .NET object at all" — so two overloads differing
+only by a non-primitive parameter type at the same position (`Song` vs. `SongCollection`)
+produced byte-identical guards, indistinguishable to the dispatcher regardless of Root
+Cause 1's ordering fix. Fixing Root Cause 1 alone resolves the `MediaPlayer.Play` case
+specifically (ordering now favors the exact match), but leaves this latent gap for any
+other same-position non-primitive-type pair.
+
+The fix uses DotCL 0.1.18's new `dotnet:is-instance-of` primitive
+(`Runtime.DotNet.cs`'s `DotNetIsInstanceOf`, dotcl/dotcl#45) — `(dotnet:is-instance-of obj
+type)`, a single runtime call wrapping `Type.IsInstanceOfType` that marshals `obj` to its
+natural .NET type and resolves `type` (a type-name string, symbol, or `System.Type`)
+internally. The fallback becomes `(cl:or (cl:null arg) (dotnet:is-instance-of arg
+"<param-type>"))`. This is deliberately an ordinary runtime call, not a `#.` read-time-eval
+type resolution — ordinary per-class Master Wrapper files must stay resolvable without
+DotCL type resolution at compile time, the same hazard `--defgeneric`'s opt-in-only,
+separately-`.asd`-gated `csharp-generics.lisp` exists to contain (see
+`doc/dispatch-on-open-generics.md`, and Versions 41/42/46 above). `dotcl-packagegen.csproj`'s
+`DotCL.Runtime` pin is bumped from `0.1.17` to `0.1.18` for this, mirroring how Version 41
+bumped it from `0.1.15` to `0.1.17` for `dotnet:class-for-type`.
+
+### Verification
+
+`make check-parens` on `apg-overload-dispatch.lisp`, then `make build test` — the full
+Lisp + C# suite, plus a purpose-built regression fixture in
+`AssemblyToLispyTestTarget/EdgeCases.cs` reproducing the exact bug shape (two overloads of
+one method name sharing a required prefix, one fully required, the other with a defaulted
+trailing parameter, both non-primitive at the discriminating position), asserting the
+generated `cond` order/guards route a minimal-argument call to the fully-required overload,
+and that the fallback guard now includes `dotnet:is-instance-of`. Regenerating
+`cspackages-test/` is expected to change every previously-generated Master Wrapper that has
+a defaulted trailing parameter (dispatch order and/or non-primitive guards) — reviewed for
+sanity, not just presence, since this touches a large fraction of already-shipped generated
+code.

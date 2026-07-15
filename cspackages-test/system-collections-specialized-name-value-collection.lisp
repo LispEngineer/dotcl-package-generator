@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Specialized.NameValueCollection
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-collections-specialized-name-value-collection)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Specialized.NameValueCollection"))
 (cl:defconstant <type-str> "System.Collections.Specialized.NameValueCollection")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (col cl:nil supplied-col) (comparer cl:nil supplied-comparer) (comparer2 cl:nil supplied-comparer2))
   "Master wrapper for System.Collections.Specialized.NameValueCollection constructor overloads. Dispatches at runtime.
@@ -63,21 +63,21 @@ new(Int32, IHashCodeProvider, IComparer)
     - comparer (System.Collections.IComparer): The System.Collections.IComparer to use to determine whether two keys are equal.
 "
   (cl:cond
-    ((cl:and supplied-col (cl:numberp col) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:object-type comparer2)))
+    ((cl:and supplied-col (cl:numberp col) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.IHashCodeProvider")) supplied-comparer2 (cl:or (cl:null comparer2) (dotnet:is-instance-of comparer2 "System.Collections.IComparer")))
      (dotnet:new <type-str> col comparer comparer2))
-    ((cl:and supplied-col (cl:or (cl:null col) (dotnet:object-type col)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+    ((cl:and supplied-col (cl:or (cl:null col) (dotnet:is-instance-of col "System.Collections.IHashCodeProvider")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.IComparer")) (cl:not supplied-comparer2))
      (dotnet:new <type-str> col comparer))
-    ((cl:and supplied-col (cl:numberp col) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+    ((cl:and supplied-col (cl:numberp col) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.IEqualityComparer")) (cl:not supplied-comparer2))
      (dotnet:new <type-str> col comparer))
-    ((cl:and supplied-col (cl:numberp col) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+    ((cl:and supplied-col (cl:numberp col) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.Specialized.NameValueCollection")) (cl:not supplied-comparer2))
      (dotnet:new <type-str> col comparer))
-    ((cl:and supplied-col (cl:or (cl:null col) (dotnet:object-type col)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)) (cl:not supplied-comparer2))
+    ((cl:and supplied-col (cl:or (cl:null col) (dotnet:is-instance-of col "System.Runtime.Serialization.SerializationInfo")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Runtime.Serialization.StreamingContext")) (cl:not supplied-comparer2))
      (dotnet:new <type-str> col comparer))
-    ((cl:and supplied-col (cl:or (cl:null col) (dotnet:object-type col)) (cl:not supplied-comparer) (cl:not supplied-comparer2))
+    ((cl:and supplied-col (cl:or (cl:null col) (dotnet:is-instance-of col "System.Collections.Specialized.NameValueCollection")) (cl:not supplied-comparer) (cl:not supplied-comparer2))
      (dotnet:new <type-str> col))
     ((cl:and supplied-col (cl:numberp col) (cl:not supplied-comparer) (cl:not supplied-comparer2))
      (dotnet:new <type-str> col))
-    ((cl:and supplied-col (cl:or (cl:null col) (dotnet:object-type col)) (cl:not supplied-comparer) (cl:not supplied-comparer2))
+    ((cl:and supplied-col (cl:or (cl:null col) (dotnet:is-instance-of col "System.Collections.IEqualityComparer")) (cl:not supplied-comparer) (cl:not supplied-comparer2))
      (dotnet:new <type-str> col))
     ((cl:and (cl:not supplied-col) (cl:not supplied-comparer) (cl:not supplied-comparer2))
      (dotnet:new <type-str>))
@@ -113,7 +113,7 @@ Add(String, String) -> Void
   (cl:cond
     ((cl:and (cl:stringp c) supplied-value (cl:stringp value))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Specialized.NameValueCollection") obj!) "Add" c value))
-    ((cl:and (cl:or (cl:null c) (dotnet:object-type c)) (cl:not supplied-value))
+    ((cl:and (cl:or (cl:null c) (dotnet:is-instance-of c "System.Collections.Specialized.NameValueCollection")) (cl:not supplied-value))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Specialized.NameValueCollection") obj!) "Add" c))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-COLLECTIONS-SPECIALIZED-NAME-VALUE-COLLECTION"

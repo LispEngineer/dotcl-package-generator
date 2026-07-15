@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Specialized.NameObjectCollectionBase
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-collections-specialized-name-object-collection-base)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Specialized.NameObjectCollectionBase"))
 (cl:defconstant <type-str> "System.Collections.Specialized.NameObjectCollectionBase")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (equality-comparer cl:nil supplied-equality-comparer) (equality-comparer2 cl:nil supplied-equality-comparer2) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Specialized.NameObjectCollectionBase constructor overloads. Dispatches at runtime.
@@ -52,15 +52,15 @@ new(Int32, IHashCodeProvider, IComparer)
     - comparer (System.Collections.IComparer): The System.Collections.IComparer to use to determine whether two keys are equal.
 "
   (cl:cond
-    ((cl:and supplied-equality-comparer (cl:numberp equality-comparer) supplied-equality-comparer2 (cl:or (cl:null equality-comparer2) (dotnet:object-type equality-comparer2)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and supplied-equality-comparer (cl:numberp equality-comparer) supplied-equality-comparer2 (cl:or (cl:null equality-comparer2) (dotnet:is-instance-of equality-comparer2 "System.Collections.IHashCodeProvider")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.IComparer")))
      (dotnet:new <type-str> equality-comparer equality-comparer2 comparer))
-    ((cl:and supplied-equality-comparer (cl:numberp equality-comparer) supplied-equality-comparer2 (cl:or (cl:null equality-comparer2) (dotnet:object-type equality-comparer2)) (cl:not supplied-comparer))
+    ((cl:and supplied-equality-comparer (cl:numberp equality-comparer) supplied-equality-comparer2 (cl:or (cl:null equality-comparer2) (dotnet:is-instance-of equality-comparer2 "System.Collections.IEqualityComparer")) (cl:not supplied-comparer))
      (dotnet:new <type-str> equality-comparer equality-comparer2))
-    ((cl:and supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:object-type equality-comparer)) supplied-equality-comparer2 (cl:or (cl:null equality-comparer2) (dotnet:object-type equality-comparer2)) (cl:not supplied-comparer))
+    ((cl:and supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:is-instance-of equality-comparer "System.Collections.IHashCodeProvider")) supplied-equality-comparer2 (cl:or (cl:null equality-comparer2) (dotnet:is-instance-of equality-comparer2 "System.Collections.IComparer")) (cl:not supplied-comparer))
      (dotnet:new <type-str> equality-comparer equality-comparer2))
-    ((cl:and supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:object-type equality-comparer)) supplied-equality-comparer2 (cl:or (cl:null equality-comparer2) (dotnet:object-type equality-comparer2)) (cl:not supplied-comparer))
+    ((cl:and supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:is-instance-of equality-comparer "System.Runtime.Serialization.SerializationInfo")) supplied-equality-comparer2 (cl:or (cl:null equality-comparer2) (dotnet:is-instance-of equality-comparer2 "System.Runtime.Serialization.StreamingContext")) (cl:not supplied-comparer))
      (dotnet:new <type-str> equality-comparer equality-comparer2))
-    ((cl:and supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:object-type equality-comparer)) (cl:not supplied-equality-comparer2) (cl:not supplied-comparer))
+    ((cl:and supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:is-instance-of equality-comparer "System.Collections.IEqualityComparer")) (cl:not supplied-equality-comparer2) (cl:not supplied-comparer))
      (dotnet:new <type-str> equality-comparer))
     ((cl:and supplied-equality-comparer (cl:numberp equality-comparer) (cl:not supplied-equality-comparer2) (cl:not supplied-comparer))
      (dotnet:new <type-str> equality-comparer))
@@ -147,7 +147,7 @@ BaseGetAllValues(Type) -> Object[]
     - type (System.Type): A System.Type that represents the type of array to return.
 "
   (cl:cond
-    ((cl:and supplied-type (cl:or (cl:null type) (dotnet:object-type type)))
+    ((cl:and supplied-type (cl:or (cl:null type) (dotnet:is-instance-of type "System.Type")))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Specialized.NameObjectCollectionBase") obj!) "BaseGetAllValues" type))
     ((cl:and (cl:not supplied-type))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Specialized.NameObjectCollectionBase") obj!) "BaseGetAllValues"))
@@ -201,9 +201,9 @@ BaseSet(Int32, Object) -> Void
     - value (System.Object): The System.Object that represents the new value of the entry to set. The value can be .
 "
   (cl:cond
-    ((cl:and (cl:stringp name) (cl:or (cl:null value) (dotnet:object-type value)))
+    ((cl:and (cl:stringp name) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Specialized.NameObjectCollectionBase") obj!) "BaseSet" name value))
-    ((cl:and (cl:numberp name) (cl:or (cl:null value) (dotnet:object-type value)))
+    ((cl:and (cl:numberp name) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.Collections.Specialized.NameObjectCollectionBase") obj!) "BaseSet" name value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-COLLECTIONS-SPECIALIZED-NAME-OBJECT-COLLECTION-BASE"

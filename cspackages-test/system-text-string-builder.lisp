@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Text.StringBuilder
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-text-string-builder)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Text.StringBuilder"))
 (cl:defconstant <type-str> "System.Text.StringBuilder")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (capacity2 cl:nil supplied-capacity2) (length cl:nil supplied-length) (capacity3 cl:nil supplied-capacity3))
   "Master wrapper for System.Text.StringBuilder constructor overloads. Dispatches at runtime.
@@ -247,31 +247,29 @@ Append(StringBuilder, Int32, Int32) -> StringBuilder
     - count (System.Int32): The number of characters in value to append.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-repeat-count (cl:numberp repeat-count) supplied-char-count (cl:numberp char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Text.StringBuilder")) supplied-repeat-count (cl:numberp repeat-count) supplied-char-count (cl:numberp char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value repeat-count char-count))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-repeat-count (cl:numberp repeat-count) supplied-char-count (cl:numberp char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) supplied-repeat-count (cl:numberp repeat-count) supplied-char-count (cl:numberp char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value repeat-count char-count))
     ((cl:and (cl:stringp value) supplied-repeat-count (cl:numberp repeat-count) supplied-char-count (cl:numberp char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value repeat-count char-count))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-repeat-count (cl:numberp repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char*")) supplied-repeat-count (cl:numberp repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value repeat-count))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) supplied-repeat-count (cl:numberp repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-repeat-count (cl:numberp repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value repeat-count))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlyMemory`1[System.Char]")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
     ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
@@ -283,13 +281,15 @@ Append(StringBuilder, Int32, Int32) -> StringBuilder
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
     ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
     ((cl:and (cl:typep value 'cl:boolean) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Text.StringBuilder")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
     ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
@@ -385,23 +385,23 @@ AppendFormat(IFormatProvider, String, Object, Object, Object) -> StringBuilder
     - arg2 (System.Object): The third object to format.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) supplied-arg2 (cl:or (cl:null arg2) (dotnet:object-type arg2)) supplied-arg22 (cl:or (cl:null arg22) (dotnet:object-type arg22)))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.Object")) supplied-arg22 (cl:or (cl:null arg22) (dotnet:is-instance-of arg22 "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1 arg2 arg22))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) supplied-arg2 (cl:or (cl:null arg2) (dotnet:object-type arg2)) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.Object")) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1 arg2))
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) supplied-arg2 (cl:or (cl:null arg2) (dotnet:object-type arg2)) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) supplied-arg2 (cl:or (cl:null arg2) (dotnet:is-instance-of arg2 "System.Object")) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1 arg2))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.Object")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:stringp arg0) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1))
-    ((cl:and (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null arg0) (dotnet:object-type arg0)) supplied-arg1 (cl:or (cl:null arg1) (dotnet:object-type arg1)) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:or (cl:null format) (dotnet:is-instance-of format "System.IFormatProvider")) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Text.CompositeFormat")) supplied-arg1 (cl:or (cl:null arg1) (dotnet:is-instance-of arg1 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0 arg1))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.Object")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0))
-    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:object-type arg0)) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
+    ((cl:and (cl:stringp format) (cl:or (cl:null arg0) (dotnet:is-instance-of arg0 "System.ReadOnlySpan`1[System.Object]")) (cl:not supplied-arg1) (cl:not supplied-arg2) (cl:not supplied-arg22))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendFormat" format arg0))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"
@@ -500,13 +500,13 @@ AppendJoin(Char, String]) -> StringBuilder
     - values (System.ReadOnlySpan`1[System.String]): A span that contains the strings to concatenate and append to the current instance of the string builder.
 "
   (cl:cond
-    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:object-type values)))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[System.Object]")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" separator values))
-    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:object-type values)))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[System.String]")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" separator values))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:null values) (dotnet:object-type values)))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[System.Object]")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" separator values))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:null values) (dotnet:object-type values)))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null values) (dotnet:is-instance-of values "System.ReadOnlySpan`1[System.String]")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" separator values))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"
@@ -532,9 +532,9 @@ AppendJoin(Char, IEnumerable) -> StringBuilder
     - values (System.Collections.Generic.IEnumerable`1[T]): A collection that contains the objects to concatenate and append to the current instance of the string builder.
 "
   (cl:cond
-    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:object-type values)))
+    ((cl:and (cl:stringp separator) (cl:or (cl:null values) (dotnet:is-instance-of values "System.Collections.Generic.IEnumerable`1[T]")))
      (dotnet:invoke-generic (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" (cl:list type) separator values))
-    ((cl:and (cl:or (cl:null separator) (dotnet:object-type separator)) (cl:or (cl:null values) (dotnet:object-type values)))
+    ((cl:and (cl:or (cl:null separator) (dotnet:is-instance-of separator "System.Char")) (cl:or (cl:null values) (dotnet:is-instance-of values "System.Collections.Generic.IEnumerable`1[T]")))
      (dotnet:invoke-generic (cl:the (dotnet "System.Text.StringBuilder") obj!) "AppendJoin" (cl:list type) separator values))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"
@@ -622,9 +622,9 @@ CopyTo(Int32, Char[], Int32, Int32) -> Void
     - count (System.Int32): The number of characters to be copied.
 "
   (cl:cond
-    ((cl:and (cl:numberp source-index) (cl:or (cl:null destination) (dotnet:object-type destination)) (cl:numberp count) supplied-count2 (cl:numberp count2))
+    ((cl:and (cl:numberp source-index) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Char[]")) (cl:numberp count) supplied-count2 (cl:numberp count2))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "CopyTo" source-index destination count count2))
-    ((cl:and (cl:numberp source-index) (cl:or (cl:null destination) (dotnet:object-type destination)) (cl:numberp count) (cl:not supplied-count2))
+    ((cl:and (cl:numberp source-index) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[System.Char]")) (cl:numberp count) (cl:not supplied-count2))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "CopyTo" source-index destination count))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"
@@ -656,9 +656,9 @@ Equals(Char]) -> Boolean
     - span (System.ReadOnlySpan`1[System.Char]): The character span to compare with the current instance.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null sb) (dotnet:object-type sb)))
+    ((cl:and (cl:or (cl:null sb) (dotnet:is-instance-of sb "System.Text.StringBuilder")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Equals" sb))
-    ((cl:and (cl:or (cl:null sb) (dotnet:object-type sb)))
+    ((cl:and (cl:or (cl:null sb) (dotnet:is-instance-of sb "System.ReadOnlySpan`1[System.Char]")))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Equals" sb))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"
@@ -812,21 +812,19 @@ Insert(Int32, Char[], Int32, Int32) -> StringBuilder
     - char-count (System.Int32): The number of characters to insert.
 "
   (cl:cond
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:object-type value)) supplied-count (cl:numberp count) supplied-char-count (cl:numberp char-count))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) supplied-count (cl:numberp count) supplied-char-count (cl:numberp char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value count char-count))
     ((cl:and (cl:numberp index) (cl:stringp value) supplied-count (cl:numberp count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value count))
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
@@ -834,15 +832,17 @@ Insert(Int32, Char[], Int32, Int32) -> StringBuilder
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) (cl:not supplied-count) (cl:not supplied-char-count))
+     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:object-type value)) (cl:not supplied-count) (cl:not supplied-char-count))
+    ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     ((cl:and (cl:numberp index) (cl:typep value 'cl:boolean) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
@@ -919,15 +919,15 @@ Replace(Char, Char, Int32, Int32) -> StringBuilder
   (cl:cond
     ((cl:and (cl:stringp old-value) (cl:stringp new-value) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value start-index count))
-    ((cl:and (cl:or (cl:null old-value) (dotnet:object-type old-value)) (cl:or (cl:null new-value) (dotnet:object-type new-value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.ReadOnlySpan`1[System.Char]")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value start-index count))
-    ((cl:and (cl:or (cl:null old-value) (dotnet:object-type old-value)) (cl:or (cl:null new-value) (dotnet:object-type new-value)) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
+    ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.Char")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.Char")) supplied-start-index (cl:numberp start-index) supplied-count (cl:numberp count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value start-index count))
     ((cl:and (cl:stringp old-value) (cl:stringp new-value) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value))
-    ((cl:and (cl:or (cl:null old-value) (dotnet:object-type old-value)) (cl:or (cl:null new-value) (dotnet:object-type new-value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.ReadOnlySpan`1[System.Char]")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value))
-    ((cl:and (cl:or (cl:null old-value) (dotnet:object-type old-value)) (cl:or (cl:null new-value) (dotnet:object-type new-value)) (cl:not supplied-start-index) (cl:not supplied-count))
+    ((cl:and (cl:or (cl:null old-value) (dotnet:is-instance-of old-value "System.Char")) (cl:or (cl:null new-value) (dotnet:is-instance-of new-value "System.Char")) (cl:not supplied-start-index) (cl:not supplied-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Replace" old-value new-value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TEXT-STRING-BUILDER"

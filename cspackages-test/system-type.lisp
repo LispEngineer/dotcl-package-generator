@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Type
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-type)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Type"))
 (cl:defconstant <type-str> "System.Type")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.Type class.
@@ -337,9 +337,9 @@ Equals(Type) -> Boolean
     - o (System.Type): The object whose underlying system type is to be compared with the underlying system type of the current System.Type.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null o) (dotnet:object-type o)))
+    ((cl:and (cl:or (cl:null o) (dotnet:is-instance-of o "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "Equals" o))
-    ((cl:and (cl:or (cl:null o) (dotnet:object-type o)))
+    ((cl:and (cl:or (cl:null o) (dotnet:is-instance-of o "System.Type")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "Equals" o))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TYPE"
@@ -415,13 +415,13 @@ GetConstructor(BindingFlags, Binder, CallingConventions, Type[], ParameterModifi
     - modifiers (System.Reflection.ParameterModifier[]): An array of System.Reflection.ParameterModifier objects representing the attributes associated with the corresponding element in the types array. The default binder does not process this parameter.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null types) (dotnet:object-type types)) supplied-types2 (cl:or (cl:null types2) (dotnet:object-type types2)) supplied-types3 (cl:or (cl:null types3) (dotnet:object-type types3)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:object-type modifiers2)))
+    ((cl:and (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.BindingFlags")) supplied-types2 (cl:or (cl:null types2) (dotnet:is-instance-of types2 "System.Reflection.Binder")) supplied-types3 (cl:or (cl:null types3) (dotnet:is-instance-of types3 "System.Reflection.CallingConventions")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Type[]")) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:is-instance-of modifiers2 "System.Reflection.ParameterModifier[]")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetConstructor" types types2 types3 modifiers modifiers2))
-    ((cl:and (cl:or (cl:null types) (dotnet:object-type types)) supplied-types2 (cl:or (cl:null types2) (dotnet:object-type types2)) supplied-types3 (cl:or (cl:null types3) (dotnet:object-type types3)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) (cl:not supplied-modifiers2))
+    ((cl:and (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.BindingFlags")) supplied-types2 (cl:or (cl:null types2) (dotnet:is-instance-of types2 "System.Reflection.Binder")) supplied-types3 (cl:or (cl:null types3) (dotnet:is-instance-of types3 "System.Type[]")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Reflection.ParameterModifier[]")) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetConstructor" types types2 types3 modifiers))
-    ((cl:and (cl:or (cl:null types) (dotnet:object-type types)) supplied-types2 (cl:or (cl:null types2) (dotnet:object-type types2)) (cl:not supplied-types3) (cl:not supplied-modifiers) (cl:not supplied-modifiers2))
+    ((cl:and (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.BindingFlags")) supplied-types2 (cl:or (cl:null types2) (dotnet:is-instance-of types2 "System.Type[]")) (cl:not supplied-types3) (cl:not supplied-modifiers) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetConstructor" types types2))
-    ((cl:and (cl:or (cl:null types) (dotnet:object-type types)) (cl:not supplied-types2) (cl:not supplied-types3) (cl:not supplied-modifiers) (cl:not supplied-modifiers2))
+    ((cl:and (cl:or (cl:null types) (dotnet:is-instance-of types "System.Type[]")) (cl:not supplied-types2) (cl:not supplied-types3) (cl:not supplied-modifiers) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetConstructor" types))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TYPE"
@@ -455,7 +455,7 @@ GetConstructors(BindingFlags) -> ConstructorInfo[]
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return an empty array.
 "
   (cl:cond
-    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetConstructors" binding-attr))
     ((cl:and (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetConstructors"))
@@ -526,7 +526,7 @@ GetEvent(String, BindingFlags) -> EventInfo
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return .
 "
   (cl:cond
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetEvent" name binding-attr))
     ((cl:and (cl:stringp name) (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetEvent" name))
@@ -550,7 +550,7 @@ GetEvents(BindingFlags) -> EventInfo[]
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return an empty array.
 "
   (cl:cond
-    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetEvents" binding-attr))
     ((cl:and (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetEvents"))
@@ -577,7 +577,7 @@ GetField(String, BindingFlags) -> FieldInfo
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return .
 "
   (cl:cond
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetField" name binding-attr))
     ((cl:and (cl:stringp name) (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetField" name))
@@ -601,7 +601,7 @@ GetFields(BindingFlags) -> FieldInfo[]
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return an empty array.
 "
   (cl:cond
-    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetFields" binding-attr))
     ((cl:and (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetFields"))
@@ -719,9 +719,9 @@ GetMember(String, MemberTypes, BindingFlags) -> MemberInfo[]
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return an empty array.
 "
   (cl:cond
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-binding-attr2 (cl:or (cl:null binding-attr2) (dotnet:object-type binding-attr2)))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.MemberTypes")) supplied-binding-attr2 (cl:or (cl:null binding-attr2) (dotnet:is-instance-of binding-attr2 "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMember" name binding-attr binding-attr2))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) (cl:not supplied-binding-attr2))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) (cl:not supplied-binding-attr2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMember" name binding-attr))
     ((cl:and (cl:stringp name) (cl:not supplied-binding-attr) (cl:not supplied-binding-attr2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMember" name))
@@ -745,7 +745,7 @@ GetMembers(BindingFlags) -> MemberInfo[]
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return an empty array.
 "
   (cl:cond
-    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMembers" binding-attr))
     ((cl:and (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMembers"))
@@ -873,27 +873,27 @@ GetMethod(String, Int32, BindingFlags, Binder, CallingConventions, Type[], Param
     - modifiers (System.Reflection.ParameterModifier[]): An array of System.Reflection.ParameterModifier objects representing the attributes associated with the corresponding element in the types array. To be only used when calling through COM interop, and only parameters that are passed by reference are handled. The default binder does not process this parameter.
 "
   (cl:cond
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:object-type modifiers2)) supplied-modifiers3 (cl:or (cl:null modifiers3) (dotnet:object-type modifiers3)) supplied-modifiers4 (cl:or (cl:null modifiers4) (dotnet:object-type modifiers4)))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.BindingFlags")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Reflection.Binder")) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:is-instance-of modifiers2 "System.Reflection.CallingConventions")) supplied-modifiers3 (cl:or (cl:null modifiers3) (dotnet:is-instance-of modifiers3 "System.Type[]")) supplied-modifiers4 (cl:or (cl:null modifiers4) (dotnet:is-instance-of modifiers4 "System.Reflection.ParameterModifier[]")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr types modifiers modifiers2 modifiers3 modifiers4))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:object-type modifiers2)) supplied-modifiers3 (cl:or (cl:null modifiers3) (dotnet:object-type modifiers3)) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.Binder")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Reflection.CallingConventions")) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:is-instance-of modifiers2 "System.Type[]")) supplied-modifiers3 (cl:or (cl:null modifiers3) (dotnet:is-instance-of modifiers3 "System.Reflection.ParameterModifier[]")) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr types modifiers modifiers2 modifiers3))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:object-type modifiers2)) supplied-modifiers3 (cl:or (cl:null modifiers3) (dotnet:object-type modifiers3)) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.BindingFlags")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Reflection.Binder")) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:is-instance-of modifiers2 "System.Type[]")) supplied-modifiers3 (cl:or (cl:null modifiers3) (dotnet:is-instance-of modifiers3 "System.Reflection.ParameterModifier[]")) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr types modifiers modifiers2 modifiers3))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:object-type modifiers2)) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.Binder")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Type[]")) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:is-instance-of modifiers2 "System.Reflection.ParameterModifier[]")) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr types modifiers modifiers2))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Type[]")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Reflection.ParameterModifier[]")) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr types modifiers))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.BindingFlags")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Type[]")) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr types modifiers))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Type[]")) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr types))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Type[]")) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.ParameterModifier[]")) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr types))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:numberp binding-attr) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Type[]")) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr types))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Type[]")) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name binding-attr))
     ((cl:and (cl:stringp name) (cl:not supplied-binding-attr) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-modifiers2) (cl:not supplied-modifiers3) (cl:not supplied-modifiers4))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethod" name))
@@ -930,9 +930,9 @@ GetMethodImpl(String, Int32, BindingFlags, Binder, CallingConventions, Type[], P
     - modifiers (System.Reflection.ParameterModifier[]): An array of System.Reflection.ParameterModifier objects representing the attributes associated with the corresponding element in the types array. The default binder does not process this parameter.
 "
   (cl:cond
-    ((cl:and (cl:stringp name) (cl:numberp binding-attr) (cl:or (cl:null binder) (dotnet:object-type binder)) (cl:or (cl:null call-convention) (dotnet:object-type call-convention)) (cl:or (cl:null types) (dotnet:object-type types)) (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:object-type modifiers2)))
+    ((cl:and (cl:stringp name) (cl:numberp binding-attr) (cl:or (cl:null binder) (dotnet:is-instance-of binder "System.Reflection.BindingFlags")) (cl:or (cl:null call-convention) (dotnet:is-instance-of call-convention "System.Reflection.Binder")) (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.CallingConventions")) (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Type[]")) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:is-instance-of modifiers2 "System.Reflection.ParameterModifier[]")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethodImpl" name binding-attr binder call-convention types modifiers modifiers2))
-    ((cl:and (cl:stringp name) (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) (cl:or (cl:null binder) (dotnet:object-type binder)) (cl:or (cl:null call-convention) (dotnet:object-type call-convention)) (cl:or (cl:null types) (dotnet:object-type types)) (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) (cl:not supplied-modifiers2))
+    ((cl:and (cl:stringp name) (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) (cl:or (cl:null binder) (dotnet:is-instance-of binder "System.Reflection.Binder")) (cl:or (cl:null call-convention) (dotnet:is-instance-of call-convention "System.Reflection.CallingConventions")) (cl:or (cl:null types) (dotnet:is-instance-of types "System.Type[]")) (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Reflection.ParameterModifier[]")) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethodImpl" name binding-attr binder call-convention types modifiers))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TYPE"
@@ -954,7 +954,7 @@ GetMethods(BindingFlags) -> MethodInfo[]
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return an empty array.
 "
   (cl:cond
-    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethods" binding-attr))
     ((cl:and (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetMethods"))
@@ -981,7 +981,7 @@ GetNestedType(String, BindingFlags) -> Type
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return .
 "
   (cl:cond
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetNestedType" name binding-attr))
     ((cl:and (cl:stringp name) (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetNestedType" name))
@@ -1005,7 +1005,7 @@ GetNestedTypes(BindingFlags) -> Type[]
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return .
 "
   (cl:cond
-    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetNestedTypes" binding-attr))
     ((cl:and (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetNestedTypes"))
@@ -1035,7 +1035,7 @@ GetProperties(BindingFlags) -> PropertyInfo[]
     - binding-attr (System.Reflection.BindingFlags): A bitwise combination of the enumeration values that specify how the search is conducted. -or- System.Reflection.BindingFlags.Default to return an empty array.
 "
   (cl:cond
-    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)))
+    ((cl:and supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetProperties" binding-attr))
     ((cl:and (cl:not supplied-binding-attr))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetProperties"))
@@ -1104,17 +1104,17 @@ GetProperty(String, BindingFlags, Binder, Type, Type[], ParameterModifier[]) -> 
     - modifiers (System.Reflection.ParameterModifier[]): An array of System.Reflection.ParameterModifier objects representing the attributes associated with the corresponding element in the types array. The default binder does not process this parameter.
 "
   (cl:cond
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) supplied-types2 (cl:or (cl:null types2) (dotnet:object-type types2)) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:object-type modifiers2)))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Reflection.Binder")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Type")) supplied-types2 (cl:or (cl:null types2) (dotnet:is-instance-of types2 "System.Type[]")) supplied-modifiers2 (cl:or (cl:null modifiers2) (dotnet:is-instance-of modifiers2 "System.Reflection.ParameterModifier[]")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetProperty" name binding-attr types modifiers types2 modifiers2))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:object-type modifiers)) (cl:not supplied-types2) (cl:not supplied-modifiers2))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Type")) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Type[]")) supplied-modifiers (cl:or (cl:null modifiers) (dotnet:is-instance-of modifiers "System.Reflection.ParameterModifier[]")) (cl:not supplied-types2) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetProperty" name binding-attr types modifiers))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) supplied-types (cl:or (cl:null types) (dotnet:object-type types)) (cl:not supplied-modifiers) (cl:not supplied-types2) (cl:not supplied-modifiers2))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Type")) supplied-types (cl:or (cl:null types) (dotnet:is-instance-of types "System.Type[]")) (cl:not supplied-modifiers) (cl:not supplied-types2) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetProperty" name binding-attr types))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-types2) (cl:not supplied-modifiers2))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Reflection.BindingFlags")) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-types2) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetProperty" name binding-attr))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-types2) (cl:not supplied-modifiers2))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Type")) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-types2) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetProperty" name binding-attr))
-    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:object-type binding-attr)) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-types2) (cl:not supplied-modifiers2))
+    ((cl:and (cl:stringp name) supplied-binding-attr (cl:or (cl:null binding-attr) (dotnet:is-instance-of binding-attr "System.Type[]")) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-types2) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetProperty" name binding-attr))
     ((cl:and (cl:stringp name) (cl:not supplied-binding-attr) (cl:not supplied-types) (cl:not supplied-modifiers) (cl:not supplied-types2) (cl:not supplied-modifiers2))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "GetProperty" name))
@@ -1201,13 +1201,13 @@ GetType(String, Assembly], Type], Boolean, Boolean) -> Type
     - ignore-case (System.Boolean): to perform a case-insensitive search for typeName, to perform a case-sensitive search for typeName.
 "
   (cl:cond
-    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:object-type throw-on-error)) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:object-type ignore-case)) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean) supplied-ignore-case2 (cl:typep ignore-case2 'cl:boolean))
+    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:is-instance-of throw-on-error "System.Func`2[System.Reflection.AssemblyName, System.Reflection.Assembly]")) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Func`4[System.Reflection.Assembly, System.String, System.Boolean, System.Type]")) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean) supplied-ignore-case2 (cl:typep ignore-case2 'cl:boolean))
      (dotnet:static <type-str> "GetType" type-name throw-on-error ignore-case throw-on-error2 ignore-case2))
-    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:object-type throw-on-error)) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:object-type ignore-case)) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean) (cl:not supplied-ignore-case2))
+    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:is-instance-of throw-on-error "System.Func`2[System.Reflection.AssemblyName, System.Reflection.Assembly]")) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Func`4[System.Reflection.Assembly, System.String, System.Boolean, System.Type]")) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean) (cl:not supplied-ignore-case2))
      (dotnet:static <type-str> "GetType" type-name throw-on-error ignore-case throw-on-error2))
     ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:typep throw-on-error 'cl:boolean) supplied-ignore-case (cl:typep ignore-case 'cl:boolean) (cl:not supplied-throw-on-error2) (cl:not supplied-ignore-case2))
      (dotnet:static <type-str> "GetType" type-name throw-on-error ignore-case))
-    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:object-type throw-on-error)) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:object-type ignore-case)) (cl:not supplied-throw-on-error2) (cl:not supplied-ignore-case2))
+    ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:or (cl:null throw-on-error) (dotnet:is-instance-of throw-on-error "System.Func`2[System.Reflection.AssemblyName, System.Reflection.Assembly]")) supplied-ignore-case (cl:or (cl:null ignore-case) (dotnet:is-instance-of ignore-case "System.Func`4[System.Reflection.Assembly, System.String, System.Boolean, System.Type]")) (cl:not supplied-throw-on-error2) (cl:not supplied-ignore-case2))
      (dotnet:static <type-str> "GetType" type-name throw-on-error ignore-case))
     ((cl:and (cl:stringp type-name) supplied-throw-on-error (cl:typep throw-on-error 'cl:boolean) (cl:not supplied-ignore-case) (cl:not supplied-throw-on-error2) (cl:not supplied-ignore-case2))
      (dotnet:static <type-str> "GetType" type-name throw-on-error))
@@ -1273,13 +1273,13 @@ GetTypeFromCLSID(Guid, String, Boolean) -> Type
     - throw-on-error (System.Boolean): to throw any exception that occurs. -or- to ignore any exception that occurs.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null clsid) (dotnet:object-type clsid)) supplied-throw-on-error (cl:stringp throw-on-error) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean))
+    ((cl:and (cl:or (cl:null clsid) (dotnet:is-instance-of clsid "System.Guid")) supplied-throw-on-error (cl:stringp throw-on-error) supplied-throw-on-error2 (cl:typep throw-on-error2 'cl:boolean))
      (dotnet:static <type-str> "GetTypeFromCLSID" clsid throw-on-error throw-on-error2))
-    ((cl:and (cl:or (cl:null clsid) (dotnet:object-type clsid)) supplied-throw-on-error (cl:typep throw-on-error 'cl:boolean) (cl:not supplied-throw-on-error2))
+    ((cl:and (cl:or (cl:null clsid) (dotnet:is-instance-of clsid "System.Guid")) supplied-throw-on-error (cl:typep throw-on-error 'cl:boolean) (cl:not supplied-throw-on-error2))
      (dotnet:static <type-str> "GetTypeFromCLSID" clsid throw-on-error))
-    ((cl:and (cl:or (cl:null clsid) (dotnet:object-type clsid)) supplied-throw-on-error (cl:stringp throw-on-error) (cl:not supplied-throw-on-error2))
+    ((cl:and (cl:or (cl:null clsid) (dotnet:is-instance-of clsid "System.Guid")) supplied-throw-on-error (cl:stringp throw-on-error) (cl:not supplied-throw-on-error2))
      (dotnet:static <type-str> "GetTypeFromCLSID" clsid throw-on-error))
-    ((cl:and (cl:or (cl:null clsid) (dotnet:object-type clsid)) (cl:not supplied-throw-on-error) (cl:not supplied-throw-on-error2))
+    ((cl:and (cl:or (cl:null clsid) (dotnet:is-instance-of clsid "System.Guid")) (cl:not supplied-throw-on-error) (cl:not supplied-throw-on-error2))
      (dotnet:static <type-str> "GetTypeFromCLSID" clsid))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TYPE"
@@ -1393,11 +1393,11 @@ InvokeMember(String, BindingFlags, Binder, Object, Object[], ParameterModifier[]
     - named-parameters (System.String[]): An array containing the names of the parameters to which the values in the args array are passed.
 "
   (cl:cond
-    ((cl:and (cl:stringp name) (cl:or (cl:null invoke-attr) (dotnet:object-type invoke-attr)) (cl:or (cl:null binder) (dotnet:object-type binder)) (cl:or (cl:null target) (dotnet:object-type target)) (cl:or (cl:null args) (dotnet:object-type args)) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)) supplied-culture2 (cl:or (cl:null culture2) (dotnet:object-type culture2)) supplied-named-parameters (cl:or (cl:null named-parameters) (dotnet:object-type named-parameters)))
+    ((cl:and (cl:stringp name) (cl:or (cl:null invoke-attr) (dotnet:is-instance-of invoke-attr "System.Reflection.BindingFlags")) (cl:or (cl:null binder) (dotnet:is-instance-of binder "System.Reflection.Binder")) (cl:or (cl:null target) (dotnet:is-instance-of target "System.Object")) (cl:or (cl:null args) (dotnet:is-instance-of args "System.Object[]")) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Reflection.ParameterModifier[]")) supplied-culture2 (cl:or (cl:null culture2) (dotnet:is-instance-of culture2 "System.Globalization.CultureInfo")) supplied-named-parameters (cl:or (cl:null named-parameters) (dotnet:is-instance-of named-parameters "System.String[]")))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "InvokeMember" name invoke-attr binder target args culture culture2 named-parameters))
-    ((cl:and (cl:stringp name) (cl:or (cl:null invoke-attr) (dotnet:object-type invoke-attr)) (cl:or (cl:null binder) (dotnet:object-type binder)) (cl:or (cl:null target) (dotnet:object-type target)) (cl:or (cl:null args) (dotnet:object-type args)) supplied-culture (cl:or (cl:null culture) (dotnet:object-type culture)) (cl:not supplied-culture2) (cl:not supplied-named-parameters))
+    ((cl:and (cl:stringp name) (cl:or (cl:null invoke-attr) (dotnet:is-instance-of invoke-attr "System.Reflection.BindingFlags")) (cl:or (cl:null binder) (dotnet:is-instance-of binder "System.Reflection.Binder")) (cl:or (cl:null target) (dotnet:is-instance-of target "System.Object")) (cl:or (cl:null args) (dotnet:is-instance-of args "System.Object[]")) supplied-culture (cl:or (cl:null culture) (dotnet:is-instance-of culture "System.Globalization.CultureInfo")) (cl:not supplied-culture2) (cl:not supplied-named-parameters))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "InvokeMember" name invoke-attr binder target args culture))
-    ((cl:and (cl:stringp name) (cl:or (cl:null invoke-attr) (dotnet:object-type invoke-attr)) (cl:or (cl:null binder) (dotnet:object-type binder)) (cl:or (cl:null target) (dotnet:object-type target)) (cl:or (cl:null args) (dotnet:object-type args)) (cl:not supplied-culture) (cl:not supplied-culture2) (cl:not supplied-named-parameters))
+    ((cl:and (cl:stringp name) (cl:or (cl:null invoke-attr) (dotnet:is-instance-of invoke-attr "System.Reflection.BindingFlags")) (cl:or (cl:null binder) (dotnet:is-instance-of binder "System.Reflection.Binder")) (cl:or (cl:null target) (dotnet:is-instance-of target "System.Object")) (cl:or (cl:null args) (dotnet:is-instance-of args "System.Object[]")) (cl:not supplied-culture) (cl:not supplied-culture2) (cl:not supplied-named-parameters))
      (dotnet:invoke (cl:the (dotnet "System.Type") obj!) "InvokeMember" name invoke-attr binder target args))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TYPE"

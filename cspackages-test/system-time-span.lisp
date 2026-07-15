@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-time-span)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (ticks cl:nil supplied-ticks) (minutes cl:nil supplied-minutes) (seconds cl:nil supplied-seconds) (seconds2 cl:nil supplied-seconds2) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
   "Master wrapper for System.TimeSpan constructor overloads. Dispatches at runtime.
@@ -361,9 +361,9 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
     - t2 (System.TimeSpan): The subtrahend.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null t-val) (dotnet:object-type t-val)) supplied-t2 (cl:or (cl:null t2) (dotnet:object-type t2)))
+    ((cl:and (cl:or (cl:null t-val) (dotnet:is-instance-of t-val "System.TimeSpan")) supplied-t2 (cl:or (cl:null t2) (dotnet:is-instance-of t2 "System.TimeSpan")))
      (dotnet:static <type-str> "op_Subtraction" t-val t2))
-    ((cl:and (cl:or (cl:null t-val) (dotnet:object-type t-val)) (cl:not supplied-t2))
+    ((cl:and (cl:or (cl:null t-val) (dotnet:is-instance-of t-val "System.TimeSpan")) (cl:not supplied-t2))
      (dotnet:static <type-str> "op_UnaryNegation" t-val))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
@@ -389,9 +389,9 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
     - time-span (System.TimeSpan): The value to be multiplied.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null time-span) (dotnet:object-type time-span)) (cl:numberp factor))
+    ((cl:and (cl:or (cl:null time-span) (dotnet:is-instance-of time-span "System.TimeSpan")) (cl:numberp factor))
      (dotnet:static <type-str> "op_Multiply" time-span factor))
-    ((cl:and (cl:numberp time-span) (cl:or (cl:null factor) (dotnet:object-type factor)))
+    ((cl:and (cl:numberp time-span) (cl:or (cl:null factor) (dotnet:is-instance-of factor "System.TimeSpan")))
      (dotnet:static <type-str> "op_Multiply" time-span factor))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
@@ -417,9 +417,9 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
     - t2 (System.TimeSpan): The divisor or value to be divided by.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null time-span) (dotnet:object-type time-span)) (cl:numberp divisor))
+    ((cl:and (cl:or (cl:null time-span) (dotnet:is-instance-of time-span "System.TimeSpan")) (cl:numberp divisor))
      (dotnet:static <type-str> "op_Division" time-span divisor))
-    ((cl:and (cl:or (cl:null time-span) (dotnet:object-type time-span)) (cl:or (cl:null divisor) (dotnet:object-type divisor)))
+    ((cl:and (cl:or (cl:null time-span) (dotnet:is-instance-of time-span "System.TimeSpan")) (cl:or (cl:null divisor) (dotnet:is-instance-of divisor "System.TimeSpan")))
      (dotnet:static <type-str> "op_Division" time-span divisor))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
@@ -444,9 +444,9 @@ new(Int32, Int32, Int32, Int32, Int32, Int32)
     - t2 (System.TimeSpan): The second time interval to add.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null t-val) (dotnet:object-type t-val)) supplied-t2 (cl:or (cl:null t2) (dotnet:object-type t2)))
+    ((cl:and (cl:or (cl:null t-val) (dotnet:is-instance-of t-val "System.TimeSpan")) supplied-t2 (cl:or (cl:null t2) (dotnet:is-instance-of t2 "System.TimeSpan")))
      (dotnet:static <type-str> "op_Addition" t-val t2))
-    ((cl:and (cl:or (cl:null t-val) (dotnet:object-type t-val)) (cl:not supplied-t2))
+    ((cl:and (cl:or (cl:null t-val) (dotnet:is-instance-of t-val "System.TimeSpan")) (cl:not supplied-t2))
      (dotnet:static <type-str> "op_UnaryPlus" t-val))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
@@ -532,9 +532,9 @@ CompareTo(TimeSpan) -> Int32
     - value (System.TimeSpan): An object to compare to this instance.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "CompareTo" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.TimeSpan")))
      (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "CompareTo" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
@@ -560,7 +560,7 @@ Divide(TimeSpan) -> Double
   (cl:cond
     ((cl:and (cl:numberp divisor))
      (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Divide" divisor))
-    ((cl:and (cl:or (cl:null divisor) (dotnet:object-type divisor)))
+    ((cl:and (cl:or (cl:null divisor) (dotnet:is-instance-of divisor "System.TimeSpan")))
      (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Divide" divisor))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
@@ -590,9 +590,9 @@ Equals(TimeSpan) -> Boolean
     - obj (System.TimeSpan): An object to compare with this instance.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Equals" value))
-    ((cl:and (cl:or (cl:null value) (dotnet:object-type value)))
+    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.TimeSpan")))
      (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "Equals" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
@@ -636,12 +636,12 @@ FromDays(Int32, Int32 = 0, Int64 = 0, Int64 = 0, Int64 = 0, Int64 = 0) -> TimeSp
     - microseconds (System.Int64): Number of microseconds.
 "
   (cl:cond
+    ((cl:and (cl:numberp value) (cl:not supplied-hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
+     (dotnet:static <type-str> "FromDays" value))
+    ((cl:and (cl:numberp value) (cl:not supplied-hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
+     (dotnet:static <type-str> "FromDays" value))
     ((cl:and (cl:numberp value) (cl:or (cl:not supplied-hours) (cl:numberp hours)) (cl:or (cl:not supplied-minutes) (cl:numberp minutes)) (cl:or (cl:not supplied-seconds) (cl:numberp seconds)) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
      (dotnet:static <type-str> "FromDays" value (cl:if supplied-hours hours 0) (cl:if supplied-minutes minutes 0) (cl:if supplied-seconds seconds 0) (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
-    ((cl:and (cl:numberp value) (cl:not supplied-hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromDays" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromDays" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
@@ -674,12 +674,12 @@ FromHours(Int32, Int64 = 0, Int64 = 0, Int64 = 0, Int64 = 0) -> TimeSpan
     - microseconds (System.Int64): Number of microseconds.
 "
   (cl:cond
+    ((cl:and (cl:numberp hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
+     (dotnet:static <type-str> "FromHours" hours))
+    ((cl:and (cl:numberp hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
+     (dotnet:static <type-str> "FromHours" hours))
     ((cl:and (cl:numberp hours) (cl:or (cl:not supplied-minutes) (cl:numberp minutes)) (cl:or (cl:not supplied-seconds) (cl:numberp seconds)) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
      (dotnet:static <type-str> "FromHours" hours (cl:if supplied-minutes minutes 0) (cl:if supplied-seconds seconds 0) (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
-    ((cl:and (cl:numberp hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromHours" hours))
-    ((cl:and (cl:numberp hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromHours" hours))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
@@ -772,12 +772,12 @@ FromMinutes(Int64, Int64 = 0, Int64 = 0, Int64 = 0) -> TimeSpan
     - microseconds (System.Int64): Number of microseconds.
 "
   (cl:cond
+    ((cl:and (cl:numberp minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
+     (dotnet:static <type-str> "FromMinutes" minutes))
+    ((cl:and (cl:numberp minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
+     (dotnet:static <type-str> "FromMinutes" minutes))
     ((cl:and (cl:numberp minutes) (cl:or (cl:not supplied-seconds) (cl:numberp seconds)) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
      (dotnet:static <type-str> "FromMinutes" minutes (cl:if supplied-seconds seconds 0) (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
-    ((cl:and (cl:numberp minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromMinutes" minutes))
-    ((cl:and (cl:numberp minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromMinutes" minutes))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
@@ -808,12 +808,12 @@ FromSeconds(Int64, Int64 = 0, Int64 = 0) -> TimeSpan
     - microseconds (System.Int64): Number of microseconds.
 "
   (cl:cond
+    ((cl:and (cl:numberp seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
+     (dotnet:static <type-str> "FromSeconds" seconds))
+    ((cl:and (cl:numberp seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
+     (dotnet:static <type-str> "FromSeconds" seconds))
     ((cl:and (cl:numberp seconds) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
      (dotnet:static <type-str> "FromSeconds" seconds (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
-    ((cl:and (cl:numberp seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromSeconds" seconds))
-    ((cl:and (cl:numberp seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromSeconds" seconds))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
@@ -881,12 +881,12 @@ Parse(Char], IFormatProvider = null) -> TimeSpan
     - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
 "
   (cl:cond
-    ((cl:and (cl:stringp s) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:object-type format-provider)))
+    ((cl:and (cl:stringp s) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")))
      (dotnet:static <type-str> "Parse" s format-provider))
-    ((cl:and (cl:or (cl:null s) (dotnet:object-type s)) (cl:or (cl:not supplied-format-provider) (cl:or (cl:null format-provider) (dotnet:object-type format-provider))))
-     (dotnet:static <type-str> "Parse" s (cl:if supplied-format-provider format-provider cl:nil)))
     ((cl:and (cl:stringp s) (cl:not supplied-format-provider))
      (dotnet:static <type-str> "Parse" s))
+    ((cl:and (cl:or (cl:null s) (dotnet:is-instance-of s "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:not supplied-format-provider) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider"))))
+     (dotnet:static <type-str> "Parse" s (cl:if supplied-format-provider format-provider cl:nil)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
@@ -949,18 +949,18 @@ ParseExact(Char], String[], IFormatProvider, TimeSpanStyles = None) -> TimeSpan
     - styles (System.Globalization.TimeSpanStyles): A bitwise combination of enumeration values that defines the style elements that may be present in input.
 "
   (cl:cond
-    ((cl:and (cl:stringp input) (cl:stringp format) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) supplied-styles (cl:or (cl:null styles) (dotnet:object-type styles)))
+    ((cl:and (cl:stringp input) (cl:stringp format) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) supplied-styles (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles")))
      (dotnet:static <type-str> "ParseExact" input format format-provider styles))
-    ((cl:and (cl:or (cl:null input) (dotnet:object-type input)) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:object-type styles))))
-     (dotnet:static <type-str> "ParseExact" input format format-provider (cl:if supplied-styles styles (dotnet:enum-or "System.Globalization.TimeSpanStyles" "None"))))
-    ((cl:and (cl:stringp input) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) supplied-styles (cl:or (cl:null styles) (dotnet:object-type styles)))
+    ((cl:and (cl:stringp input) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) supplied-styles (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles")))
      (dotnet:static <type-str> "ParseExact" input format format-provider styles))
-    ((cl:and (cl:or (cl:null input) (dotnet:object-type input)) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:object-type styles))))
+    ((cl:and (cl:stringp input) (cl:stringp format) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:not supplied-styles))
+     (dotnet:static <type-str> "ParseExact" input format format-provider))
+    ((cl:and (cl:stringp input) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:not supplied-styles))
+     (dotnet:static <type-str> "ParseExact" input format format-provider))
+    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles"))))
      (dotnet:static <type-str> "ParseExact" input format format-provider (cl:if supplied-styles styles (dotnet:enum-or "System.Globalization.TimeSpanStyles" "None"))))
-    ((cl:and (cl:stringp input) (cl:stringp format) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) (cl:not supplied-styles))
-     (dotnet:static <type-str> "ParseExact" input format format-provider))
-    ((cl:and (cl:stringp input) (cl:or (cl:null format) (dotnet:object-type format)) (cl:or (cl:null format-provider) (dotnet:object-type format-provider)) (cl:not supplied-styles))
-     (dotnet:static <type-str> "ParseExact" input format format-provider))
+    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[System.Char]")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:or (cl:not supplied-styles) (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles"))))
+     (dotnet:static <type-str> "ParseExact" input format format-provider (cl:if supplied-styles styles (dotnet:enum-or "System.Globalization.TimeSpanStyles" "None"))))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
@@ -996,7 +996,7 @@ ToString(String, IFormatProvider) -> String
     - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
 "
   (cl:cond
-    ((cl:and supplied-format (cl:stringp format) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:object-type format-provider)))
+    ((cl:and supplied-format (cl:stringp format) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")))
      (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "ToString" format format-provider))
     ((cl:and supplied-format (cl:stringp format) (cl:not supplied-format-provider))
      (dotnet:invoke (cl:the (dotnet "System.TimeSpan") obj!) "ToString" format))

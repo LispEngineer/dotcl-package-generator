@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ValueTuple`7
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-value-tuple-7)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ValueTuple`7"))
 (cl:defconstant <type-str> "System.ValueTuple`7")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (item1 cl:nil supplied-item1) (item2 cl:nil supplied-item2) (item3 cl:nil supplied-item3) (item4 cl:nil supplied-item4) (item5 cl:nil supplied-item5) (item6 cl:nil supplied-item6) (item7 cl:nil supplied-item7))
   "Master wrapper for System.ValueTuple`7 constructor overloads. Dispatches at runtime.
@@ -27,7 +27,7 @@ new(T1, T2, T3, T4, T5, T6, T7)
     - item7 (T7): The value tuple's seventh element.
 "
   (cl:cond
-    ((cl:and supplied-item1 (cl:or (cl:null item1) (dotnet:object-type item1)) supplied-item2 (cl:or (cl:null item2) (dotnet:object-type item2)) supplied-item3 (cl:or (cl:null item3) (dotnet:object-type item3)) supplied-item4 (cl:or (cl:null item4) (dotnet:object-type item4)) supplied-item5 (cl:or (cl:null item5) (dotnet:object-type item5)) supplied-item6 (cl:or (cl:null item6) (dotnet:object-type item6)) supplied-item7 (cl:or (cl:null item7) (dotnet:object-type item7)))
+    ((cl:and supplied-item1 (cl:or (cl:null item1) (dotnet:is-instance-of item1 "T1")) supplied-item2 (cl:or (cl:null item2) (dotnet:is-instance-of item2 "T2")) supplied-item3 (cl:or (cl:null item3) (dotnet:is-instance-of item3 "T3")) supplied-item4 (cl:or (cl:null item4) (dotnet:is-instance-of item4 "T4")) supplied-item5 (cl:or (cl:null item5) (dotnet:is-instance-of item5 "T5")) supplied-item6 (cl:or (cl:null item6) (dotnet:is-instance-of item6 "T6")) supplied-item7 (cl:or (cl:null item7) (dotnet:is-instance-of item7 "T7")))
      (dotnet:new <type-str> item1 item2 item3 item4 item5 item6 item7))
     ((cl:and (cl:not supplied-item1) (cl:not supplied-item2) (cl:not supplied-item3) (cl:not supplied-item4) (cl:not supplied-item5) (cl:not supplied-item6) (cl:not supplied-item7))
      (dotnet:new <type-str>))
@@ -159,9 +159,9 @@ Equals(ValueTuple) -> Boolean
     - other (System.ValueTuple`7[T1, T2, T3, T4, T5, T6, T7]): The value tuple to compare with this instance.
 "
   (cl:cond
-    ((cl:and (cl:or (cl:null obj) (dotnet:object-type obj)))
+    ((cl:and (cl:or (cl:null obj) (dotnet:is-instance-of obj "System.Object")))
      (dotnet:invoke (cl:the (dotnet "System.ValueTuple`7") obj!) "Equals" obj))
-    ((cl:and (cl:or (cl:null obj) (dotnet:object-type obj)))
+    ((cl:and (cl:or (cl:null obj) (dotnet:is-instance-of obj "System.ValueTuple`7[T1, T2, T3, T4, T5, T6, T7]")))
      (dotnet:invoke (cl:the (dotnet "System.ValueTuple`7") obj!) "Equals" obj))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-VALUE-TUPLE-7"

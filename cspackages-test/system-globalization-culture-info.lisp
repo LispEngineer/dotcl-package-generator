@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Globalization.CultureInfo
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-globalization-culture-info)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Globalization.CultureInfo"))
 (cl:defconstant <type-str> "System.Globalization.CultureInfo")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (name cl:&optional (use-user-override cl:nil supplied-use-user-override))
   "Master wrapper for System.Globalization.CultureInfo constructor overloads. Dispatches at runtime.

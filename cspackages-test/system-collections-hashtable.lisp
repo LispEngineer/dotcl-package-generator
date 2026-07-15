@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Hashtable
-;;; Generator Version: 48
-;;; Creation Date: 2026-07-14T16:26:13Z
+;;; Generator Version: 49
+;;; Creation Date: 2026-07-15T02:38:57Z
 
 (cl:in-package :system-collections-hashtable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Hashtable"))
 (cl:defconstant <type-str> "System.Collections.Hashtable")
-(cl:defconstant <creation> "2026-07-14T16:26:13Z")
-(cl:defconstant <version> 48)
+(cl:defconstant <creation> "2026-07-15T02:38:57Z")
+(cl:defconstant <version> 49)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (load-factor cl:nil supplied-load-factor) (equality-comparer cl:nil supplied-equality-comparer) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Hashtable constructor overloads. Dispatches at runtime.
@@ -112,35 +112,35 @@ new(IDictionary, Single, IHashCodeProvider, IComparer)
     - comparer (System.Collections.IComparer): The System.Collections.IComparer object to use to determine whether two keys are equal. -or- to use the default comparer, which is each key's implementation of System.Object.Equals(System.Object).
 "
   (cl:cond
-    ((cl:and supplied-capacity (cl:numberp capacity) supplied-load-factor (cl:numberp load-factor) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:object-type equality-comparer)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and supplied-capacity (cl:numberp capacity) supplied-load-factor (cl:numberp load-factor) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:is-instance-of equality-comparer "System.Collections.IHashCodeProvider")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.IComparer")))
      (dotnet:new <type-str> capacity load-factor equality-comparer comparer))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-load-factor (cl:numberp load-factor) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:object-type equality-comparer)) supplied-comparer (cl:or (cl:null comparer) (dotnet:object-type comparer)))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.IDictionary")) supplied-load-factor (cl:numberp load-factor) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:is-instance-of equality-comparer "System.Collections.IHashCodeProvider")) supplied-comparer (cl:or (cl:null comparer) (dotnet:is-instance-of comparer "System.Collections.IComparer")))
      (dotnet:new <type-str> capacity load-factor equality-comparer comparer))
-    ((cl:and supplied-capacity (cl:numberp capacity) supplied-load-factor (cl:numberp load-factor) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:object-type equality-comparer)) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:numberp capacity) supplied-load-factor (cl:numberp load-factor) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:is-instance-of equality-comparer "System.Collections.IEqualityComparer")) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor equality-comparer))
-    ((cl:and supplied-capacity (cl:numberp capacity) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:object-type load-factor)) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:object-type equality-comparer)) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:numberp capacity) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:is-instance-of load-factor "System.Collections.IHashCodeProvider")) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:is-instance-of equality-comparer "System.Collections.IComparer")) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor equality-comparer))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:object-type load-factor)) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:object-type equality-comparer)) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.IDictionary")) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:is-instance-of load-factor "System.Collections.IHashCodeProvider")) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:is-instance-of equality-comparer "System.Collections.IComparer")) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor equality-comparer))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-load-factor (cl:numberp load-factor) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:object-type equality-comparer)) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.IDictionary")) supplied-load-factor (cl:numberp load-factor) supplied-equality-comparer (cl:or (cl:null equality-comparer) (dotnet:is-instance-of equality-comparer "System.Collections.IEqualityComparer")) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor equality-comparer))
     ((cl:and supplied-capacity (cl:numberp capacity) supplied-load-factor (cl:numberp load-factor) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:object-type load-factor)) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.IHashCodeProvider")) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:is-instance-of load-factor "System.Collections.IComparer")) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor))
-    ((cl:and supplied-capacity (cl:numberp capacity) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:object-type load-factor)) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:numberp capacity) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:is-instance-of load-factor "System.Collections.IEqualityComparer")) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-load-factor (cl:numberp load-factor) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.IDictionary")) supplied-load-factor (cl:numberp load-factor) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:object-type load-factor)) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.IDictionary")) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:is-instance-of load-factor "System.Collections.IEqualityComparer")) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:object-type load-factor)) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Runtime.Serialization.SerializationInfo")) supplied-load-factor (cl:or (cl:null load-factor) (dotnet:is-instance-of load-factor "System.Runtime.Serialization.StreamingContext")) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity load-factor))
     ((cl:and supplied-capacity (cl:numberp capacity) (cl:not supplied-load-factor) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-load-factor) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.IEqualityComparer")) (cl:not supplied-load-factor) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
-    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:object-type capacity)) (cl:not supplied-load-factor) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
+    ((cl:and supplied-capacity (cl:or (cl:null capacity) (dotnet:is-instance-of capacity "System.Collections.IDictionary")) (cl:not supplied-load-factor) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str> capacity))
     ((cl:and (cl:not supplied-capacity) (cl:not supplied-load-factor) (cl:not supplied-equality-comparer) (cl:not supplied-comparer))
      (dotnet:new <type-str>))
