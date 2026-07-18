@@ -69,3 +69,7 @@
   (:export
     #:run-generator-tests
     #:run-package-generator-tests))
+
+(defpackage :read-check
+  (:use :cl)
+  (:export #:run-read-check))

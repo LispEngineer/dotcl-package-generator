@@ -2765,6 +2765,11 @@ full readability, so this went undetected since Version 30.
 `packages.lisp` through a real Lisp reader — the concrete repro this fix targets — not just
 `check_parens.py`'s paren-balance check.
 
+This "load it through a real reader" verification step was, at the time, a one-off manual
+REPL check. `make test` now runs it automatically, every time, via `--read-check` (see
+`read-check.lisp`, RELEASES.md's 2.50.1 entry, and `doc/plan-fable-detail-01.md`) — so this
+exact bug class can never again ship undetected.
+
 ## Constructors and Methods With Default Parameter Values (Version 48)
 
 Found 2026-07-14: `MonoGameGum.GueDeriving.TextRuntime` generated no constructor at all.

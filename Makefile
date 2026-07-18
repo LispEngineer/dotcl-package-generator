@@ -1,6 +1,17 @@
 # Makefile for dotcl-packagegen
 # Copyright 2026 Douglas P. Fields, Jr.
 
+# Some installs (notably Arch, whose dotnet-sdk package is rolling-release)
+# end up with a workload-set manifest that references packages package
+# management has since removed, breaking every `dotnet build`/`dotnet pack`
+# invocation with "SDK Resolver Failure ... Workload set version ... has
+# missing manifests" -- even `dotnet workload repair` reports "No workloads
+# are installed, nothing to repair", since the failure is in resolving the
+# workload SDK resolver itself, not in any actual installed workload. This
+# project uses no workloads (no mobile/wasm/MAUI targets), so disabling
+# workload resolution entirely is safe here.
+export MSBuildEnableWorkloadResolver := false
+
 # On a fully clean checkout, -getProperty:OutputPath can return a mixed-separator
 # value (e.g. "bin\Debug/net10.0/"); normalize to forward slashes.
 BIN_DIR := $(shell dotnet build dotcl-packagegen.csproj -getProperty:OutputPath | tr '\\' '/')
@@ -15,9 +26,11 @@ VERSION := $(shell grep -m1 -oP ':version\s+"\K[^"]+' dotcl-packagegen.asd)
 
 # Reference assembly directory for the standard .NET metadata used by `test`
 # to exercise Stage 1/Stage 2 generation end-to-end. This is the Arch Linux
-# path; on Ubuntu it is /usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.9/ref/net10.0/
-# (see dotcl-dungeonslime's Makefile for the same distinction).
-REF_DIR = /usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.9/ref/net10.0/
+# path; on Ubuntu it is /usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/
+# (see dotcl-dungeonslime's Makefile for the same distinction). Hardcoded and
+# SDK-patch-version-fragile -- see doc/plan-fable-detail-08.md for the planned
+# env-var-override + auto-discovery fix.
+REF_DIR = /usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/
 
 # The generated test directory is kept, and even checked in to version control,
 # so we can see how the output changes over time.
@@ -148,6 +161,12 @@ test: build
 	# Undo any changes that only changed typestamp
 	./revert-cspackages-timestamps.sh
 	python3 check_parens.py $(GEN_TEST_DIR)/*.lisp $(GEN_TEST_DIR)/*.asd
+	# Full-reader validation: every generated file must be readable by the
+	# real Lisp reader (catches invalid symbol tokens, bad string escapes,
+	# and reader-macro breakage that paren-balance checking cannot see --
+	# see doc/generator-design-notes.md's Version 47 section for the bug
+	# class this exists to catch).
+	$(EXECUTABLE) --read-check $(GEN_TEST_DIR)
 
 check-parens:
 	# Verifies balanced parentheses in every source .lisp/.asd file in the

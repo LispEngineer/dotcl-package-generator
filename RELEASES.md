@@ -10,6 +10,27 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.50.1 — 2026-07-18
+
+**New `--read-check <dir>` mode: read-back verification of generated output through a
+real Common Lisp reader.**
+
+* Adds `read-check.lisp` (`read-check:run-read-check`), which reads every `.lisp`/`.asd`
+  file in a directory (`packages.lisp` first, so every generated package exists before
+  anything referencing it is read) through a genuine Lisp reader — evaluating only
+  `defpackage`/`in-package` forms, and neutralizing `#.` read-time evaluation (it reads
+  and discards the subform rather than evaluating it, so `csharp-generics.lisp`'s
+  `#.(dotnet:class-for-type ...)` forms are validated as well-formed Lisp without
+  requiring the target assembly to be loaded). Any packages created during the check
+  (including the generated ones) are deleted again afterward.
+* This closes an escape path that let the Version 47 bug (an invalid bare `#:|` export
+  token, present since Version 30) go undetected for three generator versions: nothing in
+  `make test` had ever read generated output through a real reader before, only checked
+  paren balance (`check_parens.py`), which cannot see this class of bug. `make test` now
+  runs `--read-check` on the generated `cspackages-test/` output as its final step.
+* No `*generator-version*` bump — this is a verification-only addition; generated-output
+  shape is unchanged. See `doc/plan-fable-detail-01.md` for the full design.
+
 ## 2.48.0 — 2026-07-14
 
 **Constructors (and methods) with C# default parameter values are now fully supported,

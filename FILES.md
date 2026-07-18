@@ -37,6 +37,10 @@ All emit one Lisp package, `assembly-package-generator`; split out of a former s
   `csharp-overload-not-found` condition type.
 * **`monoutils.lisp`** — package definition/shims exposing `get-type`/`get-type-full-name`
   for live-CLR semantic verification in this repo's own test suite only.
+* **`read-check.lisp`** — `run-read-check`: reads every generated `.lisp`/`.asd` file in a
+  directory through a real Lisp reader (not just paren-balance checking), invoked from
+  `Program.cs`'s `--read-check <dir>` mode and as part of `make test`. A verification tool,
+  not part of the generator itself. See `doc/plan-fable-detail-01.md`.
 * **`apg-naming.lisp`** — `*generator-version*`/changelog, and naming/mangling helpers
   (`camel-to-kebab`, `map-member-name`, `type-fq-name-to-pkg-name`, `safe-symbol-token`,
   string-escaping).
@@ -94,6 +98,8 @@ All emit one Lisp package, `assembly-package-generator`; split out of a former s
 * **`package-generator-tests-defgeneric.lisp`** — unified `--defgeneric` CLOS
   generic-function tests.
 * **`package-generator-tests-extension-methods.lisp`** — extension-method injection tests.
+* **`package-generator-tests-read-check.lisp`** — `read-check:run-read-check` tests,
+  including a regression test recreating the exact Version 47 unescaped-`#:|` bug shape.
 
 (The `tests/` subdirectory holds a separate, dynamically-globbed suite that
 semantically cross-checks reflected metadata against the live CLR — not itemized here.)

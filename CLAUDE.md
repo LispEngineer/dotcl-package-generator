@@ -72,10 +72,13 @@ post-build verification steps that matter (see below).
   `AssemblyToLispyTestTarget.dll`, and `DotCL.Runtime.dll`). It then does an **end-to-end
   smoke test**: a single single-pass invocation against real reference assemblies
   (`System.Runtime`, `System.Linq`, `System.Xml.ReaderWriter`) to generate real `.lisp` packages
-  into `cspackages-test/` (checked into git so output drift is visible in diffs), and finally
-  runs `check_parens.py` on everything generated. This last step exists because generated code
+  into `cspackages-test/` (checked into git so output drift is visible in diffs), then
+  runs `check_parens.py` on everything generated. This step exists because generated code
   comes from `format` string templating in `assembly-package-generator.lisp` — a bug there can
-  silently emit Lisp with mismatched parens that no unit test would catch.
+  silently emit Lisp with mismatched parens that no unit test would catch. Finally it runs
+  `--read-check` (see `read-check.lisp`) on the same directory: a real Lisp reader read-back
+  of every generated `.lisp`/`.asd` file, catching invalid-token-shaped bugs (e.g. Version 47's
+  unescaped `#:|` export) that paren-balance checking alone cannot see.
 * `make check-parens` — runs `check_parens.py` over every source `.lisp`/`.asd` file in the
   repo. **Run this after hand-editing any `.lisp` file**; a stray/missing paren produces
   confusing downstream errors (symbols reported as "not external", macros silently swallowing

@@ -129,7 +129,11 @@ A `Makefile` is provided with the following targets:
   (`package-generator-tests.lisp`, including the generated `System.TimeSpan`
   operator-overload checks) followed by the `AssemblyToLispy` metadata test
   suite against `System.Runtime.dll`, `System.Console.dll`, the synthetic
-  `AssemblyToLispyTestTarget.dll`, and `DotCL.Runtime.dll`.
+  `AssemblyToLispyTestTarget.dll`, and `DotCL.Runtime.dll`. It then generates a
+  real batch of packages end-to-end into `cspackages-test/`, verifies balanced
+  parentheses with `check_parens.py`, and finally read-checks the same output
+  with `--read-check` (a real Lisp reader read-back, catching invalid-token
+  bugs paren-balance checking alone cannot see).
 
 * `make package` — Builds Release binaries for every configured
   `RuntimeIdentifier` (`linux-x64`, `linux-arm64`, `win-x64`, `osx-x64`,

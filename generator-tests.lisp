@@ -23,5 +23,6 @@
   (run-defgeneric-tests)
   (run-extension-methods-tests)
   (run-related-discovery-tests)
+  (run-read-check-tests)
 
   (format *error-output* "[generator-tests.lisp] ...tests complete.~%"))

@@ -17,6 +17,7 @@ const string UtilsTemplateFileName = "csharp-assembly-utils.template.lisp";
 var isTestMode = false;
 var printHelp = false;
 var printVersion = false;
+string? readCheckDir = null;
 
 string? outDir = null;
 var groups = new List<AssemblyGroup>();
@@ -229,6 +230,9 @@ for (int i = 0; i < args.Length; i++) {
         ensureTypeInGeneric = false;
     } else if (args[i] == "--test") {
         isTestMode = true;
+    } else if (args[i] == "--read-check" && i + 1 < args.Length) {
+        readCheckDir = args[i + 1];
+        i++;
     }
 }
 
@@ -368,6 +372,23 @@ if (isTestMode) {
     PackageGenerator.AssemblyToLispyTest.RunTests();
 
     Console.WriteLine($"[Program.cs] Done.");
+    return;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// --read-check: read-back verification of a directory of already-generated
+// output (see doc/plan-fable-detail-01.md / read-check.lisp). Does not run
+// the metadata-reflection stage; only reads and validates existing files.
+
+if (readCheckDir != null) {
+    Console.WriteLine($"[Program.cs] Read-checking {readCheckDir}...");
+    try {
+        int formCount = DotclHost.ToClr<int>(DotclHost.Call("RUN-READ-CHECK", readCheckDir));
+        Console.WriteLine($"[Program.cs] Read-check OK: {formCount} forms read.");
+    } catch (Exception ex) {
+        WriteRed($"Error: read-check failed: {ex.Message}");
+        Environment.Exit(1);
+    }
     return;
 }
 
@@ -599,6 +620,12 @@ void PrintHelp() {
     Console.WriteLine("Other:");
     Opt("--test", "Run the generator's own Lisp unit tests plus the",
         "AssemblyToLispy metadata test suite.");
+    Opt("--read-check <dir>", "Read every .lisp/.asd file in <dir> through a",
+        "real Lisp reader (catches invalid symbol tokens etc.",
+        "that paren-balance checking alone cannot see -- see",
+        "doc/generator-design-notes.md's Version 47 section).",
+        "Does not run generation; <dir> must already contain",
+        "generated output.");
     Opt("--version", "Show version, author, license, and copyright",
         "information (read from dotcl-packagegen.asd).");
     Opt("--help", "Show this help message.");

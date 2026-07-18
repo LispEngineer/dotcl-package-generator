@@ -2,13 +2,14 @@
 
 (defsystem "dotcl-packagegen"
   :description "DotCL C#-assembly-to-Lisp package generator"
-  :version "2.50.0"
+  :version "2.50.1"
   :author "Douglas P. Fields, Jr. <symbolics@lisp.engineer>"
   :license "Apache 2.0; Copyright 2026 Douglas P. Fields, Jr."
   :depends-on ("dotnet-class")
   :components ((:file "packages")
                (:file "utils" :depends-on ("packages"))
                (:file "monoutils" :depends-on ("packages"))
+               (:file "read-check" :depends-on ("packages" "utils"))
                (:file "apg-naming" :depends-on ("packages" "utils"))
                (:file "apg-member-predicates" :depends-on ("apg-naming"))
                (:file "apg-overload-signatures" :depends-on ("apg-naming" "apg-member-predicates"))
@@ -31,6 +32,7 @@
                (:file "package-generator-tests-defgeneric" :depends-on ("package-generator-tests-support"))
                (:file "package-generator-tests-extension-methods" :depends-on ("package-generator-tests-support"))
                (:file "package-generator-tests-related-discovery" :depends-on ("package-generator-tests-support"))
+               (:file "package-generator-tests-read-check" :depends-on ("package-generator-tests-support" "read-check"))
                (:file "generator-tests" :depends-on ("package-generator-tests-naming"
                                                       "package-generator-tests-overload-classification"
                                                       "package-generator-tests-batch-resolution"
@@ -41,4 +43,5 @@
                                                       "package-generator-tests-parents-interfaces"
                                                       "package-generator-tests-defgeneric"
                                                       "package-generator-tests-extension-methods"
-                                                      "package-generator-tests-related-discovery"))))
+                                                      "package-generator-tests-related-discovery"
+                                                      "package-generator-tests-read-check"))))

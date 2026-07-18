@@ -1259,10 +1259,12 @@ namespace PackageGenerator {
     /// </summary>
     public static class AssemblyToLispyTest {
 
-        // FIXME: Have the system tell us where these are somehow?
+        // FIXME: Have the system tell us where these are somehow? (see
+        // doc/plan-fable-detail-08.md for the planned fix: env var override +
+        // auto-discovery instead of a hardcoded, SDK-patch-version-pinned path.)
         // This is for Arch Linux
-        // Ubuntu is at: /usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.9/ref/net10.0/
-        public const string AssemblyDirectory = "/usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.9/ref/net10.0/";
+        // Ubuntu is at: /usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/
+        public const string AssemblyDirectory = "/usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/";
 
         /// <summary>
         ///   Runs the AssemblyToLispy test case on System.Runtime.dll and validates the generated plist data.

@@ -123,6 +123,9 @@ parentheses.
   balance of *all* modified files individually.
 * A target `check-parens` in the `Makefile` runs `check_parens.py` against each 
   `.lisp` file and the `.asd` file. Run `make check-parens` to verify parentheses balance.
+* `make test` also runs `--read-check` against the generated `cspackages-test/` output: a
+  real Lisp reader read-back (see `read-check.lisp`) that catches invalid-token bugs (e.g.
+  an unescaped `#:|` export) which balanced-parens checking alone cannot see.
 
 
 # Language
