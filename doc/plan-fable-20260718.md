@@ -294,3 +294,36 @@ The recent version history (four consecutive releases fixing field-discovered bu
 the highest-return investment is not the next feature but making generated output
 readable-by-a-reader and runnable-by-a-test before it ships; everything else on this
 list gets safer and faster once that net exists.
+
+# 7. Detailed Per-Item Plans (added 2026-07-18)
+
+Each recommendation above has a standalone, modular implementation plan in
+`doc/plan-fable-detail-NN.md`. They may be executed in any order unless noted; the
+numbering follows the suggested sequencing of section 6.
+
+| Plan | Title | Covers section | Notes |
+|------|-------|----------------|-------|
+| [01](plan-fable-detail-01.md) | Read-back verification (`--read-check`) | 3.1(a) | Do first |
+| [02](plan-fable-detail-02.md) | Runtime exercise suite (`make test-runtime`) | 3.1(b) | Largest; do early |
+| [03](plan-fable-detail-03.md) | Documentation sync after modularization | 3.7 | Cheap; helps all others |
+| [04](plan-fable-detail-04.md) | Document silently-dropped generic-param members | 3.2 | Generator version bump |
+| [05](plan-fable-detail-05.md) | `out` parameters → `cl:values` | 3.3 | May block on upstream DotCL |
+| [06](plan-fable-detail-06.md) | Struct `clone` helper (PLAN.md Option A) | 3.4 | + `dotnet:clone` proposal |
+| [07](plan-fable-detail-07.md) | `--options-file` + invocation echo | 3.5 | Two separable halves |
+| [08](plan-fable-detail-08.md) | De-fragilize tests vs .NET versions | 3.6 | Small |
+| [09](plan-fable-detail-09.md) | Extract `apg-type-checks.lisp` | 4.2 | Byte-identical-output refactor |
+| [10](plan-fable-detail-10.md) | Collapse degenerate Master Wrapper conds | 4.3 | Dispatch-sensitive; careful |
+| [11](plan-fable-detail-11.md) | Arity-less package nicknames | 4.4 | Small |
+| [12](plan-fable-detail-12.md) | `--all-classes` namespace import | 5.3 | |
+| [13](plan-fable-detail-13.md) | Async `-await` wrappers | 5.4.1 | Live verification first |
+| [14](plan-fable-detail-14.md) | Records and `init`-only properties | 5.4.2 | Schema change |
+| [15](plan-fable-detail-15.md) | Nullable reference-type annotations | 5.4.3 | Docs-only, no dispatch impact |
+| [16](plan-fable-detail-16.md) | `[Obsolete]` + tuple element names | 5.4.4–5 | Two separable halves |
+| [17](plan-fable-detail-17.md) | Investigation: closed-generic instance members | 5.2 | Research deliverable |
+| [18](plan-fable-detail-18.md) | Proposal: CLOS→C# proxies (upstream) | 5.1 | Research deliverable |
+| [19](plan-fable-detail-19.md) | Lispy standard library layer | 5.5 | Needs a user decision (repo location) |
+
+Ordering constraints worth honoring even if the rest is reshuffled: 01 and 02 before
+any behavior-changing plan (05, 10, 13 especially); 09 before 05/10 if convenient
+(smaller blast radius); 04 before or alongside 17; 05 and 17 unlock the best parts
+of 19.
