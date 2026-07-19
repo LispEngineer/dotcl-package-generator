@@ -46,8 +46,9 @@ The tool is a **single-pass generator**: one invocation takes `--out-dir` plus o
 * **Package generation** (boots DotCL): once every assembly's metadata has been reflected,
   `Program.cs` builds a Lisp-reader-compatible manifest (one entry per assembly: its metadata
   file path plus its requested class names/constant-properties) to a temp file and calls into
-  `assembly-package-generator.lisp` (`run-assembly-package-generator-batch` →
-  `generate-assembly-packages-batch` → `generate-class-file`), which resolves and validates every
+  the `apg-*.lisp` modules (`run-assembly-package-generator-batch` →
+  `generate-assembly-packages-batch` → `generate-class-file`; see "Architecture map" below),
+  which resolves and validates every
   requested class *before* generating anything, then emits a `.lisp` file per class defining a
   package with idiomatic Lisp wrapper functions for that C# type's constructors, methods,
   properties, and fields. All files from one invocation share a single creation timestamp.
@@ -63,18 +64,21 @@ Always prefer the `Makefile` targets over calling `dotnet` directly — they enc
 post-build verification steps that matter (see below).
 
 * `make build` — `dotnet build dotcl-packagegen.csproj -c Debug`. Compiles the C# host *and*
-  cross-compiles the DotCL Lisp sources (`packages.lisp`, `utils.lisp`, `monoutils.lisp`,
-  `assembly-package-generator.lisp`, `package-generator-tests.lisp`, `generator-tests.lisp` —
-  see `dotcl-packagegen.asd` for the load order) into `bin/Debug/net10.0/`.
+  cross-compiles the DotCL Lisp sources (`packages.lisp`, `utils.lisp`, `monoutils.lisp`, the
+  ten `apg-*.lisp` modules the generator proper is split into, the eleven
+  `package-generator-tests-*.lisp` files, and `generator-tests.lisp` — see
+  `dotcl-packagegen.asd` for the load order, or `FILES.md` for the per-file breakdown) into
+  `bin/Debug/net10.0/`.
 * `make test` — builds, then runs the built executable's `--test` mode (Lisp unit tests in
-  `package-generator-tests.lisp`/`generator-tests.lisp`, plus the `AssemblyToLispyTest` C# suite
+  `package-generator-tests-*.lisp`, registered via `generator-tests.lisp`'s
+  `run-generator-tests`, plus the `AssemblyToLispyTest` C# suite
   against `System.Runtime.dll`, `System.Console.dll`, the synthetic
   `AssemblyToLispyTestTarget.dll`, and `DotCL.Runtime.dll`). It then does an **end-to-end
   smoke test**: a single single-pass invocation against real reference assemblies
   (`System.Runtime`, `System.Linq`, `System.Xml.ReaderWriter`) to generate real `.lisp` packages
   into `cspackages-test/` (checked into git so output drift is visible in diffs), then
   runs `check_parens.py` on everything generated. This step exists because generated code
-  comes from `format` string templating in `assembly-package-generator.lisp` — a bug there can
+  comes from `format` string templating across the `apg-*.lisp` modules — a bug there can
   silently emit Lisp with mismatched parens that no unit test would catch. Finally it runs
   `--read-check` (see `read-check.lisp`) on the same directory: a real Lisp reader read-back
   of every generated `.lisp`/`.asd` file, catching invalid-token-shaped bugs (e.g. Version 47's
@@ -242,23 +246,33 @@ reflection and runs before DotCL boots.
   verification. Neither file's content is used by the generator itself or by generated
   package code — see `doc/package-generator-dependencies.md` for the full dependency list
   in both directions.
-* **`assembly-package-generator.lisp`** — the code generator proper. Entry points
-  `run-assembly-package-generator-batch` → `generate-assembly-packages-batch` (which resolves
-  and validates every requested class against its assembly's metadata *before* generating
-  anything, via `resolve-batch-entry`; then a work queue, seeded by every explicitly-requested
-  class, recursively discovers related classes across all six `--export-*`/`--output-*` direction flags via
-  `expand-related` — a global index (`build-metadata-index`) plus two reverse indexes
-  (`build-reverse-indexes`) — folding newly-discovered classes into the same working set, each
-  carrying its discoverer's entire flag set, before anything is generated — see
-  `doc/parents-and-interfaces-plan.md` and `doc/plan-v38.md`'s Part B) → `generate-class-file`
-  (~1000 lines; the bulk of the file). Bump `*generator-version*` (top of file) whenever
-  generation *behavior* (the shape of
-  emitted `.lisp` files) changes, and add a changelog line in its docstring —
-  `doc/generator-design-notes.md`'s "Generator Version History" section has the detailed
-  rationale per version and should gain an entry for significant changes. `VERSION` in
-  `Makefile`, `dotcl-packagegen.asd`, and `assembly-package-generator.lisp` must all be kept in
-  lockstep (see `BUILD.md`); see `RELEASES.md` for the CLI-level (as opposed to generated-code)
-  version history.
+* **The code generator proper** — as of the July 2026 refactor (commit `6a47c35`), no longer
+  one monolithic `assembly-package-generator.lisp`; split into ten `apg-*.lisp` modules (see
+  `FILES.md` for the authoritative per-file breakdown and `dotcl-packagegen.asd` for load
+  order). Entry points `run-assembly-package-generator-batch` → `generate-assembly-packages-batch`
+  (`apg-batch-orchestration.lisp`; resolves and validates every requested class against its
+  assembly's metadata *before* generating anything, via `resolve-batch-entry`
+  (`apg-batch-discovery.lisp`); then a work queue, seeded by every explicitly-requested class,
+  recursively discovers related classes across all six `--export-*`/`--output-*` direction flags
+  via `expand-related` (`apg-batch-discovery.lisp`) — a global index (`build-metadata-index`)
+  plus two reverse indexes (`build-reverse-indexes`) — folding newly-discovered classes into the
+  same working set, each carrying its discoverer's entire flag set, before anything is
+  generated — see `doc/parents-and-interfaces-plan.md` and `doc/plan-v38.md`'s Part B) →
+  `generate-class-file` (`apg-class-file-generator.lisp`; the driver plus per-section `emit-*`
+  helpers). Member classification (`classify-class-members` → the `class-member-classification`
+  struct) lives in `apg-member-predicates.lisp`; overload signature/docstring formatting in
+  `apg-overload-signatures.lisp`; the Master Wrapper dispatch machinery (`format-param-type-check`,
+  `generate-method-name-wrappers`, generic-arity dispatch) — largest and highest-risk module — in
+  `apg-overload-dispatch.lisp`; struct-boxing/shared-constant warning comments in
+  `apg-immutability.lisp`; export/shadow-list computation and generic-method collection in
+  `apg-export-mirrors.lisp`; re-exports/`packages.lisp`/`csharp-generics.lisp` generation in
+  `apg-reexports-and-generics.lisp`. Bump `*generator-version*` (top of `apg-naming.lisp`)
+  whenever generation *behavior* (the shape of emitted `.lisp` files) changes, and add a
+  changelog line in its docstring — `doc/generator-design-notes.md`'s "Generator Version
+  History" section has the detailed rationale per version and should gain an entry for
+  significant changes. `VERSION` in `Makefile` and `dotcl-packagegen.asd`'s `:version`, and
+  `apg-naming.lisp`'s `*generator-version*`, must all be kept in lockstep (see `BUILD.md`); see
+  `RELEASES.md` for the CLI-level (as opposed to generated-code) version history.
 * **`utils.lisp`** / **`monoutils.lisp`** / **`packages.lisp`** — shared plumbing: safe
   s-expression file reading, path helpers, the `csharp-overload-not-found` condition type
   (signaled by generated overload-dispatch code at runtime when no C# overload matches), and

@@ -144,6 +144,21 @@ obj!)` form instead, deprecating Option A's per-type codegen.
 
 **Option D** - TBD
 
+**2026-07-19 note (append-only, does not alter the above):** the July 2026 refactor
+(commit `6a47c35`) split the monolithic `assembly-package-generator.lisp` this section's line
+numbers refer to into ten `apg-*.lisp` modules (see `FILES.md`). The old references above no
+longer resolve; current locations for the same logic are: `is-value-type-p`'s computation
+(the old `assembly-package-generator.lisp:1272` cite) is now the `(or (eq kind :struct) (eq
+kind :enum))` check in `generate-class-file`, `apg-class-file-generator.lisp`; the parameterless
+constructor synthesis for structs (old `:1266-1271`) is in `apg-member-predicates.lisp`;
+`instance-property-p`/`public-instance-field-p` (old `:202-213`) are in
+`apg-member-predicates.lisp`; the getter/setter emission (old `:1468-1553`) is
+`emit-instance-properties`/`emit-public-instance-fields` in `apg-class-file-generator.lisp`;
+`clean-constructor-p`/`constructor-signature-str` (old `:543-578`) are in
+`apg-member-predicates.lisp`/`apg-overload-signatures.lisp` respectively; the constructor
+Master Wrapper (old `:905`) is `generate-constructor-master-wrapper` in
+`apg-overload-dispatch.lisp`.
+
 
 # Miscellaneous
 

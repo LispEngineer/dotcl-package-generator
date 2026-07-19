@@ -4,7 +4,8 @@
 
 This document outlines the dependencies that the Lisp C# package generator and the generated wrappers have on non-standard, custom code in this repository (excluding standard Common Lisp symbols and standard DotCL features).
 
-## 1. Dependencies of the Package Generator Code (`assembly-package-generator.lisp`)
+## 1. Dependencies of the Package Generator Code (`assembly-package-generator.lisp`, since
+split into the `apg-*.lisp` modules — see `FILES.md`)
 
 The generator depends on custom utility functions defined in other source files in this repository:
 

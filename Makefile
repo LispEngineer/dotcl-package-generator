@@ -20,7 +20,7 @@ NUPKG_DIR = nupkg
 
 # Tool package version, read from dotcl-packagegen.asd's :version so it is
 # only ever defined in one place. The minor version tracks
-# assembly-package-generator.lisp's internal *generator-version*, so they
+# apg-naming.lisp's internal *generator-version*, so they
 # stay visibly in sync.
 VERSION := $(shell grep -m1 -oP ':version\s+"\K[^"]+' dotcl-packagegen.asd)
 

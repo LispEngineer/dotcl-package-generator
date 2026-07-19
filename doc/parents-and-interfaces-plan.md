@@ -123,8 +123,10 @@ Update `--help` output (`Program.cs:253-286`) with all new flags.
 
 ## Phase 2 — Global type index + ancestor expansion (Lisp)
 
-Location: `assembly-package-generator.lisp`, feeding into
-`generate-assembly-packages-batch` (line 1920). Preserve the existing
+Location: `assembly-package-generator.lisp` (since split into the `apg-*.lisp` modules — see
+`FILES.md`; this logic now lives in `apg-batch-discovery.lisp`/`apg-batch-orchestration.lisp`),
+feeding into `generate-assembly-packages-batch` (line 1920 at the time of this plan — line
+numbers below are historical and refer to the pre-split monolith). Preserve the existing
 resolve-and-validate-everything-*before*-generating contract.
 
 **2a. Build a global type index.** Today `resolve-batch-entry` (line 1781) loads

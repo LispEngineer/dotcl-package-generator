@@ -35,8 +35,9 @@ first, then Part B.
   set of packages generated.
 
 Both parts reuse the existing global metadata index (`build-metadata-index`,
-`assembly-package-generator.lisp:1994`) and require **no `AssemblyToLispy.cs`
-output-shape change**.
+`assembly-package-generator.lisp:1994` — since split into the `apg-*.lisp` modules, this lives
+in `apg-batch-discovery.lisp`; line numbers throughout this plan are historical, referring to
+the pre-split monolith) and require **no `AssemblyToLispy.cs` output-shape change**.
 
 ## Locked design decisions (from requirements Q&A)
 

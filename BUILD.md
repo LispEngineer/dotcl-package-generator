@@ -10,7 +10,9 @@ When changing the code, the version number needs to be updated in
 these locations:
 
 * [`Makefile`](Makefile)
-* [`assembly-package-generator.lisp`](assembly-package-generator.lisp)
+* [`apg-naming.lisp`](apg-naming.lisp) — `*generator-version*`, whenever generated-code
+  *shape* changes (this is a separate integer from the CLI version below, though the
+  latter's minor component tracks it — see the `Makefile`'s `VERSION` comment)
 * [`dotcl-packagegen.asd`](dotcl-packagegen.asd)
 * [`RELEASES.md`](RELEASES.md) — add an entry describing the change alongside the version bump.
 
@@ -35,7 +37,7 @@ comments, nested `#| ... |#` block comments, and string literals. It exits
   `obj/test-generated/`) and then runs `check_parens.py` on those generated
   `.lisp` files. This is a regression check on the generator's own
   code-emission logic — since packages are produced via textual templating
-  (`format` strings in `assembly-package-generator.lisp`), a bug there can
+  (`format` strings across the `apg-*.lisp` modules), a bug there can
   silently emit Lisp with mismatched parentheses that unit tests alone
   wouldn't catch.
 

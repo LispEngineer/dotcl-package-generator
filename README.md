@@ -26,7 +26,8 @@ A single invocation generates everything for one or more assemblies in one pass:
   documentation plists, default-value literal formatting, etc.)
 
 * **Package generation** (boots DotCL): once every assembly's metadata has been reflected, the
-  metadata plus the requested classes are handed to `assembly-package-generator.lisp`
+  metadata plus the requested classes are handed to the code generator (the `apg-*.lisp`
+  modules; see `CLAUDE.md`'s architecture map or `FILES.md` for the per-file breakdown)
   (`run-assembly-package-generator-batch` → `generate-assembly-packages-batch` →
   `generate-class-file`), which emits a `.lisp` file per requested class defining a package with
   idiomatic Lisp wrapper functions for that C# type's constructors, methods, properties, and
@@ -126,8 +127,8 @@ A `Makefile` is provided with the following targets:
 
 * `make test` — Builds the project (via `build`), then runs the built executable
   in `--test` mode. This runs the generator's own Lisp unit tests
-  (`package-generator-tests.lisp`, including the generated `System.TimeSpan`
-  operator-overload checks) followed by the `AssemblyToLispy` metadata test
+  (`package-generator-tests-*.lisp`, registered via `generator-tests.lisp`, including the
+  generated `System.TimeSpan` operator-overload checks) followed by the `AssemblyToLispy` metadata test
   suite against `System.Runtime.dll`, `System.Console.dll`, the synthetic
   `AssemblyToLispyTestTarget.dll`, and `DotCL.Runtime.dll`. It then generates a
   real batch of packages end-to-end into `cspackages-test/`, verifies balanced

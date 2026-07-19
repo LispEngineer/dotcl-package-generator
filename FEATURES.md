@@ -762,7 +762,7 @@ wrapper.
 See `doc/make-everything-defgeneric.md` for the full design rationale and history (this
 mechanism consolidates two earlier independent variants, `--defgeneric` and
 `--defgeneric-dynamic`, once DotCL 0.1.17 made a single mechanism strictly dominate both), and
-`assembly-package-generator.lisp`'s Version 41 changelog entry.
+`apg-naming.lisp`'s `*generator-version*` Version 41 changelog entry.
 
 
 

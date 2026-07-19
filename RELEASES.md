@@ -6,7 +6,7 @@
 This file tracks CLI-level and tool-behavior changes to `dotcl-packagegen`, keyed by the
 `VERSION` in `Makefile`/`dotcl-packagegen.asd`. For the code-generation template's own version
 history (the integer `*generator-version*` embedded in every emitted `.lisp` file), see
-`assembly-package-generator.lisp`'s docstring and `doc/generator-design-notes.md`'s "Generator
+`apg-naming.lisp`'s `*generator-version*` docstring and `doc/generator-design-notes.md`'s "Generator
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
