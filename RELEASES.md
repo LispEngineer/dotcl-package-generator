@@ -10,6 +10,58 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.50.5 — 2026-07-19
+
+**Corrected stale `FEATURES.md` claim about generic-type-parameter members (`doc/plan-fable-detail-04.md`); no code or generated-output change.**
+
+* Plan 04 set out to give visibility (a documented skip comment, no behavior change) to
+  members mentioning the declaring generic type's own unresolved type parameter (e.g.
+  `List<T>.Add(T item)`), which `FEATURES.md` claimed were "silently excluded from the
+  method list entirely, with no comment." Auditing the actual exclusion mechanism
+  (`generic-type-p` in `apg-member-predicates.lisp`, which tests for a literal `!` in a
+  type-signature string, on the assumption that an unresolved type parameter is
+  rendered CIL-style as `!0`/`!!0`) found that assumption doesn't hold:
+  `AssemblyToLispy.cs`'s `GetFriendlyTypeName` always renders an unresolved type
+  parameter as its bare C# identifier (`"T"`, `"TKey"`, etc.), never a `!`-marked token —
+  confirmed by grepping every `.lispy.metadata` file `make test` generates (zero `!`
+  characters anywhere) and by the checked-in `cspackages-test/` output itself, where
+  `system-collections-generic-list-1.lisp`'s `add` and
+  `system-collections-generic-dictionary-2.lisp`'s `add`/`contains-key` (and its
+  comparer-taking constructor overload) all already generate and work correctly today.
+  No member is actually being silently dropped for this reason — the generated
+  `dotnet:invoke`/`dotnet:static`/`dotnet:new` calls dispatch by the runtime type of
+  whatever's actually passed, needing no compile-time knowledge of the erased type
+  parameter. Since the plan's own scope was "zero behavior change," and there is no
+  existing behavior to make visible, no exclusion/comment logic was added (doing so now
+  would be a **regression**, newly dropping wrappers that work today). `FEATURES.md`'s
+  "Nested and Generic Types" section and "Unsupported Features" list were corrected
+  instead. See `doc/generator-design-notes.md`'s "Audit: the 'Silently-Dropped
+  Generic-Type-Parameter Members' Premise Does Not Hold" section for the full writeup.
+  No `*generator-version*` bump (no generated-output shape changed).
+
+## 2.50.4 — 2026-07-19
+
+**De-fragilized tests against .NET SDK version/path changes (`doc/plan-fable-detail-08.md`).**
+
+* `AssemblyToLispyTest.AssemblyDirectory` (the reference-assembly directory used to test the
+  reflector against real BCL assemblies) is no longer a hardcoded, SDK-patch-version-pinned
+  constant — `ResolveRefAssemblyDirectory()` now resolves it at test start, tried in order: the
+  `DOTCL_PACKAGEGEN_REF_DIR` environment variable override, then auto-discovery across the
+  known Arch (`/usr/share/dotnet/...`) and Ubuntu (`/usr/lib/dotnet/...`) pack roots (plus any
+  root derivable from `DOTNET_ROOT` or the running runtime's own directory), picking the
+  highest reference-pack version whose major matches the running runtime's major.
+* `Makefile`'s `REF_DIR` is likewise now auto-discovered (filtered to the csproj's own
+  `TargetFramework` major) instead of a hardcoded SDK-patch-version path, still overridable via
+  `make test REF_DIR=...` or `DOTCL_PACKAGEGEN_REF_DIR=...`; the `test` target now guards
+  against an empty/unresolved `REF_DIR` with a clear error, and exports
+  `DOTCL_PACKAGEGEN_REF_DIR=$(REF_DIR)` so the Makefile and the C# test suite always agree on
+  one directory.
+* Audited `AssemblyToLispyTest`'s BCL-assertion tests (`tests/system-runtime.test.lisp`,
+  `tests/system-console.test.lisp`) for exact-content assertions that a .NET patch release
+  could legitimately break: both were already existence/shape checks only (e.g. "does
+  `ArrayList` exist and implement `IList`", "does `Console` have a `WriteLine` method"), so no
+  migration to the synthetic `AssemblyToLispyTestTarget` fixture was needed.
+
 ## 2.50.3 — 2026-07-18
 
 **`make test-runtime` expanded to real-world MonoGame, Gum, and additional BCL classes

@@ -48,6 +48,23 @@ python3 check_parens.py path/to/file.lisp [path/to/another.lisp ...]
 ```
 
 
+# Reference Assembly Directory (`REF_DIR` / `DOTCL_PACKAGEGEN_REF_DIR`)
+
+`make test`/`make test-runtime` need the .NET reference-assembly pack
+(`Microsoft.NETCore.App.Ref`) to exercise the reflector and end-to-end smoke test against real
+BCL assemblies. This directory is auto-discovered (`Makefile`'s `REF_DIR`, filtered to the
+csproj's own `TargetFramework` major; and, independently, `AssemblyToLispyTest`'s
+`ResolveRefAssemblyDirectory()` for the `--test` C# suite) across the known Arch
+(`/usr/share/dotnet/...`) and Ubuntu (`/usr/lib/dotnet/...`) pack layouts — no longer a
+hardcoded, SDK-patch-version-pinned path (see
+[`doc/plan-fable-detail-08.md`](doc/plan-fable-detail-08.md)).
+
+* Override explicitly with `make test REF_DIR=/some/path/` if auto-discovery picks the wrong
+  one, or set `DOTCL_PACKAGEGEN_REF_DIR=/some/path/` for the same effect (the Makefile also
+  falls back to `DOTCL_PACKAGEGEN_REF_DIR` if `REF_DIR` isn't given, and re-exports whichever
+  one wins so Make and the C# test suite always agree).
+* `make test` fails fast with a clear error if `REF_DIR` can't be resolved at all.
+
 # Runtime Exercise Suite
 
 `make test-runtime` (`RuntimeExerciseTest/`, see

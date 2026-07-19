@@ -1259,12 +1259,116 @@ namespace PackageGenerator {
     /// </summary>
     public static class AssemblyToLispyTest {
 
-        // FIXME: Have the system tell us where these are somehow? (see
-        // doc/plan-fable-detail-08.md for the planned fix: env var override +
-        // auto-discovery instead of a hardcoded, SDK-patch-version-pinned path.)
-        // This is for Arch Linux
-        // Ubuntu is at: /usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/
-        public const string AssemblyDirectory = "/usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/";
+        /// <summary>
+        ///   Resolves the directory containing the .NET reference assemblies
+        ///   (<c>Microsoft.NETCore.App.Ref</c>) used to exercise the reflector against
+        ///   real BCL assemblies. Tried in order: the <c>DOTCL_PACKAGEGEN_REF_DIR</c>
+        ///   environment variable override, then auto-discovery across the known Arch
+        ///   (<c>/usr/share/dotnet/...</c>) and Ubuntu (<c>/usr/lib/dotnet/...</c>) pack
+        ///   roots plus any root derivable from <c>DOTNET_ROOT</c> or the running
+        ///   runtime's own directory, picking the highest reference-pack version whose
+        ///   major matches the running runtime's major. This replaces a hardcoded,
+        ///   SDK-patch-version-pinned constant that broke every time the local .NET SDK
+        ///   took a patch update (see doc/plan-fable-detail-08.md).
+        /// </summary>
+        /// <exception cref="Exception">Thrown when no matching reference-assembly directory can be found anywhere searched.</exception>
+        internal static string ResolveRefAssemblyDirectory() {
+            string? envOverride = Environment.GetEnvironmentVariable("DOTCL_PACKAGEGEN_REF_DIR");
+            if (!string.IsNullOrEmpty(envOverride)) {
+                Console.WriteLine($"[AssemblyToLispyTest] Using DOTCL_PACKAGEGEN_REF_DIR override: {envOverride}");
+                return NormalizeRefDir(envOverride);
+            }
+
+            var candidateRoots = new List<string> {
+                "/usr/share/dotnet/packs/Microsoft.NETCore.App.Ref",
+                "/usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref",
+            };
+
+            string? dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+            if (!string.IsNullOrEmpty(dotnetRoot)) {
+                candidateRoots.Add(Path.Combine(dotnetRoot, "packs", "Microsoft.NETCore.App.Ref"));
+            }
+
+            try {
+                // Typically .../dotnet/shared/Microsoft.NETCore.App/<ver>/ -- walk up
+                // to the "shared" directory's parent, which is the dotnet root.
+                var cursor = new DirectoryInfo(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory());
+                while (cursor != null) {
+                    if (string.Equals(cursor.Name, "shared", StringComparison.OrdinalIgnoreCase) && cursor.Parent != null) {
+                        candidateRoots.Add(Path.Combine(cursor.Parent.FullName, "packs", "Microsoft.NETCore.App.Ref"));
+                        break;
+                    }
+                    cursor = cursor.Parent;
+                }
+            } catch {
+                // Best-effort discovery source; ignore failures and fall through to the next candidate.
+            }
+
+            int runtimeMajor = Environment.Version.Major;
+            var searchedRoots = new List<string>();
+
+            foreach (string root in candidateRoots.Distinct()) {
+                searchedRoots.Add(root);
+                if (!Directory.Exists(root)) {
+                    continue;
+                }
+
+                Version? bestVersion = null;
+                string? bestVersionDir = null;
+                foreach (string versionDirPath in Directory.GetDirectories(root)) {
+                    string versionName = Path.GetFileName(versionDirPath.TrimEnd('/', '\\'));
+                    if (!Version.TryParse(versionName, out Version? parsed) || parsed.Major != runtimeMajor) {
+                        continue;
+                    }
+                    if (bestVersion == null || parsed > bestVersion) {
+                        bestVersion = parsed;
+                        bestVersionDir = versionDirPath;
+                    }
+                }
+
+                if (bestVersionDir == null) {
+                    continue;
+                }
+
+                string refRoot = Path.Combine(bestVersionDir, "ref");
+                if (!Directory.Exists(refRoot)) {
+                    continue;
+                }
+
+                // Pick the highest "netX.Y" directory -- string ordering is safe here
+                // since all candidates share the "net" prefix and single-digit-per-
+                // component formatting.
+                string? netDir = Directory.GetDirectories(refRoot, "net*").OrderByDescending(d => d).FirstOrDefault();
+                if (netDir == null) {
+                    continue;
+                }
+
+                string resolved = NormalizeRefDir(netDir);
+                Console.WriteLine($"[AssemblyToLispyTest] Resolved reference assembly directory: {resolved}");
+                return resolved;
+            }
+
+            throw new Exception(
+                $"Could not resolve the .NET reference-assembly directory (Microsoft.NETCore.App.Ref) for runtime major {runtimeMajor}. " +
+                $"Searched roots: {string.Join(", ", searchedRoots)}. " +
+                "Set the DOTCL_PACKAGEGEN_REF_DIR environment variable to override.");
+        }
+
+        /// <summary>
+        ///   Normalizes a reference-assembly directory path to use forward slashes and
+        ///   end with a trailing slash, matching how <see cref="AssemblyDirectory"/> is
+        ///   consumed by callers that string-concatenate a filename onto it.
+        /// </summary>
+        private static string NormalizeRefDir(string path) {
+            path = path.Replace('\\', '/');
+            return path.EndsWith("/") ? path : path + "/";
+        }
+
+        /// <summary>
+        ///   The resolved directory containing the .NET reference assemblies, computed
+        ///   once via <see cref="ResolveRefAssemblyDirectory"/>.
+        /// </summary>
+        public static readonly string AssemblyDirectory = ResolveRefAssemblyDirectory();
 
         /// <summary>
         ///   Runs the AssemblyToLispy test case on System.Runtime.dll and validates the generated plist data.

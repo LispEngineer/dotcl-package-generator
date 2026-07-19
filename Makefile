@@ -25,12 +25,24 @@ NUPKG_DIR = nupkg
 VERSION := $(shell grep -m1 -oP ':version\s+"\K[^"]+' dotcl-packagegen.asd)
 
 # Reference assembly directory for the standard .NET metadata used by `test`
-# to exercise Stage 1/Stage 2 generation end-to-end. This is the Arch Linux
-# path; on Ubuntu it is /usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/
-# (see dotcl-dungeonslime's Makefile for the same distinction). Hardcoded and
-# SDK-patch-version-fragile -- see doc/plan-fable-detail-08.md for the planned
-# env-var-override + auto-discovery fix.
-REF_DIR = /usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/
+# to exercise Stage 1/Stage 2 generation end-to-end. Auto-discovered across
+# both the Arch (/usr/share/dotnet/...) and Ubuntu (/usr/lib/dotnet/...) pack
+# layouts (see dotcl-dungeonslime's Makefile for the same distinction),
+# picking the highest reference-pack version whose major matches the target
+# framework below -- no longer a hardcoded, SDK-patch-version-fragile
+# constant (doc/plan-fable-detail-08.md). Override explicitly with
+# `make test REF_DIR=...` if auto-discovery picks the wrong one, or set
+# DOTCL_PACKAGEGEN_REF_DIR for the same effect on the C# test suite alone.
+TARGET_FRAMEWORK_MAJOR := $(shell grep -oP '<TargetFramework>net\K[0-9]+' dotcl-packagegen.csproj)
+ifndef REF_DIR
+ifdef DOTCL_PACKAGEGEN_REF_DIR
+REF_DIR := $(DOTCL_PACKAGEGEN_REF_DIR)
+else
+REF_DIR := $(shell ls -d /usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/$(TARGET_FRAMEWORK_MAJOR).*/ref/net*/ \
+                         /usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref/$(TARGET_FRAMEWORK_MAJOR).*/ref/net*/ 2>/dev/null \
+                    | sort -V | tail -1)
+endif
+endif
 
 # The generated test directory is kept, and even checked in to version control,
 # so we can see how the output changes over time.
@@ -64,7 +76,8 @@ test: build
 	# Runs the generator's own Lisp unit tests plus the AssemblyToLispy
 	# metadata test suite (System.Runtime, System.Console, the synthetic
 	# target, and DotCL.Runtime).
-	$(EXECUTABLE) --test
+	@test -n "$(REF_DIR)" || (echo "REF_DIR not found; set REF_DIR=... explicitly" >&2 && exit 1)
+	DOTCL_PACKAGEGEN_REF_DIR=$(REF_DIR) $(EXECUTABLE) --test
 	# Exercise the single-pass generator end-to-end (metadata reflection +
 	# package generation for a couple of representative standard-.NET
 	# classes, all in one invocation), then verify the emitted Lisp is

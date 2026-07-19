@@ -243,6 +243,13 @@ Master Wrapper (old `:905`) is `generate-constructor-master-wrapper` in
 * Make the `AssemblyToLispy` tests less fragile
   * I upgraded from DotNet 10.0.8 to 10.0.9 and the tests broke.
   * Remove hardcoded paths and find the assemblies in some automated fashion?
+  * DONE (see `doc/plan-fable-detail-08.md`, version 2.50.4): reference-assembly
+    directory is now auto-discovered (`DOTCL_PACKAGEGEN_REF_DIR` env override, else
+    highest-version pack matching the running/target runtime major, across Arch/Ubuntu
+    layouts) instead of a hardcoded SDK-patch-version path, in both `AssemblyToLispyTest`
+    (C#) and the `Makefile`'s `REF_DIR`. Audited the BCL-assertion Lisp tests
+    (`system-runtime.test.lisp`/`system-console.test.lisp`) for exact-content fragility;
+    both were already existence/shape checks only, so no migration was needed.
 
 * Implement a system to convert a CLOS class to a CLR/C# class somehow,
   or really, create a C# proxy for the CLOS class.

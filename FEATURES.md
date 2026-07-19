@@ -915,9 +915,17 @@ system-collections-generic-dictionary-2
 ```
 
 A generic type's *own* type parameters (e.g. `List<T>`'s `T`) are a different matter from
-a generic *method's* type parameters (above) — see Unsupported Features: a member whose
-signature mentions the enclosing type's own open type parameter is silently excluded, not
-generated at all.
+a generic *method's* type parameters (above): a member whose parameter or return type
+mentions the *declaring* generic type's own unresolved type parameter (e.g.
+`List<T>.Add(T item)`, `Dictionary<TKey,TValue>.ContainsKey(TKey key)`) generates an
+ordinary wrapper exactly like any other clean member — no special-casing is needed,
+since the generated `dotnet:invoke`/`dotnet:static`/`dotnet:new` call dispatches by the
+*runtime* type of whatever argument is actually passed, not by the C#-compiler-level
+generic signature; by the time a wrapper actually runs, `T` has already been erased to
+whichever concrete type the live object was constructed with. See
+`doc/generator-design-notes.md`'s "Audit: the 'Silently-Dropped Generic-Type-Parameter
+Members' Premise Does Not Hold" section for the verification (a prior version of this
+document incorrectly claimed such members were silently excluded).
 
 
 
@@ -932,13 +940,6 @@ function's Lisp docstring (or, for constants/symbol-macros, a `(cl:documentation
 # Unsupported Features
 
 ## C# Features
-
-* **A generic type's own type parameters.** A member whose parameter or return type
-  mentions the *declaring* generic type's own unresolved type parameter (e.g.
-  `List<T>.Add(T item)`, as opposed to a generic *method's* own type parameter, which
-  *is* supported — see "Generic Methods" above) is silently excluded from the method
-  list entirely, with no comment. Only members whose signature doesn't reference the
-  enclosing type's open parameters are considered at all.
 
 * **Overloaded indexers.** A C# indexer overloaded across distinct index-parameter
   signatures (e.g. `this[int]` alongside `this[string]`) generates no function — every

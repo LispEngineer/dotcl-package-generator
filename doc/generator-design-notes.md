@@ -3106,3 +3106,67 @@ reach the Master Wrapper dispatch path at all, plus mock-plist-based assertions 
 `package-generator-tests-overload-classification.lisp` confirming the generated guard
 checks `dotnet:is-instance-of` against the underlying struct type (never a `Nullable\`1[...]`
 string), and that the nullable-int case emits a null-tolerant `cl:numberp` check instead.
+
+## Audit: the "Silently-Dropped Generic-Type-Parameter Members" Premise Does Not Hold (no version bump)
+
+`doc/plan-fable-detail-04.md` (from `doc/plan-fable-20260718.md` section 3.2) set out to
+give **visibility** — a documented skip comment, no behavior change — to members whose
+signature mentions the *declaring* generic type's own unresolved type parameter (e.g.
+`List<T>.Add(T item)`, `Dictionary<TKey,TValue>.ContainsKey(TKey key)`), which both that
+plan and `FEATURES.md`'s "Unsupported Features" section claimed were "silently excluded
+from the method list entirely, with no comment."
+
+Implementing it required first locating where the exclusion happens
+(`classify-class-members`'s `non-operator-non-accessor-methods` filter and
+`clean-method-p`/`clean-constructor-p`, all gated on `generic-type-p` —
+`apg-member-predicates.lisp`, which tests a type-signature string for a literal `#\!`
+character). That predicate assumes an unresolved type parameter is rendered as a
+CIL-style `!0`/`!!0` token. It never is: `AssemblyToLispy.cs`'s `GetFriendlyTypeName`
+falls back to `type.Name` for any `IsGenericParameter` type (its `FullName` is always
+`null`), so an unresolved type parameter's `:type`/`:return-type` string is always its
+bare C# identifier — `"T"`, `"TKey"`, `"TSource"`, etc. — never anything containing `!`.
+Grepping every `.lispy.metadata` file `make test` generates for the character confirms
+this (`grep -c "!"` returns 0 across all of them); the only place `#\!`-style tokens
+appear in this codebase at all is `package-generator-tests-overload-classification.lisp`'s
+own synthetic mock plist (`:return-type "!!0"`), used solely to unit-test `generic-type-p`
+in isolation, never as a stand-in for real reflected data.
+
+The practical consequence: `generic-type-p` never evaluates true against any real
+assembly, so **nothing is actually excluded for this reason today**. Verified directly
+against `cspackages-test/`'s checked-in output:
+
+* `system-collections-generic-list-1.lisp` defines a working `add` (`List<T>.Add(T)`),
+  with no drop/skip comment anywhere in the file.
+* `system-collections-generic-dictionary-2.lisp` defines working `add` and `contains-key`
+  (`Dictionary<TKey,TValue>.Add`/`ContainsKey`, both `TKey`/`TValue`-typed), and its
+  constructor Master Wrapper includes the `IEqualityComparer<TKey>`-taking overload
+  (`clean-constructor-p` likewise never rejects it).
+* `System.Linq.lispy.metadata`'s `Select<TSource,TResult>` reflects with plain
+  `TSource`/`TResult` tokens, same as above.
+
+This is not actually surprising in hindsight: these wrappers all forward to
+`dotnet:invoke`/`dotnet:static`/`dotnet:new`, which dispatch by the **runtime** type of
+the arguments actually passed, not by the C# compiler's static generic signature — a
+generated `add` wrapper for `List<T>` needs no compile-time knowledge of `T` to work
+correctly, since by the time it runs, `T` has already been erased to whatever concrete
+type the live object was constructed with. The `generic-type-p` guards were written
+defending against a failure mode (an unresolvable `!`-marked type breaking a generated
+type-check or `dotnet:invoke` call) that the actual reflected metadata format never
+produces.
+
+**Conclusion: no code change was made.** The plan's own scope was explicitly
+"visibility only, zero behavior change to any generated wrapper" — but since the
+exclusion this plan meant to make visible does not exist, implementing new exclusion
+logic (teaching `generic-type-p`, or a replacement, to actually recognize the class's own
+type-parameter names and start producing skip comments for `Add`/`ContainsKey`/etc.)
+would be a **regression**, silently removing wrappers that work correctly today, which
+directly contradicts that same "zero behavior change" acceptance criterion. The
+`generic-type-p` predicate and its call sites are left exactly as they are — inert
+against real data, but harmless, and not worth a larger unrelated refactor to excise as
+part of this audit.
+
+**What was corrected:** the stale claims in `FEATURES.md` (the "Nested and Generic
+Types" section and the "Unsupported Features" → "C# Features" first bullet), which both
+asserted the silent-exclusion behavior actually happens — it doesn't, and now describe
+the real, dynamic-dispatch-based behavior instead. No `*generator-version*` bump
+accompanies this entry, since no generated-output shape changed.
