@@ -36,7 +36,7 @@ REF_DIR = /usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/
 # so we can see how the output changes over time.
 GEN_TEST_DIR = cspackages-test
 
-.PHONY: all clean build test check-parens package deploy
+.PHONY: all clean build test test-runtime check-parens package deploy
 
 all: build test
 
@@ -168,6 +168,32 @@ test: build
 	# class this exists to catch).
 	$(EXECUTABLE) --read-check $(GEN_TEST_DIR)
 
+test-runtime: build
+	# Runtime exercise suite (doc/plan-fable-detail-02.md, RuntimeExerciseTest/):
+	# actually compiles, loads, and CALLS generated wrapper code against live
+	# .NET objects -- the structural fix for the v48-v50 escape class
+	# (omitted-optional-passed-as-nil, Master Wrapper dispatch ordering,
+	# Nullable<T> guards), all of which were runtime-dispatch bugs invisible
+	# to `test`'s string-level (paren-balance/read-back) assertions above.
+	rm -rf RuntimeExerciseTest/gen
+	$(EXECUTABLE) --out-dir RuntimeExerciseTest/gen \
+	    --assembly $(REF_DIR)System.Runtime.dll \
+	      --class System.TimeSpan --constant-properties "*" \
+	    --assembly $(BIN_DIR)AssemblyToLispyTestTarget.dll \
+	      --class AssemblyToLispyTestTarget.RuntimeExerciseFixtures --constant-properties "SharedSingleton" \
+	      --class AssemblyToLispyTestTarget.EdgeCaseStruct \
+	      --class AssemblyToLispyTestTarget.RuntimeOpStruct \
+	      --class AssemblyToLispyTestTarget.GenericDispatchFixtureA --defgeneric \
+	      --class AssemblyToLispyTestTarget.GenericDispatchFixtureB --defgeneric \
+	      --class AssemblyToLispyTestTarget.EventTestClass \
+	      --class AssemblyToLispyTestTarget.GenericMethodTestClass
+	# DotCL cross-compiles gen/'s generated .lisp during this dotnet build,
+	# exactly as a real downstream consumer (dotcl-dungeonslime) would --
+	# this also permanently regression-tests ASDF-loadability (the
+	# dotcl/dotcl#49 class fixed across Versions 42-46).
+	dotnet build RuntimeExerciseTest/RuntimeExerciseTest.csproj -c Debug
+	dotnet run --no-build --project RuntimeExerciseTest/RuntimeExerciseTest.csproj -c Debug
+
 check-parens:
 	# Verifies balanced parentheses in every source .lisp/.asd file in the
 	# repository (excludes build output and the local NuGet feed).
@@ -190,6 +216,7 @@ deploy: package
 clean:
 	dotnet clean dotcl-packagegen.csproj
 	rm -rf bin obj AssemblyToLispyTestTarget/bin AssemblyToLispyTestTarget/obj $(NUPKG_DIR)
+	rm -rf RuntimeExerciseTest/bin RuntimeExerciseTest/obj RuntimeExerciseTest/gen
 
 version:
 	echo $(VERSION)

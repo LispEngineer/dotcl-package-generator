@@ -188,6 +188,16 @@ obj!)` form instead, deprecating Option A's per-type codegen.
   ones recently removed for TimeStamp) with all those generated packages,
   testing every possible method with every possible set of parameters.
   * This can be run with make test-packages and should be run after make-test passes.
+  * **DONE (2026-07-18).** Implemented as `RuntimeExerciseTest/` + `make test-runtime`,
+    per `doc/plan-fable-detail-02.md`: a sibling C#/.asd project (modeled on
+    `dotcl-packagegen.csproj` itself) that generates and cross-compiles real packages
+    against `AssemblyToLispyTestTarget` fixtures (plus `System.TimeSpan`), then actually
+    calls the generated wrapper functions and asserts on results — covering the v48-v50
+    runtime-dispatch escape class plus Master Wrapper/operator/property/event/
+    `--defgeneric`/generic-method/struct-boxing-mutation breadth. Not exhaustive over
+    every method/parameter combination as originally envisioned, but structurally proves
+    generated code is actually callable and dispatches correctly, which no prior test
+    layer did.
 * Make a utilities template and copy it to the generated directory
 * Do multiple assemblies and classes at the same time
 * Generate a packages.lisp as well

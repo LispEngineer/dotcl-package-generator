@@ -135,6 +135,18 @@ A `Makefile` is provided with the following targets:
   with `--read-check` (a real Lisp reader read-back, catching invalid-token
   bugs paren-balance checking alone cannot see).
 
+* `make test-runtime` — The runtime exercise suite
+  (`RuntimeExerciseTest/`, see [`doc/plan-fable-detail-02.md`](doc/plan-fable-detail-02.md)):
+  generates real packages against a handful of `AssemblyToLispyTestTarget`
+  fixture classes (plus `System.TimeSpan` as a BCL smoke test) into
+  `RuntimeExerciseTest/gen/`, then a sibling C# project cross-compiles and
+  **actually calls** the generated wrapper functions against live .NET
+  objects — the structural fix for the v48-v50 escape class
+  (omitted-optional-passed-as-`nil`, Master Wrapper dispatch ordering,
+  `Nullable<T>` guards), all runtime-dispatch bugs invisible to `make test`'s
+  string-level (paren-balance/read-back) checks above. Run it before any
+  release, or after touching overload dispatch/codegen.
+
 * `make package` — Builds Release binaries for every configured
   `RuntimeIdentifier` (`linux-x64`, `linux-arm64`, `win-x64`, `osx-x64`,
   `osx-arm64`, `any`) and produces the installable NuGet package(s)
@@ -148,8 +160,9 @@ A `Makefile` is provided with the following targets:
   `PATH` from any directory.
 
 * `make clean` — Runs `dotnet clean` and removes the `bin/`, `obj/`,
-  `AssemblyToLispyTestTarget/bin/`, `AssemblyToLispyTestTarget/obj/`, and
-  `nupkg/` directories.
+  `AssemblyToLispyTestTarget/bin/`, `AssemblyToLispyTestTarget/obj/`,
+  `RuntimeExerciseTest/bin/`, `RuntimeExerciseTest/obj/`,
+  `RuntimeExerciseTest/gen/`, and `nupkg/` directories.
 
 Typical workflow: `make build test` while developing, `make deploy` to install
 a local build as the system-wide `dotcl-packagegen` command.

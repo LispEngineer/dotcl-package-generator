@@ -220,9 +220,32 @@ namespace AssemblyToLispyTestTarget
         /// </summary>
         public string ReadOnlyProperty { get; }
 
-#pragma warning disable CS0649 // never assigned; only its indexer accessors' existence is under test, not their behavior
+        /// <summary>
+        /// A read-write instance property, to give the runtime exercise suite
+        /// (doc/plan-fable-detail-02.md) a settable instance property to prove the
+        /// "struct boxing mutation" aliasing behavior documented in
+        /// doc/generator-design-notes.md's "Instance Properties and Struct 'Boxing
+        /// Mutation'" section: a setf through one Lisp-level alias of a boxed
+        /// EdgeCaseStruct must be visible when read back through a second alias
+        /// bound to the same boxed instance.
+        /// </summary>
+        public int MutableProperty { get; set; }
+
+        /// <summary>
+        /// An explicit constructor, so the runtime exercise suite can obtain a
+        /// boxed EdgeCaseStruct instance via a generated <c>new</c> wrapper (a
+        /// struct with no declared constructor gets no clean-constructor Master
+        /// Wrapper at all -- see emit-constructors's "Case 1: No clean
+        /// constructors" in apg-class-file-generator.lisp).
+        /// </summary>
+        /// <param name="publicField">Initial value for PublicField.</param>
+        public EdgeCaseStruct(int publicField) : this()
+        {
+            PublicField = publicField;
+            _items = new int[10];
+        }
+
         private readonly int[] _items;
-#pragma warning restore CS0649
 
         /// <summary>
         /// An indexer to test capture of a property's own index parameters,
@@ -576,5 +599,143 @@ namespace AssemblyToLispyTestTarget
             {
             }
         }
+    }
+
+    /// <summary>
+    /// Echo-style fixtures for the runtime exercise suite (doc/plan-fable-detail-02.md,
+    /// RuntimeExerciseTest/): each method returns a string that discriminates exactly
+    /// which C# overload/default/nullable-state was actually observed, so a Lisp-side
+    /// call-through assertion is a single string comparison. These guard the v48-v50
+    /// escape class (omitted-optional-passed-as-nil, Master Wrapper dispatch ordering,
+    /// Nullable&lt;T&gt; guards) at the actual runtime-dispatch level, not just string-level
+    /// codegen assertions.
+    /// </summary>
+    public class RuntimeExerciseFixtures
+    {
+        /// <summary>
+        /// v48 guard: omitting a defaulted parameter must observe the real C# default,
+        /// never a Lisp nil/false/0 substitute.
+        /// </summary>
+        public string EchoDefaults(int x = 42, string s = "hi", ByteEnum e = ByteEnum.Second)
+        {
+            return $"{x}|{s}|{e}";
+        }
+
+        /// <summary>
+        /// v49 guard, overload 1 of 2: a single-int-argument call must reach this
+        /// overload, not the string overload's defaulted-extra-parameter form.
+        /// </summary>
+        public string Discriminate(int a) => $"int:{a}";
+
+        /// <summary>
+        /// v49 guard, overload 2 of 2: same arity-1 call shape once the trailing
+        /// default is considered, but a different (and discriminable) parameter type.
+        /// </summary>
+        public string Discriminate(string a, int extra = 0) => $"string:{a}:{extra}";
+
+        /// <summary>
+        /// v50 guard: a real value must dispatch with HasValue true and the actual
+        /// value observed.
+        /// </summary>
+        public string EchoNullableStruct(EdgeCaseStruct? s, int extra = 0)
+            => s.HasValue ? $"has:{s.Value.PublicField}:{extra}" : $"none:{extra}";
+
+        /// <summary>
+        /// v50 guard, numeric-primitive-nullable sibling of
+        /// <see cref="EchoNullableStruct"/>.
+        /// </summary>
+        public string EchoNullableInt(int? n, int extra = 0)
+            => n.HasValue ? $"has:{n}:{extra}" : $"none:{extra}";
+
+        /// <summary>
+        /// v50 guard, cross-assembly sibling of <see cref="EchoNullableStruct"/>: T
+        /// (System.TimeSpan) is declared in a different assembly (System.Runtime.dll)
+        /// than this class (AssemblyToLispyTestTarget.dll), exercising the
+        /// cross-assembly type-resolution half of the v50 bug class.
+        /// </summary>
+        public string EchoNullableTimeSpan(System.TimeSpan? t, int extra = 0)
+            => t.HasValue ? $"has:{t.Value.Ticks}:{extra}" : $"none:{extra}";
+
+        /// <summary>Master Wrapper branch 1 of 3: string-typed.</summary>
+        public string WhichOverload(string s) => "string";
+
+        /// <summary>Master Wrapper branch 2 of 3: number-typed.</summary>
+        public string WhichOverload(int n) => "int";
+
+        /// <summary>Master Wrapper branch 3 of 3: object-typed (the weak fallback).</summary>
+        public string WhichOverload(object o) => "object";
+
+        /// <summary>
+        /// A static, get-only property always returning the same underlying CLR
+        /// object, to test <c>--constant-properties</c> memoization: without
+        /// memoization, each Lisp-level read re-crosses the C#/Lisp boundary and
+        /// receives a freshly-boxed <c>#&lt;DOTNET ...&gt;</c> wrapper around the same
+        /// CLR object (not <c>cl:eq</c> to a prior read); with memoization, the
+        /// generated wrapper caches the first box and returns that same box on every
+        /// subsequent read (<c>cl:eq</c> holds).
+        /// </summary>
+        public static object SharedSingleton { get; } = new object();
+    }
+
+    /// <summary>
+    /// A struct with a representative set of operator overloads (binary +, binary and
+    /// unary -, equality, and bitwise-or -- the Version 47-renamed <c>bitwise-or!</c>
+    /// operator), for the runtime exercise suite to call and assert both the results
+    /// and that the shadowed CL symbols (<c>+</c>/<c>-</c>/<c>=</c>) still work correctly
+    /// inside the generated package.
+    /// </summary>
+    public struct RuntimeOpStruct
+    {
+        /// <summary>The struct's sole payload, for assertions.</summary>
+        public int Value;
+
+        /// <summary>Constructs an instance with a given <see cref="Value"/>.</summary>
+        public RuntimeOpStruct(int value) : this()
+        {
+            Value = value;
+        }
+
+        /// <summary>Binary addition.</summary>
+        public static RuntimeOpStruct operator +(RuntimeOpStruct a, RuntimeOpStruct b)
+            => new RuntimeOpStruct(a.Value + b.Value);
+
+        /// <summary>Unary negation.</summary>
+        public static RuntimeOpStruct operator -(RuntimeOpStruct a)
+            => new RuntimeOpStruct(-a.Value);
+
+        /// <summary>Bitwise OR (mangled to <c>bitwise-or!</c> since Version 47).</summary>
+        public static RuntimeOpStruct operator |(RuntimeOpStruct a, RuntimeOpStruct b)
+            => new RuntimeOpStruct(a.Value | b.Value);
+
+        /// <summary>Value equality, paired with the required <see cref="operator !="/>.</summary>
+        public static bool operator ==(RuntimeOpStruct a, RuntimeOpStruct b) => a.Value == b.Value;
+
+        /// <summary>Required pairing for <see cref="operator =="/>.</summary>
+        public static bool operator !=(RuntimeOpStruct a, RuntimeOpStruct b) => !(a == b);
+
+        /// <inheritdoc/>
+        public override bool Equals(object? obj) => obj is RuntimeOpStruct r && r.Value == Value;
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => Value;
+    }
+
+    /// <summary>
+    /// Two unrelated fixture classes sharing an instance method name, both intended to
+    /// be generated with <c>--defgeneric</c>, so the runtime exercise suite can call the
+    /// unified <c>csharp-generics</c> CLOS generic function on instances of each and
+    /// assert dispatch reaches the correct per-class method body.
+    /// </summary>
+    public class GenericDispatchFixtureA
+    {
+        /// <summary>Returns a value identifying this class, for dispatch assertions.</summary>
+        public string Kind() => "A";
+    }
+
+    /// <summary>See <see cref="GenericDispatchFixtureA"/>.</summary>
+    public class GenericDispatchFixtureB
+    {
+        /// <summary>Returns a value identifying this class, for dispatch assertions.</summary>
+        public string Kind() => "B";
     }
 }

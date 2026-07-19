@@ -83,6 +83,21 @@ post-build verification steps that matter (see below).
   repo. **Run this after hand-editing any `.lisp` file**; a stray/missing paren produces
   confusing downstream errors (symbols reported as "not external", macros silently swallowing
   subsequent top-level forms) rather than a clear syntax error.
+* `make test-runtime` — the runtime exercise suite (`RuntimeExerciseTest/`, see
+  `doc/plan-fable-detail-02.md`): generates real packages against
+  `AssemblyToLispyTestTarget` fixture classes (plus `System.TimeSpan` as a BCL smoke test)
+  into `RuntimeExerciseTest/gen/`, then a sibling C# project — modeled on
+  `dotcl-packagegen.csproj` itself, i.e. DotCL cross-compiles the generated `.lisp` during
+  `dotnet build`, exactly as `dotcl-dungeonslime` consumes real generated output — actually
+  **calls** the generated wrapper functions against live .NET objects and asserts on the
+  results via a small self-contained `runtime-tests.lisp` (deliberately not reusing
+  `tests/framework.lisp`, which does metadata schema validation for this repo's own test
+  suite instead). This is the structural fix for the v48–v50 escape class
+  (omitted-optional-passed-as-`nil`, Master Wrapper dispatch ordering, `Nullable<T>`
+  guards) — all runtime-dispatch bugs invisible to `make test`'s string-level
+  (paren-balance/read-back) checks above, since those only ever validate the *shape* of
+  generated code, never that calling it produces correct results. Run before any release,
+  or after touching overload dispatch/codegen.
 * `make package` — `dotnet pack -c Release -o nupkg`, once per `RuntimeIdentifier`
   (`linux-x64`, `linux-arm64`, `win-x64`, `osx-x64`, `osx-arm64`, `any`), producing the
   per-RID packages plus a dispatching meta-package.

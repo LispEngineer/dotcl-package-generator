@@ -160,3 +160,43 @@ regenerated on every `make test` run so generation-output drift is visible in di
 * `csharp-assembly-utils.lisp` / `csharp-generics.lisp` — the batch's shared runtime-support
   and unified-generics files.
 * `csharp-assembly-packages.asd` — the ASDF system tying every generated file together.
+
+## `RuntimeExerciseTest/`
+
+The runtime exercise suite (`make test-runtime`, see
+[`doc/plan-fable-detail-02.md`](doc/plan-fable-detail-02.md)): actually compiles, loads,
+and calls generated wrapper code against live .NET objects, guarding the v48-v50
+runtime-dispatch escape class invisible to `make test`'s string-level checks.
+
+* **`RuntimeExerciseTest.csproj`** — modeled on `dotcl-packagegen.csproj` itself: DotCL
+  cross-compiles `gen/`'s generated `.lisp` during `dotnet build`, exactly as
+  `dotcl-dungeonslime` consumes real generated output. References
+  `AssemblyToLispyTestTarget.csproj` directly (needed so `--defgeneric`'s
+  `#.(dotnet:class-for-type ...)` forms can resolve those fixture types at DotCL
+  compile time) and declares `gen/` as a `DotclAsdSearchPath`.
+* **`build-setup.lisp`** — a `DotclBuildInit` script, loaded before both dependency
+  resolution and root compilation: explicitly loads `AssemblyToLispyTestTarget.dll` and
+  pre-registers the CLOS classes for its `--defgeneric` fixture classes, since the usual
+  `dotnet:resolve-type` base-directory probe looks in the wrong place when running inside
+  an in-process MSBuild task.
+* **`runtime-exercise.asd`** — `:depends-on ("csharp-assembly-packages")` (the system
+  `gen/` defines, regardless of which classes were requested).
+* **`runtime-tests.lisp`** — the assertion suite itself: a small, self-contained
+  `deftest`/`check-equal`-style harness (deliberately not `tests/framework.lisp`, which
+  does metadata schema validation for this repo's own Stage-1 suite instead) covering one
+  test per historical escape (v48 omitted defaults, v49 dispatch ordering, v50
+  `Nullable<T>`) plus breadth (Master Wrapper branches, operators, properties/fields/
+  indexers, static-property memoization, events, `--defgeneric` dispatch, generic
+  methods, struct boxing mutation, a `System.TimeSpan` BCL smoke test).
+* **`Program.cs`** — boots DotCL, pre-registers the same `--defgeneric` CLOS classes
+  (this time for the real runtime process, not the build-time MSBuild task), loads the
+  manifest, calls `RUN-RUNTIME-EXERCISE-TESTS`, and exits nonzero on any failure.
+* **`gen/`** — output of `make test-runtime`'s generation step; gitignored, not checked in
+  (unlike `cspackages-test/`, which exists specifically to make generation-output drift
+  visible in diffs — `gen/`'s only job is to be compiled and called, not diffed).
+
+Fixture classes supporting this suite live in `AssemblyToLispyTestTarget/EdgeCases.cs`:
+`RuntimeExerciseFixtures`, `EdgeCaseStruct` (extended with a constructor, a mutable
+instance property, and a populated indexer backing array), `RuntimeOpStruct`,
+`GenericDispatchFixtureA`/`GenericDispatchFixtureB`, reusing the pre-existing
+`EventTestClass`/`GenericMethodTestClass`.

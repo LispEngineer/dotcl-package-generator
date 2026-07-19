@@ -4,3 +4,4 @@ obj/
 .aider*
 scratch/
 nupkg/
+RuntimeExerciseTest/gen/

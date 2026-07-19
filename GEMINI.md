@@ -126,6 +126,13 @@ parentheses.
 * `make test` also runs `--read-check` against the generated `cspackages-test/` output: a
   real Lisp reader read-back (see `read-check.lisp`) that catches invalid-token bugs (e.g.
   an unescaped `#:|` export) which balanced-parens checking alone cannot see.
+* `make test-runtime` (`RuntimeExerciseTest/`) goes one step further than either of the
+  above: it actually compiles, loads, and calls the generated wrapper functions against
+  live .NET objects, catching runtime-dispatch bugs (omitted-optional-passed-as-`nil`,
+  Master Wrapper dispatch ordering, `Nullable<T>` guards) that neither paren-balance
+  checking nor read-back checking can see, since both only validate the *shape* of
+  generated code, never that calling it produces correct results. See
+  `doc/plan-fable-detail-02.md`.
 
 
 # Language

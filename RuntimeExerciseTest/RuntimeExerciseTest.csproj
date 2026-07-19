@@ -1,0 +1,126 @@
+<!-- Copyright 2026 Douglas P. Fields, Jr. -->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ========================================================================= -->
+  <!-- General Project Configuration Property Group                              -->
+  <!-- ========================================================================= -->
+  <!-- Runtime exercise suite for doc/plan-fable-detail-02.md: consumes           -->
+  <!-- generated packages (in gen/, produced by `make test-runtime` before this  -->
+  <!-- project builds) exactly as a real downstream consumer (dotcl-dungeonslime) -->
+  <!-- would: DotCL cross-compiles the generated .lisp during `dotnet build`,    -->
+  <!-- which also permanently regression-tests ASDF-loadability (the             -->
+  <!-- dotcl/dotcl#49 class fixed across Versions 42 to 46).                     -->
+  <!-- ========================================================================= -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>RuntimeExerciseTest</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RollForward>Major</RollForward>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- ========================================================================= -->
+  <!-- DotCL Build Properties                                                    -->
+  <!-- ========================================================================= -->
+  <!-- DotclProjectAsd: the entry ASDF system definition file. The compiler task  -->
+  <!-- resolves dependencies (including the generated csharp-assembly-packages   -->
+  <!-- system in gen/) and compiles Lisp sources relative to this file.          -->
+  <!-- ========================================================================= -->
+  <PropertyGroup>
+    <DotclProjectAsd>$(MSBuildProjectDirectory)/runtime-exercise.asd</DotclProjectAsd>
+  </PropertyGroup>
+
+  <!-- ========================================================================= -->
+  <!-- ASD Search Path for the Generated Packages                                -->
+  <!-- ========================================================================= -->
+  <!-- gen/ is produced fresh by `make test-runtime` (via dotcl-packagegen's      -->
+  <!-- out-dir option) before this project builds, and                          -->
+  <!-- defines the "csharp-assembly-packages" system that runtime-exercise.asd    -->
+  <!-- depends on. Not checked in; see .gitignore.                               -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <DotclAsdSearchPath Include="$(MSBuildProjectDirectory)/gen/" />
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- Build-Time Lisp Initialization                                            -->
+  <!-- ========================================================================= -->
+  <!-- build-setup.lisp explicitly loads AssemblyToLispyTestTarget.dll before     -->
+  <!-- dependency resolution/compilation, so the generated csharp-generics.lisp's -->
+  <!-- read-time #.(dotnet:class-for-type "...") forms (from defgeneric) can       -->
+  <!-- resolve those fixture types; see build-setup.lisp's own comment for why    -->
+  <!-- dotnet:resolve-type's usual base-directory probe cannot find them here.    -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <DotclBuildInit Include="$(MSBuildProjectDirectory)/build-setup.lisp" />
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- Raw Lisp Source File Exclusions                                           -->
+  <!-- ========================================================================= -->
+  <!-- Prevents default MSBuild copy tasks from copying uncompiled Lisp source    -->
+  <!-- files directly to the output directory (mirrors dotcl-packagegen.csproj). -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <None Remove="runtime-exercise.asd" />
+    <None Remove="runtime-tests.lisp" />
+    <None Remove="gen\**" />
+    <Compile Remove="gen\**" />
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- DotCL Runtime and Test Fixture References                                 -->
+  <!-- ========================================================================= -->
+  <!-- AssemblyToLispyTestTarget is referenced directly (not just generated      -->
+  <!-- against) because generated code opted into defgeneric emits               -->
+  <!-- #.(dotnet:class-for-type "...") forms, read-time-evaluated during this    -->
+  <!-- project's own DotCL compilation: the fixture types must actually be       -->
+  <!-- loadable at that point, mirroring dotcl-packagegen.csproj's own reference -->
+  <!-- (needed there for the same reason, plus its own test suite).             -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <PackageReference Include="DotCL.Runtime" Version="0.1.18" />
+    <ProjectReference Include="..\AssemblyToLispyTestTarget\AssemblyToLispyTestTarget.csproj" />
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- Contrib Lisp Library Copy Task                                            -->
+  <!-- ========================================================================= -->
+  <!-- Copies the Lisp standard library ('contrib' directory) from the restored  -->
+  <!-- NuGet package assets folder to the build output directory, so the host    -->
+  <!-- can dynamically resolve ASDF/UIOP packages via (require "asdf") at        -->
+  <!-- runtime. Mirrors dotcl-packagegen.csproj/DungeonSlime.csproj.             -->
+  <!-- ========================================================================= -->
+  <ItemGroup Condition="'$(DotclProjectAsd)' != '' and '$(_DotCLContribDir)' != ''">
+    <None Include="$(_DotCLContribDir)\**\*">
+      <Link>contrib\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- NuGet Reference Assembly Copy Target                                      -->
+  <!-- ========================================================================= -->
+  <!-- Copies all local NuGet reference assemblies to the output bin/ directory  -->
+  <!-- before Lisp dependency resolution runs, preventing compile-time Lisp      -->
+  <!-- loading errors on clean builds. Mirrors dotcl-packagegen.csproj.          -->
+  <!-- ========================================================================= -->
+  <Target Name="CopyReferencesBeforeLisp" BeforeTargets="_DotCLResolveDeps" DependsOnTargets="ResolveReferences" Condition="'$(DotclProjectAsd)' != ''">
+    <MakeDir Directories="$(OutDir)" />
+    <Copy SourceFiles="@(ReferenceCopyLocalPaths)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- ========================================================================= -->
+  <!-- Output Directory Manifest Target                                          -->
+  <!-- ========================================================================= -->
+  <!-- Runs before BOTH _DotCLResolveDeps and _DotCLCompileRoot (unlike the       -->
+  <!-- single-target version in dotcl-packagegen.csproj/DungeonSlime.csproj):    -->
+  <!-- build-setup.lisp's assembly load needs obj/dotcl-outdir.txt to already     -->
+  <!-- exist at the resolve-deps stage too, since that stage is what actually     -->
+  <!-- evaluates csharp-generics.lisp's #.(dotnet:class-for-type "...") forms.    -->
+  <Target Name="WriteOutDirForLisp" BeforeTargets="_DotCLResolveDeps;_DotCLCompileRoot" DependsOnTargets="ResolveReferences" Condition="'$(DotclProjectAsd)' != ''">
+    <WriteLinesToFile File="obj/dotcl-outdir.txt" Lines="$(OutDir)" Overwrite="true" />
+  </Target>
+
+</Project>

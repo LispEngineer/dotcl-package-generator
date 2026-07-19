@@ -11,7 +11,7 @@
     <Nullable>enable</Nullable>
     <RollForward>Major</RollForward>
     <TargetFramework>net10.0</TargetFramework>
-    <DefaultItemExcludes>$(DefaultItemExcludes);AssemblyToLispyTestTarget\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);AssemblyToLispyTestTarget\**;RuntimeExerciseTest\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <!-- ========================================================================= -->

@@ -44,3 +44,26 @@ To check a specific file (or a freshly generated one) directly:
 ```sh
 python3 check_parens.py path/to/file.lisp [path/to/another.lisp ...]
 ```
+
+
+# Runtime Exercise Suite
+
+`make test-runtime` (`RuntimeExerciseTest/`, see
+[`doc/plan-fable-detail-02.md`](doc/plan-fable-detail-02.md)) goes further than
+either `make test`'s paren-balance check or its `--read-check` read-back: it
+actually **compiles, loads, and calls** freshly-generated wrapper code against
+live .NET objects. `RuntimeExerciseTest.csproj` is a sibling C# project modeled
+directly on `dotcl-packagegen.csproj` itself — DotCL cross-compiles the
+generated `.lisp` (produced into `RuntimeExerciseTest/gen/`, gitignored) during
+`dotnet build`, exactly as a real downstream consumer (`dotcl-dungeonslime`)
+does, which also permanently regression-tests ASDF-loadability. Its
+`runtime-tests.lisp` is a small, self-contained assertion harness (deliberately
+not `tests/framework.lisp`, which does metadata schema validation for this
+repo's own Stage-1 test suite instead) covering one test per historical
+runtime-dispatch escape (v48 omitted-optional-arguments, v49 overload dispatch
+ordering, v50 `Nullable<T>` guards) plus breadth (Master Wrapper branches,
+operators, properties/fields/indexers, events, `--defgeneric` dispatch,
+generic methods, struct boxing mutation). Run it before any release, or after
+touching overload dispatch/codegen — `make test` alone cannot catch this bug
+class, since it only ever validates the *shape* of generated code, never that
+calling it produces correct results.

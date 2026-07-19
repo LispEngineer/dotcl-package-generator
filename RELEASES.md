@@ -10,6 +10,39 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.50.2 — 2026-07-18
+
+**New `make test-runtime` target: a runtime exercise suite that actually calls generated
+wrapper code against live .NET objects.**
+
+* Adds `RuntimeExerciseTest/`, a sibling C# project modeled directly on
+  `dotcl-packagegen.csproj` itself: `dotcl-packagegen --out-dir RuntimeExerciseTest/gen`
+  generates real packages for a handful of new `AssemblyToLispyTestTarget` fixture
+  classes (`RuntimeExerciseFixtures`, `RuntimeOpStruct`, `GenericDispatchFixtureA`/
+  `GenericDispatchFixtureB`, plus extensions to `EdgeCaseStruct`) and reuses
+  `EventTestClass`/`GenericMethodTestClass`, plus `System.TimeSpan` as a single BCL smoke
+  test; DotCL then cross-compiles that generated `.lisp` during `dotnet build`, exactly
+  as a real downstream consumer (`dotcl-dungeonslime`) would, which also permanently
+  regression-tests ASDF-loadability. `runtime-tests.lisp` is a small, self-contained
+  assertion harness that then actually **calls** the generated functions and checks
+  results, covering one test per historical runtime-dispatch escape (v48
+  omitted-optional-arguments, v49 overload dispatch ordering, v50 `Nullable<T>` guards,
+  including a cross-assembly nullable case) plus breadth (Master Wrapper branches with
+  3+ clean overloads, operators including the Version-47-renamed `bitwise-or!`,
+  properties/fields/indexer get-set, `--constant-properties` memoization identity via
+  `cl:eq`, events, unified `--defgeneric` dispatch, generic methods including the
+  `name<>` arity dispatcher, and struct boxing mutation aliasing).
+* This is the structural fix for the class of bug the v48-v50 fixes all shared: each was
+  a runtime-dispatch bug invisible to string-level assertions (paren-balance checking,
+  `--read-check`'s read-back) and only ever found downstream, in a real consumer
+  (Dungeon Slime). Verified to have teeth: hand-injecting the v48 bug shape (a
+  defaulted-parameter's Lisp `&key` default changed from the real C# default to `nil`,
+  reproducing the historical "omitted optional passed as nil" failure) makes exactly the
+  targeted test fail with a clear diagnostic and a nonzero exit code; reverting restores
+  a clean 36/36 pass.
+* No `*generator-version*` bump — no generated-output shape changed. See
+  `doc/plan-fable-detail-02.md` for the full design and acceptance criteria.
+
 ## 2.50.1 — 2026-07-18
 
 **New `--read-check <dir>` mode: read-back verification of generated output through a
