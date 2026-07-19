@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ValueTuple`2
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: --export-interfaces
 
 (cl:in-package :system-value-tuple-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ValueTuple`2"))
 (cl:defconstant <type-str> "System.ValueTuple`2")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defun new (cl:&optional (item1 cl:nil supplied-item1) (item2 cl:nil supplied-item2))
   "Master wrapper for System.ValueTuple`2 constructor overloads. Dispatches at runtime.

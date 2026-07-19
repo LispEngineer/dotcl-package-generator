@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Specialized.NameObjectCollectionBase
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: --export-interfaces --export-object --export-parents
 ;;; Discovered via: --export-parents/--export-interfaces from System.Collections.Specialized.NameValueCollection
 
@@ -9,8 +9,8 @@
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Specialized.NameObjectCollectionBase"))
 (cl:defconstant <type-str> "System.Collections.Specialized.NameObjectCollectionBase")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defun new (cl:&optional (equality-comparer cl:nil supplied-equality-comparer) (equality-comparer2 cl:nil supplied-equality-comparer2) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Specialized.NameObjectCollectionBase constructor overloads. Dispatches at runtime.

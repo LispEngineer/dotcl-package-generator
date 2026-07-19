@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Object
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: --defgeneric
 
 (cl:in-package :system-object)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Object"))
 (cl:defconstant <type-str> "System.Object")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.Object class.

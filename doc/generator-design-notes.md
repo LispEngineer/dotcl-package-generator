@@ -3535,3 +3535,97 @@ existing fixture classes (`System.AppDomain`, `System.Collections.Hashtable`,
 `System.Threading.Thread`, `System.Collections.Generic.Dictionary\`2`, `System.String`,
 `System.Type`, and others already in the smoke set) alongside the new synthetic fixture
 files.
+
+## Collapsing Degenerate Master Wrapper `cond` Branches (Version 54)
+
+`doc/plan-fable-detail-10.md` addresses `PLAN.md`'s Miscellaneous item about
+`System.Linq.Enumerable.Average()`'s many-identical-branch `cond`: the Master Wrapper
+emits one `cl:cond` branch per clean overload, and when several overloads' guards
+degenerate to the same test (commonly "argument is a .NET object" via
+`dotnet:is-instance-of`, or many of LINQ's selector-overload families), the generated
+`cond` contains runs of branches with literally identical guards, of which only the
+first is ever reachable. Effects: bloated output, and — worse for this project's
+workflow, where humans reading generated code is how the Version 48–50 dispatch bugs
+were caught — *unauditable* output.
+
+### Safety analysis
+
+Guard ordering is semantic (Version 49 fixed exactly an ordering bug), so the only
+transformation permitted is one that provably cannot change dispatch:
+
+* **T1 — Dead-branch elision.** If branch *i* and branch *j* (*i* < *j*, in the same
+  order `master-wrapper-more-specific-p` already sorts by) have byte-identical guard
+  strings, branch *j* is unreachable regardless of its body — `cl:cond` always takes
+  its first matching clause. Dropping *j* never changes behavior. When *i* and *j*'s
+  bodies differ, dropping *j* silently discards an overload that was *already*
+  unreachable before this change — a pre-existing dispatch limitation now made visible
+  rather than hidden: a comment is emitted in *j*'s place instead
+  (`;; unreachable: same runtime guard as <i's signature>; calls <j's signature>`),
+  naming both overloads, so the ambiguity is surfaced in the generated source rather
+  than silently disappearing.
+* **T2 — Uniform-body collapse — analyzed, not implemented separately.** The plan
+  considered a further step: once T1 has run, if every *remaining* branch shares a
+  byte-identical body, could the whole `cond` reduce to that one body? Doing so naively
+  would remove the argument-type validation the guards provide (a wrong-typed argument
+  would then reach `dotnet:invoke` directly instead of signaling
+  `csharp-overload-not-found`), so the only safe version keeps a guard:
+  `(cl:cond (<shared guard> <body>) (cl:t <not-found error>))` — which is exactly what
+  T1 alone already produces once every duplicate-guard branch has been elided (one
+  surviving branch plus the existing fallthrough `cl:t` error clause). T2 is therefore
+  not a distinct transformation; T1, applied at the branch level, already achieves the
+  `Average` cleanup on its own.
+
+No reordering, no guard merging, no "similar" matching — identical guard *strings*
+only. This deliberately mirrors T1/T2 exactly as scoped in the plan, including the
+decision to record why T2 needed no separate implementation.
+
+### Implementation
+
+New shared `emit-master-wrapper-cond-branches` (`apg-overload-dispatch.lisp`) takes a
+stream and an ordered list of `(guard-str action-str signature-str)` triples — the
+per-overload branch data collected *before* any text is written, rather than formatted
+straight to the stream as before. It walks the triples with a `guard-str -> signature-str`
+hash table of guards already kept: a guard not yet seen gets its own `cl:cond` clause
+emitted (and is recorded as seen, keyed by its exact string); a guard matching one
+already kept instead emits the `;; unreachable: ...` comment naming the earlier
+(shadowing) overload's signature and its own.
+
+All three Master Wrapper flavors were refactored to build their branch list as data
+and call this one shared helper, instead of each having its own inline
+`dolist`-over-sorted-overloads loop that formatted directly to the stream:
+
+* `generate-master-wrapper` (ordinary methods, including the static/instance `*`-suffixed
+  split and the internal per-generic-arity functions `generate-generic-cell-wrapper`
+  dispatches to — since they all funnel through this one function, dedup applies to them
+  automatically with no separate change needed), using `method-signature-str` for each
+  branch's signature text.
+* `generate-constructor-master-wrapper` (the `new` Master Wrapper), using
+  `constructor-signature-str`.
+* `generate-out-master-wrapper` (the out-parameter Master Wrapper,
+  `doc/plan-fable-detail-05.md`), using `method-signature-str` against each branch's
+  *original* (not out-filtered) method plist, so the emitted signature still shows the
+  real C# `out` parameter(s) rather than the filtered view `make-filtered-out-method`
+  produces purely for dispatch-guard computation.
+
+Dedup keys on the complete guard expression string produced by
+`format-master-overload-condition` — which already incorporates the `&optional`/`&key`
+default-dispatch positional-slot logic added in Version 48 — so two overloads whose
+guards happen to agree on every positional/optional/keyword clause (not just a
+prefix) are the only ones collapsed; a Version 48 positional-slot default-supplied-p
+difference between two overloads' guards is a real string difference and prevents
+collapse, as it must.
+
+### Testing
+
+New `package-generator-tests-overload-dispatch.lisp` (or the existing overload-dispatch
+test file, depending on where Plan 09's split landed it) exercises
+`emit-master-wrapper-cond-branches` directly against synthetic triples: (a) two
+identical guards with different bodies collapse to one branch plus one
+`;; unreachable:` comment naming both signatures; (b) identical guards *and* identical
+bodies still collapse with the comment (uniformity, not an optimization to skip it);
+(c) all-distinct guards pass through untouched, byte-for-byte, in original order.
+`cspackages-test/system-linq-enumerable.lisp`'s `average`/`sum`/`max`/`min` wrappers
+were manually diffed post-regeneration to confirm only duplicate-guard branches
+disappeared, each replaced by its comment, with no other change. `make check-parens`
+and the full `make test` (Lisp + C# suite, end-to-end smoke generation, `check_parens.py`,
+`--read-check`) all pass.

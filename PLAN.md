@@ -223,6 +223,24 @@ not ten. See `FILES.md` for the current per-file breakdown.
   the system only checks if it's a dotnet object. This can be
   simplified or improved.
 
+  **DONE (see `doc/plan-fable-detail-10.md`, `*generator-version*` 53 → 54):** any two or
+  more Master Wrapper `cond` branches (method, constructor, or out-parameter dispatch)
+  whose runtime guard strings are byte-for-byte identical now collapse to one live
+  branch plus a `;; unreachable: same runtime guard as <earlier signature>; calls <this
+  signature>` comment for each later duplicate, instead of one dead `cond` clause per
+  duplicate. New shared `emit-master-wrapper-cond-branches` (`apg-overload-dispatch.lisp`)
+  applies this dead-branch elision (identical-string guards only — no reordering, no
+  merging of merely similar guards) across all three Master Wrapper flavors.
+  `System.Linq.Enumerable.Average()` itself, on inspection at the time this was fixed,
+  turned out to already discriminate its overloads via assembly-qualified closed-generic
+  type checks and had no degenerate guards left to collapse; the fix still fires
+  correctly across many other real BCL overload families with genuinely identical
+  numeric-primitive guards (`Console.Write`/`WriteLine`, `Convert.To*`,
+  `Array.Copy`/`GetValue`/`SetValue`, `StringBuilder.Append`/`Insert`, `TimeSpan.From*`,
+  `Timer.Change`/its constructor, and others — confirmed via the `cspackages-test/`
+  smoke diff). See `doc/generator-design-notes.md`'s "Collapsing Degenerate Master
+  Wrapper `cond` Branches (Version 54)" section for the full safety analysis.
+
 * Handle generic classes name mangling using backticks more elegantly.
   * Backticks have special meaning in Lisp so we cannot include them in the
     package names, for example.

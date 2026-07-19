@@ -10,6 +10,39 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.54.0 — 2026-07-19
+
+**Collapsed degenerate Master Wrapper `cond` branches (`doc/plan-fable-detail-10.md`,
+`*generator-version*` 53 → 54).**
+
+* When two or more clean overloads sharing one Master Wrapper produce byte-for-byte
+  identical runtime dispatch guards (common for numeric-primitive overload families —
+  the `System.Linq.Enumerable.Average()` family was the motivating case flagged in
+  `PLAN.md`'s Miscellaneous section), only the first such branch is generated; every
+  later one with the same guard is replaced with a `;; unreachable: same runtime guard
+  as <earlier signature>; calls <this signature>` comment instead of a second, dead
+  `cond` clause.
+* Dead-branch elision only (T1 in the plan's safety analysis) — no reordering, and no
+  merging of merely *similar* (as opposed to byte-identical) guards. A uniform-body
+  collapse (T2) was analyzed and found to add nothing beyond what T1 alone already
+  produces once duplicates are elided; see the design-notes writeup.
+* New shared `emit-master-wrapper-cond-branches` (`apg-overload-dispatch.lisp`), used by
+  all three Master Wrapper flavors: `generate-master-wrapper` (methods, including the
+  static/instance `*`-split and generic-arity internal functions),
+  `generate-constructor-master-wrapper` (`new`), and `generate-out-master-wrapper`
+  (out-parameter dispatch, `doc/plan-fable-detail-05.md`).
+* `cspackages-test/` diff confirms real collapses across many real BCL classes
+  (`Console.Write`/`WriteLine`, `Convert.To*`, `Array.Copy`/`GetValue`/`SetValue`,
+  `StringBuilder.Append`/`Insert`, `TimeSpan.From*`, `Timer.Change`/its constructor,
+  and others), each with the expected elision comment; no unrelated output changed.
+  `System.Linq.Enumerable.Average` itself, on inspection, turned out to already
+  discriminate its overloads via assembly-qualified closed-generic type checks (no
+  degenerate guards there in the current codebase) — the collapse still fires
+  correctly wherever a real duplicate exists, and correctly does *not* fire where
+  guards genuinely differ.
+* See `doc/generator-design-notes.md`'s "Collapsing Degenerate Master Wrapper `cond`
+  Branches (Version 54)" section for the full safety-analysis writeup.
+
 ## 2.53.0 — 2026-07-19
 
 **Surfaced `[System.Obsolete]` and `[TupleElementNames]` in reflected metadata and generated output (`doc/plan-fable-detail-16.md`, `*generator-version*` 52 → 53).**

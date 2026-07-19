@@ -1,5 +1,10 @@
 # Detail Plan 10: Collapse Degenerate Master Wrapper `cond` Branches
 
+**Status: DONE** — implemented (`*generator-version*` 53 → 54); not yet committed (see
+new `emit-master-wrapper-cond-branches` in `apg-overload-dispatch.lisp`,
+`doc/generator-design-notes.md`'s "Collapsing Degenerate Master Wrapper `cond` Branches
+(Version 54)" section, and `RELEASES.md`'s 2.54.0 entry).
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 4.3); addresses
   `PLAN.md`'s Miscellaneous item about `System.Linq.Enumerable.Average()`'s
   many-identical-branch `cond`.

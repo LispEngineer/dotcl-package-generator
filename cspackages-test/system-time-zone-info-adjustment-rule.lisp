@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo+AdjustmentRule
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: (none)
 
 (cl:in-package :system-time-zone-info-adjustment-rule)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeZoneInfo+AdjustmentRule"))
 (cl:defconstant <type-str> "System.TimeZoneInfo+AdjustmentRule")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defun base-utc-offset-delta (obj!)
   "Gets the time difference with the base UTC offset for the time zone during the adjustment-rule period."

@@ -463,6 +463,32 @@
         (cl:push (cl:format nil "(cl:when ~A (cl:list :~A ~A))" supplied-var lpname lpname) parts)))
     (cl:format nil "(cl:append ~{~A~^ ~})" (cl:nreverse parts))))
 
+(cl:defun emit-master-wrapper-cond-branches (stream branches)
+  "Emits one cl:cond clause per (guard-str action-str signature-str) triple
+   in BRANCHES (already ordered by master-wrapper-more-specific-p), applying
+   T1 dead-branch elision from doc/plan-fable-detail-10.md's safety
+   analysis: a branch whose guard-str is byte-identical to an earlier,
+   already-kept branch's is provably unreachable regardless of its body,
+   since cl:cond always takes its first matching clause. Such a branch is
+   replaced with a comment naming both the earlier (shadowing) overload's
+   signature and its own, rather than being silently dropped -- this
+   surfaces latent dispatch ambiguity instead of hiding it. No reordering
+   and no merging of non-identical guards is ever performed; only strictly
+   byte-identical guard strings are considered duplicates. Shared by
+   generate-master-wrapper, generate-constructor-master-wrapper, and
+   generate-out-master-wrapper so all three Master Wrapper flavors benefit
+   identically."
+  (cl:let ((seen (cl:make-hash-table :test #'cl:equal)))
+    (cl:dolist (branch branches)
+      (cl:destructuring-bind (guard-str action-str sig-str) branch
+        (cl:let ((shadowing-sig (cl:gethash guard-str seen)))
+          (cl:if shadowing-sig
+              (cl:format stream "    ;; unreachable: same runtime guard as ~A; calls ~A~%" shadowing-sig sig-str)
+              (cl:progn
+                (cl:setf (cl:gethash guard-str seen) sig-str)
+                (cl:format stream "    (~A~%" guard-str)
+                (cl:format stream "     ~A)~%" action-str))))))))
+
 (cl:defun generate-master-wrapper (stream methods name mname fq-name static-p is-generic-p)
   "Generates Master Wrapper defun with precise dispatch cond block and fallback error signaling.
    When IS-GENERIC-P, every method in METHODS is assumed to share the same
@@ -509,12 +535,13 @@
 
     ;; Sort methods by effective (mandatory) arity for specificity -- see
     ;; master-wrapper-more-specific-p.
-    (cl:let ((sorted-methods (cl:sort (cl:copy-list methods) #'master-wrapper-more-specific-p)))
-      (cl:dolist (cm sorted-methods)
-        (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
-              (action-str (format-master-overload-action cm fq-name name static-p is-generic-p generic-type-names prefix opt-params key-params)))
-          (cl:format stream "    (~A~%" cond-str)
-          (cl:format stream "     ~A)~%" action-str))))
+    (cl:let* ((sorted-methods (cl:sort (cl:copy-list methods) #'master-wrapper-more-specific-p))
+              (branches (cl:mapcar (cl:lambda (cm)
+                                      (cl:list (format-master-overload-condition cm prefix opt-params key-params)
+                                               (format-master-overload-action cm fq-name name static-p is-generic-p generic-type-names prefix opt-params key-params)
+                                               (method-signature-str cm)))
+                                    sorted-methods)))
+      (emit-master-wrapper-cond-branches stream branches))
 
     (cl:let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
       (cl:format stream "    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
@@ -568,12 +595,13 @@
 
     ;; Sort constructors by effective (mandatory) arity for specificity --
     ;; see master-wrapper-more-specific-p.
-    (cl:let ((sorted-ctors (cl:sort (cl:copy-list ctors) #'master-wrapper-more-specific-p)))
-      (cl:dolist (cm sorted-ctors)
-        (cl:let ((cond-str (format-master-overload-condition cm prefix opt-params key-params))
-                 (action-str (format-constructor-master-overload-action cm prefix opt-params key-params)))
-          (cl:format stream "    (~A~%" cond-str)
-          (cl:format stream "     ~A)~%" action-str))))
+    (cl:let* ((sorted-ctors (cl:sort (cl:copy-list ctors) #'master-wrapper-more-specific-p))
+              (branches (cl:mapcar (cl:lambda (cm)
+                                      (cl:list (format-master-overload-condition cm prefix opt-params key-params)
+                                               (format-constructor-master-overload-action cm prefix opt-params key-params)
+                                               (constructor-signature-str cm)))
+                                    sorted-ctors)))
+      (emit-master-wrapper-cond-branches stream branches))
 
     (cl:let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
       (cl:format stream "    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
@@ -906,17 +934,18 @@
     ;; parameter list, since that's the arity that actually governs dispatch
     ;; here, while still emitting the ORIGINAL method plist's own
     ;; :mangled-name/:name for the call.
-    (let ((sorted-pairs (sort (mapcar #'cons methods filtered) #'master-wrapper-more-specific-p :key #'cdr)))
-      (dolist (pair sorted-pairs)
-        (let* ((cm-orig (car pair))
-               (cm-filtered (cdr pair))
-               (cond-str (format-master-overload-condition cm-filtered prefix opt-params key-params))
-               (call-param-names (master-overload-param-names cm-filtered prefix opt-params key-params))
-               (dotnet-method-name (or (getf cm-orig :mangled-name) name))
-               (type-args-str (format nil "~{~A~^ ~}" generic-type-names))
-               (action-str (format-call-out-invocation-expr fq-name dotnet-method-name static-p is-generic-p type-args-str call-param-names)))
-          (format stream "    (~A~%" cond-str)
-          (format stream "     ~A)~%" action-str))))
+    (let* ((sorted-pairs (sort (mapcar #'cons methods filtered) #'master-wrapper-more-specific-p :key #'cdr))
+           (branches (mapcar (lambda (pair)
+                                (let* ((cm-orig (car pair))
+                                       (cm-filtered (cdr pair))
+                                       (cond-str (format-master-overload-condition cm-filtered prefix opt-params key-params))
+                                       (call-param-names (master-overload-param-names cm-filtered prefix opt-params key-params))
+                                       (dotnet-method-name (or (getf cm-orig :mangled-name) name))
+                                       (type-args-str (format nil "~{~A~^ ~}" generic-type-names))
+                                       (action-str (format-call-out-invocation-expr fq-name dotnet-method-name static-p is-generic-p type-args-str call-param-names)))
+                                  (list cond-str action-str (method-signature-str cm-orig))))
+                              sorted-pairs)))
+      (emit-master-wrapper-cond-branches stream branches))
 
     (let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
       (format stream "    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")

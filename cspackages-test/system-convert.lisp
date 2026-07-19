@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Convert
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: (none)
 
 (cl:in-package :system-convert)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Convert"))
 (cl:defconstant <type-str> "System.Convert")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:define-symbol-macro db-null (dotnet:static <type-str> "DBNull"))
 (cl:setf (cl:documentation (cl:quote db-null) (cl:quote cl:variable)) "A constant that represents a database column that is absent of data; that is, database null.")
@@ -344,32 +344,26 @@ ToBoolean(String, IFormatProvider) -> Boolean
      (dotnet:static <type-str> "ToBoolean" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToBoolean" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToBoolean" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToBoolean" value))
+    ;; unreachable: same runtime guard as ToBoolean(Decimal) -> Boolean; calls ToBoolean(Double) -> Boolean
+    ;; unreachable: same runtime guard as ToBoolean(Decimal) -> Boolean; calls ToBoolean(Single) -> Boolean
     ((cl:and (cl:stringp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToBoolean" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToBoolean" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToBoolean" value))
+    ;; unreachable: same runtime guard as ToBoolean(Decimal) -> Boolean; calls ToBoolean(Int64) -> Boolean
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToBoolean" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToBoolean" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToBoolean" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToBoolean" value))
+    ;; unreachable: same runtime guard as ToBoolean(Decimal) -> Boolean; calls ToBoolean(Int16) -> Boolean
+    ;; unreachable: same runtime guard as ToBoolean(Decimal) -> Boolean; calls ToBoolean(Byte) -> Boolean
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToBoolean" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToBoolean" value))
     ((cl:and (cl:typep value 'cl:boolean) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToBoolean" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToBoolean" value))
+    ;; unreachable: same runtime guard as ToBoolean(Decimal) -> Boolean; calls ToBoolean(Int32) -> Boolean
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToBoolean" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -511,26 +505,20 @@ ToByte(String, Int32) -> Byte
      (dotnet:static <type-str> "ToByte" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToByte" value))
+    ;; unreachable: same runtime guard as ToByte(Decimal) -> Byte; calls ToByte(Double) -> Byte
+    ;; unreachable: same runtime guard as ToByte(Decimal) -> Byte; calls ToByte(Single) -> Byte
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToByte" value))
+    ;; unreachable: same runtime guard as ToByte(Decimal) -> Byte; calls ToByte(Int64) -> Byte
+    ;; unreachable: same runtime guard as ToByte(Decimal) -> Byte; calls ToByte(Int32) -> Byte
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToByte" value))
+    ;; unreachable: same runtime guard as ToByte(Decimal) -> Byte; calls ToByte(Int16) -> Byte
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToByte" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToByte" value))
+    ;; unreachable: same runtime guard as ToByte(Decimal) -> Byte; calls ToByte(Byte) -> Byte
     ((cl:and (cl:typep value 'cl:boolean) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToByte" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
@@ -665,32 +653,26 @@ ToChar(String, IFormatProvider) -> Char
      (dotnet:static <type-str> "ToChar" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToChar" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToChar" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToChar" value))
+    ;; unreachable: same runtime guard as ToChar(Decimal) -> Char; calls ToChar(Double) -> Char
+    ;; unreachable: same runtime guard as ToChar(Decimal) -> Char; calls ToChar(Single) -> Char
     ((cl:and (cl:stringp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToChar" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToChar" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToChar" value))
+    ;; unreachable: same runtime guard as ToChar(Decimal) -> Char; calls ToChar(Int64) -> Char
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToChar" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToChar" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToChar" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToChar" value))
+    ;; unreachable: same runtime guard as ToChar(Decimal) -> Char; calls ToChar(Int16) -> Char
+    ;; unreachable: same runtime guard as ToChar(Decimal) -> Char; calls ToChar(Byte) -> Char
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToChar" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToChar" value))
     ((cl:and (cl:typep value 'cl:boolean) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToChar" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToChar" value))
+    ;; unreachable: same runtime guard as ToChar(Decimal) -> Char; calls ToChar(Int32) -> Char
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToChar" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -819,34 +801,28 @@ ToDateTime(String, IFormatProvider) -> DateTime
      (dotnet:static <type-str> "ToDateTime" value provider))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDateTime" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDateTime" value))
+    ;; unreachable: same runtime guard as ToDateTime(Decimal) -> DateTime; calls ToDateTime(Double) -> DateTime
+    ;; unreachable: same runtime guard as ToDateTime(Decimal) -> DateTime; calls ToDateTime(Single) -> DateTime
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
     ((cl:and (cl:typep value 'cl:boolean) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDateTime" value))
+    ;; unreachable: same runtime guard as ToDateTime(Decimal) -> DateTime; calls ToDateTime(Int64) -> DateTime
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDateTime" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDateTime" value))
+    ;; unreachable: same runtime guard as ToDateTime(Decimal) -> DateTime; calls ToDateTime(Int16) -> DateTime
+    ;; unreachable: same runtime guard as ToDateTime(Decimal) -> DateTime; calls ToDateTime(Byte) -> DateTime
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
     ((cl:and (cl:stringp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDateTime" value))
+    ;; unreachable: same runtime guard as ToDateTime(Decimal) -> DateTime; calls ToDateTime(Int32) -> DateTime
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.DateTime")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDateTime" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -981,24 +957,18 @@ ToDecimal(String, IFormatProvider) -> Decimal
      (dotnet:static <type-str> "ToDecimal" value))
     ((cl:and (cl:stringp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDecimal" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDecimal" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDecimal" value))
+    ;; unreachable: same runtime guard as ToDecimal(Decimal) -> Decimal; calls ToDecimal(Double) -> Decimal
+    ;; unreachable: same runtime guard as ToDecimal(Decimal) -> Decimal; calls ToDecimal(Single) -> Decimal
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDecimal" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDecimal" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDecimal" value))
+    ;; unreachable: same runtime guard as ToDecimal(Decimal) -> Decimal; calls ToDecimal(Int64) -> Decimal
+    ;; unreachable: same runtime guard as ToDecimal(Decimal) -> Decimal; calls ToDecimal(Int32) -> Decimal
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDecimal" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDecimal" value))
+    ;; unreachable: same runtime guard as ToDecimal(Decimal) -> Decimal; calls ToDecimal(Int16) -> Decimal
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDecimal" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDecimal" value))
+    ;; unreachable: same runtime guard as ToDecimal(Decimal) -> Decimal; calls ToDecimal(Byte) -> Decimal
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDecimal" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
@@ -1137,24 +1107,18 @@ ToDouble(String, IFormatProvider) -> Double
      (dotnet:static <type-str> "ToDouble" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDouble" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDouble" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDouble" value))
+    ;; unreachable: same runtime guard as ToDouble(Decimal) -> Double; calls ToDouble(Double) -> Double
+    ;; unreachable: same runtime guard as ToDouble(Decimal) -> Double; calls ToDouble(Single) -> Double
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDouble" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDouble" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDouble" value))
+    ;; unreachable: same runtime guard as ToDouble(Decimal) -> Double; calls ToDouble(Int64) -> Double
+    ;; unreachable: same runtime guard as ToDouble(Decimal) -> Double; calls ToDouble(Int32) -> Double
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDouble" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDouble" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDouble" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToDouble" value))
+    ;; unreachable: same runtime guard as ToDouble(Decimal) -> Double; calls ToDouble(Int16) -> Double
+    ;; unreachable: same runtime guard as ToDouble(Decimal) -> Double; calls ToDouble(Byte) -> Double
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToDouble" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
@@ -1372,30 +1336,24 @@ ToInt16(String, Int32) -> Int16
      (dotnet:static <type-str> "ToInt16" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt16" value))
+    ;; unreachable: same runtime guard as ToInt16(Decimal) -> Int16; calls ToInt16(Double) -> Int16
+    ;; unreachable: same runtime guard as ToInt16(Decimal) -> Int16; calls ToInt16(Single) -> Int16
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt16" value))
+    ;; unreachable: same runtime guard as ToInt16(Decimal) -> Int16; calls ToInt16(Int64) -> Int16
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt16" value))
+    ;; unreachable: same runtime guard as ToInt16(Decimal) -> Int16; calls ToInt16(Int32) -> Int16
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt16" value))
+    ;; unreachable: same runtime guard as ToInt16(Decimal) -> Int16; calls ToInt16(Byte) -> Int16
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt16" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt16" value))
     ((cl:and (cl:typep value 'cl:boolean) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt16" value))
+    ;; unreachable: same runtime guard as ToInt16(Decimal) -> Int16; calls ToInt16(Int16) -> Int16
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt16" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -1537,30 +1495,24 @@ ToInt32(String, Int32) -> Int32
      (dotnet:static <type-str> "ToInt32" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt32" value))
+    ;; unreachable: same runtime guard as ToInt32(Decimal) -> Int32; calls ToInt32(Double) -> Int32
+    ;; unreachable: same runtime guard as ToInt32(Decimal) -> Int32; calls ToInt32(Single) -> Int32
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt32" value))
+    ;; unreachable: same runtime guard as ToInt32(Decimal) -> Int32; calls ToInt32(Int64) -> Int32
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt32" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt32" value))
+    ;; unreachable: same runtime guard as ToInt32(Decimal) -> Int32; calls ToInt32(Int16) -> Int32
+    ;; unreachable: same runtime guard as ToInt32(Decimal) -> Int32; calls ToInt32(Byte) -> Int32
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt32" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt32" value))
     ((cl:and (cl:typep value 'cl:boolean) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt32" value))
+    ;; unreachable: same runtime guard as ToInt32(Decimal) -> Int32; calls ToInt32(Int32) -> Int32
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt32" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -1702,22 +1654,16 @@ ToInt64(String, Int32) -> Int64
      (dotnet:static <type-str> "ToInt64" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt64" value))
+    ;; unreachable: same runtime guard as ToInt64(Decimal) -> Int64; calls ToInt64(Double) -> Int64
+    ;; unreachable: same runtime guard as ToInt64(Decimal) -> Int64; calls ToInt64(Single) -> Int64
+    ;; unreachable: same runtime guard as ToInt64(Decimal) -> Int64; calls ToInt64(Int64) -> Int64
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt64" value))
+    ;; unreachable: same runtime guard as ToInt64(Decimal) -> Int64; calls ToInt64(Int32) -> Int64
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToInt64" value))
+    ;; unreachable: same runtime guard as ToInt64(Decimal) -> Int64; calls ToInt64(Int16) -> Int64
+    ;; unreachable: same runtime guard as ToInt64(Decimal) -> Int64; calls ToInt64(Byte) -> Int64
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToInt64" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
@@ -1867,22 +1813,16 @@ ToSByte(String, Int32) -> SByte
      (dotnet:static <type-str> "ToSByte" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToSByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSByte" value))
+    ;; unreachable: same runtime guard as ToSByte(Decimal) -> SByte; calls ToSByte(Double) -> SByte
+    ;; unreachable: same runtime guard as ToSByte(Decimal) -> SByte; calls ToSByte(Single) -> SByte
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToSByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSByte" value))
+    ;; unreachable: same runtime guard as ToSByte(Decimal) -> SByte; calls ToSByte(Int64) -> SByte
+    ;; unreachable: same runtime guard as ToSByte(Decimal) -> SByte; calls ToSByte(Int32) -> SByte
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToSByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSByte" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSByte" value))
+    ;; unreachable: same runtime guard as ToSByte(Decimal) -> SByte; calls ToSByte(Int16) -> SByte
+    ;; unreachable: same runtime guard as ToSByte(Decimal) -> SByte; calls ToSByte(Byte) -> SByte
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToSByte" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
@@ -2025,24 +1965,18 @@ ToSingle(String, IFormatProvider) -> Single
      (dotnet:static <type-str> "ToSingle" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToSingle" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSingle" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSingle" value))
+    ;; unreachable: same runtime guard as ToSingle(Decimal) -> Single; calls ToSingle(Double) -> Single
+    ;; unreachable: same runtime guard as ToSingle(Decimal) -> Single; calls ToSingle(Single) -> Single
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToSingle" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSingle" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSingle" value))
+    ;; unreachable: same runtime guard as ToSingle(Decimal) -> Single; calls ToSingle(Int64) -> Single
+    ;; unreachable: same runtime guard as ToSingle(Decimal) -> Single; calls ToSingle(Int32) -> Single
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToSingle" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSingle" value))
+    ;; unreachable: same runtime guard as ToSingle(Decimal) -> Single; calls ToSingle(Int16) -> Single
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToSingle" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToSingle" value))
+    ;; unreachable: same runtime guard as ToSingle(Decimal) -> Single; calls ToSingle(Byte) -> Single
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToSingle" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
@@ -2299,42 +2233,33 @@ ToString(Int64, Int32) -> String
      (dotnet:static <type-str> "ToString" value provider))
     ((cl:and (cl:numberp value) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:static <type-str> "ToString" value provider))
-    ((cl:and (cl:numberp value) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
-     (dotnet:static <type-str> "ToString" value provider))
+    ;; unreachable: same runtime guard as ToString(Byte, IFormatProvider) -> String; calls ToString(Int16, IFormatProvider) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:static <type-str> "ToString" value provider))
-    ((cl:and (cl:numberp value) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
-     (dotnet:static <type-str> "ToString" value provider))
+    ;; unreachable: same runtime guard as ToString(Byte, IFormatProvider) -> String; calls ToString(Int32, IFormatProvider) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:static <type-str> "ToString" value provider))
-    ((cl:and (cl:numberp value) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
-     (dotnet:static <type-str> "ToString" value provider))
+    ;; unreachable: same runtime guard as ToString(Byte, IFormatProvider) -> String; calls ToString(Int64, IFormatProvider) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:static <type-str> "ToString" value provider))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:static <type-str> "ToString" value provider))
-    ((cl:and (cl:numberp value) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
-     (dotnet:static <type-str> "ToString" value provider))
-    ((cl:and (cl:numberp value) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
-     (dotnet:static <type-str> "ToString" value provider))
+    ;; unreachable: same runtime guard as ToString(Byte, IFormatProvider) -> String; calls ToString(Double, IFormatProvider) -> String
+    ;; unreachable: same runtime guard as ToString(Byte, IFormatProvider) -> String; calls ToString(Decimal, IFormatProvider) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.DateTime")) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:static <type-str> "ToString" value provider))
     ((cl:and (cl:stringp value) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:static <type-str> "ToString" value provider))
     ((cl:and (cl:numberp value) supplied-provider (cl:numberp provider))
      (dotnet:static <type-str> "ToString" value provider))
-    ((cl:and (cl:numberp value) supplied-provider (cl:numberp provider))
-     (dotnet:static <type-str> "ToString" value provider))
-    ((cl:and (cl:numberp value) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
-     (dotnet:static <type-str> "ToString" value provider))
+    ;; unreachable: same runtime guard as ToString(Byte, Int32) -> String; calls ToString(Int16, Int32) -> String
+    ;; unreachable: same runtime guard as ToString(Byte, IFormatProvider) -> String; calls ToString(Single, IFormatProvider) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:static <type-str> "ToString" value provider))
-    ((cl:and (cl:numberp value) supplied-provider (cl:numberp provider))
-     (dotnet:static <type-str> "ToString" value provider))
+    ;; unreachable: same runtime guard as ToString(Byte, Int32) -> String; calls ToString(Int64, Int32) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) supplied-provider (cl:or (cl:null provider) (dotnet:is-instance-of provider "System.IFormatProvider")))
      (dotnet:static <type-str> "ToString" value provider))
-    ((cl:and (cl:numberp value) supplied-provider (cl:numberp provider))
-     (dotnet:static <type-str> "ToString" value provider))
+    ;; unreachable: same runtime guard as ToString(Byte, Int32) -> String; calls ToString(Int32, Int32) -> String
     ((cl:and (cl:typep value 'cl:boolean) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToString" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
@@ -2343,28 +2268,22 @@ ToString(Int64, Int32) -> String
      (dotnet:static <type-str> "ToString" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToString" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToString" value))
+    ;; unreachable: same runtime guard as ToString(Byte) -> String; calls ToString(Int16) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToString" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToString" value))
+    ;; unreachable: same runtime guard as ToString(Byte) -> String; calls ToString(Int32) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt32")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToString" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToString" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToString" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToString" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToString" value))
+    ;; unreachable: same runtime guard as ToString(Byte) -> String; calls ToString(Single) -> String
+    ;; unreachable: same runtime guard as ToString(Byte) -> String; calls ToString(Double) -> String
+    ;; unreachable: same runtime guard as ToString(Byte) -> String; calls ToString(Decimal) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.DateTime")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToString" value))
     ((cl:and (cl:stringp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToString" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToString" value))
+    ;; unreachable: same runtime guard as ToString(Byte) -> String; calls ToString(Int64) -> String
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToString" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -2506,22 +2425,16 @@ ToUInt16(String, Int32) -> UInt16
      (dotnet:static <type-str> "ToUInt16" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt16" value))
+    ;; unreachable: same runtime guard as ToUInt16(Decimal) -> UInt16; calls ToUInt16(Double) -> UInt16
+    ;; unreachable: same runtime guard as ToUInt16(Decimal) -> UInt16; calls ToUInt16(Single) -> UInt16
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt16" value))
+    ;; unreachable: same runtime guard as ToUInt16(Decimal) -> UInt16; calls ToUInt16(Int64) -> UInt16
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt16" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt16" value))
+    ;; unreachable: same runtime guard as ToUInt16(Decimal) -> UInt16; calls ToUInt16(Int32) -> UInt16
+    ;; unreachable: same runtime guard as ToUInt16(Decimal) -> UInt16; calls ToUInt16(Int16) -> UInt16
+    ;; unreachable: same runtime guard as ToUInt16(Decimal) -> UInt16; calls ToUInt16(Byte) -> UInt16
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt16" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
@@ -2671,22 +2584,16 @@ ToUInt32(String, Int32) -> UInt32
      (dotnet:static <type-str> "ToUInt32" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt32" value))
+    ;; unreachable: same runtime guard as ToUInt32(Decimal) -> UInt32; calls ToUInt32(Double) -> UInt32
+    ;; unreachable: same runtime guard as ToUInt32(Decimal) -> UInt32; calls ToUInt32(Single) -> UInt32
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt32" value))
+    ;; unreachable: same runtime guard as ToUInt32(Decimal) -> UInt32; calls ToUInt32(Int64) -> UInt32
+    ;; unreachable: same runtime guard as ToUInt32(Decimal) -> UInt32; calls ToUInt32(Int32) -> UInt32
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt32" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt32" value))
+    ;; unreachable: same runtime guard as ToUInt32(Decimal) -> UInt32; calls ToUInt32(Int16) -> UInt32
+    ;; unreachable: same runtime guard as ToUInt32(Decimal) -> UInt32; calls ToUInt32(Byte) -> UInt32
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt32" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))
@@ -2836,22 +2743,16 @@ ToUInt64(String, Int32) -> UInt64
      (dotnet:static <type-str> "ToUInt64" value))
     ((cl:and (cl:numberp value) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt64" value))
+    ;; unreachable: same runtime guard as ToUInt64(Decimal) -> UInt64; calls ToUInt64(Double) -> UInt64
+    ;; unreachable: same runtime guard as ToUInt64(Decimal) -> UInt64; calls ToUInt64(Single) -> UInt64
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt64")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt64" value))
+    ;; unreachable: same runtime guard as ToUInt64(Decimal) -> UInt64; calls ToUInt64(Int64) -> UInt64
+    ;; unreachable: same runtime guard as ToUInt64(Decimal) -> UInt64; calls ToUInt64(Int32) -> UInt64
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.UInt16")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt64" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-provider))
-     (dotnet:static <type-str> "ToUInt64" value))
+    ;; unreachable: same runtime guard as ToUInt64(Decimal) -> UInt64; calls ToUInt64(Int16) -> UInt64
+    ;; unreachable: same runtime guard as ToUInt64(Decimal) -> UInt64; calls ToUInt64(Byte) -> UInt64
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-provider))
      (dotnet:static <type-str> "ToUInt64" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-provider))

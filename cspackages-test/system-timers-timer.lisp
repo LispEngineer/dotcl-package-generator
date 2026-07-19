@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Timers.Timer
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: --defgeneric
 
 (cl:in-package :system-timers-timer)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Timers.Timer"))
 (cl:defconstant <type-str> "System.Timers.Timer")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defun new (cl:&optional (interval cl:nil supplied-interval))
   "Master wrapper for System.Timers.Timer constructor overloads. Dispatches at runtime.

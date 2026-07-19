@@ -644,6 +644,16 @@ real wrapper too, via a different mechanism — see "Out Parameters" below.
 * Every Master Wrapper's docstring enumerates every overload it covers — its
   human-readable signature plus that overload's own XML-doc Summary/Returns/Parameters —
   so the full set of available overloads stays documented on the one function.
+* **Degenerate (byte-identical) guards are elided, not duplicated.** When two or more
+  overloads' runtime dispatch guards come out byte-for-byte identical (common for
+  numeric-primitive overload families, e.g. `Console.WriteLine(int)` vs.
+  `WriteLine(long)` vs. `WriteLine(double)`, all of which guard via a plain
+  `cl:numberp` check — the `System.Linq.Enumerable.Average()` overload family was the
+  original motivating case, `doc/plan-fable-detail-10.md`), only the first such branch
+  is ever reachable; every later one with the same guard is replaced with a
+  `;; unreachable: same runtime guard as <earlier signature>; calls <this signature>`
+  comment instead of a second, dead `cond` clause. This is dead-branch elision only — no
+  reordering, and no merging of merely *similar* (as opposed to byte-identical) guards.
 
 
 

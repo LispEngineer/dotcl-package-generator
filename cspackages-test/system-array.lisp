@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Array
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: --defgeneric
 
 (cl:in-package :system-array)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Array"))
 (cl:defconstant <type-str> "System.Array")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defvar %max-length-cache% csharp-assembly-utils:+unbound-marker+)
 (cl:define-symbol-macro +max-length+
@@ -265,12 +265,10 @@ Copy(Array, Int32, Array, Int32, Int32) -> Void
   (cl:cond
     ((cl:and (cl:or (cl:null source-array) (dotnet:is-instance-of source-array "System.Array")) (cl:numberp destination-array) (cl:or (cl:null length) (dotnet:is-instance-of length "System.Array")) supplied-destination-index (cl:numberp destination-index) supplied-length2 (cl:numberp length2))
      (dotnet:static <type-str> "Copy" source-array destination-array length destination-index length2))
-    ((cl:and (cl:or (cl:null source-array) (dotnet:is-instance-of source-array "System.Array")) (cl:numberp destination-array) (cl:or (cl:null length) (dotnet:is-instance-of length "System.Array")) supplied-destination-index (cl:numberp destination-index) supplied-length2 (cl:numberp length2))
-     (dotnet:static <type-str> "Copy" source-array destination-array length destination-index length2))
+    ;; unreachable: same runtime guard as Copy(Array, Int64, Array, Int64, Int64) -> Void; calls Copy(Array, Int32, Array, Int32, Int32) -> Void
     ((cl:and (cl:or (cl:null source-array) (dotnet:is-instance-of source-array "System.Array")) (cl:or (cl:null destination-array) (dotnet:is-instance-of destination-array "System.Array")) (cl:numberp length) (cl:not supplied-destination-index) (cl:not supplied-length2))
      (dotnet:static <type-str> "Copy" source-array destination-array length))
-    ((cl:and (cl:or (cl:null source-array) (dotnet:is-instance-of source-array "System.Array")) (cl:or (cl:null destination-array) (dotnet:is-instance-of destination-array "System.Array")) (cl:numberp length) (cl:not supplied-destination-index) (cl:not supplied-length2))
-     (dotnet:static <type-str> "Copy" source-array destination-array length))
+    ;; unreachable: same runtime guard as Copy(Array, Array, Int64) -> Void; calls Copy(Array, Array, Int32) -> Void
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
                     :class-name <type-str>
@@ -295,8 +293,7 @@ CopyTo(Array, Int64) -> Void
   (cl:cond
     ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:numberp index))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "CopyTo" array index))
-    ((cl:and (cl:or (cl:null array) (dotnet:is-instance-of array "System.Array")) (cl:numberp index))
-     (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "CopyTo" array index))
+    ;; unreachable: same runtime guard as CopyTo(Array, Int32) -> Void; calls CopyTo(Array, Int64) -> Void
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
                     :class-name <type-str>
@@ -637,16 +634,13 @@ GetValue(Int64, Int64, Int64) -> Object
   (cl:cond
     ((cl:and (cl:numberp index) supplied-index2 (cl:numberp index2) supplied-index3 (cl:numberp index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "GetValue" index index2 index3))
-    ((cl:and (cl:numberp index) supplied-index2 (cl:numberp index2) supplied-index3 (cl:numberp index3))
-     (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "GetValue" index index2 index3))
+    ;; unreachable: same runtime guard as GetValue(Int32, Int32, Int32) -> Object; calls GetValue(Int64, Int64, Int64) -> Object
     ((cl:and (cl:numberp index) supplied-index2 (cl:numberp index2) (cl:not supplied-index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "GetValue" index index2))
-    ((cl:and (cl:numberp index) supplied-index2 (cl:numberp index2) (cl:not supplied-index3))
-     (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "GetValue" index index2))
+    ;; unreachable: same runtime guard as GetValue(Int32, Int32) -> Object; calls GetValue(Int64, Int64) -> Object
     ((cl:and (cl:numberp index) (cl:not supplied-index2) (cl:not supplied-index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "GetValue" index))
-    ((cl:and (cl:numberp index) (cl:not supplied-index2) (cl:not supplied-index3))
-     (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "GetValue" index))
+    ;; unreachable: same runtime guard as GetValue(Int32) -> Object; calls GetValue(Int64) -> Object
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
                     :class-name <type-str>
@@ -979,16 +973,13 @@ SetValue(Object, Int64, Int64, Int64) -> Void
   (cl:cond
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) supplied-index2 (cl:numberp index2) supplied-index3 (cl:numberp index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index index2 index3))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) supplied-index2 (cl:numberp index2) supplied-index3 (cl:numberp index3))
-     (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index index2 index3))
+    ;; unreachable: same runtime guard as SetValue(Object, Int32, Int32, Int32) -> Void; calls SetValue(Object, Int64, Int64, Int64) -> Void
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) supplied-index2 (cl:numberp index2) (cl:not supplied-index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index index2))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) supplied-index2 (cl:numberp index2) (cl:not supplied-index3))
-     (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index index2))
+    ;; unreachable: same runtime guard as SetValue(Object, Int32, Int32) -> Void; calls SetValue(Object, Int64, Int64) -> Void
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) (cl:not supplied-index2) (cl:not supplied-index3))
      (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index))
-    ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Object")) (cl:numberp index) (cl:not supplied-index2) (cl:not supplied-index3))
-     (dotnet:invoke (cl:the (dotnet "System.Array") obj!) "SetValue" value index))
+    ;; unreachable: same runtime guard as SetValue(Object, Int32) -> Void; calls SetValue(Object, Int64) -> Void
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-ARRAY"
                     :class-name <type-str>

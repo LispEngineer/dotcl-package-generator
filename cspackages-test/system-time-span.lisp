@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: (none)
 
 (cl:in-package :system-time-span)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defun new (cl:&optional (ticks cl:nil supplied-ticks) (minutes cl:nil supplied-minutes) (seconds cl:nil supplied-seconds) (seconds2 cl:nil supplied-seconds2) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
   "Master wrapper for System.TimeSpan constructor overloads. Dispatches at runtime.
@@ -639,8 +639,7 @@ FromDays(Int32, Int32 = 0, Int64 = 0, Int64 = 0, Int64 = 0, Int64 = 0) -> TimeSp
   (cl:cond
     ((cl:and (cl:numberp value) (cl:not supplied-hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
      (dotnet:static <type-str> "FromDays" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromDays" value))
+    ;; unreachable: same runtime guard as FromDays(Double) -> TimeSpan; calls FromDays(Int32) -> TimeSpan
     ((cl:and (cl:numberp value) (cl:or (cl:not supplied-hours) (cl:numberp hours)) (cl:or (cl:not supplied-minutes) (cl:numberp minutes)) (cl:or (cl:not supplied-seconds) (cl:numberp seconds)) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
      (dotnet:static <type-str> "FromDays" value (cl:if supplied-hours hours 0) (cl:if supplied-minutes minutes 0) (cl:if supplied-seconds seconds 0) (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -677,8 +676,7 @@ FromHours(Int32, Int64 = 0, Int64 = 0, Int64 = 0, Int64 = 0) -> TimeSpan
   (cl:cond
     ((cl:and (cl:numberp hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
      (dotnet:static <type-str> "FromHours" hours))
-    ((cl:and (cl:numberp hours) (cl:not supplied-minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromHours" hours))
+    ;; unreachable: same runtime guard as FromHours(Int32) -> TimeSpan; calls FromHours(Double) -> TimeSpan
     ((cl:and (cl:numberp hours) (cl:or (cl:not supplied-minutes) (cl:numberp minutes)) (cl:or (cl:not supplied-seconds) (cl:numberp seconds)) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
      (dotnet:static <type-str> "FromHours" hours (cl:if supplied-minutes minutes 0) (cl:if supplied-seconds seconds 0) (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -705,8 +703,7 @@ FromMicroseconds(Double) -> TimeSpan
   (cl:cond
     ((cl:and (cl:numberp microseconds))
      (dotnet:static <type-str> "FromMicroseconds" microseconds))
-    ((cl:and (cl:numberp microseconds))
-     (dotnet:static <type-str> "FromMicroseconds" microseconds))
+    ;; unreachable: same runtime guard as FromMicroseconds(Int64) -> TimeSpan; calls FromMicroseconds(Double) -> TimeSpan
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
@@ -740,8 +737,7 @@ FromMilliseconds(Int64, Int64) -> TimeSpan
      (dotnet:static <type-str> "FromMilliseconds" milliseconds microseconds))
     ((cl:and (cl:numberp milliseconds) (cl:not supplied-microseconds))
      (dotnet:static <type-str> "FromMilliseconds" milliseconds))
-    ((cl:and (cl:numberp milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromMilliseconds" milliseconds))
+    ;; unreachable: same runtime guard as FromMilliseconds(Double) -> TimeSpan; calls FromMilliseconds(Int64) -> TimeSpan
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-TIME-SPAN"
                     :class-name <type-str>
@@ -775,8 +771,7 @@ FromMinutes(Int64, Int64 = 0, Int64 = 0, Int64 = 0) -> TimeSpan
   (cl:cond
     ((cl:and (cl:numberp minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
      (dotnet:static <type-str> "FromMinutes" minutes))
-    ((cl:and (cl:numberp minutes) (cl:not supplied-seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromMinutes" minutes))
+    ;; unreachable: same runtime guard as FromMinutes(Int64) -> TimeSpan; calls FromMinutes(Double) -> TimeSpan
     ((cl:and (cl:numberp minutes) (cl:or (cl:not supplied-seconds) (cl:numberp seconds)) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
      (dotnet:static <type-str> "FromMinutes" minutes (cl:if supplied-seconds seconds 0) (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -811,8 +806,7 @@ FromSeconds(Int64, Int64 = 0, Int64 = 0) -> TimeSpan
   (cl:cond
     ((cl:and (cl:numberp seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
      (dotnet:static <type-str> "FromSeconds" seconds))
-    ((cl:and (cl:numberp seconds) (cl:not supplied-milliseconds) (cl:not supplied-microseconds))
-     (dotnet:static <type-str> "FromSeconds" seconds))
+    ;; unreachable: same runtime guard as FromSeconds(Int64) -> TimeSpan; calls FromSeconds(Double) -> TimeSpan
     ((cl:and (cl:numberp seconds) (cl:or (cl:not supplied-milliseconds) (cl:numberp milliseconds)) (cl:or (cl:not supplied-microseconds) (cl:numberp microseconds)))
      (dotnet:static <type-str> "FromSeconds" seconds (cl:if supplied-milliseconds milliseconds 0) (cl:if supplied-microseconds microseconds 0)))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found

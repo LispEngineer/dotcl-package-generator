@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Text.StringBuilder
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: --defgeneric
 
 (cl:in-package :system-text-string-builder)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Text.StringBuilder"))
 (cl:defconstant <type-str> "System.Text.StringBuilder")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (capacity2 cl:nil supplied-capacity2) (length cl:nil supplied-length) (capacity3 cl:nil supplied-capacity3))
   "Master wrapper for System.Text.StringBuilder constructor overloads. Dispatches at runtime.
@@ -274,16 +274,11 @@ Append(StringBuilder, Int32, Int32) -> StringBuilder
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
     ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
+    ;; unreachable: same runtime guard as Append(Decimal) -> StringBuilder; calls Append(Single) -> StringBuilder
+    ;; unreachable: same runtime guard as Append(Decimal) -> StringBuilder; calls Append(Int64) -> StringBuilder
+    ;; unreachable: same runtime guard as Append(Decimal) -> StringBuilder; calls Append(Int32) -> StringBuilder
+    ;; unreachable: same runtime guard as Append(Decimal) -> StringBuilder; calls Append(Int16) -> StringBuilder
+    ;; unreachable: same runtime guard as Append(Decimal) -> StringBuilder; calls Append(Byte) -> StringBuilder
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
@@ -292,8 +287,7 @@ Append(StringBuilder, Int32, Int32) -> StringBuilder
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Text.StringBuilder")) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
+    ;; unreachable: same runtime guard as Append(Decimal) -> StringBuilder; calls Append(Double) -> StringBuilder
     ((cl:and (cl:stringp value) (cl:not supplied-repeat-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Append" value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -829,26 +823,20 @@ Insert(Int32, Char[], Int32, Int32) -> StringBuilder
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
+    ;; unreachable: same runtime guard as Insert(Int32, Decimal) -> StringBuilder; calls Insert(Int32, Double) -> StringBuilder
+    ;; unreachable: same runtime guard as Insert(Int32, Decimal) -> StringBuilder; calls Insert(Int32, Single) -> StringBuilder
+    ;; unreachable: same runtime guard as Insert(Int32, Decimal) -> StringBuilder; calls Insert(Int32, Int32) -> StringBuilder
     ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
+    ;; unreachable: same runtime guard as Insert(Int32, Decimal) -> StringBuilder; calls Insert(Int32, Int16) -> StringBuilder
+    ;; unreachable: same runtime guard as Insert(Int32, Decimal) -> StringBuilder; calls Insert(Int32, Byte) -> StringBuilder
     ((cl:and (cl:numberp index) (cl:or (cl:null value) (dotnet:is-instance-of value "System.SByte")) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     ((cl:and (cl:numberp index) (cl:typep value 'cl:boolean) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
-    ((cl:and (cl:numberp index) (cl:numberp value) (cl:not supplied-count) (cl:not supplied-char-count))
-     (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
+    ;; unreachable: same runtime guard as Insert(Int32, Decimal) -> StringBuilder; calls Insert(Int32, Int64) -> StringBuilder
     ((cl:and (cl:numberp index) (cl:stringp value) (cl:not supplied-count) (cl:not supplied-char-count))
      (dotnet:invoke (cl:the (dotnet "System.Text.StringBuilder") obj!) "Insert" index value))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found

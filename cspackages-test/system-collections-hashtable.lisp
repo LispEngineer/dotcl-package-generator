@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Hashtable
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: (none)
 
 (cl:in-package :system-collections-hashtable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Hashtable"))
 (cl:defconstant <type-str> "System.Collections.Hashtable")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (load-factor cl:nil supplied-load-factor) (equality-comparer cl:nil supplied-equality-comparer) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Hashtable constructor overloads. Dispatches at runtime.

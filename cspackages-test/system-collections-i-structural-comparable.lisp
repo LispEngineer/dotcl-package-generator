@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.IStructuralComparable
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: --export-interfaces
 ;;; Discovered via: --export-interfaces from System.ValueTuple`2
 
@@ -9,8 +9,8 @@
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.IStructuralComparable"))
 (cl:defconstant <type-str> "System.Collections.IStructuralComparable")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:defun compare-to (obj! other comparer)
   "Summary: Determines whether the current collection object precedes, occurs in the same position as, or follows another object in the sort order.

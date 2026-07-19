@@ -417,4 +417,78 @@
               (assert-test (not (null (search "(cl:or (cl:null nullable-int) (cl:numberp nullable-int))" contents))) t
                           "NullableIntParamMethod's guard for a nullable primitive (int?) uses a null-tolerant cl:numberp check, not dotnet:is-instance-of")))
         (when (probe-file out-dir)
-          (uiop:delete-directory-tree out-dir :validate t)))))
+          (uiop:delete-directory-tree out-dir :validate t))))
+
+    ;; 3.11 doc/plan-fable-detail-10.md: emit-master-wrapper-cond-branches
+    ;; applies T1 dead-branch elision directly over (guard action signature)
+    ;; triples -- (a) identical guards with different bodies collapse to one
+    ;; branch plus one comment naming both signatures; (b) identical guards
+    ;; AND identical bodies still collapse with the comment (uniformity, not
+    ;; an optimization to skip it); (c) all-distinct guards pass through
+    ;; untouched, in original order, byte-for-byte.
+  (let ((output (with-output-to-string (s)
+                  (assembly-package-generator::emit-master-wrapper-cond-branches
+                   s '(("(cl:and (dotnet:is-instance-of x \"System.Object\"))" "(action-one)" "sig-one")
+                       ("(cl:and (dotnet:is-instance-of x \"System.Object\"))" "(action-two)" "sig-two"))))))
+    (assert-test (not (null (search "(action-one)" output))) t
+                "emit-master-wrapper-cond-branches (a): first branch with a duplicate guard is kept")
+    (assert-test (null (search "(action-two)" output)) t
+                "emit-master-wrapper-cond-branches (a): second branch with a duplicate guard is elided, not emitted")
+    (assert-test (not (null (search ";; unreachable: same runtime guard as sig-one; calls sig-two" output))) t
+                "emit-master-wrapper-cond-branches (a): elided branch is replaced by a comment naming both signatures"))
+
+  (let ((output (with-output-to-string (s)
+                  (assembly-package-generator::emit-master-wrapper-cond-branches
+                   s '(("(cl:and (dotnet:is-instance-of x \"System.Object\"))" "(same-action)" "sig-one")
+                       ("(cl:and (dotnet:is-instance-of x \"System.Object\"))" "(same-action)" "sig-two"))))))
+    (assert-test (= 1 (cl:count-if (cl:lambda (line) (search "(same-action)" line))
+                                    (assembly-package-generator::split-string output #\Newline)))
+                t
+                "emit-master-wrapper-cond-branches (b): identical-guard-and-identical-body still collapses to exactly one live clause")
+    (assert-test (not (null (search ";; unreachable: same runtime guard as sig-one; calls sig-two" output))) t
+                "emit-master-wrapper-cond-branches (b): identical-guard-and-body branch is still elided with a comment, not silently merged"))
+
+  (let* ((branches '(("(cl:and (dotnet:is-instance-of x \"Fixture.TypeA\"))" "(action-a)" "sig-a")
+                     ("(cl:and (dotnet:is-instance-of x \"Fixture.TypeB\"))" "(action-b)" "sig-b")))
+         (output (with-output-to-string (s)
+                   (assembly-package-generator::emit-master-wrapper-cond-branches s branches))))
+    (assert-test (null (search ";; unreachable" output)) t
+                "emit-master-wrapper-cond-branches (c): all-distinct guards produce no unreachable comment")
+    (let ((pos-a (search "(action-a)" output))
+          (pos-b (search "(action-b)" output)))
+      (assert-test (and pos-a pos-b (< pos-a pos-b)) t
+                  "emit-master-wrapper-cond-branches (c): distinct-guard branches are emitted in original order")))
+
+    ;; 3.12 End-to-end regression: two overloads whose Master Wrapper guards
+    ;; are byte-identical (same single-parameter type, no defaults -- the
+    ;; System.Linq.Enumerable.Average() shape, where several overloads
+    ;; degenerate to the same "is this a .NET object of type X" guard) must
+    ;; collapse to one cond clause plus one unreachable comment, not two
+    ;; live clauses.
+  (let* ((class-plist
+             '(:fully-qualified-name "Fixture.DegenerateGuards"
+               :kind :class
+               :fields nil
+               :properties nil
+               :constructors nil
+               :methods ((:name "Go" :is-static nil :return-type "System.Int32"
+                          :parameters ((:name "a" :type "Fixture.TypeA")))
+                         (:name "Go" :is-static nil :return-type "System.Double"
+                          :parameters ((:name "a" :type "Fixture.TypeA"))))))
+         (out-dir (merge-pathnames "package-generator-tests-degenerate-guards-out/"
+                                    (uiop:temporary-directory))))
+    (unwind-protect
+        (progn
+          (ensure-directories-exist out-dir)
+          (assembly-package-generator:generate-class-file class-plist (namestring out-dir))
+          (let* ((class-file (merge-pathnames "fixture-degenerate-guards.lisp" out-dir))
+                 (contents (uiop:read-file-string class-file))
+                 (guard-str "(dotnet:is-instance-of a \"Fixture.TypeA\")"))
+            (assert-test (= 1 (cl:count-if (cl:lambda (line) (search guard-str line))
+                                            (assembly-package-generator::split-string contents #\Newline)))
+                        t
+                        "Two overloads with byte-identical guards collapse to exactly one live cond clause")
+            (assert-test (not (null (search ";; unreachable: same runtime guard as" contents))) t
+                        "The elided duplicate-guard overload is documented as an unreachable comment")))
+      (when (probe-file out-dir)
+        (uiop:delete-directory-tree out-dir :validate t)))))

@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Threading.Timer
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: --defgeneric --ensure-type --ensure-type-in-generic
 
 (cl:in-package :system-threading-timer)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Threading.Timer"))
 (cl:defconstant <type-str> "System.Threading.Timer")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 ;; Register C# Type with CLOS
 (cl:eval-when (:load-toplevel :execute)
@@ -36,8 +36,7 @@ new(TimerCallback, Object, Int64, Int64)
      (dotnet:new <type-str> callback state due-time period))
     ((cl:and (cl:or (cl:null callback) (dotnet:is-instance-of callback "System.Threading.TimerCallback")) supplied-state (cl:or (cl:null state) (dotnet:is-instance-of state "System.Object")) supplied-due-time (cl:or (cl:null due-time) (dotnet:is-instance-of due-time "System.UInt32")) supplied-period (cl:or (cl:null period) (dotnet:is-instance-of period "System.UInt32")))
      (dotnet:new <type-str> callback state due-time period))
-    ((cl:and (cl:or (cl:null callback) (dotnet:is-instance-of callback "System.Threading.TimerCallback")) supplied-state (cl:or (cl:null state) (dotnet:is-instance-of state "System.Object")) supplied-due-time (cl:numberp due-time) supplied-period (cl:numberp period))
-     (dotnet:new <type-str> callback state due-time period))
+    ;; unreachable: same runtime guard as new(TimerCallback, Object, Int32, Int32); calls new(TimerCallback, Object, Int64, Int64)
     ((cl:and (cl:or (cl:null callback) (dotnet:is-instance-of callback "System.Threading.TimerCallback")) (cl:not supplied-state) (cl:not supplied-due-time) (cl:not supplied-period))
      (dotnet:new <type-str> callback))
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
@@ -66,8 +65,7 @@ Change(Int64, Int64) -> Boolean
      (dotnet:invoke (cl:the (dotnet "System.Threading.Timer") obj!) "Change" due-time period))
     ((cl:and (cl:or (cl:null due-time) (dotnet:is-instance-of due-time "System.UInt32")) (cl:or (cl:null period) (dotnet:is-instance-of period "System.UInt32")))
      (dotnet:invoke (cl:the (dotnet "System.Threading.Timer") obj!) "Change" due-time period))
-    ((cl:and (cl:numberp due-time) (cl:numberp period))
-     (dotnet:invoke (cl:the (dotnet "System.Threading.Timer") obj!) "Change" due-time period))
+    ;; unreachable: same runtime guard as Change(Int32, Int32) -> Boolean; calls Change(Int64, Int64) -> Boolean
     (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
                     :package-name "SYSTEM-THREADING-TIMER"
                     :class-name <type-str>

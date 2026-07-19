@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Console
-;;; Generator Version: 53
-;;; Creation Date: 2026-07-19T16:02:09Z
+;;; Generator Version: 54
+;;; Creation Date: 2026-07-19T20:42:53Z
 ;;; Options: (none)
 
 (cl:in-package :system-console)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Console"))
 (cl:defconstant <type-str> "System.Console")
-(cl:defconstant <creation> "2026-07-19T16:02:09Z")
-(cl:defconstant <version> 53)
+(cl:defconstant <creation> "2026-07-19T20:42:53Z")
+(cl:defconstant <version> 54)
 
 (cl:define-symbol-macro caps-lock (dotnet:static <type-str> "CapsLock"))
 (cl:setf (cl:documentation (cl:quote caps-lock) (cl:quote cl:variable)) "Gets a value indicating whether the CAPS LOCK keyboard toggle is turned on or turned off.")
@@ -531,14 +531,10 @@ Write(String, Object, Object, Object) -> Void
      (dotnet:static <type-str> "Write" value))
     ((cl:and (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
      (dotnet:static <type-str> "Write" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
-     (dotnet:static <type-str> "Write" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
-     (dotnet:static <type-str> "Write" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
-     (dotnet:static <type-str> "Write" value))
-    ((cl:and (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
-     (dotnet:static <type-str> "Write" value))
+    ;; unreachable: same runtime guard as Write(Int64) -> Void; calls Write(Int32) -> Void
+    ;; unreachable: same runtime guard as Write(Int64) -> Void; calls Write(Single) -> Void
+    ;; unreachable: same runtime guard as Write(Int64) -> Void; calls Write(Decimal) -> Void
+    ;; unreachable: same runtime guard as Write(Int64) -> Void; calls Write(Double) -> Void
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
      (dotnet:static <type-str> "Write" value))
     ((cl:and (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-arg0) (cl:not supplied-arg1) (cl:not supplied-arg2))
@@ -683,14 +679,10 @@ WriteLine(String, Object, Object, Object) -> Void
      (dotnet:static <type-str> "WriteLine" value))
     ((cl:and supplied-value (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
      (dotnet:static <type-str> "WriteLine" value))
-    ((cl:and supplied-value (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
-     (dotnet:static <type-str> "WriteLine" value))
-    ((cl:and supplied-value (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
-     (dotnet:static <type-str> "WriteLine" value))
-    ((cl:and supplied-value (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
-     (dotnet:static <type-str> "WriteLine" value))
-    ((cl:and supplied-value (cl:numberp value) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
-     (dotnet:static <type-str> "WriteLine" value))
+    ;; unreachable: same runtime guard as WriteLine(Int64) -> Void; calls WriteLine(Int32) -> Void
+    ;; unreachable: same runtime guard as WriteLine(Int64) -> Void; calls WriteLine(Single) -> Void
+    ;; unreachable: same runtime guard as WriteLine(Int64) -> Void; calls WriteLine(Double) -> Void
+    ;; unreachable: same runtime guard as WriteLine(Int64) -> Void; calls WriteLine(Decimal) -> Void
     ((cl:and supplied-value (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char[]")) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
      (dotnet:static <type-str> "WriteLine" value))
     ((cl:and supplied-value (cl:or (cl:null value) (dotnet:is-instance-of value "System.Char")) (cl:not supplied-arg0) (cl:not supplied-count) (cl:not supplied-arg2))
