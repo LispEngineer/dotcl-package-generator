@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Exception
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --export-interfaces --export-object --export-parents
 ;;; Discovered via: --export-parents/--export-interfaces from System.ArgumentOutOfRangeException
 
@@ -9,8 +9,8 @@
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Exception"))
 (cl:defconstant <type-str> "System.Exception")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (message cl:nil supplied-message) (inner-exception cl:nil supplied-inner-exception))
   "Master wrapper for System.Exception constructor overloads. Dispatches at runtime.
@@ -30,6 +30,7 @@ new(String, Exception)
     - inner-exception (System.Exception): The exception that is the cause of the current exception, or a null reference ( in Visual Basic) if no inner exception is specified.
 
 new(SerializationInfo, StreamingContext)
+  OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
   Summary: Initializes a new instance of the System.Exception class with serialized data.
   Parameters:
     - info (System.Runtime.Serialization.SerializationInfo): The System.Runtime.Serialization.SerializationInfo that holds the serialized object data about the exception being thrown.
@@ -95,7 +96,8 @@ new(SerializationInfo, StreamingContext)
   (dotnet:invoke (cl:the (dotnet "System.Exception") obj!) "get_TargetSite"))
 
 (cl:defun add-serialize-object-state (obj! handler)
-  "Occurs when an exception is serialized to create an exception state object that contains serialized data about the exception."
+  "OBSOLETE: BinaryFormatter serialization is obsolete and should not be used. See https://aka.ms/binaryformatter for more information.
+Occurs when an exception is serialized to create an exception state object that contains serialized data about the exception."
   (dotnet:add-event (cl:the (dotnet "System.Exception") obj!) "SerializeObjectState" handler))
 
 (cl:defun remove-serialize-object-state (obj! handler)
@@ -109,7 +111,8 @@ Returns: The first exception thrown in a chain of exceptions. If the System.Exce
   (dotnet:invoke (cl:the (dotnet "System.Exception") obj!) "GetBaseException"))
 
 (cl:defun get-object-data (obj! info context)
-  "Summary: When overridden in a derived class, sets the System.Runtime.Serialization.SerializationInfo with information about the exception.
+  "OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
+Summary: When overridden in a derived class, sets the System.Runtime.Serialization.SerializationInfo with information about the exception.
 Parameters:
   - info (System.Runtime.Serialization.SerializationInfo): The System.Runtime.Serialization.SerializationInfo that holds the serialized object data about the exception being thrown.
   - context (System.Runtime.Serialization.StreamingContext): The System.Runtime.Serialization.StreamingContext that contains contextual information about the source or destination.

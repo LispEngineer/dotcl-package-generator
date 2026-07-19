@@ -89,9 +89,31 @@
                              params)))
     (format nil "new(~{~A~^, ~})" param-strs)))
 
-(defun build-docstring (summary returns parameters doc-plist)
-  "Builds a formatted docstring from documentation elements."
+(defun obsolete-docstring-line (member-plist)
+  "Returns an \"OBSOLETE...~%\"-style line for MEMBER-PLIST (a type/method/
+   constructor/property/field/event plist) when it carries :obsolete t
+   (AssemblyToLispy.cs's [System.Obsolete] reflection, doc/plan-fable-
+   detail-16.md's Half A), or \"\" otherwise: \"OBSOLETE.\" with no
+   :obsolete-message, \"OBSOLETE: <message>\" with one, and \"OBSOLETE
+   (error-level)...\" instead of bare \"OBSOLETE...\" when :obsolete-error
+   is also set (a C#-compiler-error-level obsolete member is still
+   reflected and still gets a real wrapper here -- this is visibility
+   only, never an exclusion)."
+  (if (getf member-plist :obsolete)
+      (let* ((message (getf member-plist :obsolete-message))
+             (label (if (getf member-plist :obsolete-error) "OBSOLETE (error-level)" "OBSOLETE")))
+        (if (and message (> (length message) 0))
+            (format nil "~A: ~A~%" label message)
+            (format nil "~A.~%" label)))
+      ""))
+
+(defun build-docstring (summary returns parameters doc-plist &optional member-plist)
+  "Builds a formatted docstring from documentation elements. MEMBER-PLIST,
+   when supplied, contributes obsolete-docstring-line's own leading
+   \"OBSOLETE...\" line ahead of everything else (doc/plan-fable-detail-
+   16.md)."
   (with-output-to-string (out)
+    (format out "~A" (obsolete-docstring-line member-plist))
     (when (and summary (> (length summary) 0))
       (format out "Summary: ~A~%" summary))
     (when (and returns (> (length returns) 0))
@@ -109,14 +131,15 @@
                     ptype
                     pdesc)))))))
 
-(defun format-overload-doc-block (signature-str summary returns parameters doc-plist)
+(defun format-overload-doc-block (signature-str summary returns parameters doc-plist &optional member-plist)
   "Builds one documentation block for a single overload inside a combined
    master-wrapper docstring: SIGNATURE-STR (from method-signature-str or
    constructor-signature-str) followed by an indented build-docstring block
-   (Summary/Returns/Parameters, sourced from the assembly's XML doc comments)
-   when any of that was available; omits the indented block entirely when
+   (a leading OBSOLETE line when MEMBER-PLIST is obsolete, then Summary/
+   Returns/Parameters sourced from the assembly's XML doc comments) when
+   any of that was available; omits the indented block entirely when
    there is nothing to show."
-  (let ((body (build-docstring summary returns parameters doc-plist)))
+  (let ((body (build-docstring summary returns parameters doc-plist member-plist)))
     (with-output-to-string (out)
       (format out "~A~%" signature-str)
       (dolist (line (split-string body #\Newline))
@@ -130,7 +153,10 @@
    #'method-signature-str or #'constructor-signature-str, to produce that
    overload's signature line), so the full set of available overloads and
    their XML documentation stays visible even though only one dispatching
-   function is generated."
+   function is generated. Each overload's own :obsolete status (doc/plan-
+   fable-detail-16.md) is passed through to format-overload-doc-block, so
+   an obsolete overload buried inside a Master Wrapper is still visibly
+   flagged in its own indented block."
   (with-output-to-string (out)
     (format out "~A~%" header)
     (dolist (m methods)
@@ -139,4 +165,4 @@
              (returns (getf m-doc :returns))
              (params (getf m :parameters))
              (sig (funcall signature-fn m)))
-        (format out "~%~A" (format-overload-doc-block sig summary returns params m-doc))))))
+        (format out "~%~A" (format-overload-doc-block sig summary returns params m-doc m))))))

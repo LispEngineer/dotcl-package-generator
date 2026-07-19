@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.IEnumerable
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --export-interfaces --export-object --export-parents
 ;;; Discovered via: --export-parents/--export-interfaces from System.Collections.Specialized.NameValueCollection
 
@@ -9,8 +9,8 @@
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.IEnumerable"))
 (cl:defconstant <type-str> "System.Collections.IEnumerable")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun get-enumerator (obj!)
   "Summary: Returns an enumerator that iterates through a collection.

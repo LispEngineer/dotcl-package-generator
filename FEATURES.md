@@ -976,7 +976,19 @@ document incorrectly claimed such members were silently excluded).
 
 **Summary:** XML doc comments (`<summary>`, `<returns>`, `<param>`) become the generated
 function's Lisp docstring (or, for constants/symbol-macros, a `(cl:documentation ...)`
-`setf` form), when present in the assembly's sidecar `.xml` file.
+`setf` form), when present in the assembly's sidecar `.xml` file. A `[System.Obsolete]`
+member's docstring (or a `[System.Obsolete]` type's header comment/`packages.lisp`
+entry) also gets a leading `OBSOLETE.`/`OBSOLETE: <message>`/`OBSOLETE (error-level):
+<message>` line ahead of the XML-doc content — see "Custom attributes" under Unsupported
+Features below.
+
+C#'s named tuples (`(int Count, string Name) GetStats()`) have their element names
+reflected too — `:tuple-element-names`/`:tuple-element-return-names` in the metadata
+schema (`doc/assembly-to-lispy.md`), raw C# casing, omitted when the tuple is nested
+(the element names would actually describe an inner tuple) — but as of this version
+that metadata is not yet rendered into any generated docstring; a tuple-typed
+parameter/return still shows only the bare `ValueTuple` type string. Docstring
+rendering is tracked as a follow-up (`doc/plan-fable-detail-16.md`'s Half B).
 
 
 
@@ -1009,10 +1021,15 @@ function's Lisp docstring (or, for constants/symbol-macros, a `(cl:documentation
 * **Generic constraints** (`where T : ...`) are not reflected — no `:generic-constraints`
   key exists yet (tracked as Phase 4 future work in `doc/assembly-to-lispy.md`).
 
-* **Custom attributes** (`[Obsolete]`, `[Serializable]`'s value, custom attributes, etc.)
-  are not reflected as data — no `:attributes` key exists yet, beyond the handful of
-  type-level boolean `:flags` already captured (`:abstract`, `:sealed`, `:serializable`,
-  etc.).
+* **Custom attributes** (`[Serializable]`'s value, arbitrary user-defined attributes,
+  etc.) are not reflected as data — no general `:attributes` key exists, beyond the
+  handful of type-level boolean `:flags` already captured (`:abstract`, `:sealed`,
+  `:serializable`, etc.). **`[Obsolete]` is the one surfaced exception** (`doc/plan-fable-
+  detail-16.md`): every type/method/constructor/property/field/event plist gets its own
+  `:obsolete`/`:obsolete-message`/`:obsolete-error` keys, and the generated wrapper's
+  docstring (or, for a type, its header comment and `packages.lisp` entry) gets a leading
+  `OBSOLETE...` line — visibility only, an obsolete member is still fully generated and
+  still eligible for `--defgeneric`/`csharp-generics`.
 
 * **Extension methods** are flagged in the metadata (`:extension-method`,
   `:extension-this`) but the generator does not yet do anything special with that

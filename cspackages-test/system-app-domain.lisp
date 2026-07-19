@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.AppDomain
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: (none)
 
 (cl:in-package :system-app-domain)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.AppDomain"))
 (cl:defconstant <type-str> "System.AppDomain")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:define-symbol-macro current-domain (dotnet:static <type-str> "CurrentDomain"))
 
@@ -49,6 +49,8 @@
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "get_MonitoringTotalProcessorTime"))
 
 (cl:defun permission-set (obj!)
+  "OBSOLETE: Code Access Security is not supported or honored by the runtime.
+"
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "get_PermissionSet"))
 
 (cl:defun relative-search-path (obj!)
@@ -124,18 +126,26 @@
   (dotnet:remove-event (cl:the (dotnet "System.AppDomain") obj!) "UnhandledException" handler))
 
 (cl:defun append-private-path (obj! path)
+  "OBSOLETE: AppDomain.AppendPrivatePath has been deprecated and is not supported.
+"
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "AppendPrivatePath" path))
 
 (cl:defun apply-policy (obj! assembly-name)
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "ApplyPolicy" assembly-name))
 
 (cl:defun clear-private-path (obj!)
+  "OBSOLETE: AppDomain.ClearPrivatePath has been deprecated and is not supported.
+"
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "ClearPrivatePath"))
 
 (cl:defun clear-shadow-copy-path (obj!)
+  "OBSOLETE: AppDomain.ClearShadowCopyPath has been deprecated and is not supported.
+"
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "ClearShadowCopyPath"))
 
 (cl:defun create-domain (friendly-name)
+  "OBSOLETE: Creating and unloading AppDomains is not supported and throws an exception.
+"
   (dotnet:static <type-str> "CreateDomain" (cl:the (dotnet "System.String") friendly-name)))
 
 (cl:defun create-instance (obj! assembly-name type-name cl:&optional (activation-attributes cl:nil supplied-activation-attributes) (binding-attr cl:nil supplied-binding-attr) (binder cl:nil supplied-binder) (args cl:nil supplied-args) (culture cl:nil supplied-culture) (activation-attributes2 cl:nil supplied-activation-attributes2))
@@ -234,6 +244,7 @@ ExecuteAssembly(String) -> Int32
 ExecuteAssembly(String, String[]) -> Int32
 
 ExecuteAssembly(String, String[], Byte[], AssemblyHashAlgorithm) -> Int32
+  OBSOLETE: Code Access Security is not supported or honored by the runtime.
 "
   (cl:cond
     ((cl:and (cl:stringp assembly-file) supplied-args (cl:or (cl:null args) (dotnet:is-instance-of args "System.String[]")) supplied-hash-value (cl:or (cl:null hash-value) (dotnet:is-instance-of hash-value "System.Byte[]")) supplied-hash-algorithm (cl:or (cl:null hash-algorithm) (dotnet:is-instance-of hash-algorithm "System.Configuration.Assemblies.AssemblyHashAlgorithm")))
@@ -261,6 +272,8 @@ ExecuteAssembly(String, String[], Byte[], AssemblyHashAlgorithm) -> Int32
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "GetAssemblies"))
 
 (cl:defun get-current-thread-id ()
+  "OBSOLETE: AppDomain.GetCurrentThreadId has been deprecated because it does not provide a stable Id when managed threads are running on fibers (aka lightweight threads). To get a stable identifier for a managed thread, use the ManagedThreadId property on Thread instead.
+"
   (dotnet:static <type-str> "GetCurrentThreadId"))
 
 (cl:defun get-data (obj! name)
@@ -305,21 +318,29 @@ Load(Byte[], Byte[]) -> Assembly
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "ReflectionOnlyGetAssemblies"))
 
 (cl:defun set-cache-path (obj! path)
+  "OBSOLETE: AppDomain.SetCachePath has been deprecated and is not supported.
+"
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "SetCachePath" path))
 
 (cl:defun set-data (obj! name data)
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "SetData" name data))
 
 (cl:defun set-dynamic-base (obj! path)
+  "OBSOLETE: AppDomain.SetDynamicBase has been deprecated and is not supported.
+"
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "SetDynamicBase" path))
 
 (cl:defun set-principal-policy (obj! policy)
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "SetPrincipalPolicy" policy))
 
 (cl:defun set-shadow-copy-files (obj!)
+  "OBSOLETE: AppDomain.SetShadowCopyFiles has been deprecated and is not supported.
+"
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "SetShadowCopyFiles"))
 
 (cl:defun set-shadow-copy-path (obj! path)
+  "OBSOLETE: AppDomain.SetShadowCopyPath has been deprecated and is not supported.
+"
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "SetShadowCopyPath" path))
 
 (cl:defun set-thread-principal (obj! principal)
@@ -329,5 +350,7 @@ Load(Byte[], Byte[]) -> Assembly
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "ToString"))
 
 (cl:defun unload (domain)
+  "OBSOLETE: Creating and unloading AppDomains is not supported and throws an exception.
+"
   (dotnet:static <type-str> "Unload" (cl:the (dotnet "System.AppDomain") domain)))
 

@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.Stream
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --export-interfaces --export-object --export-parents
 ;;; Discovered via: --export-parents/--export-interfaces from System.IO.MemoryStream
 
@@ -9,8 +9,8 @@
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.Stream"))
 (cl:defconstant <type-str> "System.IO.Stream")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.IO.Stream class.
@@ -165,7 +165,8 @@ CopyToAsync(Stream, Int32, CancellationToken) -> Task
                     :supplied-args (cl:append (cl:list :destination destination) (cl:when supplied-buffer-size (cl:list :buffer-size buffer-size)) (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)))))))
 
 (cl:defun create-wait-handle (obj!)
-  "Summary: Allocates a System.Threading.WaitHandle object.
+  "OBSOLETE: CreateWaitHandle has been deprecated. Use the ManualResetEvent(false) constructor instead.
+Summary: Allocates a System.Threading.WaitHandle object.
 Returns: A reference to the allocated .
 "
   (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "CreateWaitHandle"))
@@ -243,7 +244,8 @@ FlushAsync(CancellationToken) -> Task
                     :supplied-args (cl:append (cl:when supplied-cancellation-token (cl:list :cancellation-token cancellation-token)))))))
 
 (cl:defun object-invariant (obj!)
-  "Summary: Provides support for a System.Diagnostics.Contracts.Contract.
+  "OBSOLETE: Do not call or override this method.
+Summary: Provides support for a System.Diagnostics.Contracts.Contract.
 "
   (dotnet:invoke (cl:the (dotnet "System.IO.Stream") obj!) "ObjectInvariant"))
 

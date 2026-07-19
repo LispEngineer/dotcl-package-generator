@@ -103,6 +103,16 @@ Each type entry plist contains the following entries, by key:
   `Enum.GetUnderlyingType(type)`). Omitted for every other `:kind`.
 * `:documentation` (Documentation Plist or omitted): A plist containing the type-level XML
   documentation summary. Omitted if no documentation is found.
+* `:obsolete` (Keyword `t` or omitted): Omitted unless the type carries a
+  `[System.Obsolete]` attribute; otherwise `t`. See `:obsolete-message`/`:obsolete-error`
+  below (identical shape on every plist kind that can carry `[Obsolete]` -- type, method,
+  constructor, property, field, event). A type/member being obsolete does not exclude it
+  from reflection or generation; it is a visibility-only marker (doc/plan-fable-detail-16.md).
+* `:obsolete-message` (String or omitted): Present only when `:obsolete` is `t` and
+  `ObsoleteAttribute.Message` is non-null/non-empty; the attribute's message text.
+* `:obsolete-error` (Keyword `t` or omitted): Present only when `:obsolete` is `t` and
+  `ObsoleteAttribute.IsError` is `true` (a C#-compiler-error-level obsolete member --
+  reflection can still invoke it; the error level is a compile-time-only C# concern).
 * `:superclass` (String or `nil`): The fully qualified name of the base class. 
   If there is no base class (such as for interfaces or `System.Object`), 
   this value is `nil`. **When the base class is a generic type** (whether closed to
@@ -210,6 +220,11 @@ Each type entry plist contains the following entries, by key:
     no index parameters.
   * `:documentation` (Documentation Plist or omitted): Omitted if no documentation is
     found; otherwise a plist containing property documentation.
+  * `:obsolete`/`:obsolete-message`/`:obsolete-error` (see the type-level keys above):
+    identical shape, reflecting the property's own `[Obsolete]` attribute.
+  * `:tuple-element-names` (List of Strings/`nil`, or omitted): identical shape to the
+    same-named key on a Parameter Plist below, reflecting the property's own
+    `[TupleElementNames]` attribute against its `:type`.
 * `:fields` (List of Field Plists or omitted): A list of plists containing
   details of public or protected fields declared directly on the type. If no
   fields are declared, this key is omitted. Each field plist contains:
@@ -232,6 +247,11 @@ Each type entry plist contains the following entries, by key:
     otherwise `t`.
   * `:documentation` (Documentation Plist or omitted): Omitted if no documentation is
     found; otherwise a plist containing field documentation.
+  * `:obsolete`/`:obsolete-message`/`:obsolete-error` (see the type-level keys above):
+    identical shape, reflecting the field's own `[Obsolete]` attribute.
+  * `:tuple-element-names` (List of Strings/`nil`, or omitted): identical shape to the
+    same-named key on a Parameter Plist below, reflecting the field's own
+    `[TupleElementNames]` attribute against its `:type`.
 * `:constructors` (List of Constructor Plists or omitted): A list of plists containing
   details of public or protected constructors declared directly on the type. If no
   constructors are declared, this key is omitted. Each constructor plist contains:
@@ -245,6 +265,8 @@ Each type entry plist contains the following entries, by key:
     for each parameter. If the constructor takes no parameters, this key is omitted.
   * `:documentation` (Documentation Plist or omitted): Omitted if no documentation is
     found; otherwise a plist containing constructor documentation.
+  * `:obsolete`/`:obsolete-message`/`:obsolete-error` (see the type-level keys above):
+    identical shape, reflecting the constructor's own `[Obsolete]` attribute.
 * `:methods` (List of Method Plists or omitted): A list of plists containing
   details of public or protected methods declared directly on the type. If no
   methods are declared, this key is omitted. Each method plist contains:
@@ -273,6 +295,11 @@ Each type entry plist contains the following entries, by key:
     for each parameter. If the method takes no parameters, this key is omitted.
   * `:documentation` (Documentation Plist or omitted): Omitted if no documentation is
     found; otherwise a plist containing method documentation.
+  * `:obsolete`/`:obsolete-message`/`:obsolete-error` (see the type-level keys above):
+    identical shape, reflecting the method's own `[Obsolete]` attribute.
+  * `:tuple-element-return-names` (List of Strings/`nil`, or omitted): identical shape to
+    a Parameter Plist's `:tuple-element-names` below, reflecting the method's own
+    `[TupleElementNames]` attribute against its `:return-type` (via `MethodInfo.ReturnParameter`).
 * `:events` (List of Event Plists or omitted): A list of plists containing details of
   public or protected **instance** events (`add_X`/`remove_X` accessor pairs) declared
   directly on the type. If no instance events are declared, this key is omitted. Static
@@ -292,6 +319,8 @@ Each type entry plist contains the following entries, by key:
     method.
   * `:documentation` (Documentation Plist or omitted): Omitted if no documentation is
     found; otherwise a plist containing event documentation.
+  * `:obsolete`/`:obsolete-message`/`:obsolete-error` (see the type-level keys above):
+    identical shape, reflecting the event's own `[Obsolete]` attribute.
 
 ### Parameter Plist Details
 
@@ -344,6 +373,20 @@ Each parameter plist contains:
   except `:unrepresentable` this is a valid Common Lisp literal (or, for `:enum`, an escaped
   Lisp string naming the enum member(s) -- not itself a literal of the enum's type; construct
   the enum value via e.g. `dotnet:enum-or` using `:default-type` and this name).
+* `:tuple-element-names` (List of Strings/`nil`, or omitted): Present only when the parameter's
+  type is a closed `System.ValueTuple` (of any arity) whose element names were compiled from a
+  C# tuple-literal-style type (`(int Count, string Name)`), reflected via
+  `[System.Runtime.CompilerServices.TupleElementNames]`. One entry per tuple element, in
+  declaration order, using the raw C# element name as written (never kebab-cased -- this
+  metadata is a faithful reflection record; kebab-casing is generator policy applied
+  downstream); an unnamed element within an otherwise-named tuple (`(int Count, string)`) is a
+  bare `nil` at that position, not an empty string. Omitted both when the type carries no
+  `[TupleElementNames]` attribute at all, and -- v1 limitation -- when the attribute's
+  `TransformNames` list (a flattened pre-order list covering *nested* tuples) does not have
+  exactly one name per element of *this* tuple's own arity, which means the names actually
+  describe a nested tuple; nothing is emitted in that case rather than misattributing a nested
+  name to the wrong element. See doc/generator-design-notes.md's "[Obsolete] and Tuple Element
+  Names" section.
 
 
 ### Documentation Plist Details

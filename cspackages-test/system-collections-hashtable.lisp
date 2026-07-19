@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Hashtable
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: (none)
 
 (cl:in-package :system-collections-hashtable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Hashtable"))
 (cl:defconstant <type-str> "System.Collections.Hashtable")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (load-factor cl:nil supplied-load-factor) (equality-comparer cl:nil supplied-equality-comparer) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Hashtable constructor overloads. Dispatches at runtime.
@@ -39,6 +39,7 @@ new(Int32, Single)
     - load-factor (System.Single): A number in the range from 0.1 through 1.0 that is multiplied by the default value that provides the best performance. The result is the maximum ratio of elements to buckets.
 
 new(IHashCodeProvider, IComparer)
+  OBSOLETE: This constructor has been deprecated. Use Hashtable(IEqualityComparer) instead.
   Summary: Initializes a new, empty instance of the System.Collections.Hashtable class using the default initial capacity and load factor, and the specified hash code provider and comparer.
   Parameters:
     - hcp (System.Collections.IHashCodeProvider): The System.Collections.IHashCodeProvider object that supplies the hash codes for all keys in the System.Collections.Hashtable object. -or- to use the default hash code provider, which is each key's implementation of System.Object.GetHashCode.
@@ -63,6 +64,7 @@ new(IDictionary, IEqualityComparer)
     - equality-comparer (System.Collections.IEqualityComparer): The System.Collections.IEqualityComparer object that defines the hash code provider and the comparer to use with the System.Collections.Hashtable. -or- to use the default hash code provider and the default comparer. The default hash code provider is each key's implementation of System.Object.GetHashCode and the default comparer is each key's implementation of System.Object.Equals(System.Object).
 
 new(SerializationInfo, StreamingContext)
+  OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
   Summary: Initializes a new, empty instance of the System.Collections.Hashtable class that is serializable using the specified System.Runtime.Serialization.SerializationInfo and System.Runtime.Serialization.StreamingContext objects.
   Parameters:
     - info (System.Runtime.Serialization.SerializationInfo): A System.Runtime.Serialization.SerializationInfo object containing the information required to serialize the System.Collections.Hashtable object.
@@ -76,6 +78,7 @@ new(Int32, Single, IEqualityComparer)
     - equality-comparer (System.Collections.IEqualityComparer): The System.Collections.IEqualityComparer object that defines the hash code provider and the comparer to use with the System.Collections.Hashtable. -or- to use the default hash code provider and the default comparer. The default hash code provider is each key's implementation of System.Object.GetHashCode and the default comparer is each key's implementation of System.Object.Equals(System.Object).
 
 new(Int32, IHashCodeProvider, IComparer)
+  OBSOLETE: This constructor has been deprecated. Use Hashtable(int, IEqualityComparer) instead.
   Summary: Initializes a new, empty instance of the System.Collections.Hashtable class using the specified initial capacity, hash code provider, comparer, and the default load factor.
   Parameters:
     - capacity (System.Int32): The approximate number of elements that the System.Collections.Hashtable object can initially contain.
@@ -83,6 +86,7 @@ new(Int32, IHashCodeProvider, IComparer)
     - comparer (System.Collections.IComparer): The System.Collections.IComparer object to use to determine whether two keys are equal. -or- to use the default comparer, which is each key's implementation of System.Object.Equals(System.Object).
 
 new(IDictionary, IHashCodeProvider, IComparer)
+  OBSOLETE: This constructor has been deprecated. Use Hashtable(IDictionary, IEqualityComparer) instead.
   Summary: Initializes a new instance of the System.Collections.Hashtable class by copying the elements from the specified dictionary to the new System.Collections.Hashtable object. The new System.Collections.Hashtable object has an initial capacity equal to the number of elements copied, and uses the default load factor, and the specified hash code provider and comparer. This API is obsolete. For an alternative, see System.Collections.Hashtable.#ctor(System.Collections.IDictionary,System.Collections.IEqualityComparer).
   Parameters:
     - d (System.Collections.IDictionary): The System.Collections.IDictionary object to copy to a new System.Collections.Hashtable object.
@@ -97,6 +101,7 @@ new(IDictionary, Single, IEqualityComparer)
     - equality-comparer (System.Collections.IEqualityComparer): The System.Collections.IEqualityComparer object that defines the hash code provider and the comparer to use with the System.Collections.Hashtable. -or- to use the default hash code provider and the default comparer. The default hash code provider is each key's implementation of System.Object.GetHashCode and the default comparer is each key's implementation of System.Object.Equals(System.Object).
 
 new(Int32, Single, IHashCodeProvider, IComparer)
+  OBSOLETE: This constructor has been deprecated. Use Hashtable(int, float, IEqualityComparer) instead.
   Summary: Initializes a new, empty instance of the System.Collections.Hashtable class using the specified initial capacity, load factor, hash code provider, and comparer.
   Parameters:
     - capacity (System.Int32): The approximate number of elements that the System.Collections.Hashtable object can initially contain.
@@ -105,6 +110,7 @@ new(Int32, Single, IHashCodeProvider, IComparer)
     - comparer (System.Collections.IComparer): The System.Collections.IComparer object to use to determine whether two keys are equal. -or- to use the default comparer, which is each key's implementation of System.Object.Equals(System.Object).
 
 new(IDictionary, Single, IHashCodeProvider, IComparer)
+  OBSOLETE: This constructor has been deprecated. Use Hashtable(IDictionary, float, IEqualityComparer) instead.
   Summary: Initializes a new instance of the System.Collections.Hashtable class by copying the elements from the specified dictionary to the new System.Collections.Hashtable object. The new System.Collections.Hashtable object has an initial capacity equal to the number of elements copied, and uses the specified load factor, hash code provider, and comparer.
   Parameters:
     - d (System.Collections.IDictionary): The System.Collections.IDictionary object to copy to a new System.Collections.Hashtable object.
@@ -152,11 +158,13 @@ new(IDictionary, Single, IHashCodeProvider, IComparer)
                     :supplied-args (cl:append (cl:when supplied-capacity (cl:list :capacity capacity)) (cl:when supplied-load-factor (cl:list :load-factor load-factor)) (cl:when supplied-equality-comparer (cl:list :equality-comparer equality-comparer)) (cl:when supplied-comparer (cl:list :comparer comparer)))))))
 
 (cl:defun comparer (obj!)
-  "Gets or sets the System.Collections.IComparer to use for the System.Collections.Hashtable."
+  "OBSOLETE: Hashtable.comparer has been deprecated. Use the KeyComparer properties instead.
+Gets or sets the System.Collections.IComparer to use for the System.Collections.Hashtable."
   (dotnet:invoke (cl:the (dotnet "System.Collections.Hashtable") obj!) "get_comparer"))
 
 (cl:defun (cl:setf comparer) (new-value obj!)
-  "Gets or sets the System.Collections.IComparer to use for the System.Collections.Hashtable."
+  "OBSOLETE: Hashtable.comparer has been deprecated. Use the KeyComparer properties instead.
+Gets or sets the System.Collections.IComparer to use for the System.Collections.Hashtable."
   (dotnet:invoke (cl:the (dotnet "System.Collections.Hashtable") obj!) "set_comparer" new-value))
 
 (cl:defun count (obj!)
@@ -168,11 +176,13 @@ new(IDictionary, Single, IHashCodeProvider, IComparer)
   (dotnet:invoke (cl:the (dotnet "System.Collections.Hashtable") obj!) "get_EqualityComparer"))
 
 (cl:defun hcp (obj!)
-  "Gets or sets the object that can dispense hash codes."
+  "OBSOLETE: Hashtable.hcp has been deprecated. Use the EqualityComparer property instead.
+Gets or sets the object that can dispense hash codes."
   (dotnet:invoke (cl:the (dotnet "System.Collections.Hashtable") obj!) "get_hcp"))
 
 (cl:defun (cl:setf hcp) (new-value obj!)
-  "Gets or sets the object that can dispense hash codes."
+  "OBSOLETE: Hashtable.hcp has been deprecated. Use the EqualityComparer property instead.
+Gets or sets the object that can dispense hash codes."
   (dotnet:invoke (cl:the (dotnet "System.Collections.Hashtable") obj!) "set_hcp" new-value))
 
 (cl:defun fixed-size? (obj!)
@@ -271,7 +281,8 @@ Parameters:
   (dotnet:invoke (cl:the (dotnet "System.Collections.Hashtable") obj!) "GetHash" key))
 
 (cl:defun get-object-data (obj! info context)
-  "Summary: Implements the System.Runtime.Serialization.ISerializable interface and returns the data needed to serialize the System.Collections.Hashtable.
+  "OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
+Summary: Implements the System.Runtime.Serialization.ISerializable interface and returns the data needed to serialize the System.Collections.Hashtable.
 Parameters:
   - info (System.Runtime.Serialization.SerializationInfo): A System.Runtime.Serialization.SerializationInfo object containing the information required to serialize the System.Collections.Hashtable.
   - context (System.Runtime.Serialization.StreamingContext): A System.Runtime.Serialization.StreamingContext object containing the source and destination of the serialized stream associated with the System.Collections.Hashtable.

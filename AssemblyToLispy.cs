@@ -257,6 +257,7 @@ namespace PackageGenerator {
                         string underlyingTypeName = Enum.GetUnderlyingType(type).FullName ?? Enum.GetUnderlyingType(type).Name;
                         parts.Add($":enum-underlying-type {EscapeLispString(underlyingTypeName)}");
                     }
+                    AppendObsoleteKeys(parts, type);
 
                     // Phase 2D: Retrieve type documentation
                     string typeDocKey = GetXmlDocMemberName(type);
@@ -520,6 +521,12 @@ namespace PackageGenerator {
                 parts.Add($":set-method {EscapeLispString(setMethod!.Name)}");
             }
 
+            AppendObsoleteKeys(parts, prop);
+            var tupleNames = FormatTupleElementNamesValue(prop.PropertyType, prop.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
+            if (tupleNames != null) {
+                parts.Add($":tuple-element-names {tupleNames}");
+            }
+
             // Phase 2D: Retrieve property documentation (moved to end of plist)
             string docKey = GetXmlDocMemberName(prop);
             if (xmlDoc.TryGetValue(docKey, out var memberElement)) {
@@ -550,6 +557,7 @@ namespace PackageGenerator {
             parts.Add(FormatTypeField(":type", evt.EventHandlerType!));
             parts.Add($":add-method {EscapeLispString(evt.AddMethod!.Name)}");
             parts.Add($":remove-method {EscapeLispString(evt.RemoveMethod!.Name)}");
+            AppendObsoleteKeys(parts, evt);
 
             // Phase 2D: Retrieve event documentation (moved to end of plist)
             string docKey = GetXmlDocMemberName(evt);
@@ -589,6 +597,12 @@ namespace PackageGenerator {
                 parts.Add(":public t");
             }
 
+            AppendObsoleteKeys(parts, field);
+            var fieldTupleNames = FormatTupleElementNamesValue(field.FieldType, field.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
+            if (fieldTupleNames != null) {
+                parts.Add($":tuple-element-names {fieldTupleNames}");
+            }
+
             // Phase 2D: Retrieve field documentation (moved to end of plist)
             string docKey = GetXmlDocMemberName(field);
             if (xmlDoc.TryGetValue(docKey, out var memberElement)) {
@@ -623,6 +637,8 @@ namespace PackageGenerator {
                 var paramPlists = parameters.Select(p => FormatParameterPlist(p)).ToList();
                 parts.Add($":parameters ({string.Join(" ", paramPlists)})");
             }
+
+            AppendObsoleteKeys(parts, ctor);
 
             // Phase 2D: Retrieve constructor documentation (moved to end of plist)
             string docKey = GetXmlDocMemberName(ctor);
@@ -673,6 +689,12 @@ namespace PackageGenerator {
             if (parameters.Length > 0) {
                 var paramPlists = parameters.Select((p, i) => FormatParameterPlist(p, isExtensionMethod && i == 0)).ToList();
                 parts.Add($":parameters ({string.Join(" ", paramPlists)})");
+            }
+
+            AppendObsoleteKeys(parts, method);
+            var returnTupleNames = FormatTupleElementNamesValue(method.ReturnType, method.ReturnParameter.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
+            if (returnTupleNames != null) {
+                parts.Add($":tuple-element-return-names {returnTupleNames}");
             }
 
             // Phase 2D: Retrieve method documentation (moved to end of plist)
@@ -727,6 +749,11 @@ namespace PackageGenerator {
                 parts.Add($":default-kind {kind}");
                 parts.Add($":default-type {EscapeLispString(defaultType)}");
                 parts.Add($":default-value {valueLiteral}");
+            }
+
+            var tupleNames = FormatTupleElementNamesValue(param.ParameterType, param.GetCustomAttribute<System.Runtime.CompilerServices.TupleElementNamesAttribute>());
+            if (tupleNames != null) {
+                parts.Add($":tuple-element-names {tupleNames}");
             }
 
             return "(" + string.Join(" ", parts) + ")";
@@ -994,6 +1021,71 @@ namespace PackageGenerator {
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        ///   Appends :obsolete/:obsolete-message/:obsolete-error keys to PARTS when MEMBER
+        ///   carries a [System.Obsolete] attribute (doc/plan-fable-detail-16.md, Half A).
+        ///   Emitted alongside the member's other keys, not inside :flags -- unlike the
+        ///   boolean flags there, :obsolete carries an optional message payload, so it needs
+        ///   its own key(s) rather than a bare flag symbol. This is visibility only: an
+        ///   obsolete member is still reflected, still generates a wrapper, and is still
+        ///   eligible for --defgeneric/csharp-generics -- no behavior change, only a
+        ///   docstring/comment marker consumers can see before calling it.
+        /// </summary>
+        /// <param name="parts">The plist's part-string accumulator to append to.</param>
+        /// <param name="member">The type/method/constructor/property/field/event being reflected.</param>
+        private static void AppendObsoleteKeys(List<string> parts, MemberInfo member) {
+            var obsolete = member.GetCustomAttribute<ObsoleteAttribute>();
+            if (obsolete == null) {
+                return;
+            }
+            parts.Add(":obsolete t");
+            if (!string.IsNullOrEmpty(obsolete.Message)) {
+                parts.Add($":obsolete-message {EscapeLispString(obsolete.Message)}");
+            }
+            if (obsolete.IsError) {
+                parts.Add(":obsolete-error t");
+            }
+        }
+
+        /// <summary>
+        ///   Returns TYPE's tuple arity (its number of generic type arguments) if TYPE is a
+        ///   closed <c>System.ValueTuple\`N</c>, or 0 if it is not a tuple type at all.
+        /// </summary>
+        private static int TupleArity(Type type) {
+            if (!type.IsGenericType) {
+                return 0;
+            }
+            Type def = type.GetGenericTypeDefinition();
+            return (def.Namespace == "System" && def.Name.StartsWith("ValueTuple`"))
+                ? type.GetGenericArguments().Length
+                : 0;
+        }
+
+        /// <summary>
+        ///   Formats a [TupleElementNames] attribute's element names into a Lisp list literal
+        ///   string (e.g. <c>("count" "name")</c>, raw C# names -- not kebab-cased, since
+        ///   this metadata is a faithful reflection record, and kebab-casing is generator
+        ///   policy applied downstream), or null when ATTR is null, TYPE is not itself a
+        ///   tuple type, or ATTR's TransformNames count does not equal TYPE's own arity --
+        ///   the latter case means TransformNames' flattened pre-order list actually
+        ///   describes a NESTED tuple (doc/plan-fable-detail-16.md Half B's v1 explicitly
+        ///   handles only the non-nested case; a nested tuple's element names are silently
+        ///   omitted rather than misattributed). An unnamed position within an otherwise-
+        ///   named tuple (e.g. <c>(int Count, string)</c>) renders as a bare <c>nil</c> at
+        ///   that position, not an empty string.
+        /// </summary>
+        private static string? FormatTupleElementNamesValue(Type type, System.Runtime.CompilerServices.TupleElementNamesAttribute? attr) {
+            if (attr == null) {
+                return null;
+            }
+            int arity = TupleArity(type);
+            if (arity == 0 || attr.TransformNames.Count != arity) {
+                return null;
+            }
+            var names = attr.TransformNames.Select(n => n == null ? "nil" : EscapeLispString(n));
+            return "(" + string.Join(" ", names) + ")";
         }
 
         /// <summary>

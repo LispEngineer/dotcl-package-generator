@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --defgeneric
 
 (cl:in-package :system-string)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (value cl:&optional (count cl:nil supplied-count) (length cl:nil supplied-length) (enc cl:nil supplied-enc))
   "Master wrapper for System.String constructor overloads. Dispatches at runtime.
@@ -500,7 +500,8 @@ Contains(Char, StringComparison) -> Boolean
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-comparison-type (cl:list :comparison-type comparison-type)))))))
 
 (cl:defun copy (str)
-  "Summary: Creates a new instance of System.String with the same value as a specified System.String.
+  "OBSOLETE: This API should not be used to create mutable strings. See https://go.microsoft.com/fwlink/?linkid=2084035 for alternatives.
+Summary: Creates a new instance of System.String with the same value as a specified System.String.
 Returns: A new string with the same value as str.
 Parameters:
   - str (System.String): The string to copy.

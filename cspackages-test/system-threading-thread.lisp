@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Threading.Thread
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: (none)
 
 (cl:in-package :system-threading-thread)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Threading.Thread"))
 (cl:defconstant <type-str> "System.Threading.Thread")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (start cl:&optional (max-stack-size cl:nil supplied-max-stack-size))
   "Master wrapper for System.Threading.Thread constructor overloads. Dispatches at runtime.
@@ -63,11 +63,13 @@ new(ParameterizedThreadStart, Int32)
   (cl:setf (dotnet:static <type-str> "CurrentPrincipal") new-value))
 
 (cl:defun apartment-state (obj!)
-  "Gets or sets the apartment state of this thread."
+  "OBSOLETE: The ApartmentState property has been deprecated. Use GetApartmentState, SetApartmentState or TrySetApartmentState instead.
+Gets or sets the apartment state of this thread."
   (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "get_ApartmentState"))
 
 (cl:defun (cl:setf apartment-state) (new-value obj!)
-  "Gets or sets the apartment state of this thread."
+  "OBSOLETE: The ApartmentState property has been deprecated. Use GetApartmentState, SetApartmentState or TrySetApartmentState instead.
+Gets or sets the apartment state of this thread."
   (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "set_ApartmentState" new-value))
 
 (cl:defun current-culture (obj!)
@@ -134,9 +136,11 @@ new(ParameterizedThreadStart, Int32)
   "Master wrapper for System.Threading.Thread.Abort overloads. Dispatches at runtime.
 
 Abort() -> Void
+  OBSOLETE: Thread.Abort is not supported and throws PlatformNotSupportedException.
   Summary: Raises a System.Threading.ThreadAbortException in the thread on which it is invoked, to begin the process of terminating the thread. Calling this method usually terminates the thread.
 
 Abort(Object) -> Void
+  OBSOLETE: Thread.Abort is not supported and throws PlatformNotSupportedException.
   Summary: Raises a System.Threading.ThreadAbortException in the thread on which it is invoked, to begin the process of terminating the thread while also providing exception information about the thread termination. Calling this method usually terminates the thread.
   Parameters:
     - state-info (System.Object): An object that contains application-specific information, such as state, which can be used by the thread being aborted.
@@ -210,7 +214,8 @@ Returns: One of the System.Threading.ApartmentState values indicating the apartm
   (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "GetApartmentState"))
 
 (cl:defun get-compressed-stack (obj!)
-  "Summary: Returns a System.Threading.CompressedStack object that can be used to capture the stack for the current thread.
+  "OBSOLETE: Code Access Security is not supported or honored by the runtime.
+Summary: Returns a System.Threading.CompressedStack object that can be used to capture the stack for the current thread.
 "
   (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "GetCompressedStack"))
 
@@ -296,12 +301,14 @@ Join(TimeSpan) -> Boolean
   (dotnet:static <type-str> "MemoryBarrier"))
 
 (cl:defun reset-abort ()
-  "Summary: Cancels an System.Threading.Thread.Abort(System.Object) requested for the current thread.
+  "OBSOLETE: Thread.ResetAbort is not supported and throws PlatformNotSupportedException.
+Summary: Cancels an System.Threading.Thread.Abort(System.Object) requested for the current thread.
 "
   (dotnet:static <type-str> "ResetAbort"))
 
 (cl:defun resume (obj!)
-  "Summary: Resumes a thread that has been suspended.
+  "OBSOLETE: Thread.Resume has been deprecated. Use other classes in System.Threading, such as Monitor, Mutex, Event, and Semaphore, to synchronize Threads or protect resources.
+Summary: Resumes a thread that has been suspended.
 "
   (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "Resume"))
 
@@ -313,7 +320,8 @@ Parameters:
   (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "SetApartmentState" state))
 
 (cl:defun set-compressed-stack (obj! stack)
-  "Summary: Applies a captured System.Threading.CompressedStack to the current thread.
+  "OBSOLETE: Code Access Security is not supported or honored by the runtime.
+Summary: Applies a captured System.Threading.CompressedStack to the current thread.
 Parameters:
   - stack (System.Threading.CompressedStack): The System.Threading.CompressedStack object to be applied to the current thread.
 "
@@ -381,7 +389,8 @@ Start(Object) -> Void
                     :supplied-args (cl:append (cl:when supplied-parameter (cl:list :parameter parameter)))))))
 
 (cl:defun suspend (obj!)
-  "Summary: Either suspends the thread, or if the thread is already suspended, has no effect.
+  "OBSOLETE: Thread.Suspend has been deprecated. Use other classes in System.Threading, such as Monitor, Mutex, Event, and Semaphore, to synchronize Threads or protect resources.
+Summary: Either suspends the thread, or if the thread is already suspended, has no effect.
 "
   (dotnet:invoke (cl:the (dotnet "System.Threading.Thread") obj!) "Suspend"))
 

@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Diagnostics.Debug
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: (none)
 
 (cl:in-package :system-diagnostics-debug)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Diagnostics.Debug"))
 (cl:defconstant <type-str> "System.Diagnostics.Debug")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun auto-flush ()
   (dotnet:static <type-str> "AutoFlush"))

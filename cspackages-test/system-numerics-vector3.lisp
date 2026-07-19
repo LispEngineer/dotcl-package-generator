@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector3
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --defgeneric
 
 (cl:in-package :system-numerics-vector3)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector3"))
 (cl:defconstant <type-str> "System.Numerics.Vector3")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (value cl:nil supplied-value) (z cl:nil supplied-z) (z2 cl:nil supplied-z2))
   "Master wrapper for System.Numerics.Vector3 constructor overloads. Dispatches at runtime.

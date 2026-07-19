@@ -266,6 +266,8 @@
               (format stream ";;; Options: ~A~%" (format-class-options-line rc))
               (when (getf rc :discovered-via)
                 (format stream ";;; Discovered via: ~A~%" (getf rc :discovered-via)))
+              (when (getf cls :obsolete)
+                (format stream ";;; ~A" (obsolete-docstring-line cls)))
               (format stream "(cl:defpackage :~A~%" pkg-name)
               (format stream "  (:use :cl)~%")
               (when shadows

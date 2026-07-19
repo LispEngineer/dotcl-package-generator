@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Runtime.Serialization.ISerializable
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --export-interfaces --export-object --export-parents
 ;;; Discovered via: --export-parents/--export-interfaces from System.ArgumentOutOfRangeException
 
@@ -9,11 +9,12 @@
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Runtime.Serialization.ISerializable"))
 (cl:defconstant <type-str> "System.Runtime.Serialization.ISerializable")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun get-object-data (obj! info context)
-  "Summary: Populates a System.Runtime.Serialization.SerializationInfo with the data needed to serialize the target object.
+  "OBSOLETE: Formatter-based serialization is obsolete and should not be used.
+Summary: Populates a System.Runtime.Serialization.SerializationInfo with the data needed to serialize the target object.
 Parameters:
   - info (System.Runtime.Serialization.SerializationInfo): The System.Runtime.Serialization.SerializationInfo to populate with data.
   - context (System.Runtime.Serialization.StreamingContext): The destination (see System.Runtime.Serialization.StreamingContext) for this serialization.

@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: AssemblyToLispyTestTarget.EventTestClass
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: (none)
 
 (cl:in-package :assembly-to-lispy-test-target-event-test-class)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "AssemblyToLispyTestTarget.EventTestClass"))
 (cl:defconstant <type-str> "AssemblyToLispyTestTarget.EventTestClass")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new ()
   (dotnet:new <type-str>))

@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.MarshalByRefObject
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --export-interfaces --export-object --export-parents
 ;;; Discovered via: --export-parents/--export-interfaces from System.IO.MemoryStream
 
@@ -9,8 +9,8 @@
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.MarshalByRefObject"))
 (cl:defconstant <type-str> "System.MarshalByRefObject")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.MarshalByRefObject class.
@@ -18,13 +18,15 @@
   (dotnet:new <type-str>))
 
 (cl:defun get-lifetime-service (obj!)
-  "Summary: Retrieves the current lifetime service object that controls the lifetime policy for this instance.
+  "OBSOLETE: This Remoting API is not supported and throws PlatformNotSupportedException.
+Summary: Retrieves the current lifetime service object that controls the lifetime policy for this instance.
 Returns: An object of type System.Runtime.Remoting.Lifetime.ILease used to control the lifetime policy for this instance.
 "
   (dotnet:invoke (cl:the (dotnet "System.MarshalByRefObject") obj!) "GetLifetimeService"))
 
 (cl:defun initialize-lifetime-service (obj!)
-  "Summary: Obtains a lifetime service object to control the lifetime policy for this instance.
+  "OBSOLETE: This Remoting API is not supported and throws PlatformNotSupportedException.
+Summary: Obtains a lifetime service object to control the lifetime policy for this instance.
 Returns: An object of type System.Runtime.Remoting.Lifetime.ILease used to control the lifetime policy for this instance. This is the current lifetime service object for this instance if one exists; otherwise, a new lifetime service object initialized to the value of the System.Runtime.Remoting.Lifetime.LifetimeServices.LeaseManagerPollTime property.
 "
   (dotnet:invoke (cl:the (dotnet "System.MarshalByRefObject") obj!) "InitializeLifetimeService"))

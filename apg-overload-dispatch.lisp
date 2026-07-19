@@ -601,7 +601,7 @@
                          (cl:format nil "~A obj!~@[ ~{~A~^ ~}~]" generic-type-args-str param-names))
                         (cl:t
                          (cl:format nil "obj!~@[ ~{~A~^ ~}~]" param-names))))
-            (docstring (build-docstring summary returns params m-doc))
+            (docstring (build-docstring summary returns params m-doc m))
             (escaped-docstring (escape-lisp-string docstring))
             (dotnet-method-name (cl:or (cl:getf m :mangled-name) (cl:getf m :name)))
             ;; For static method params, add (the (dotnet "Type") arg) hints.
@@ -823,7 +823,7 @@
                       (format nil "obj!~@[ ~{~A~^ ~}~]" param-names))))
          (out-note (format nil "Returns (cl:values <primary-return> ~{~A~^ ~}) -- ~A"
                             out-param-names (method-signature-str m)))
-         (body (build-docstring summary returns in-params m-doc))
+         (body (build-docstring summary returns in-params m-doc m))
          (docstring (if (> (length body) 0)
                         (format nil "~A~%~A" out-note body)
                         out-note))

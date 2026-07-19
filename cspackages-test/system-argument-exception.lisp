@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ArgumentException
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --export-interfaces --export-object --export-parents
 ;;; Discovered via: --export-parents/--export-interfaces from System.ArgumentOutOfRangeException
 
@@ -9,8 +9,8 @@
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ArgumentException"))
 (cl:defconstant <type-str> "System.ArgumentException")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (message cl:nil supplied-message) (inner-exception cl:nil supplied-inner-exception) (inner-exception2 cl:nil supplied-inner-exception2))
   "Master wrapper for System.ArgumentException constructor overloads. Dispatches at runtime.
@@ -36,6 +36,7 @@ new(String, String)
     - param-name (System.String): The name of the parameter that caused the current exception.
 
 new(SerializationInfo, StreamingContext)
+  OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
   Summary: Initializes a new instance of the System.ArgumentException class with serialized data.
   Parameters:
     - info (System.Runtime.Serialization.SerializationInfo): The object that holds the serialized object data.
@@ -76,7 +77,8 @@ new(String, String, Exception)
   (dotnet:invoke (cl:the (dotnet "System.ArgumentException") obj!) "get_ParamName"))
 
 (cl:defun get-object-data (obj! info context)
-  "Summary: Sets the System.Runtime.Serialization.SerializationInfo object with the parameter name and additional exception information.
+  "OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
+Summary: Sets the System.Runtime.Serialization.SerializationInfo object with the parameter name and additional exception information.
 Parameters:
   - info (System.Runtime.Serialization.SerializationInfo): The object that holds the serialized object data.
   - context (System.Runtime.Serialization.StreamingContext): The contextual information about the source or destination.

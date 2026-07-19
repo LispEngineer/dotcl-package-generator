@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Xml.XmlReader
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --export-interfaces
 
 (cl:in-package :system-xml-xml-reader)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Xml.XmlReader"))
 (cl:defconstant <type-str> "System.Xml.XmlReader")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the class.

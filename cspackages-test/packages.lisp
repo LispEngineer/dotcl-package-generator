@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:45:00Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 
 (cl:in-package :cl-user)
 
@@ -2568,6 +2568,7 @@
 ;;; C# Class: System.Net.ServicePointManager
 ;;; Constant Properties: (none)
 ;;; Options: (none)
+;;; OBSOLETE: WebRequest, HttpWebRequest, ServicePoint, and WebClient are obsolete. Use HttpClient instead. Settings on ServicePointManager no longer affect SslStream or HttpClient.
 (cl:defpackage :system-net-service-point-manager
   (:use :cl)
   (:export
@@ -2921,6 +2922,44 @@
    #:<creation>
    #:<version>
    #:new
+  ))
+
+;;; Source File: assembly-to-lispy-test-target-obsolete-type.lisp
+;;; C# Class: AssemblyToLispyTestTarget.ObsoleteType
+;;; Constant Properties: (none)
+;;; Options: (none)
+;;; OBSOLETE.
+(cl:defpackage :assembly-to-lispy-test-target-obsolete-type
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+  ))
+
+;;; Source File: assembly-to-lispy-test-target-obsolete-and-tuple-fixtures.lisp
+;;; C# Class: AssemblyToLispyTestTarget.ObsoleteAndTupleFixtures
+;;; Constant Properties: (none)
+;;; Options: (none)
+(cl:defpackage :assembly-to-lispy-test-target-obsolete-and-tuple-fixtures
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:obsolete-field
+   #:obsolete-property
+   #:get-nested-stats
+   #:get-partially-named
+   #:get-stats
+   #:obsolete-error
+   #:obsolete-with-message
+   #:plain-obsolete
+   #:take-stats
   ))
 
 ;;; Source File: assembly-to-lispy-test-target-sub-space-sub-space-class-one.lisp

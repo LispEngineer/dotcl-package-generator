@@ -3448,3 +3448,90 @@ many classes already individually exercised elsewhere in the smoke test and woul
 produce a much larger, harder-to-review diff). `make clean build test test-runtime` all
 green; `cspackages-test/` diff shows exactly the two new `SubSpaceClass*` files plus the
 expected `.asd`/`packages.lisp`/metadata updates.
+
+## [Obsolete] and Tuple Element Names (Version 53)
+
+`doc/plan-fable-detail-16.md` addresses `doc/claude-suggested-improvements-20260703.md`'s
+items 9 and 11 (the `[Obsolete]` slice of 11 only — general attribute reflection stays
+out of scope). Two independent halves.
+
+### Half A: `[System.Obsolete]`
+
+Calling an obsolete member from Lisp previously gave no warning at all. `AssemblyToLispy.cs`'s
+new `AppendObsoleteKeys` (called from every `Format*Plist` function, plus the main
+type-plist loop) appends `:obsolete t` — plus `:obsolete-message "..."` when
+`ObsoleteAttribute.Message` is non-null/non-empty, and `:obsolete-error t` when `IsError`
+— alongside a type/method/constructor/property/field/event's other keys, deliberately
+**not** inside `:flags`: unlike the boolean flags there, `:obsolete` carries an optional
+message payload, so it needs its own key(s).
+
+Codegen: new `obsolete-docstring-line` (`apg-overload-signatures.lisp`) renders
+`"OBSOLETE.~%"` / `"OBSOLETE: <message>~%"` / `"OBSOLETE (error-level): <message>~%"`
+(error-level still gets the message, just relabeled — reflection can invoke an
+error-level-obsolete member regardless; the error is a C#-compiler-only concern).
+`build-docstring` gained an optional trailing `member-plist` parameter that prepends this
+line ahead of everything else; `format-overload-doc-block` (and, transitively,
+`format-combined-overloads-docstring`, used by every Master Wrapper's combined docstring
+for both methods and constructors) now threads each overload's own plist through, so an
+obsolete overload buried inside a multi-overload Master Wrapper still gets its own
+indented `OBSOLETE...` line, not just a class-wide one. The four direct `build-docstring`
+call sites (`generate-single-overload`, `generate-single-out-overload`, the single-clean-
+constructor case in `emit-constructors`, and injected extension-method wrappers) each
+now pass their own member plist too. Every plain (non-overload-dispatching)
+property/field/event `emit-*` helper in `apg-class-file-generator.lisp` previously
+re-derived the identical `(x-doc (getf (getf x :documentation) :summary)) (doc-str (if
+x-doc (escape-lisp-string x-doc) ""))` pattern independently at ten call sites; this is
+now a single shared `member-doc-str` that also folds in `obsolete-docstring-line`, so
+none of those emit-* helpers needed their own separate obsolete-handling code.
+
+Type-level `:obsolete` adds a `";;; OBSOLETE...~%"` comment line to both the class
+file's own header (`emit-class-file-header`, now taking an optional trailing
+`class-plist` parameter purely to check this one key) and its `packages.lisp`
+per-package comment block (`generate-batch-packages-file`).
+
+**Obsolete members are NOT excluded from generation or from `--defgeneric`/
+`csharp-generics`** — this is visibility only, no behavior change, matching the same
+hard constraint Plan 15's documentation-only work already established.
+
+### Half B: Tuple element names (metadata only this version)
+
+`(int Count, string Name) GetStats()` reflects, absent this change, as bare
+`System.ValueTuple\`2[System.Int32,System.String]` — the semantic element names are
+erased. Element names live in `[System.Runtime.CompilerServices.TupleElementNames]`
+(`TransformNames`) on the *parameter/return-parameter/property/field*, not the type
+itself — and `TransformNames` is a flattened **pre-order list covering nested tuples**,
+which this v1 deliberately does not attempt to unpack: new `FormatTupleElementNamesValue`
+(paired with `TupleArity`, both `AssemblyToLispy.cs`) emits the names list only when
+`TransformNames.Count` equals the tuple type's own arity exactly (the non-nested case);
+a count mismatch (nesting detected) emits nothing at all, rather than misattributing an
+inner tuple's names to the outer one's positions. Keys, raw (not kebab-cased) C# element
+names, `nil` at an unnamed position within an otherwise-named tuple: `:tuple-element-names`
+on a parameter/property/field plist, `:tuple-element-return-names` on a method plist (see
+`doc/assembly-to-lispy.md`'s per-plist-kind entries for the exact shape).
+
+**No codegen consumes these keys yet** — a tuple-typed parameter/return still renders as
+the bare `ValueTuple` type string everywhere it's shown (docstrings, signature strings).
+This is a deliberate, documented scope cut (`FEATURES.md`'s "Documentation" section) —
+the plan's own suggested rendering (`(System.Int32 Count, System.String Name)` in a
+docstring) is tracked as a follow-up, not implemented here, to keep this already-two-
+part change bounded.
+
+### Testing
+
+`tests/framework.lisp`'s schema validator gained all five new keys across every
+affected plist kind's `allowed-keys` list (type/method/constructor/property/field/event
+for the obsolete triad; parameter/property/field for `:tuple-element-names`; method for
+`:tuple-element-return-names`). New `AssemblyToLispyTestTarget.ObsoleteType` (a bare
+`[Obsolete]` type) and `ObsoleteAndTupleFixtures` (all three obsolete flavors across
+method/property/field; a simple fully-named tuple return and parameter; a
+partially-named tuple return, exercising the `nil`-at-unnamed-position case; a nested
+named-tuple return, exercising the no-emission case) exercise both halves; new
+`package-generator-tests-obsolete.lisp` covers `obsolete-docstring-line`'s three
+renderings plus end-to-end codegen (an obsolete type's header comment, an obsolete
+method's wrapper docstring). `make clean build test test-runtime` all green;
+`cspackages-test/` diff shows real BCL obsolete members newly marked across several
+existing fixture classes (`System.AppDomain`, `System.Collections.Hashtable`,
+`System.Exception`/`ArgumentException`/`ArgumentOutOfRangeException`/`SystemException`,
+`System.Threading.Thread`, `System.Collections.Generic.Dictionary\`2`, `System.String`,
+`System.Type`, and others already in the smoke set) alongside the new synthetic fixture
+files.

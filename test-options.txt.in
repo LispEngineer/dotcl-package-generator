@@ -72,3 +72,5 @@
   --class AssemblyToLispyTestTarget.IDummyInterface --output-implementations
   --class AssemblyToLispyTestTarget.ConcreteDerivedFromGeneric --export-parents
   --all-classes AssemblyToLispyTestTarget.SubSpace --defgeneric
+  --class AssemblyToLispyTestTarget.ObsoleteType
+  --class AssemblyToLispyTestTarget.ObsoleteAndTupleFixtures

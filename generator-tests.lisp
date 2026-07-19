@@ -19,6 +19,7 @@
   (run-generic-method-codegen-tests)
   (run-operator-overload-tests)
   (run-out-parameter-tests)
+  (run-obsolete-tests)
   (run-events-tests)
   (run-parents-interfaces-tests)
   (run-defgeneric-tests)

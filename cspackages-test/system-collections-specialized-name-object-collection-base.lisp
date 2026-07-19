@@ -1,7 +1,7 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Specialized.NameObjectCollectionBase
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --export-interfaces --export-object --export-parents
 ;;; Discovered via: --export-parents/--export-interfaces from System.Collections.Specialized.NameValueCollection
 
@@ -9,8 +9,8 @@
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Specialized.NameObjectCollectionBase"))
 (cl:defconstant <type-str> "System.Collections.Specialized.NameObjectCollectionBase")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (equality-comparer cl:nil supplied-equality-comparer) (equality-comparer2 cl:nil supplied-equality-comparer2) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Specialized.NameObjectCollectionBase constructor overloads. Dispatches at runtime.
@@ -35,18 +35,21 @@ new(Int32, IEqualityComparer)
     - equality-comparer (System.Collections.IEqualityComparer): The System.Collections.IEqualityComparer object to use to determine whether two keys are equal and to generate hash codes for the keys in the collection.
 
 new(IHashCodeProvider, IComparer)
+  OBSOLETE: This constructor has been deprecated. Use NameObjectCollectionBase(IEqualityComparer) instead.
   Summary: Initializes a new instance of the System.Collections.Specialized.NameObjectCollectionBase class that is empty, has the default initial capacity, and uses the specified hash code provider and the specified comparer.
   Parameters:
     - hash-provider (System.Collections.IHashCodeProvider): The System.Collections.IHashCodeProvider that will supply the hash codes for all keys in the System.Collections.Specialized.NameObjectCollectionBase instance.
     - comparer (System.Collections.IComparer): The System.Collections.IComparer to use to determine whether two keys are equal.
 
 new(SerializationInfo, StreamingContext)
+  OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
   Summary: Initializes a new instance of the System.Collections.Specialized.NameObjectCollectionBase class that is serializable and uses the specified System.Runtime.Serialization.SerializationInfo and System.Runtime.Serialization.StreamingContext.
   Parameters:
     - info (System.Runtime.Serialization.SerializationInfo): A System.Runtime.Serialization.SerializationInfo object that contains the information required to serialize the new System.Collections.Specialized.NameObjectCollectionBase instance.
     - context (System.Runtime.Serialization.StreamingContext): A System.Runtime.Serialization.StreamingContext object that contains the source and destination of the serialized stream associated with the new System.Collections.Specialized.NameObjectCollectionBase instance.
 
 new(Int32, IHashCodeProvider, IComparer)
+  OBSOLETE: This constructor has been deprecated. Use NameObjectCollectionBase(Int32, IEqualityComparer) instead.
   Summary: Initializes a new instance of the System.Collections.Specialized.NameObjectCollectionBase class that is empty, has the specified initial capacity and uses the specified hash code provider and the specified comparer.
   Parameters:
     - capacity (System.Int32): The approximate number of entries that the System.Collections.Specialized.NameObjectCollectionBase instance can initially contain.
@@ -220,7 +223,8 @@ Returns: An System.Collections.IEnumerator for the System.Collections.Specialize
   (dotnet:invoke (cl:the (dotnet "System.Collections.Specialized.NameObjectCollectionBase") obj!) "GetEnumerator"))
 
 (cl:defun get-object-data (obj! info context)
-  "Summary: Implements the System.Runtime.Serialization.ISerializable interface and returns the data needed to serialize the System.Collections.Specialized.NameObjectCollectionBase instance.
+  "OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
+Summary: Implements the System.Runtime.Serialization.ISerializable interface and returns the data needed to serialize the System.Collections.Specialized.NameObjectCollectionBase instance.
 Parameters:
   - info (System.Runtime.Serialization.SerializationInfo): A System.Runtime.Serialization.SerializationInfo object that contains the information required to serialize the System.Collections.Specialized.NameObjectCollectionBase instance.
   - context (System.Runtime.Serialization.StreamingContext): A System.Runtime.Serialization.StreamingContext object that contains the source and destination of the serialized stream associated with the System.Collections.Specialized.NameObjectCollectionBase instance.

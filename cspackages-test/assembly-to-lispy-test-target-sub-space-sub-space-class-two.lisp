@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: AssemblyToLispyTestTarget.SubSpace.SubSpaceClassTwo
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:45:00Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --defgeneric
 
 (cl:in-package :assembly-to-lispy-test-target-sub-space-sub-space-class-two)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "AssemblyToLispyTestTarget.SubSpace.SubSpaceClassTwo"))
 (cl:defconstant <type-str> "AssemblyToLispyTestTarget.SubSpace.SubSpaceClassTwo")
-(cl:defconstant <creation> "2026-07-19T15:45:00Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new ()
   (dotnet:new <type-str>))

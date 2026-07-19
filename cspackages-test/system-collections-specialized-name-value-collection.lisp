@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Specialized.NameValueCollection
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --export-interfaces --export-object --export-parents
 
 (cl:in-package :system-collections-specialized-name-value-collection)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Specialized.NameValueCollection"))
 (cl:defconstant <type-str> "System.Collections.Specialized.NameValueCollection")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (col cl:nil supplied-col) (comparer cl:nil supplied-comparer) (comparer2 cl:nil supplied-comparer2))
   "Master wrapper for System.Collections.Specialized.NameValueCollection constructor overloads. Dispatches at runtime.
@@ -33,6 +33,7 @@ new(IEqualityComparer)
     - equality-comparer (System.Collections.IEqualityComparer): The System.Collections.IEqualityComparer object to use to determine whether two keys are equal and to generate hash codes for the keys in the collection.
 
 new(IHashCodeProvider, IComparer)
+  OBSOLETE: This constructor has been deprecated. Use NameValueCollection(IEqualityComparer) instead.
   Summary: Initializes a new instance of the System.Collections.Specialized.NameValueCollection class that is empty, has the default initial capacity and uses the specified hash code provider and the specified comparer.
   Parameters:
     - hash-provider (System.Collections.IHashCodeProvider): The System.Collections.IHashCodeProvider that will supply the hash codes for all keys in the System.Collections.Specialized.NameValueCollection.
@@ -51,12 +52,14 @@ new(Int32, NameValueCollection)
     - col (System.Collections.Specialized.NameValueCollection): The System.Collections.Specialized.NameValueCollection to copy to the new System.Collections.Specialized.NameValueCollection instance.
 
 new(SerializationInfo, StreamingContext)
+  OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
   Summary: Initializes a new instance of the System.Collections.Specialized.NameValueCollection class that is serializable and uses the specified System.Runtime.Serialization.SerializationInfo and System.Runtime.Serialization.StreamingContext.
   Parameters:
     - info (System.Runtime.Serialization.SerializationInfo): A System.Runtime.Serialization.SerializationInfo object that contains the information required to serialize the new System.Collections.Specialized.NameValueCollection instance.
     - context (System.Runtime.Serialization.StreamingContext): A System.Runtime.Serialization.StreamingContext object that contains the source and destination of the serialized stream associated with the new System.Collections.Specialized.NameValueCollection instance.
 
 new(Int32, IHashCodeProvider, IComparer)
+  OBSOLETE: This constructor has been deprecated. Use NameValueCollection(Int32, IEqualityComparer) instead.
   Summary: Initializes a new instance of the System.Collections.Specialized.NameValueCollection class that is empty, has the specified initial capacity and uses the specified hash code provider and the specified comparer.
   Parameters:
     - capacity (System.Int32): The initial number of entries that the System.Collections.Specialized.NameValueCollection can contain.

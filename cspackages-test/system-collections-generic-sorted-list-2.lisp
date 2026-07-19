@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.SortedList`2
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --defgeneric
 
 (cl:in-package :system-collections-generic-sorted-list-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.SortedList`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.SortedList`2")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Generic.SortedList`2 constructor overloads. Dispatches at runtime.

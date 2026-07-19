@@ -10,14 +10,18 @@
 (in-package :assembly-package-generator)
 
 
-(defun emit-class-file-header (stream fq-name pkg-name creation-time &optional options-line discovered-via)
+(defun emit-class-file-header (stream fq-name pkg-name creation-time &optional options-line discovered-via class-plist)
   "Writes the generated-file header comment block and the cl:in-package
    preamble (the defpackage itself lives in packages.lisp, emitted
    separately by generate-batch-packages-file). OPTIONS-LINE
    (format-class-options-line) and DISCOVERED-VIA (nil for an explicitly-
    requested class) record this class's own effective per-class flags and
    discovery provenance, so a generated file is self-describing even in
-   isolation (doc/plan-fable-detail-07.md)."
+   isolation (doc/plan-fable-detail-07.md). CLASS-PLIST, when supplied and
+   itself :obsolete (doc/plan-fable-detail-16.md), adds its own
+   obsolete-docstring-line as a \";;; OBSOLETE...\" comment line -- type-
+   level obsolete is visibility only, same as every member-level one; the
+   type is still fully generated."
   (format stream ";;; Generated automatically. Do not edit.~%")
   (format stream ";;; Class: ~A~%" fq-name)
   (format stream ";;; Generator Version: ~D~%" *generator-version*)
@@ -26,6 +30,8 @@
     (format stream ";;; Options: ~A~%" options-line))
   (when discovered-via
     (format stream ";;; Discovered via: ~A~%" discovered-via))
+  (when (and class-plist (getf class-plist :obsolete))
+    (format stream ";;; ~A" (obsolete-docstring-line class-plist)))
   (format stream "~%(cl:in-package :~A)~%~%" pkg-name))
 
 (defun emit-type-constants-and-clos-registration (stream fq-name creation-time ensure-type)
@@ -105,7 +111,7 @@
               (params (getf c :parameters))
               (param-names (mapcar (lambda (p) (map-param-name (getf p :name))) params))
               (args-str (format nil "~{~A~^ ~}" param-names))
-              (docstring (build-docstring summary returns params c-doc))
+              (docstring (build-docstring summary returns params c-doc c))
               (escaped-docstring (escape-lisp-string docstring)))
          (format stream "(cl:defun new (~A)~%" args-str)
          (when (> (length escaped-docstring) 0)
@@ -163,13 +169,24 @@
       (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
       (format stream "~%")))
 
+(defun member-doc-str (member-plist)
+  "Returns MEMBER-PLIST's (a field/property/event plist) escaped docstring
+   text: obsolete-docstring-line's own leading \"OBSOLETE...\" line (doc/
+   plan-fable-detail-16.md), if any, followed by its XML-doc :summary, if
+   any -- the shared doc-str computation every plain (non-overload-
+   dispatching) property/field/event emit-* helper below uses, factored
+   out so each no longer separately re-derives \"(x-doc ...) (doc-str (if
+   x-doc (escape-lisp-string x-doc) \"\"))\"."
+  (let* ((summary (getf (getf member-plist :documentation) :summary))
+         (raw (format nil "~A~A" (obsolete-docstring-line member-plist) (or summary ""))))
+    (if (> (length raw) 0) (escape-lisp-string raw) "")))
+
 (defun emit-literal-field-constants (stream literal-fields)
   "Writes memoized-symbol-macro bindings (see emit-memoized-constant-binding)
    for compile-time literal fields."
   (dolist (f literal-fields)
     (let* ((cname (format nil "+~A+" (camel-to-kebab (getf f :name))))
-           (f-doc (getf (getf f :documentation) :summary))
-           (doc-str (if f-doc (escape-lisp-string f-doc) "")))
+           (doc-str (member-doc-str f)))
       (emit-shared-mutable-constant-warning stream (getf f :type))
       (emit-memoized-constant-binding stream cname (getf f :name) doc-str))))
 
@@ -180,16 +197,14 @@
   ;; Runtime Read-Only Fields (Constants)
   (dolist (f pure-const-fields)
     (let* ((cname (format nil "+~A+" (camel-to-kebab (getf f :name))))
-           (f-doc (getf (getf f :documentation) :summary))
-           (doc-str (if f-doc (escape-lisp-string f-doc) "")))
+           (doc-str (member-doc-str f)))
       (emit-shared-mutable-constant-warning stream (getf f :type))
       (emit-memoized-constant-binding stream cname (getf f :name) doc-str)))
 
   ;; Runtime Read-Only Fields (Dynamic)
   (dolist (f dynamic-const-fields)
     (let* ((cname (map-member-name (getf f :name)))
-           (f-doc (getf (getf f :documentation) :summary))
-           (doc-str (if f-doc (escape-lisp-string f-doc) "")))
+           (doc-str (member-doc-str f)))
       (format stream "(cl:define-symbol-macro ~A (dotnet:static <type-str> \"~A\"))~%" cname (getf f :name))
       (if (> (length doc-str) 0)
           (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
@@ -204,16 +219,14 @@
   ;; Pure Constant Properties
   (dolist (p pure-const-props)
     (let* ((cname (format nil "+~A+" (camel-to-kebab (getf p :name))))
-           (p-doc (getf (getf p :documentation) :summary))
-           (doc-str (if p-doc (escape-lisp-string p-doc) "")))
+           (doc-str (member-doc-str p)))
       (emit-shared-mutable-constant-warning stream (getf p :type))
       (emit-memoized-constant-binding stream cname (getf p :name) doc-str)))
 
   ;; Runtime Read-Only Properties
   (dolist (p dynamic-const-props)
     (let* ((cname (map-member-name (getf p :name)))
-           (p-doc (getf (getf p :documentation) :summary))
-           (doc-str (if p-doc (escape-lisp-string p-doc) "")))
+           (doc-str (member-doc-str p)))
       (format stream "(cl:define-symbol-macro ~A (dotnet:static <type-str> \"~A\"))~%" cname (getf p :name))
       (if (> (length doc-str) 0)
           (format stream "(cl:setf (cl:documentation (cl:quote ~A) (cl:quote cl:variable)) \"~A\")~%~%" cname doc-str)
@@ -226,8 +239,7 @@
   (dolist (p writeable-static-props)
     (let* ((pname (map-member-name (getf p :name)))
            (readable (getf p :readable))
-           (p-doc (getf (getf p :documentation) :summary))
-           (doc-str (if p-doc (escape-lisp-string p-doc) "")))
+           (doc-str (member-doc-str p)))
       (when readable
         (format stream "(cl:defun ~A ()~%" (safe-symbol-token pname))
         (when (> (length doc-str) 0)
@@ -269,8 +281,7 @@
                  (set-method (getf p :set-method))
                  (index-params (getf p :parameters))
                  (index-param-names (mapcar (lambda (ip) (map-param-name (getf ip :name))) index-params))
-                 (p-doc (getf (getf p :documentation) :summary))
-                 (doc-str (if p-doc (escape-lisp-string p-doc) "")))
+                 (doc-str (member-doc-str p)))
             (when readable
               (format stream "(cl:defun ~A (obj!~@[ ~{~A~^ ~}~])~%" (safe-symbol-token pname) index-param-names)
               (when (> (length doc-str) 0)
@@ -309,8 +320,7 @@
           (event-wrapper-names (getf e :name) all-other-names)
         (push add-name all-other-names)
         (push remove-name all-other-names)
-        (let* ((e-doc (getf (getf e :documentation) :summary))
-               (doc-str (if e-doc (escape-lisp-string e-doc) "")))
+        (let* ((doc-str (member-doc-str e)))
           (format stream "(cl:defun ~A (obj! handler)~%" (safe-symbol-token add-name))
           (when (> (length doc-str) 0)
             (format stream "  \"~A\"~%" doc-str))
@@ -331,8 +341,7 @@
   (dolist (f instance-fields)
     (let* ((fname (map-member-name (getf f :name)))
            (writeable (not (getf f :init-only)))
-           (f-doc (getf (getf f :documentation) :summary))
-           (doc-str (if f-doc (escape-lisp-string f-doc) "")))
+           (doc-str (member-doc-str f)))
       (format stream "(cl:defun ~A (obj!)~%" (safe-symbol-token fname))
       (when (> (length doc-str) 0)
         (format stream "  \"~A\"~%" doc-str))
@@ -351,8 +360,7 @@
    setf-expansion writes the type's own static storage slot directly."
   (dolist (f mutable-static-fields)
     (let* ((fname (map-member-name (getf f :name)))
-           (f-doc (getf (getf f :documentation) :summary))
-           (doc-str (if f-doc (escape-lisp-string f-doc) "")))
+           (doc-str (member-doc-str f)))
       (format stream "(cl:defun ~A ()~%" (safe-symbol-token fname))
       (when (> (length doc-str) 0)
         (format stream "  \"~A\"~%" doc-str))
@@ -478,7 +486,7 @@
                (docstring (with-output-to-string (out)
                             (format out "Extension method from ~A (assembly ~A)."
                                     holder-fq (or holder-assembly "?"))
-                            (let ((body (build-docstring summary returns params m-doc)))
+                            (let ((body (build-docstring summary returns params m-doc m)))
                               (when (> (length body) 0)
                                 (format out "~%~A" body)))))
                (escaped-docstring (escape-lisp-string docstring)))
@@ -522,7 +530,7 @@
 
     (let ((classification (classify-class-members class-plist constant-properties-list)))
       (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
-        (emit-class-file-header stream fq-name pkg-name creation-time options-line discovered-via)
+        (emit-class-file-header stream fq-name pkg-name creation-time options-line discovered-via class-plist)
         (emit-type-constants-and-clos-registration stream fq-name creation-time ensure-type)
         (emit-constructors stream fq-name (cmc-clean-ctors classification) (cmc-dirty-ctors classification))
         (emit-literal-field-constants stream (cmc-literal-fields classification))

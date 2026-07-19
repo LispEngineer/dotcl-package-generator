@@ -151,7 +151,7 @@
           (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Parameter is not a plist: ~S~%" context param))
         (progn
           (when (not (validate-plist-keys param '(:name :type)
-                                         '(:name :type :assembly-qualified-type :nullable-underlying-type :extension-this :out :ref :ref-readonly :scoped :params :has-default :default-kind :default-type :default-value)
+                                         '(:name :type :assembly-qualified-type :nullable-underlying-type :extension-this :out :ref :ref-readonly :scoped :params :has-default :default-kind :default-type :default-value :tuple-element-names)
                                          context))
             (setf valid nil))
           (let ((pname (getf param :name))
@@ -228,7 +228,7 @@
           (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Method entry is not a plist: ~S~%" context method))
         (progn
           (when (not (validate-plist-keys method '(:name :return-type)
-                                         '(:name :mangled-name :is-static :extension-method :return-type :assembly-qualified-return-type :nullable-underlying-return-type :parameters :documentation :is-generic :generic-arity)
+                                         '(:name :mangled-name :is-static :extension-method :return-type :assembly-qualified-return-type :nullable-underlying-return-type :parameters :documentation :is-generic :generic-arity :obsolete :obsolete-message :obsolete-error :tuple-element-return-names)
                                          context))
             (setf valid nil))
           (let ((mname (getf method :name))
@@ -291,7 +291,7 @@
           (setf valid nil)
           (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Constructor entry is not a plist: ~S~%" context ctor))
         (progn
-          (when (not (validate-plist-keys ctor nil '(:public :protected :protected-internal :parameters :documentation) context))
+          (when (not (validate-plist-keys ctor nil '(:public :protected :protected-internal :parameters :documentation :obsolete :obsolete-message :obsolete-error) context))
             (setf valid nil))
           (let ((c-pub (getf ctor :public))
                 (c-prot (getf ctor :protected))
@@ -338,7 +338,7 @@
           (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Property entry is not a plist: ~S~%" context prop))
         (progn
           (when (not (validate-plist-keys prop '(:name :type)
-                                         '(:name :type :assembly-qualified-type :nullable-underlying-type :readable :writeable :static :get-method :set-method :parameters :documentation)
+                                         '(:name :type :assembly-qualified-type :nullable-underlying-type :readable :writeable :static :get-method :set-method :parameters :documentation :obsolete :obsolete-message :obsolete-error :tuple-element-names)
                                          context))
             (setf valid nil))
           (let ((pname (getf prop :name))
@@ -409,7 +409,7 @@
           (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Event entry is not a plist: ~S~%" context event))
         (progn
           (when (not (validate-plist-keys event '(:name :type :add-method :remove-method)
-                                         '(:name :type :assembly-qualified-type :nullable-underlying-type :add-method :remove-method :documentation)
+                                         '(:name :type :assembly-qualified-type :nullable-underlying-type :add-method :remove-method :documentation :obsolete :obsolete-message :obsolete-error)
                                          context))
             (setf valid nil))
           (let ((ename (getf event :name))
@@ -460,7 +460,7 @@
           (utils:format-red *error-output* "[SCHEMA ERROR] ~A: Field entry is not a plist: ~S~%" context field))
         (progn
           (when (not (validate-plist-keys field '(:name :type)
-                                         '(:name :type :assembly-qualified-type :nullable-underlying-type :static :literal :init-only :public :documentation)
+                                         '(:name :type :assembly-qualified-type :nullable-underlying-type :static :literal :init-only :public :documentation :obsolete :obsolete-message :obsolete-error :tuple-element-names)
                                          context))
             (setf valid nil))
           (let ((fname (getf field :name))
@@ -536,7 +536,7 @@
                (context (format nil "Type '~A'" (if fqname fqname (if tname tname "Unknown")))))
 
           (when (not (validate-plist-keys type-entry '(:name :fully-qualified-name :kind)
-                                         '(:name :fully-qualified-name :namespace :kind :enum-underlying-type :documentation :superclass :superclass-closed :interfaces :interfaces-closed :flags :properties :fields :constructors :methods :events)
+                                         '(:name :fully-qualified-name :namespace :kind :enum-underlying-type :documentation :superclass :superclass-closed :interfaces :interfaces-closed :flags :properties :fields :constructors :methods :events :obsolete :obsolete-message :obsolete-error)
                                          context))
             (setf valid nil))
           

@@ -790,6 +790,66 @@ namespace AssemblyToLispyTestTarget
         public string Kind() => "B";
     }
 
+    /// <summary>
+    /// An obsolete type (doc/plan-fable-detail-16.md, Half A) -- a bare [Obsolete], no
+    /// message and not error-level.
+    /// </summary>
+    [Obsolete]
+    public class ObsoleteType
+    {
+    }
+
+    /// <summary>
+    /// Fixtures for [Obsolete] (Half A) and [TupleElementNames] (Half B) metadata
+    /// reflection, doc/plan-fable-detail-16.md.
+    /// </summary>
+    public class ObsoleteAndTupleFixtures
+    {
+        /// <summary>A bare [Obsolete] method -- no message, not error-level.</summary>
+        [Obsolete]
+        public void PlainObsolete()
+        {
+        }
+
+        /// <summary>An [Obsolete] method with a message.</summary>
+        [Obsolete("use PlainObsolete instead")]
+        public void ObsoleteWithMessage()
+        {
+        }
+
+        /// <summary>An [Obsolete] method with a message, marked error-level.</summary>
+        [Obsolete("completely gone", true)]
+        public void ObsoleteError()
+        {
+        }
+
+        /// <summary>An [Obsolete] property.</summary>
+        [Obsolete("use SomethingElse instead")]
+        public int ObsoleteProperty { get; set; }
+
+        /// <summary>An [Obsolete] field.</summary>
+        [Obsolete]
+        public int ObsoleteField;
+
+        /// <summary>A method returning a simple (non-nested), fully-named tuple.</summary>
+        public (int Count, string Name) GetStats() => (1, "one");
+
+        /// <summary>A method taking a simple, fully-named tuple parameter.</summary>
+        public void TakeStats((int Count, string Name) stats)
+        {
+        }
+
+        /// <summary>A method returning a tuple where only one element is named.</summary>
+        public (int Count, string) GetPartiallyNamed() => (1, "one");
+
+        /// <summary>
+        /// A method returning a NESTED named tuple -- doc/plan-fable-detail-16.md's Half
+        /// B v1 explicitly emits no :tuple-element-return-names key here at all (the
+        /// TransformNames count would not match the outer tuple's own arity).
+        /// </summary>
+        public (int Count, (string First, string Last) Name) GetNestedStats() => (1, ("a", "b"));
+    }
+
     // A small, deliberately-isolated sub-namespace (doc/plan-fable-detail-12.md) for a
     // precise --all-classes/--all-classes-recursive smoke-test demonstration --
     // AssemblyToLispyTestTarget.SubSpace has exactly the two classes below, so

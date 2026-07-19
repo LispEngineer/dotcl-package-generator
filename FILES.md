@@ -102,6 +102,8 @@ All emit one Lisp package, `assembly-package-generator`; split out of a former s
 * **`package-generator-tests-generic-method-codegen.lisp`** — generic-method codegen tests.
 * **`package-generator-tests-out-parameters.lisp`** — out-only-method classification and
   `dotnet:call-out`-backed codegen tests (`doc/plan-fable-detail-05.md`).
+* **`package-generator-tests-obsolete.lisp`** — `[Obsolete]`-surfacing docstring/comment
+  codegen tests (`doc/plan-fable-detail-16.md`).
 * **`package-generator-tests-events.lisp`** — C# event (add/remove accessor) codegen tests.
 * **`package-generator-tests-parents-interfaces.lisp`** — `--export-parents`/
   `--export-interfaces` upward-ancestor-graph re-export tests.

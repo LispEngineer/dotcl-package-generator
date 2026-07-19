@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --defgeneric
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Generic.Dictionary`2 constructor overloads. Dispatches at runtime.
@@ -56,6 +56,7 @@ new(KeyValuePair, IEqualityComparer)
     - comparer (System.Collections.Generic.IEqualityComparer`1[TKey]): The System.Collections.Generic.IEqualityComparer`1 implementation to use when comparing keys, or to use the default System.Collections.Generic.EqualityComparer`1 for the type of the key.
 
 new(SerializationInfo, StreamingContext)
+  OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
   Summary: Initializes a new instance of the System.Collections.Generic.Dictionary`2 class with serialized data.
   Parameters:
     - info (System.Runtime.Serialization.SerializationInfo): A System.Runtime.Serialization.SerializationInfo object containing the information required to serialize the System.Collections.Generic.Dictionary`2.
@@ -162,7 +163,8 @@ Returns: A System.Collections.Generic.Dictionary`2.Enumerator structure for the 
   (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "GetEnumerator"))
 
 (cl:defun get-object-data (obj! info context)
-  "Summary: Implements the System.Runtime.Serialization.ISerializable interface and returns the data needed to serialize the System.Collections.Generic.Dictionary`2 instance.
+  "OBSOLETE: This API supports obsolete formatter-based serialization. It should not be called or extended by application code.
+Summary: Implements the System.Runtime.Serialization.ISerializable interface and returns the data needed to serialize the System.Collections.Generic.Dictionary`2 instance.
 Parameters:
   - info (System.Runtime.Serialization.SerializationInfo): A System.Runtime.Serialization.SerializationInfo object that contains the information required to serialize the System.Collections.Generic.Dictionary`2 instance.
   - context (System.Runtime.Serialization.StreamingContext): A System.Runtime.Serialization.StreamingContext structure that contains the source and destination of the serialized stream associated with the System.Collections.Generic.Dictionary`2 instance.

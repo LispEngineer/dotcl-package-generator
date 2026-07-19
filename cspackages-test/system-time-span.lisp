@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: (none)
 
 (cl:in-package :system-time-span)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (ticks cl:nil supplied-ticks) (minutes cl:nil supplied-minutes) (seconds cl:nil supplied-seconds) (seconds2 cl:nil supplied-seconds2) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
   "Master wrapper for System.TimeSpan constructor overloads. Dispatches at runtime.

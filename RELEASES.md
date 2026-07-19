@@ -10,6 +10,31 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.53.0 — 2026-07-19
+
+**Surfaced `[System.Obsolete]` and `[TupleElementNames]` in reflected metadata and generated output (`doc/plan-fable-detail-16.md`, `*generator-version*` 52 → 53).**
+
+* **`[Obsolete]`:** every type/method/constructor/property/field/event plist gains
+  `:obsolete t` (plus `:obsolete-message "..."` when present, `:obsolete-error t` for a
+  compiler-error-level obsolete member) when reflected. The generated wrapper's
+  docstring — including each overload inside a Master Wrapper's combined docstring —
+  gets a leading `OBSOLETE.`/`OBSOLETE: <message>`/`OBSOLETE (error-level): <message>`
+  line; an obsolete type gets the same as a header comment in its class file and its
+  `packages.lisp` entry. Visibility only — an obsolete member is still fully generated
+  and still eligible for `--defgeneric`/`csharp-generics`.
+* **Tuple element names** (metadata only this version): `(int Count, string Name)
+  GetStats()`'s element names are now reflected as `:tuple-element-names`
+  (parameter/property/field) / `:tuple-element-return-names` (method), raw C# casing,
+  omitted when the tuple is nested (v1 handles only the non-nested case). No codegen
+  consumes these keys yet — a tuple-typed parameter/return still renders as the bare
+  `ValueTuple` type string; docstring rendering is tracked as a follow-up.
+  `doc/assembly-to-lispy.md` updated for all five new keys; `tests/framework.lisp`'s
+  schema validators extended to match.
+* New `AssemblyToLispyTestTarget.ObsoleteType`/`ObsoleteAndTupleFixtures` fixtures; new
+  `package-generator-tests-obsolete.lisp`.
+* See `doc/generator-design-notes.md`'s "[Obsolete] and Tuple Element Names (Version
+  53)" section for the full writeup.
+
 ## 2.52.1 — 2026-07-19
 
 **`--all-classes`/`--all-classes-recursive` namespace-level import (`doc/plan-fable-detail-12.md`); no `*generator-version*` bump.**

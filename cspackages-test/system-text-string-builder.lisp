@@ -1,15 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Text.StringBuilder
-;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Generator Version: 53
+;;; Creation Date: 2026-07-19T16:02:09Z
 ;;; Options: --defgeneric
 
 (cl:in-package :system-text-string-builder)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Text.StringBuilder"))
 (cl:defconstant <type-str> "System.Text.StringBuilder")
-(cl:defconstant <creation> "2026-07-19T15:32:24Z")
-(cl:defconstant <version> 52)
+(cl:defconstant <creation> "2026-07-19T16:02:09Z")
+(cl:defconstant <version> 53)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (capacity2 cl:nil supplied-capacity2) (length cl:nil supplied-length) (capacity3 cl:nil supplied-capacity3))
   "Master wrapper for System.Text.StringBuilder constructor overloads. Dispatches at runtime.
