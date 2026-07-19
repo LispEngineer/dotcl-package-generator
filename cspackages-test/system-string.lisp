@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.String
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-string)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.String"))
 (cl:defconstant <type-str> "System.String")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (value cl:&optional (count cl:nil supplied-count) (length cl:nil supplied-length) (enc cl:nil supplied-enc))
   "Master wrapper for System.String constructor overloads. Dispatches at runtime.
@@ -449,7 +449,7 @@ Parameters:
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.String.Concat also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   Concat(params Object[]) -> String
 ;;   Concat(params String[]) -> String
@@ -544,7 +544,7 @@ Parameters:
   (dotnet:static-generic <type-str> "Create" (cl:list type) length state action))
 
 ;; Note: System.String.Create also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   Create(IFormatProvider, ref DefaultInterpolatedStringHandler&) -> String
 ;;   Create(IFormatProvider, Char], ref DefaultInterpolatedStringHandler&) -> String
@@ -819,7 +819,7 @@ Parameters:
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.String.Format also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   Format(String, params Object[]) -> String
 ;;   Format(IFormatProvider, String, params Object[]) -> String
@@ -1225,7 +1225,7 @@ Join(String, IEnumerable) -> String
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; Note: System.String.Join also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   Join(Char, params String[]) -> String
 ;;   Join(String, params String[]) -> String
@@ -1654,7 +1654,7 @@ Split(String[], Int32, StringSplitOptions) -> String[]
                     :supplied-args (cl:append (cl:list :separator separator) (cl:when supplied-options (cl:list :options options)) (cl:when supplied-options2 (cl:list :options2 options2)))))))
 
 ;; Note: System.String.Split also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   Split(params Char[]) -> String[]
 
@@ -1868,7 +1868,7 @@ Trim(Char]) -> String
                     :supplied-args (cl:append (cl:when supplied-trim-char (cl:list :trim-char trim-char)))))))
 
 ;; Note: System.String.Trim also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   Trim(params Char[]) -> String
 
@@ -1901,7 +1901,7 @@ TrimEnd(Char]) -> String
                     :supplied-args (cl:append (cl:when supplied-trim-char (cl:list :trim-char trim-char)))))))
 
 ;; Note: System.String.TrimEnd also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   TrimEnd(params Char[]) -> String
 
@@ -1934,7 +1934,7 @@ TrimStart(Char]) -> String
                     :supplied-args (cl:append (cl:when supplied-trim-char (cl:list :trim-char trim-char)))))))
 
 ;; Note: System.String.TrimStart also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   TrimStart(params Char[]) -> String
 

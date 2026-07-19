@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.List`1
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-collections-generic-list-1)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.List`1"))
 (cl:defconstant <type-str> "System.Collections.Generic.List`1")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity))
   "Master wrapper for System.Collections.Generic.List`1 constructor overloads. Dispatches at runtime.

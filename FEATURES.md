@@ -607,10 +607,9 @@ with no receiver object) are not reflected at all — see "Unsupported Features"
 **Summary:** a method with no overloads (of any kind) generates a single typed function;
 a name with two or more usable overloads, or one overload with a default parameter value,
 collapses into one runtime-dispatching "Master Wrapper" (see "Default Parameter Values"
-below); methods using `ref`/`out`/`ref readonly`/`params`, or the declaring generic type's
-own (as opposed to the method's own) unresolved type parameter, are not generated at all —
-only documented in a comment (or, for the latter, silently excluded — see Unsupported
-Features).
+below); methods using `ref`/`ref readonly`/`params` are not generated at all — only
+documented in a comment. A method whose only special parameter modifier is `out` gets a
+real wrapper too, via a different mechanism — see "Out Parameters" below.
 
 * **Single clean overload**: a direct typed wrapper, e.g.
   `(cl:defun dispose (obj!) (dotnet:invoke (the (dotnet "...") obj!) "Dispose"))`. For a
@@ -640,6 +639,45 @@ Features).
 * Every Master Wrapper's docstring enumerates every overload it covers — its
   human-readable signature plus that overload's own XML-doc Summary/Returns/Parameters —
   so the full set of available overloads stays documented on the one function.
+
+
+
+## Out Parameters
+
+**Summary:** a method whose only special parameter modifier is C#'s `out` (the
+ubiquitous `Try*` pattern — `bool TryParse(string s, out int result)`,
+`Dictionary<K,V>.TryGetValue(K, out V)`) generates a real wrapper: every `out` parameter
+is omitted from the Lisp lambda list entirely and instead returned as an additional
+`cl:values` result, in C# declaration order, after the method's own primary return
+value.
+
+```lisp
+(cl:multiple-value-bind (ok result) (int:try-parse "42")
+  (when ok (format t "Parsed: ~A~%" result)))
+```
+
+* **Mechanism:** forwards to DotCL's `dotnet:call-out`/`dotnet:call-out-generic`
+  (`doc/dotnet-dotcl-interop.md`), which already return `(cl:values primary-return out-1
+  out-2 ...)` themselves — no separate values-wrapping is needed on the generated side.
+* **Naming:** the plain mapped name in the common case (`TryParse` has no clean
+  overload, so it becomes plain `try-parse`); a `/out` suffix is added only when a clean
+  overload of the same C# name already exists in the same static/instance mode (so a
+  hypothetical clean `Parse` and out-only `Parse(out ...)` can coexist as `parse` and
+  `parse/out`) — `/` never appears in an ordinary mapped member name.
+* **Overloaded out-only methods** sharing one name go through the same Master Wrapper
+  dispatch machinery clean overloads do (positional prefix/optional/keyword slot
+  inference, runtime type-check guards, `cl:cond` dispatch, `csharp-overload-not-found`
+  fallback), computed purely over each overload's non-out parameters.
+* **v1 scope** (`doc/plan-fable-detail-05.md`): **methods only** — constructors,
+  indexers, and injected extension methods with an `out` parameter remain dirty/
+  unsupported, unchanged. A method mixing `out` with `ref`/`ref readonly`/`params` also
+  remains dirty (`dotnet:call-out` fills a `ref` parameter with a null placeholder
+  rather than accepting an input value for it, so it only actually matches `out`'s
+  semantics). An out-only method name overloaded across *different* generic arities has
+  no two-tier dispatch (assumed single arity, unlike clean generic-method overloads —
+  see "Generic Methods" below). Deliberately excluded from `--defgeneric`/
+  `csharp-generics` unification pending separate verification that DotCL's
+  generic-function dispatch correctly propagates a multi-valued forwarding call.
 
 
 
@@ -948,11 +986,14 @@ function's Lisp docstring (or, for constants/symbol-macros, a `(cl:documentation
   dispatch (the same treatment overloaded methods get, but not yet extended to
   indexers).
 
-* **Dirty method/constructor/indexer overloads** — any overload using `ref`, `out`,
-  `ref readonly`/`in`, or `params` — is not generated; its signature is documented in a
-  comment. (Explicitly planned future work per `PLAN.md`: a `-ref` suffix naming
-  convention with `out` → multiple Lisp return values.) A default parameter value is
-  *not* in this category — see "Default Parameter Values" above.
+* **Dirty method overloads** using `ref`, `ref readonly`/`in`, or `params` — is not
+  generated; its signature is documented in a comment. A **method** using only `out`
+  parameter(s) is no longer in this category — see "Out Parameters" below. **Dirty
+  constructor/indexer overloads** still cover `ref`/`out`/`params` all three, unchanged
+  — out-parameter support is method-only for now (v1, `doc/plan-fable-detail-05.md`).
+  (Explicitly planned future work per `PLAN.md`: a `-ref` suffix naming convention for
+  `ref`, and extending out-parameter support to constructors.) A default parameter
+  value is *not* in this category — see "Default Parameter Values" above.
 
 * **Static events** (raised via a static `add_X`/`remove_X` pair with no receiver object)
   are not reflected — `AssemblyToLispy.cs`'s `:events` collection explicitly excludes

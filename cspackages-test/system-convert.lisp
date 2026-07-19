@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Convert
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-convert)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Convert"))
 (cl:defconstant <type-str> "System.Convert")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:define-symbol-macro db-null (dotnet:static <type-str> "DBNull"))
 (cl:setf (cl:documentation (cl:quote db-null) (cl:quote cl:variable)) "A constant that represents a database column that is absent of data; that is, database null.")
@@ -112,13 +112,6 @@ FromHexString(Byte]) -> Byte[]
                     :class-name <type-str>
                     :method-name "FromHexString"
                     :supplied-args (cl:append (cl:list :s s))))))
-
-;; Note: System.Convert.FromHexString also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
-;; yet supported:
-;;   FromHexString(String, Byte], out Int32&, out Int32&) -> OperationStatus
-;;   FromHexString(Char], Byte], out Int32&, out Int32&) -> OperationStatus
-;;   FromHexString(Byte], Byte], out Int32&, out Int32&) -> OperationStatus
 
 (cl:defun get-type-code (value)
   "Summary: Returns the System.TypeCode for the specified object.
@@ -2874,25 +2867,147 @@ ToUInt64(String, Int32) -> UInt64
                     :method-name "ToUInt64"
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-provider (cl:list :provider provider)))))))
 
-;; The following C# System.Convert.TryFromBase64Chars overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryFromBase64Chars(Char], Byte], out Int32&) -> Boolean
+(cl:defun from-hex-string/out (source destination)
+  "Master wrapper for System.Convert.FromHexString out-only overloads. Dispatches at runtime. Each out parameter is returned as an additional cl:values result (after the primary return value), in C# declaration order.
 
-;; The following C# System.Convert.TryFromBase64String overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryFromBase64String(String, Byte], out Int32&) -> Boolean
+FromHexString(String, Byte], out Int32&, out Int32&) -> OperationStatus
+  Summary: Converts the string, which encodes binary data as hex characters, to an equivalent 8-bit unsigned integer span.
+  Returns: An System.Buffers.OperationStatus describing the result of the operation.
+  Parameters:
+    - source (System.String): The string to convert.
+    - destination (System.Span`1[System.Byte]): The span in which to write the converted 8-bit unsigned integers. When this method returns value different than System.Buffers.OperationStatus.Done, either the span remains unmodified or contains an incomplete conversion of source, up to the last valid character.
+    - chars-consumed (System.Int32&): When this method returns, contains the number of characters that were consumed from source.
+    - bytes-written (System.Int32&): When this method returns, contains the number of bytes that were written to destination.
 
-;; The following C# System.Convert.TryToBase64Chars overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryToBase64Chars(Byte], Char], out Int32&, Base64FormattingOptions = None) -> Boolean
+FromHexString(Char], Byte], out Int32&, out Int32&) -> OperationStatus
+  Summary: Converts the span of chars, which encodes binary data as hex characters, to an equivalent 8-bit unsigned integer span.
+  Returns: An System.Buffers.OperationStatus describing the result of the operation.
+  Parameters:
+    - source (System.ReadOnlySpan`1[System.Char]): The span to convert.
+    - destination (System.Span`1[System.Byte]): The span in which to write the converted 8-bit unsigned integers. When this method returns value different than System.Buffers.OperationStatus.Done, either the span remains unmodified or contains an incomplete conversion of source, up to the last valid character.
+    - chars-consumed (System.Int32&): When this method returns, contains the number of characters that were consumed from source.
+    - bytes-written (System.Int32&): When this method returns, contains the number of bytes that were written to destination.
 
-;; The following C# System.Convert.TryToHexString overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryToHexString(Byte], Char], out Int32&) -> Boolean
-;;   TryToHexString(Byte], Byte], out Int32&) -> Boolean
+FromHexString(Byte], Byte], out Int32&, out Int32&) -> OperationStatus
+  Summary: Converts the span of UTF-8 chars, which encodes binary data as hex characters, to an equivalent 8-bit unsigned integer span.
+  Returns: An System.Buffers.OperationStatus describing the result of the operation.
+  Parameters:
+    - utf8-source (System.ReadOnlySpan`1[System.Byte]): The span to convert.
+    - destination (System.Span`1[System.Byte]): The span in which to write the converted 8-bit unsigned integers.
+    - bytes-consumed (System.Int32&): When this method returns, contains the number of bytes that were consumed from utf8Source.
+    - bytes-written (System.Int32&): When this method returns, contains the number of bytes that were written to destination.
+"
+  (cl:cond
+    ((cl:and (cl:stringp source) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
+     (dotnet:call-out <type-str> "FromHexString" source destination))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
+     (dotnet:call-out <type-str> "FromHexString" source destination))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
+     (dotnet:call-out <type-str> "FromHexString" source destination))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-CONVERT"
+                    :class-name <type-str>
+                    :method-name "FromHexString"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :destination destination))))))
 
-;; The following C# System.Convert.TryToHexStringLower overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryToHexStringLower(Byte], Char], out Int32&) -> Boolean
-;;   TryToHexStringLower(Byte], Byte], out Int32&) -> Boolean
+(cl:defun try-from-base64-chars (chars bytes)
+  "Returns (cl:values <primary-return> bytes-written) -- TryFromBase64Chars(Char], Byte], out Int32&) -> Boolean
+Summary: Tries to convert the specified span containing a string representation that is encoded with base-64 digits into a span of 8-bit unsigned integers.
+Returns: if the conversion was successful; otherwise, .
+Parameters:
+  - chars (System.ReadOnlySpan`1[System.Char]): A span containing the string representation that is encoded with base-64 digits.
+  - bytes (System.Span`1[System.Byte]): The span in which to write the converted 8-bit unsigned integers. If this method returns , either the span remains unmodified or contains an incomplete conversion of chars, up to the last valid character.
+"
+  (dotnet:call-out <type-str> "TryFromBase64Chars" chars bytes))
+
+(cl:defun try-from-base64-string (s bytes)
+  "Returns (cl:values <primary-return> bytes-written) -- TryFromBase64String(String, Byte], out Int32&) -> Boolean
+Summary: Tries to convert the specified string representation that is encoded with base-64 digits into a span of 8-bit unsigned integers.
+Returns: if the conversion was successful; otherwise, .
+Parameters:
+  - s (System.String): The string representation that is encoded with base-64 digits.
+  - bytes (System.Span`1[System.Byte]): The span in which to write the converted 8-bit unsigned integers. When this method returns , either the span remains unmodified or contains an incomplete conversion of s, up to the last valid character.
+"
+  (dotnet:call-out <type-str> "TryFromBase64String" s bytes))
+
+(cl:defun try-to-base64-chars (bytes chars cl:&key (options (dotnet:enum-or "System.Base64FormattingOptions" "None") supplied-options))
+  "Master wrapper for System.Convert.TryToBase64Chars out-only overloads. Dispatches at runtime. Each out parameter is returned as an additional cl:values result (after the primary return value), in C# declaration order.
+
+TryToBase64Chars(Byte], Char], out Int32&, Base64FormattingOptions = None) -> Boolean
+  Summary: Tries to convert the 8-bit unsigned integers inside the specified read-only span into their equivalent string representation that is encoded with base-64 digits. You can optionally specify whether to insert line breaks in the return value.
+  Returns: if the conversion is successful; otherwise, .
+  Parameters:
+    - bytes (System.ReadOnlySpan`1[System.Byte]): A read-only span of 8-bit unsigned integers.
+    - chars (System.Span`1[System.Char]): The span in which to write the string representation in base 64 of the elements in bytes. If the length of bytes is 0, or when this method returns , nothing is written into this parameter.
+    - chars-written (System.Int32&): When this method returns, contains the total number of characters written into chars.
+    - options (System.Base64FormattingOptions): One of the enumeration values that specify whether to insert line breaks in the return value. The default value is System.Base64FormattingOptions.None.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null bytes) (dotnet:is-instance-of bytes "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null chars) (dotnet:is-instance-of chars "System.Span`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:not supplied-options) (cl:or (cl:null options) (dotnet:is-instance-of options "System.Base64FormattingOptions"))))
+     (dotnet:call-out <type-str> "TryToBase64Chars" bytes chars (cl:if supplied-options options (dotnet:enum-or "System.Base64FormattingOptions" "None"))))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-CONVERT"
+                    :class-name <type-str>
+                    :method-name "TryToBase64Chars"
+                    :supplied-args (cl:append (cl:list :bytes bytes) (cl:list :chars chars) (cl:when supplied-options (cl:list :options options)))))))
+
+(cl:defun try-to-hex-string (source destination)
+  "Master wrapper for System.Convert.TryToHexString out-only overloads. Dispatches at runtime. Each out parameter is returned as an additional cl:values result (after the primary return value), in C# declaration order.
+
+TryToHexString(Byte], Char], out Int32&) -> Boolean
+  Summary: Converts a span of 8-bit unsigned integers to its equivalent span representation that is encoded with uppercase hex characters.
+  Returns: if the conversion was successful; otherwise, .
+  Parameters:
+    - source (System.ReadOnlySpan`1[System.Byte]): A span of 8-bit unsigned integers.
+    - destination (System.Span`1[System.Char]): The span representation in hex of the elements in source.
+    - chars-written (System.Int32&): When this method returns, contains the number of chars that were written in destination.
+
+TryToHexString(Byte], Byte], out Int32&) -> Boolean
+  Summary: Converts a span of 8-bit unsigned integers to its equivalent UTF-8 span representation that is encoded with uppercase hex characters.
+  Returns: if the conversion was successful; otherwise, .
+  Parameters:
+    - source (System.ReadOnlySpan`1[System.Byte]): A span of 8-bit unsigned integers.
+    - utf8-destination (System.Span`1[System.Byte]): The UTF-8 span representation in hex of the elements in source.
+    - bytes-written (System.Int32&): When this method returns, contains the number of bytes that were written in utf8Destination.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
+     (dotnet:call-out <type-str> "TryToHexString" source destination))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
+     (dotnet:call-out <type-str> "TryToHexString" source destination))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-CONVERT"
+                    :class-name <type-str>
+                    :method-name "TryToHexString"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :destination destination))))))
+
+(cl:defun try-to-hex-string-lower (source destination)
+  "Master wrapper for System.Convert.TryToHexStringLower out-only overloads. Dispatches at runtime. Each out parameter is returned as an additional cl:values result (after the primary return value), in C# declaration order.
+
+TryToHexStringLower(Byte], Char], out Int32&) -> Boolean
+  Summary: Converts a span of 8-bit unsigned integers to its equivalent span representation that is encoded with lowercase hex characters.
+  Returns: if the conversion was successful; otherwise, .
+  Parameters:
+    - source (System.ReadOnlySpan`1[System.Byte]): A span of 8-bit unsigned integers.
+    - destination (System.Span`1[System.Char]): The span representation in hex of the elements in source.
+    - chars-written (System.Int32&): When this method returns, contains the number of chars that were written in destination.
+
+TryToHexStringLower(Byte], Byte], out Int32&) -> Boolean
+  Summary: Converts a span of 8-bit unsigned integers to its equivalent UTF-8 span representation that is encoded with lowercase hex characters.
+  Returns: if the conversion was successful; otherwise, .
+  Parameters:
+    - source (System.ReadOnlySpan`1[System.Byte]): A span of 8-bit unsigned integers.
+    - utf8-destination (System.Span`1[System.Byte]): The UTF-8 span representation in hex of the elements in source.
+    - bytes-written (System.Int32&): When this method returns, contains the number of bytes that were written in utf8Destination.
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
+     (dotnet:call-out <type-str> "TryToHexStringLower" source destination))
+    ((cl:and (cl:or (cl:null source) (dotnet:is-instance-of source "System.ReadOnlySpan`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")))
+     (dotnet:call-out <type-str> "TryToHexStringLower" source destination))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-CONVERT"
+                    :class-name <type-str>
+                    :method-name "TryToHexStringLower"
+                    :supplied-args (cl:append (cl:list :source source) (cl:list :destination destination))))))
 

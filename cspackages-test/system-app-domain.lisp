@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.AppDomain
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-app-domain)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.AppDomain"))
 (cl:defconstant <type-str> "System.AppDomain")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:define-symbol-macro current-domain (dotnet:static <type-str> "CurrentDomain"))
 
@@ -251,7 +251,7 @@ ExecuteAssembly(String, String[], Byte[], AssemblyHashAlgorithm) -> Int32
   (dotnet:invoke (cl:the (dotnet "System.AppDomain") obj!) "ExecuteAssemblyByName" assembly-name))
 
 ;; Note: System.AppDomain.ExecuteAssemblyByName also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   ExecuteAssemblyByName(AssemblyName, params String[]) -> Int32
 ;;   ExecuteAssemblyByName(String, params String[]) -> Int32

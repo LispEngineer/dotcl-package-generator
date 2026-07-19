@@ -28,7 +28,8 @@
         (dynamic-const-props (cmc-dynamic-const-props classification))
         (writeable-static-props (cmc-writeable-static-props classification))
         (instance-prop-groups (cmc-instance-prop-groups classification))
-        (method-groups (cmc-method-groups classification)))
+        (method-groups (cmc-method-groups classification))
+        (out-method-groups (cmc-out-method-groups classification)))
     (when (> (length (cmc-clean-ctors classification)) 0) (push "new" names))
     (dolist (f literal-fields) (push (format nil "+~A+" (camel-to-kebab (getf f :name))) names))
     (dolist (f pure-const-fields) (push (format nil "+~A+" (camel-to-kebab (getf f :name))) names))
@@ -66,6 +67,8 @@
            (dolist (n (method-name-wrapper-names static-clean kebab-name)) (push n names)))
           ((> instance-count 0)
            (dolist (n (method-name-wrapper-names instance-clean kebab-name)) (push n names))))))
+    (dolist (group out-method-groups)
+      (dolist (n (out-method-group-names (car group) (cdr group) method-groups)) (push n names)))
     names))
 
 (defun event-wrapper-names (event-name taken-names)
@@ -129,6 +132,7 @@
          (instance-prop-groups (cmc-instance-prop-groups classification))
          (writeable-static-props (cmc-writeable-static-props classification))
          (method-groups (cmc-method-groups classification))
+         (out-method-groups (cmc-out-method-groups classification))
          (clean-ctor-count (length (cmc-clean-ctors classification)))
          (instance-events (cmc-instance-events classification))
          (exports nil)
@@ -213,6 +217,13 @@
           ((> instance-count 0)
            (dolist (n (method-name-wrapper-names instance-clean kebab-name)) (push n exports))))))
 
+    ;; Collect out-only method exports (doc/plan-fable-detail-05.md) --
+    ;; mirrors emit-out-methods' own naming exactly (via
+    ;; out-method-group-names) so a class's out-only overloads are always
+    ;; exported under the same name(s) generate-class-file actually defines.
+    (dolist (group out-method-groups)
+      (dolist (n (out-method-group-names (car group) (cdr group) method-groups)) (push n exports)))
+
     ;; Collect event exports (add-X/remove-X pairs). Processed last so
     ;; event-wrapper-names' collision check sees every other member's
     ;; already-decided export name; each event's chosen add-/remove- names
@@ -260,9 +271,18 @@
    doc/make-everything-defgeneric.md's excluded categories),
    generic/type-parameterized instance methods (their wrapper's lambda
    list puts the type argument(s) before obj!, so obj! is not the leading
-   argument), and overloaded indexers (already unimplemented by
+   argument), overloaded indexers (already unimplemented by
    generate-class-file itself, so no wrapper function exists to forward
-   to).
+   to), and instance out-only methods (cmc-out-method-groups,
+   doc/plan-fable-detail-05.md) -- deliberately excluded rather than
+   included: a --defgeneric dispatch defmethod's body is just a forwarding
+   call to the underlying obj!-first wrapper, and CL does propagate that
+   call's multiple values through as the defmethod's own return values, but
+   this hasn't been separately verified against DotCL's generic-function
+   dispatch machinery, so out-only methods are left out of unification for
+   this v1 pending that verification (a follow-up, not a correctness bug --
+   an out-only method's own directly-generated wrapper is unaffected either
+   way).
    Independently filters FIELDS/PROPERTIES/METHODS the same way
    generate-class-file and compute-package-exports-and-shadows do (this
    file's existing duplication convention -- see

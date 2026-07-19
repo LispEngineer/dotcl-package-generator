@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Exception
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-exception)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Exception"))
 (cl:defconstant <type-str> "System.Exception")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (cl:&optional (message cl:nil supplied-message) (inner-exception cl:nil supplied-inner-exception))
   "Master wrapper for System.Exception constructor overloads. Dispatches at runtime.

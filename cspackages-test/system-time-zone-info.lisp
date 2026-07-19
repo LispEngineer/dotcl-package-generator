@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeZoneInfo
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-time-zone-info)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeZoneInfo"))
 (cl:defconstant <type-str> "System.TimeZoneInfo")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:define-symbol-macro local (dotnet:static <type-str> "Local"))
 (cl:setf (cl:documentation (cl:quote local) (cl:quote cl:variable)) "Gets a System.TimeZoneInfo object that represents the local time zone.")
@@ -418,16 +418,50 @@ Returns: The value of the System.TimeZoneInfo.DisplayName property of the curren
 "
   (dotnet:invoke (cl:the (dotnet "System.TimeZoneInfo") obj!) "ToString"))
 
-;; The following C# System.TimeZoneInfo.TryConvertIanaIdToWindowsId overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryConvertIanaIdToWindowsId(String, out String&) -> Boolean
+(cl:defun try-convert-iana-id-to-windows-id (iana-id)
+  "Returns (cl:values <primary-return> windows-id) -- TryConvertIanaIdToWindowsId(String, out String&) -> Boolean
+Summary: Tries to convert an IANA time zone ID to a Windows ID.
+Returns: if the ID conversion succeeded, otherwise.
+Parameters:
+  - iana-id (System.String): The IANA time zone ID.
+"
+  (dotnet:call-out <type-str> "TryConvertIanaIdToWindowsId" iana-id))
 
-;; The following C# System.TimeZoneInfo.TryConvertWindowsIdToIanaId overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryConvertWindowsIdToIanaId(String, out String&) -> Boolean
-;;   TryConvertWindowsIdToIanaId(String, String, out String&) -> Boolean
+(cl:defun try-convert-windows-id-to-iana-id (windows-id cl:&optional (region cl:nil supplied-region))
+  "Master wrapper for System.TimeZoneInfo.TryConvertWindowsIdToIanaId out-only overloads. Dispatches at runtime. Each out parameter is returned as an additional cl:values result (after the primary return value), in C# declaration order.
 
-;; The following C# System.TimeZoneInfo.TryFindSystemTimeZoneById overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryFindSystemTimeZoneById(String, out TimeZoneInfo&) -> Boolean
+TryConvertWindowsIdToIanaId(String, out String&) -> Boolean
+  Summary: Tries to convert a Windows time zone ID to an IANA ID.
+  Returns: if the ID conversion succeeded, otherwise.
+  Parameters:
+    - windows-id (System.String): The Windows time zone ID.
+    - iana-id (System.String&): When this method returns, contains the IANA ID that corresponds to the specified Windows ID.
+
+TryConvertWindowsIdToIanaId(String, String, out String&) -> Boolean
+  Summary: Tries to convert a Windows time zone ID to an IANA ID.
+  Returns: if the ID conversion succeeded, otherwise.
+  Parameters:
+    - windows-id (System.String): The Windows time zone ID.
+    - region (System.String): The ISO 3166 code for the country/region.
+    - iana-id (System.String&): When this method returns, contains the IANA ID that corresponds to the specified Windows ID.
+"
+  (cl:cond
+    ((cl:and (cl:stringp windows-id) supplied-region (cl:stringp region))
+     (dotnet:call-out <type-str> "TryConvertWindowsIdToIanaId" windows-id region))
+    ((cl:and (cl:stringp windows-id) (cl:not supplied-region))
+     (dotnet:call-out <type-str> "TryConvertWindowsIdToIanaId" windows-id))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-TIME-ZONE-INFO"
+                    :class-name <type-str>
+                    :method-name "TryConvertWindowsIdToIanaId"
+                    :supplied-args (cl:append (cl:list :windows-id windows-id) (cl:when supplied-region (cl:list :region region)))))))
+
+(cl:defun try-find-system-time-zone-by-id (id)
+  "Returns (cl:values <primary-return> time-zone-info) -- TryFindSystemTimeZoneById(String, out TimeZoneInfo&) -> Boolean
+Summary: Retrieves a System.TimeZoneInfo object by time zone name.
+Returns: if the System.TimeZoneInfo object was successfully retrieved; otherwise, .
+Parameters:
+  - id (System.String): The time zone name.
+"
+  (dotnet:call-out <type-str> "TryFindSystemTimeZoneById" id))
 

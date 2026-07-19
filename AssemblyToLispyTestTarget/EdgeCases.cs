@@ -675,6 +675,57 @@ namespace AssemblyToLispyTestTarget
         /// subsequent read (<c>cl:eq</c> holds).
         /// </summary>
         public static object SharedSingleton { get; } = new object();
+
+        /// <summary>
+        /// v51 guard: a single out parameter on a static method with no clean
+        /// overload of the same name, mirroring the ubiquitous Try* pattern
+        /// (int.TryParse) -- exercises the plain-name (no /out suffix) case.
+        /// </summary>
+        public static bool TryGetThing(string key, out int value)
+        {
+            if (key == "found")
+            {
+                value = 42;
+                return true;
+            }
+            value = 0;
+            return false;
+        }
+
+        /// <summary>
+        /// v51 guard: two out parameters, in C# declaration order, on an
+        /// instance method.
+        /// </summary>
+        public bool TryGetPair(int input, out int doubled, out string label)
+        {
+            doubled = input * 2;
+            label = input >= 0 ? "non-negative" : "negative";
+            return input != 0;
+        }
+
+        /// <summary>
+        /// v51 guard: a clean overload sharing a C# name with an out-only
+        /// overload below.
+        /// </summary>
+        public string Locate(int id) => $"id:{id}";
+
+        /// <summary>
+        /// v51 guard: out-only overload sharing a name with the clean
+        /// Locate(int) above -- must be named locate/out, not locate, so the
+        /// two coexist without colliding. Deliberately takes a DIFFERENT
+        /// number of non-out (in) arguments (2, vs. Locate(int)'s 1) than the
+        /// clean overload: DotCL's dotnet:call-out resolves an overload by
+        /// in-argument count alone (FindOutMethod, Runtime.DotNet.cs), not by
+        /// argument type, so a same-in-arg-count clean/out-only pair sharing
+        /// one name would be genuinely ambiguous at the call-out layer itself
+        /// -- a real limitation of that primitive, not exercised by this
+        /// fixture.
+        /// </summary>
+        public bool Locate(string key, int extra, out int id)
+        {
+            id = key.Length + extra;
+            return key.Length > 0;
+        }
     }
 
     /// <summary>

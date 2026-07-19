@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.StreamReader
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-io-stream-reader)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.StreamReader"))
 (cl:defconstant <type-str> "System.IO.StreamReader")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (stream cl:&optional (detect-encoding-from-byte-order-marks cl:nil supplied-detect-encoding-from-byte-order-marks) (detect-encoding-from-byte-order-marks2 cl:nil supplied-detect-encoding-from-byte-order-marks2) (buffer-size cl:nil supplied-buffer-size) cl:&key (leave-open cl:nil supplied-leave-open))
   "Master wrapper for System.IO.StreamReader constructor overloads. Dispatches at runtime.

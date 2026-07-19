@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Array
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-array)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Array"))
 (cl:defconstant <type-str> "System.Array")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defvar %max-length-cache% csharp-assembly-utils:+unbound-marker+)
 (cl:define-symbol-macro +max-length+
@@ -353,7 +353,7 @@ CreateInstance(Type, Int32, Int32, Int32) -> Array
                     :supplied-args (cl:append (cl:list :element-type element-type) (cl:list :length length) (cl:when supplied-length2 (cl:list :length2 length2)) (cl:when supplied-length3 (cl:list :length3 length3)))))))
 
 ;; Note: System.Array.CreateInstance also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   CreateInstance(Type, params Int32[]) -> Array
 ;;   CreateInstance(Type, params Int64[]) -> Array
@@ -388,7 +388,7 @@ CreateInstanceFromArrayType(Type, Int32[], Int32[]) -> Array
                     :supplied-args (cl:append (cl:list :array-type array-type) (cl:list :length length) (cl:when supplied-lower-bounds (cl:list :lower-bounds lower-bounds)))))))
 
 ;; Note: System.Array.CreateInstanceFromArrayType also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   CreateInstanceFromArrayType(Type, params Int32[]) -> Array
 
@@ -653,7 +653,7 @@ GetValue(Int64, Int64, Int64) -> Object
                     :supplied-args (cl:append (cl:list :index index) (cl:when supplied-index2 (cl:list :index2 index2)) (cl:when supplied-index3 (cl:list :index3 index3)))))))
 
 ;; Note: System.Array.GetValue also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   GetValue(params Int32[]) -> Object
 ;;   GetValue(params Int64[]) -> Object
@@ -858,7 +858,7 @@ LastIndexOf(T[], T, Int32, Int32) -> Int32
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
 ;; The following C# System.Array.Resize overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
+;; (ref or params) and are not yet supported:
 ;;   Resize(ref T[]&, Int32) -> Void
 
 (cl:defun reverse (array cl:&optional (index cl:nil supplied-index) (length cl:nil supplied-length))
@@ -995,7 +995,7 @@ SetValue(Object, Int64, Int64, Int64) -> Void
                     :supplied-args (cl:append (cl:list :value value) (cl:list :index index) (cl:when supplied-index2 (cl:list :index2 index2)) (cl:when supplied-index3 (cl:list :index3 index3)))))))
 
 ;; Note: System.Array.SetValue also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   SetValue(Object, params Int32[]) -> Void
 ;;   SetValue(Object, params Int64[]) -> Void

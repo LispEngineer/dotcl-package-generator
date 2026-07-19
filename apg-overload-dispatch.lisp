@@ -720,3 +720,220 @@
        (dolist (cell cells)
          (generate-generic-cell-wrapper stream cell name (internal-arity-fn-name base-name cell) fq-name static-p))
        (generate-generic-arity-dispatcher stream cells base-name base-name fq-name)))))
+
+
+;;; Out-parameter support (doc/plan-fable-detail-05.md): a method whose only
+;;; special parameter modifier is :out (out-only-method-p, apg-member-
+;;; predicates.lisp) gets a real wrapper here instead of a dirty comment,
+;;; forwarding to DotCL's dotnet:call-out/dotnet:call-out-generic (see
+;;; doc/dotnet-dotcl-interop.md), which already returns (cl:values
+;;; primary-return out-1 out-2 ...) itself -- the out parameter(s) are
+;;; simply omitted from the wrapper's own lambda list entirely. `ref`/
+;;; `ref readonly`/`params` overloads remain unsupported (dirty-method-p).
+
+(defun out-method-collides-with-clean-p (name is-static-p method-groups)
+  "Returns t if METHOD-GROUPS (cmc-method-groups) already has a CLEAN
+   overload of C# method NAME in the same static/instance mode as
+   IS-STATIC-P -- see out-method-wrapper-name."
+  (let ((group (cdr (assoc name method-groups :test #'string=))))
+    (some (lambda (m) (and (clean-method-p m) (eq (not (getf m :is-static)) (not is-static-p))))
+          group)))
+
+(defun out-method-wrapper-name (name is-static-p mixed-mode-p method-groups)
+  "Returns the Lisp wrapper base name for out-only overloads of C# method
+   NAME in the given static/instance mode: the plain mapped name -- e.g.
+   TryParse has no clean overload, so it becomes plain try-parse -- unless
+   MIXED-MODE-P (this out-method-group has BOTH static and instance out-only
+   overloads under the same C# name), in which case the static mode's name
+   is suffixed with \"*\" instead, exactly mirroring emit-methods' own
+   static/instance mixed-mode convention for clean methods. Either form is
+   further suffixed with \"/out\" when a clean overload of the same C# name
+   already exists in this same static/instance mode (so a hypothetical
+   clean Parse and out-only Parse(out ...) can coexist as parse and
+   parse/out). \"/\" never appears in an ordinary mapped member name
+   (camel-to-kebab never emits it, and the only \"/\" in the operator table
+   is division, always alone in its own operator group), so this suffix can
+   never collide with a real C# name. See doc/plan-fable-detail-05.md."
+  (let* ((kebab-name (map-member-name name))
+         (candidate (if (and is-static-p mixed-mode-p) (concatenate 'string kebab-name "*") kebab-name)))
+    (if (out-method-collides-with-clean-p name is-static-p method-groups)
+        (concatenate 'string candidate "/out")
+        candidate)))
+
+(defun out-method-group-names (name out-methods method-groups)
+  "Returns the wrapper name(s) (0-2: one per static/instance mode actually
+   present in OUT-METHODS) generate-out-method-name-wrappers will
+   define/export for C# method NAME's out-only overloads OUT-METHODS
+   (cmc-out-method-groups' entry for NAME), given METHOD-GROUPS
+   (cmc-method-groups, for out-method-wrapper-name's collision check).
+   Shared between emit-out-methods and compute-package-exports-and-shadows/
+   class-member-names-excluding-events so the two can never disagree."
+  (let* ((static-out (remove-if-not (lambda (m) (getf m :is-static)) out-methods))
+         (instance-out (remove-if-not (lambda (m) (not (getf m :is-static))) out-methods))
+         (mixed-mode-p (and static-out instance-out))
+         (names nil))
+    (when instance-out (push (out-method-wrapper-name name nil mixed-mode-p method-groups) names))
+    (when static-out (push (out-method-wrapper-name name t mixed-mode-p method-groups) names))
+    (nreverse names)))
+
+(defun format-call-out-invocation-expr (fq-name dotnet-method-name static-p is-generic-p generic-type-args-str param-names)
+  "Builds the dotnet:call-out/dotnet:call-out-generic invocation-expression
+   string for an out-only method -- mirrors format-invocation-expr's 4-way
+   static/instance x generic/non-generic shape, but PARAM-NAMES here are
+   only the non-out (in) arguments (see make-filtered-out-method), and the
+   callee is dotnet:call-out(-generic) instead of dotnet:invoke/static,
+   since dotnet:call-out already returns (cl:values primary-return out-1
+   out-2 ...) itself -- no separate values-wrapping is needed. The first
+   argument is <type-str> for a static call or obj! for an instance call,
+   exactly like dotnet:static/dotnet:invoke's own receiver convention."
+  (let ((receiver (if static-p "<type-str>" "obj!")))
+    (if is-generic-p
+        (format nil "(dotnet:call-out-generic ~A \"~A\" (cl:list ~A)~@[ ~{~A~^ ~}~])"
+                receiver dotnet-method-name generic-type-args-str param-names)
+        (format nil "(dotnet:call-out ~A \"~A\"~@[ ~{~A~^ ~}~])"
+                receiver dotnet-method-name param-names))))
+
+(defun generate-single-out-overload (stream m mname fq-name static-p)
+  "Generates the Lisp wrapper function for a single out-only C# overload
+   (out-only-method-p) -- mirrors generate-single-overload, but every :out
+   parameter is omitted from the lambda list entirely and the body forwards
+   to dotnet:call-out/dotnet:call-out-generic, which returns the method's
+   own return value as the primary value followed by each out parameter's
+   final value, in C# declaration order (documented in the generated
+   docstring, ahead of the ordinary summary/returns/parameters block)."
+  (let* ((m-doc (getf m :documentation))
+         (summary (getf m-doc :summary))
+         (returns (getf m-doc :returns))
+         (all-params (getf m :parameters))
+         (in-params (remove-if (lambda (p) (getf p :out)) all-params))
+         (out-param-names (mapcar (lambda (p) (map-param-name (getf p :name)))
+                                   (remove-if-not (lambda (p) (getf p :out)) all-params)))
+         (is-generic-p (getf m :is-generic))
+         (generic-type-names (and is-generic-p (generic-type-param-names (getf m :generic-arity))))
+         (generic-type-args-str (format nil "~{~A~^ ~}" generic-type-names))
+         (param-names (mapcar (lambda (p) (map-param-name (getf p :name))) in-params))
+         (args-str (cond
+                     ((and static-p is-generic-p)
+                      (format nil "~A~@[ ~{~A~^ ~}~]" generic-type-args-str param-names))
+                     (static-p
+                      (format nil "~{~A~^ ~}" param-names))
+                     (is-generic-p
+                      (format nil "~A obj!~@[ ~{~A~^ ~}~]" generic-type-args-str param-names))
+                     (t
+                      (format nil "obj!~@[ ~{~A~^ ~}~]" param-names))))
+         (out-note (format nil "Returns (cl:values <primary-return> ~{~A~^ ~}) -- ~A"
+                            out-param-names (method-signature-str m)))
+         (body (build-docstring summary returns in-params m-doc))
+         (docstring (if (> (length body) 0)
+                        (format nil "~A~%~A" out-note body)
+                        out-note))
+         (escaped-docstring (escape-lisp-string docstring))
+         (dotnet-method-name (or (getf m :mangled-name) (getf m :name))))
+    (format stream "(cl:defun ~A (~A)~%" (safe-symbol-token mname) args-str)
+    (when (> (length escaped-docstring) 0)
+      (format stream "  \"~A\"~%" escaped-docstring))
+    (format stream "  ~A)~%~%"
+            (format-call-out-invocation-expr fq-name dotnet-method-name static-p is-generic-p generic-type-args-str param-names))))
+
+(defun make-filtered-out-method (m)
+  "Returns a shallow copy of method plist M with :parameters replaced by
+   only its non-out parameters, preserving relative order -- the parameter
+   view every Master Wrapper helper (common-parameter-prefix,
+   format-master-overload-condition, master-overload-param-names, etc.)
+   should see for an out-only overload, since dotnet:call-out's in-args
+   must be supplied in this same relative order and never include an out
+   slot at all."
+  (let ((copy (copy-list m))
+        (in-params (remove-if (lambda (p) (getf p :out)) (getf m :parameters))))
+    (setf (getf copy :parameters) in-params)
+    copy))
+
+(defun generate-out-master-wrapper (stream methods name mname fq-name static-p is-generic-p)
+  "Generates a Master-Wrapper-style out-only dispatcher for multiple
+   out-only overloads of one C# method NAME, mirroring generate-master-
+   wrapper's dispatch/&optional/&key machinery exactly (via the same shared
+   helpers, operating on each overload's non-out parameters only -- see
+   make-filtered-out-method), but each cond clause's action calls
+   dotnet:call-out/dotnet:call-out-generic (format-call-out-invocation-
+   expr) instead of dotnet:invoke/static, since dotnet:call-out already
+   returns every out parameter as an additional value. All of METHODS is
+   assumed to share one generic arity -- an out-only method name overloaded
+   across different generic arities has no two-tier generic-arity dispatch
+   here (unlike generate-method-name-wrappers); this v1 scope is documented
+   in doc/plan-fable-detail-05.md."
+  (let* ((filtered (mapcar #'make-filtered-out-method methods))
+         (generic-arity (and is-generic-p (getf (first methods) :generic-arity)))
+         (generic-type-names (and is-generic-p (generic-type-param-names generic-arity)))
+         (raw-prefix (common-parameter-prefix filtered))
+         (prefix-len (length raw-prefix))
+         (max-mand-len (max-mandatory-parameter-len filtered))
+         (raw-opt-params (collect-optional-positional-params filtered prefix-len max-mand-len))
+         (uniquified (uniquify-positional-params (append raw-prefix raw-opt-params)))
+         (prefix (subseq uniquified 0 prefix-len))
+         (opt-params (nthcdr prefix-len uniquified))
+         (prefix-names (mapcar (lambda (p) (map-param-name (getf p :name))) prefix))
+         (opt-param-names (mapcar (lambda (p) (map-param-name (getf p :name))) opt-params))
+         (key-params (collect-key-params filtered max-mand-len (append prefix-names opt-param-names)))
+         (args-list nil))
+    (when is-generic-p
+      (setf args-list (append args-list generic-type-names)))
+    (unless static-p
+      (setf args-list (append args-list (list "obj!"))))
+    (setf args-list (append args-list prefix-names))
+    (when opt-params
+      (setf args-list (append args-list (list "cl:&optional")))
+      (dolist (op opt-params)
+        (let* ((op-name (map-param-name (getf op :name)))
+               (supplied-var (format nil "supplied-~A" op-name)))
+          (setf args-list (append args-list (list (format nil "(~A cl:nil ~A)" op-name supplied-var)))))))
+    (when key-params
+      (setf args-list (append args-list (list "cl:&key")))
+      (dolist (kp key-params)
+        (let* ((kp-name (map-param-name (getf kp :name)))
+               (kp-default (find-parameter-default-str (getf kp :name) filtered))
+               (supplied-var (format nil "supplied-~A" kp-name)))
+          (setf args-list (append args-list (list (format nil "(~A ~A ~A)" kp-name kp-default supplied-var)))))))
+
+    (format stream "(cl:defun ~A (~{~A~^ ~})~%" (safe-symbol-token mname) args-list)
+    (let* ((header (format nil "Master wrapper for ~A.~A out-only overloads. Dispatches at runtime. Each out parameter is returned as an additional cl:values result (after the primary return value), in C# declaration order." fq-name name))
+           (docstring (format-combined-overloads-docstring header #'method-signature-str methods))
+           (escaped-docstring (escape-lisp-string docstring)))
+      (format stream "  \"~A\"~%" escaped-docstring))
+    (format stream "  (cl:cond~%")
+
+    ;; Sort by effective (mandatory) arity for specificity, exactly like
+    ;; generate-master-wrapper -- comparing each pair's FILTERED (non-out)
+    ;; parameter list, since that's the arity that actually governs dispatch
+    ;; here, while still emitting the ORIGINAL method plist's own
+    ;; :mangled-name/:name for the call.
+    (let ((sorted-pairs (sort (mapcar #'cons methods filtered) #'master-wrapper-more-specific-p :key #'cdr)))
+      (dolist (pair sorted-pairs)
+        (let* ((cm-orig (car pair))
+               (cm-filtered (cdr pair))
+               (cond-str (format-master-overload-condition cm-filtered prefix opt-params key-params))
+               (call-param-names (master-overload-param-names cm-filtered prefix opt-params key-params))
+               (dotnet-method-name (or (getf cm-orig :mangled-name) name))
+               (type-args-str (format nil "~{~A~^ ~}" generic-type-names))
+               (action-str (format-call-out-invocation-expr fq-name dotnet-method-name static-p is-generic-p type-args-str call-param-names)))
+          (format stream "    (~A~%" cond-str)
+          (format stream "     ~A)~%" action-str))))
+
+    (let ((supplied-args-expr (format-supplied-args-expr prefix opt-params key-params)))
+      (format stream "    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found~%")
+      (format stream "                    :package-name \"~A\"~%" (string-upcase (type-fq-name-to-pkg-name fq-name)))
+      (format stream "                    :class-name <type-str>~%")
+      (format stream "                    :method-name \"~A\"~%" name)
+      (format stream "                    :supplied-args ~A))))~%~%" supplied-args-expr))))
+
+(defun generate-out-method-name-wrappers (stream out-methods name mname fq-name static-p)
+  "Generates the public Lisp wrapper function for one C# method NAME's
+   already static/instance-partitioned OUT-METHODS (out-only-method-p),
+   under MNAME (out-method-wrapper-name): generate-single-out-overload for
+   a lone non-complex overload, generate-out-master-wrapper (mirroring
+   generate-master-wrapper's dispatch, but via dotnet:call-out) for a
+   complex group of out-only overloads sharing this name. Complex here uses
+   the same complex-group-p test clean overloads do (more than one
+   overload, or a single overload with a usable-default parameter)."
+  (if (and (= (length out-methods) 1) (not (complex-group-p out-methods)))
+      (generate-single-out-overload stream (first out-methods) mname fq-name static-p)
+      (generate-out-master-wrapper stream out-methods name mname fq-name static-p (getf (first out-methods) :is-generic))))

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector4
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-numerics-vector4)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector4"))
 (cl:defconstant <type-str> "System.Numerics.Vector4")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (cl:&optional (value cl:nil supplied-value) (w cl:nil supplied-w) (w2 cl:nil supplied-w2) (w3 cl:nil supplied-w3))
   "Master wrapper for System.Numerics.Vector4 constructor overloads. Dispatches at runtime.
@@ -1277,7 +1277,7 @@ Parameters:
   (dotnet:static <type-str> "LoadAlignedNonTemporal" (cl:the (dotnet "System.Single*") source)))
 
 ;; The following C# System.Numerics.Vector4.LoadUnsafe overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
+;; (ref or params) and are not yet supported:
 ;;   LoadUnsafe(ref Single&) -> Vector4
 ;;   LoadUnsafe(ref Single&, UIntPtr) -> Vector4
 

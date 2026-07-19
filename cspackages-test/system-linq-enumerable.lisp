@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-linq-enumerable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun aggregate-arity-1 (type source func)
   "Summary: Applies an accumulator function over a sequence.
@@ -2703,10 +2703,6 @@ ToLookup(IEnumerable, Func, Func, IEqualityComparer) -> ILookup
                       :method-name "to-lookup"
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
 
-;; The following C# System.Linq.Enumerable.TryGetNonEnumeratedCount overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryGetNonEnumeratedCount(IEnumerable, out Int32&) -> Boolean
-
 (cl:defun union (type first second cl:&optional (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Linq.Enumerable.Union overloads. Dispatches at runtime.
 
@@ -2849,4 +2845,13 @@ Zip(IEnumerable, IEnumerable, IEnumerable) -> ValueTuple
                       :class-name <type-str>
                       :method-name "zip"
                       :supplied-args (cl:list :type-count (cl:length type-list) :types type-list))))))
+
+(cl:defun try-get-non-enumerated-count (type source)
+  "Returns (cl:values <primary-return> count) -- TryGetNonEnumeratedCount(IEnumerable, out Int32&) -> Boolean
+Summary: Attempts to determine the number of elements in a sequence without forcing an enumeration.
+Returns: if the count of source can be determined without enumeration; otherwise, .
+Parameters:
+  - source (System.Collections.Generic.IEnumerable`1[TSource]): A sequence that contains elements to be counted.
+"
+  (dotnet:call-out-generic <type-str> "TryGetNonEnumeratedCount" (cl:list type) source))
 

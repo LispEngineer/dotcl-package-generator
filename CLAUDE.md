@@ -339,7 +339,13 @@ reflection and runs before DotCL boots.
   if the name is overloaded as both instance and static) — with no separate type-suffixed
   direct-call functions (removed in Version 24; a method name overloaded across *different*
   generic arities gets at most one extra `name<>` dispatcher instead, added in Version 28).
-  "Dirty" overloads are skipped but documented in a comment. See
+  "Dirty" overloads (ref/ref-readonly/params) are skipped but documented in a comment. A
+  **method** (not constructor) whose only special modifier is `out` is a third category as
+  of Version 51 (`out-only-method-p`, `doc/plan-fable-detail-05.md`): neither clean nor
+  dirty, it gets its own real wrapper forwarding to `dotnet:call-out`/
+  `dotnet:call-out-generic`, with the `out` parameter(s) returned as extra `cl:values`
+  instead of appearing in the lambda list — named plainly, or `name/out` if a clean
+  overload of the same name/mode already exists. See
   `doc/generator-design-notes.md`'s per-version sections for the exact dispatch rules
   (positional-prefix computation, static/instance grouping, etc.) before modifying this logic
   — it has non-obvious history (e.g. static/instance method-name collisions, and struct

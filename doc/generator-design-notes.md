@@ -3170,3 +3170,117 @@ Types" section and the "Unsupported Features" → "C# Features" first bullet), w
 asserted the silent-exclusion behavior actually happens — it doesn't, and now describe
 the real, dynamic-dispatch-based behavior instead. No `*generator-version*` bump
 accompanies this entry, since no generated-output shape changed.
+
+## Out-Parameter Support (Version 51)
+
+`doc/plan-fable-detail-05.md`'s goal: generate real wrappers for the ubiquitous .NET
+`Try*` pattern (`bool TryParse(string s, out T result)`, `Dictionary<K,V>.TryGetValue(K,
+out V)`) instead of the dirty "not yet supported" comment every `out` parameter
+previously earned, mapping each `out` parameter to an additional Lisp return value.
+
+### Phase 0: feasibility was already satisfied
+
+The whole feature hinges on whether DotCL's invocation path can observe `out`-parameter
+writebacks. Reading `Runtime.DotNet.cs` (the `../dotcl` checkout) found the primitive
+already exists: `dotnet:call-out`/`dotnet:call-out-generic` (added in dotcl 0.1.17, per
+`dotcl/dotcl#45`) invoke a method supplying only its non-out ("in") arguments, filling
+`out`/`ref` parameter slots with a null placeholder before the call, and return `(cl:values
+primary-return out-1 out-2 ...)` — exactly the shape this plan wanted to propose
+upstream. This project's `DotCL.Runtime` pin was already at 0.1.18 (`dotcl-packagegen.csproj`),
+so no version bump or upstream proposal was needed; the plan's Phase 0 "write the proposal
+instead" branch never triggered. `doc/dotnet-dotcl-interop.md` already documented both
+primitives in detail (predating this plan); a short cross-reference note was added there
+instead of re-documenting from scratch.
+
+One real limitation surfaced by reading `FindOutMethod`/`DotNetCallOut`'s actual C#
+source: `dotnet:call-out` treats a `ref` parameter identically to `out` (both get a null
+placeholder and never receive an input value), which does not match `ref`'s real C#
+semantics (an input value the callee may also update). This is why v1's scope is
+**out-only** methods — a method mixing `out` with `ref`/`ref readonly`/`params` stays
+dirty, unchanged.
+
+### Classification: a third, disjoint bucket
+
+`out-only-method-p` (`apg-member-predicates.lisp`) mirrors `clean-method-p`'s other
+exclusions (operators, accessors, unsupported generic arity, the class's own open
+generic type parameter — the last one now correctly understood, post-Version-51's-own
+audit above, to never actually fire on real data either) but *requires* at least one
+`:out` parameter and *rejects* `:ref`/`:ref-readonly`/`:params`. `dirty-method-p` no
+longer treats a lone `:out` modifier as dirty (only `:ref`/`:ref-readonly`/`:params` do
+now); `classify-class-members`'s `non-operator-non-accessor-methods` filter additionally
+excludes `out-only-method-p` methods, so they never enter `method-groups` at all — a new,
+fully disjoint `out-method-groups` slot (`cmc-out-method-groups`) collects them instead,
+grouped by name identically (`group-methods-by-name`, factored out of the inline
+hash-table walk `method-groups` always used, to avoid duplicating it). Constructors are
+untouched: `clean-constructor-p`/`dirty-constructor-p` still treat `:out` as
+dirty/unsupported, since constructor out-parameter support is explicitly out of this
+v1's scope (out constructors are rare) — the "not yet supported" comment wording for
+constructors is therefore left as `(ref, out, or params)`, while the method-side wording
+changed to `(ref or params)` (`emit-methods`, `apg-class-file-generator.lisp`) to match
+what's actually still unsupported there.
+
+### Naming: plain, or `/out` on a same-name/mode collision
+
+The out-wrapper uses the plain mapped name in the overwhelmingly common case — `TryParse`
+has no clean overload, so `try-parse` is free. When a clean overload of the *same* C#
+name exists in the *same* static/instance mode, the out-only wrapper instead gets a
+`/out` suffix (`parse` vs. `parse/out`) — `out-method-wrapper-name`
+(`apg-overload-dispatch.lisp`) checks this via `out-method-collides-with-clean-p` against
+`cmc-method-groups`. `/` was chosen because `camel-to-kebab` never emits it (the only
+`/` among mapped operator names is division, always alone in its own operator group), so
+this suffix can never collide with a real C# name. `out-method-group-names` computes the
+same wrapper name(s) `compute-package-exports-and-shadows`/
+`class-member-names-excluding-events` need to export, mirroring `method-name-wrapper-names`'s
+role for clean methods, so codegen and export computation can never disagree.
+
+### Codegen: reusing the Master Wrapper machinery unchanged, on filtered parameters
+
+A single out-only overload (no complex group) gets a direct wrapper
+(`generate-single-out-overload`), mirroring `generate-single-overload`, but its lambda
+list only includes non-out parameters and its body calls
+`format-call-out-invocation-expr` (the `dotnet:call-out`/`dotnet:call-out-generic`
+equivalent of `format-invocation-expr`) instead of `dotnet:invoke`/`dotnet:static`.
+Multiple out-only overloads sharing a name reuse the *entire* existing Master Wrapper
+toolkit — `common-parameter-prefix`, `collect-optional-positional-params`,
+`uniquify-positional-params`, `collect-key-params`, `master-wrapper-more-specific-p`,
+`format-master-overload-condition`, `master-overload-param-names` — completely
+unchanged, by constructing a shallow copy of each overload's plist
+(`make-filtered-out-method`) with `:parameters` replaced by only its non-out parameters,
+in original relative order (exactly the order `dotnet:call-out`'s in-args must be
+supplied in). Only the final action-string constructor differs
+(`generate-out-master-wrapper` calls `format-call-out-invocation-expr` instead of
+`format-master-overload-action`) — every guard/dispatch/lambda-list computation is
+identical code to the clean-method path, just run against the filtered view. This mirrors
+`generate-constructor-master-wrapper`'s existing precedent of duplicating
+`generate-master-wrapper`'s lambda-list-building logic for a sibling case, rather than
+introducing a larger shared-abstraction refactor.
+
+An out-only method name spanning more than one generic arity gets no two-tier dispatch
+(unlike clean generic methods, `generic-arity-dispatch-mode`) — assumed to share one
+arity; documented as a v1 simplification, not implemented, since this combination is
+expected to be vanishingly rare.
+
+### Deliberately excluded: `--defgeneric`/`csharp-generics` unification
+
+`collect-class-instance-generics` (`apg-export-mirrors.lisp`) does not fold out-only
+methods into the shared generic-function unification. CL does propagate a forwarding
+call's multiple values through as a `defmethod`'s own return values, so this would very
+likely just work, but it was not separately verified against DotCL's actual
+generic-function dispatch machinery within this change's scope — deferred as a
+follow-up, not a correctness bug (an out-only method's own directly-generated wrapper is
+unaffected either way).
+
+### Testing
+
+New `package-generator-tests-out-parameters.lisp`: classification (`out-only-method-p`
+accepts/rejects, `dirty-method-p` no longer flags a lone `:out`), naming
+(`out-method-wrapper-name`'s plain/`/out` cases), and codegen (a lone out-only method's
+emitted lambda list and `dotnet:call-out` call; a clean/out-only name collision's
+`name`/`name/out` split). New `RuntimeExerciseFixtures` fixtures in
+`AssemblyToLispyTestTarget/EdgeCases.cs` (`TryGetThing` — static, one `out`, no clean
+collision; `TryGetPair` — instance, two `out` parameters; `Locate` — a clean `int`
+overload alongside an out-only overload with a *different* in-argument count, avoiding a
+genuine ambiguity in `dotnet:call-out`'s own count-only overload resolution) plus
+`RuntimeExerciseTest/runtime-tests.lisp`'s `test-out-parameters`, actually calling each
+generated wrapper against the live DotCL host and asserting on both the primary return
+value and every `out` value.

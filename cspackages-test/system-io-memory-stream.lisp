@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.MemoryStream
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-io-memory-stream)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.MemoryStream"))
 (cl:defconstant <type-str> "System.IO.MemoryStream")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (writable cl:nil supplied-writable) (count cl:nil supplied-count) (writable2 cl:nil supplied-writable2) (publicly-visible cl:nil supplied-publicly-visible))
   "Master wrapper for System.IO.MemoryStream constructor overloads. Dispatches at runtime.
@@ -239,10 +239,6 @@ Returns: A new byte array.
 "
   (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "ToArray"))
 
-;; The following C# System.IO.MemoryStream.TryGetBuffer overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryGetBuffer(out 0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]&) -> Boolean
-
 (cl:defun write (obj! buffer cl:&optional (offset cl:nil supplied-offset) (count cl:nil supplied-count))
   "Master wrapper for System.IO.MemoryStream.Write overloads. Dispatches at runtime.
 
@@ -312,4 +308,11 @@ Parameters:
   - stream (System.IO.Stream): The stream to write this memory stream to.
 "
   (dotnet:invoke (cl:the (dotnet "System.IO.MemoryStream") obj!) "WriteTo" stream))
+
+(cl:defun try-get-buffer (obj!)
+  "Returns (cl:values <primary-return> buffer) -- TryGetBuffer(out 0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]&) -> Boolean
+Summary: Returns the array of unsigned bytes from which this stream was created. The return value indicates whether the conversion succeeded.
+Returns: if the buffer is exposable; otherwise, .
+"
+  (dotnet:call-out obj! "TryGetBuffer"))
 

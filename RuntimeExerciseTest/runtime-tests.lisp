@@ -358,6 +358,37 @@ comparison would be brittle."
     (check-true "KeyCombo Is*->? renamed bool field" (kc:triggered-on-repeat? kc))))
 
 ;;; ---------------------------------------------------------------------
+;;; v51 guard: out-parameter support (doc/plan-fable-detail-05.md) --
+;;; dotnet:call-out/dotnet:call-out-generic-backed wrappers for methods
+;;; whose only special modifier is C#'s `out`.
+
+(cl:defun test-out-parameters ()
+  (cl:let ((f (ref:new)))
+    ;; Static method, single out parameter, no clean overload of the same
+    ;; name -- plain try-get-thing (no /out suffix).
+    (cl:multiple-value-bind (ok value) (ref:try-get-thing "found")
+      (check-true "v51: try-get-thing found -> t" (cl:eq ok cl:t))
+      (check-equal "v51: try-get-thing found value" 42 value))
+    (cl:multiple-value-bind (ok value) (ref:try-get-thing "missing")
+      (check-true "v51: try-get-thing missing -> nil" (cl:null ok))
+      (check-equal "v51: try-get-thing missing value" 0 value))
+    ;; Instance method, two out parameters, in C# declaration order.
+    (cl:multiple-value-bind (ok doubled label) (ref:try-get-pair f 5)
+      (check-true "v51: try-get-pair(5) -> t" (cl:eq ok cl:t))
+      (check-equal "v51: try-get-pair(5) doubled" 10 doubled)
+      (check-equal "v51: try-get-pair(5) label" "non-negative" label))
+    (cl:multiple-value-bind (ok doubled label) (ref:try-get-pair f -3)
+      (check-true "v51: try-get-pair(-3) -> t" (cl:eq ok cl:t))
+      (check-equal "v51: try-get-pair(-3) doubled" -6 doubled)
+      (check-equal "v51: try-get-pair(-3) label" "negative" label))
+    ;; Clean Locate(int) vs. out-only Locate(string,int,out int) sharing one
+    ;; C# name -- the out-only overload must be named locate/out.
+    (check-equal "v51: locate (clean int overload)" "id:7" (ref:locate f 7))
+    (cl:multiple-value-bind (ok id) (ref:locate/out f "abc" 10)
+      (check-true "v51: locate/out(\"abc\", 10) -> t" (cl:eq ok cl:t))
+      (check-equal "v51: locate/out(\"abc\", 10) id" 13 id))))
+
+;;; ---------------------------------------------------------------------
 ;;; Gum: TextRuntime -- the exact all-parameters-defaulted constructor shape
 ;;; that motivated the v48 fix (DefaultParameterTestClass mirrors it
 ;;; synthetically; this is the real one). Constructed with
@@ -393,6 +424,7 @@ comparison would be brittle."
   (test-monogame-mathhelper-gametime)
   (test-gum)
   (test-gum-text-runtime)
+  (test-out-parameters)
   (cl:format cl:t "~&[runtime-tests] ~D passed, ~D failed.~%" *pass-count* (cl:length *failures*))
   (cl:dolist (f (cl:reverse *failures*))
     (cl:format cl:t "[runtime-tests] FAIL: ~A~%" f))

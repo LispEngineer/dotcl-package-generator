@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.SortedList`2
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-collections-generic-sorted-list-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.SortedList`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.SortedList`2")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Generic.SortedList`2 constructor overloads. Dispatches at runtime.
@@ -187,7 +187,12 @@ Parameters:
 "
   (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.SortedList`2") obj!) "TrimExcess"))
 
-;; The following C# System.Collections.Generic.SortedList`2.TryGetValue overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryGetValue(TKey, out TValue&) -> Boolean
+(cl:defun try-get-value (obj! key)
+  "Returns (cl:values <primary-return> value) -- TryGetValue(TKey, out TValue&) -> Boolean
+Summary: Gets the value associated with the specified key.
+Returns: if the System.Collections.Generic.SortedList`2 contains an element with the specified key; otherwise, .
+Parameters:
+  - key (TKey): The key whose value to get.
+"
+  (dotnet:call-out obj! "TryGetValue" key))
 

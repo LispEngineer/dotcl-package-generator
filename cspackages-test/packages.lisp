@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :cl-user)
 
@@ -316,6 +316,9 @@
    #:parse-exact
    #:subtract
    #:to-string
+   #:try-format
+   #:try-parse
+   #:try-parse-exact
   ))
 
 ;;; Source File: system-object.lisp
@@ -699,6 +702,9 @@
    #:invalid-time?
    #:to-serialized-string
    #:to-string
+   #:try-convert-iana-id-to-windows-id
+   #:try-convert-windows-id-to-iana-id
+   #:try-find-system-time-zone-by-id
   ))
 
 ;;; Source File: system-convert.lisp
@@ -737,6 +743,12 @@
    #:to-u-int16
    #:to-u-int32
    #:to-u-int64
+   #:from-hex-string/out
+   #:try-from-base64-chars
+   #:try-from-base64-string
+   #:try-to-base64-chars
+   #:try-to-hex-string
+   #:try-to-hex-string-lower
   ))
 
 ;;; Source File: system-text-string-builder.lisp
@@ -1064,6 +1076,7 @@
    #:write-async
    #:write-byte
    #:write-to
+   #:try-get-buffer
   ))
 
 ;;; Source File: system-io-stream-reader.lisp
@@ -1533,6 +1546,7 @@
    #:union-by
    #:where
    #:zip
+   #:try-get-non-enumerated-count
   ))
 
 ;;; Source File: system-xml-xml-reader.lisp
@@ -1681,6 +1695,9 @@
    #:remove
    #:trim-excess
    #:try-add
+   #:remove/out
+   #:try-get-alternate-lookup
+   #:try-get-value
   ))
 
 ;;; Source File: system-collections-generic-dictionary-2-key-collection.lisp
@@ -1812,6 +1829,7 @@
    #:remove-at
    #:set-value-at-index
    #:trim-excess
+   #:try-get-value
   ))
 
 ;;; Source File: system-numerics-vector2.lisp

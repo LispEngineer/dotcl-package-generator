@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Type
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-type)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Type"))
 (cl:defconstant <type-str> "System.Type")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.Type class.
@@ -1540,11 +1540,11 @@ Parameters:
   (dotnet:static <type-str> "MakeGenericMethodParameter" (cl:the (dotnet "System.Int32") position)))
 
 ;; The following C# System.Type.MakeGenericSignatureType overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
+;; (ref or params) and are not yet supported:
 ;;   MakeGenericSignatureType(Type, params Type[]) -> Type
 
 ;; The following C# System.Type.MakeGenericType overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
+;; (ref or params) and are not yet supported:
 ;;   MakeGenericType(params Type[]) -> Type
 
 (cl:defun make-pointer-type (obj!)

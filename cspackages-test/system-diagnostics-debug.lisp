@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Diagnostics.Debug
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-diagnostics-debug)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Diagnostics.Debug"))
 (cl:defconstant <type-str> "System.Diagnostics.Debug")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun auto-flush ()
   (dotnet:static <type-str> "AutoFlush"))
@@ -51,7 +51,7 @@ Assert(Boolean, String, String) -> Void
                     :supplied-args (cl:append (cl:list :condition condition) (cl:when supplied-message (cl:list :message message)) (cl:when supplied-detail-message (cl:list :detail-message detail-message)))))))
 
 ;; Note: System.Diagnostics.Debug.Assert also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   Assert(Boolean, ref Debug+AssertInterpolatedStringHandler&) -> Void
 ;;   Assert(Boolean, ref Debug+AssertInterpolatedStringHandler&, ref Debug+AssertInterpolatedStringHandler&) -> Void
@@ -88,7 +88,7 @@ Fail(String, String) -> Void
   (dotnet:static <type-str> "Print" (cl:the (dotnet "System.String") message)))
 
 ;; Note: System.Diagnostics.Debug.Print also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   Print(String, params Object[]) -> Void
 
@@ -151,7 +151,7 @@ WriteIf(Boolean, Object, String) -> Void
                     :supplied-args (cl:append (cl:list :condition condition) (cl:list :message message) (cl:when supplied-category (cl:list :category category)))))))
 
 ;; Note: System.Diagnostics.Debug.WriteIf also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   WriteIf(Boolean, ref Debug+WriteIfInterpolatedStringHandler&) -> Void
 ;;   WriteIf(Boolean, ref Debug+WriteIfInterpolatedStringHandler&, String) -> Void
@@ -183,7 +183,7 @@ WriteLine(String, String) -> Void
                     :supplied-args (cl:append (cl:list :message message) (cl:when supplied-category (cl:list :category category)))))))
 
 ;; Note: System.Diagnostics.Debug.WriteLine also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   WriteLine(String, params Object[]) -> Void
 
@@ -214,7 +214,7 @@ WriteLineIf(Boolean, String, String) -> Void
                     :supplied-args (cl:append (cl:list :condition condition) (cl:list :value value) (cl:when supplied-category (cl:list :category category)))))))
 
 ;; Note: System.Diagnostics.Debug.WriteLineIf also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   WriteLineIf(Boolean, ref Debug+WriteIfInterpolatedStringHandler&) -> Void
 ;;   WriteLineIf(Boolean, ref Debug+WriteIfInterpolatedStringHandler&, String) -> Void

@@ -2,7 +2,7 @@
 
 (defsystem "dotcl-packagegen"
   :description "DotCL C#-assembly-to-Lisp package generator"
-  :version "2.50.5"
+  :version "2.51.0"
   :author "Douglas P. Fields, Jr. <symbolics@lisp.engineer>"
   :license "Apache 2.0; Copyright 2026 Douglas P. Fields, Jr."
   :depends-on ("dotnet-class")
@@ -28,6 +28,7 @@
                (:file "package-generator-tests-property-field-codegen" :depends-on ("package-generator-tests-support"))
                (:file "package-generator-tests-generic-method-codegen" :depends-on ("package-generator-tests-support"))
                (:file "package-generator-tests-operator-overloads" :depends-on ("package-generator-tests-support"))
+               (:file "package-generator-tests-out-parameters" :depends-on ("package-generator-tests-support"))
                (:file "package-generator-tests-events" :depends-on ("package-generator-tests-support"))
                (:file "package-generator-tests-parents-interfaces" :depends-on ("package-generator-tests-support"))
                (:file "package-generator-tests-defgeneric" :depends-on ("package-generator-tests-support"))
@@ -40,6 +41,7 @@
                                                       "package-generator-tests-property-field-codegen"
                                                       "package-generator-tests-generic-method-codegen"
                                                       "package-generator-tests-operator-overloads"
+                                                      "package-generator-tests-out-parameters"
                                                       "package-generator-tests-events"
                                                       "package-generator-tests-parents-interfaces"
                                                       "package-generator-tests-defgeneric"

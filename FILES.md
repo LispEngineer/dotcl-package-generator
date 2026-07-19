@@ -54,7 +54,10 @@ All emit one Lisp package, `assembly-package-generator`; split out of a former s
   `apg-overload-dispatch.lisp` (`doc/plan-fable-detail-09.md`, pure internal
   reorganization; see `doc/generator-design-notes.md`).
 * **`apg-overload-dispatch.lisp`** — the overload/generic-arity dispatch engine: Master
-  Wrapper generation, single-overload wrappers, generic-arity dispatchers.
+  Wrapper generation, single-overload wrappers, generic-arity dispatchers, plus the
+  parallel out-only-method dispatch machinery (`generate-out-master-wrapper`,
+  `generate-single-out-overload`, `format-call-out-invocation-expr` — forwarding to
+  `dotnet:call-out`/`dotnet:call-out-generic` — `doc/plan-fable-detail-05.md`).
 * **`apg-immutability.lisp`** — tracks which C# types are known-safe immutable primitives,
   and emits struct-boxing-mutation warning comments where they aren't.
 * **`apg-export-mirrors.lisp`** — computes a class's `defpackage` export/shadow lists
@@ -95,6 +98,8 @@ All emit one Lisp package, `assembly-package-generator`; split out of a former s
 * **`package-generator-tests-property-field-codegen.lisp`** — property/field/indexer
   codegen tests.
 * **`package-generator-tests-generic-method-codegen.lisp`** — generic-method codegen tests.
+* **`package-generator-tests-out-parameters.lisp`** — out-only-method classification and
+  `dotnet:call-out`-backed codegen tests (`doc/plan-fable-detail-05.md`).
 * **`package-generator-tests-events.lisp`** — C# event (add/remove accessor) codegen tests.
 * **`package-generator-tests-parents-interfaces.lisp`** — `--export-parents`/
   `--export-interfaces` upward-ancestor-graph re-export tests.

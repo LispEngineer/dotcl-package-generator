@@ -152,22 +152,55 @@
                 params))))
 
 (defun dirty-method-p (method)
-  "Returns t if the method has any special parameter modifiers (ref, out, or
-   params). Complement to clean-method-p; a method may be neither clean nor
-   dirty if it is an operator or accessor. A defaulted parameter no longer
-   makes a method dirty (regardless of usable-default-p): a usable default
-   is fully handled by the Master Wrapper's &optional/&key dispatch, and an
-   unrepresentable one is simply treated as mandatory -- clean-method-p
-   already accepts both, so flagging :has-default here would only produce
-   the same method listed as both clean (with a real wrapper) and dirty
-   (in the 'not yet supported' comment)."
+  "Returns t if the method has any special parameter modifiers still
+   unsupported (ref, ref-readonly, or params). Complement to clean-method-p
+   for everything except a lone :out modifier (see out-only-method-p, which
+   is checked separately and takes priority -- a method with an :out
+   parameter and nothing else dirty is no longer routed here at all). A
+   method may be neither clean, dirty, nor out-only if it is an operator or
+   accessor. A defaulted parameter no longer makes a method dirty (regardless
+   of usable-default-p): a usable default is fully handled by the Master
+   Wrapper's &optional/&key dispatch, and an unrepresentable one is simply
+   treated as mandatory -- clean-method-p already accepts both, so flagging
+   :has-default here would only produce the same method listed as both clean
+   (with a real wrapper) and dirty (in the 'not yet supported' comment)."
   (let ((params (getf method :parameters)))
     (some (lambda (p)
-            (or (getf p :out)
-                (getf p :ref)
+            (or (getf p :ref)
                 (getf p :ref-readonly)
                 (getf p :params)))
           params)))
+
+(defun out-only-method-p (method)
+  "Returns t if METHOD's only special parameter modifier is :out (at least
+   one parameter), with no :ref/:ref-readonly/:params anywhere -- the v1
+   scope for out-parameter support (doc/plan-fable-detail-05.md): `out` maps
+   cleanly to an extra Lisp return value via dotnet:call-out/
+   dotnet:call-out-generic, but `ref`/`ref readonly`/`params` do not (a
+   `ref`/`in` parameter still needs an INPUT value, which dotnet:call-out
+   does not accept -- see doc/dotnet-dotcl-interop.md -- and `params` has no
+   defined interaction with the out-args protocol at all), so a method
+   mixing :out with any of those stays dirty (dirty-method-p), unaffected by
+   this predicate. Mirrors clean-method-p/dirty-method-p's other exclusions
+   (operators, accessors, unsupported generic arity, the class's own open
+   generic type parameter)."
+  (let* ((name (getf method :name))
+         (params (getf method :parameters))
+         (is-generic (getf method :is-generic))
+         (arity (getf method :generic-arity)))
+    (and name
+         (not (uiop:string-prefix-p "op_" name))
+         (not (uiop:string-prefix-p "get_" name))
+         (not (uiop:string-prefix-p "set_" name))
+         (generic-method-arity-supported-p is-generic arity)
+         (not (generic-type-p (getf method :return-type)))
+         (some (lambda (p) (getf p :out)) params)
+         (every (lambda (p)
+                  (and (not (getf p :ref))
+                       (not (getf p :ref-readonly))
+                       (not (getf p :params))
+                       (not (generic-type-p (getf p :type)))))
+                params))))
 
 (defun clean-constructor-p (ctor)
   "Returns t if the constructor is 'clean' (no ref/out/params/generics).
@@ -211,9 +244,25 @@
   instance-prop-groups
   writeable-static-props
   method-groups
+  out-method-groups
   clean-ctors
   dirty-ctors
   instance-events)
+
+(defun group-methods-by-name (methods)
+  "Groups method plists by :name, preserving first-seen order (both across
+   groups and within each group) -- the same shape method-groups has always
+   used, factored out so out-method-groups (doc/plan-fable-detail-05.md)
+   groups its own, disjoint, out-only methods identically without
+   duplicating the hash-table walk."
+  (let ((table (make-hash-table :test #'equal)))
+    (dolist (m methods)
+      (push m (gethash (getf m :name) table)))
+    (let ((groups nil))
+      (maphash (lambda (name ms)
+                 (push (cons name (nreverse ms)) groups))
+               table)
+      (nreverse groups))))
 
 (defun classify-class-members (class-plist constant-properties-list)
   "Classifies CLASS-PLIST's fields/properties/methods/constructors/events
@@ -255,17 +304,22 @@
                             (uiop:string-prefix-p "set_" (getf m :name))
                             (generic-type-p (getf m :return-type))
                             (some (lambda (p) (generic-type-p (getf p :type)))
-                                  (getf m :parameters))))
+                                  (getf m :parameters))
+                            (out-only-method-p m)))
                       methods))
-         (method-groups
-           (let ((table (make-hash-table :test #'equal)))
-             (dolist (m non-operator-non-accessor-methods)
-               (push m (gethash (getf m :name) table)))
-             (let ((groups nil))
-               (maphash (lambda (name ms)
-                          (push (cons name (nreverse ms)) groups))
-                         table)
-               (nreverse groups))))
+         (method-groups (group-methods-by-name non-operator-non-accessor-methods))
+         ;; Out-only methods (out-only-method-p) are pulled out of the same
+         ;; op_/get_/set_/open-generic-excluded pool above, disjoint from
+         ;; method-groups, and grouped by name the same way -- see
+         ;; doc/plan-fable-detail-05.md.
+         (out-only-methods
+           (remove-if (lambda (m)
+                        (or (uiop:string-prefix-p "op_" (getf m :name))
+                            (uiop:string-prefix-p "get_" (getf m :name))
+                            (uiop:string-prefix-p "set_" (getf m :name))
+                            (not (out-only-method-p m))))
+                      methods))
+         (out-method-groups (group-methods-by-name out-only-methods))
          (clean-ctors (remove-if-not #'clean-constructor-p ctors))
          (dirty-ctors (remove-if-not #'dirty-constructor-p ctors))
          (instance-events (remove-if-not #'instance-event-p (getf class-plist :events))))
@@ -280,6 +334,7 @@
      :instance-prop-groups instance-prop-groups
      :writeable-static-props writeable-static-props
      :method-groups method-groups
+     :out-method-groups out-method-groups
      :clean-ctors clean-ctors
      :dirty-ctors dirty-ctors
      :instance-events instance-events)))

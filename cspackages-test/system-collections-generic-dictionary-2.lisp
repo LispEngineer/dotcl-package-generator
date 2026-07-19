@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Generic.Dictionary`2
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-collections-generic-dictionary-2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Generic.Dictionary`2"))
 (cl:defconstant <type-str> "System.Collections.Generic.Dictionary`2")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Generic.Dictionary`2 constructor overloads. Dispatches at runtime.
@@ -183,11 +183,6 @@ Parameters:
 "
   (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "Remove" key))
 
-;; Note: System.Collections.Generic.Dictionary`2.Remove also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
-;; yet supported:
-;;   Remove(TKey, out TValue&) -> Boolean
-
 (cl:defun trim-excess (obj! cl:&optional (capacity cl:nil supplied-capacity))
   "Master wrapper for System.Collections.Generic.Dictionary`2.TrimExcess overloads. Dispatches at runtime.
 
@@ -219,11 +214,25 @@ Parameters:
 "
   (dotnet:invoke (cl:the (dotnet "System.Collections.Generic.Dictionary`2") obj!) "TryAdd" key value))
 
-;; The following C# System.Collections.Generic.Dictionary`2.TryGetAlternateLookup overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryGetAlternateLookup(out AlternateLookup) -> Boolean
+(cl:defun remove/out (obj! key)
+  "Returns (cl:values <primary-return> value) -- Remove(TKey, out TValue&) -> Boolean
+Summary: Removes the value with the specified key from the System.Collections.Generic.Dictionary`2, and copies the element to the value parameter.
+Returns: if the element is successfully found and removed; otherwise, .
+Parameters:
+  - key (TKey): The key of the element to remove.
+"
+  (dotnet:call-out obj! "Remove" key))
 
-;; The following C# System.Collections.Generic.Dictionary`2.TryGetValue overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryGetValue(TKey, out TValue&) -> Boolean
+(cl:defun try-get-alternate-lookup (type obj!)
+  "Returns (cl:values <primary-return> lookup) -- TryGetAlternateLookup(out AlternateLookup) -> Boolean"
+  (dotnet:call-out-generic obj! "TryGetAlternateLookup" (cl:list type)))
+
+(cl:defun try-get-value (obj! key)
+  "Returns (cl:values <primary-return> value) -- TryGetValue(TKey, out TValue&) -> Boolean
+Summary: Gets the value associated with the specified key.
+Returns: if the System.Collections.Generic.Dictionary`2 contains an element with the specified key; otherwise, .
+Parameters:
+  - key (TKey): The key of the value to get.
+"
+  (dotnet:call-out obj! "TryGetValue" key))
 

@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.IEnumerable
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-collections-i-enumerable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.IEnumerable"))
 (cl:defconstant <type-str> "System.Collections.IEnumerable")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun get-enumerator (obj!)
   "Summary: Returns an enumerator that iterates through a collection.

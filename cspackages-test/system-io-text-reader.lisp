@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.TextReader
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-io-text-reader)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.TextReader"))
 (cl:defconstant <type-str> "System.IO.TextReader")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.IO.TextReader class.

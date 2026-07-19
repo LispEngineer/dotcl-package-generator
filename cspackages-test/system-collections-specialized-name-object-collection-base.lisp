@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.Specialized.NameObjectCollectionBase
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-collections-specialized-name-object-collection-base)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.Specialized.NameObjectCollectionBase"))
 (cl:defconstant <type-str> "System.Collections.Specialized.NameObjectCollectionBase")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (cl:&optional (equality-comparer cl:nil supplied-equality-comparer) (equality-comparer2 cl:nil supplied-equality-comparer2) (comparer cl:nil supplied-comparer))
   "Master wrapper for System.Collections.Specialized.NameObjectCollectionBase constructor overloads. Dispatches at runtime.

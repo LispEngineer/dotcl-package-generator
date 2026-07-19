@@ -371,10 +371,11 @@
            (mixed-mode-p (and (> static-count 0) (> instance-count 0))))
 
       (cond
-        ;; Case 1: No clean overloads - all are dirty (ref/out/params)
+        ;; Case 1: No clean overloads - all are dirty (ref/ref-readonly/params
+        ;; -- an :out-only overload is no longer dirty, see out-method-groups)
         ((= clean-count 0)
          (format stream ";; The following C# ~A.~A overloads have special parameter types~%" fq-name name)
-         (format stream ";; (ref, out, or params) and are not yet supported:~%")
+         (format stream ";; (ref or params) and are not yet supported:~%")
          (dolist (dm dirty-methods)
            (format stream ";;   ~A~%" (method-signature-str dm)))
          (format stream "~%"))
@@ -400,11 +401,39 @@
          ;; Emit dirty overload doc-comment if any
          (when (> dirty-count 0)
            (format stream ";; Note: ~A.~A also has the following overloads with special~%" fq-name name)
-           (format stream ";; parameter types (ref, out, or params) that are not~%")
+           (format stream ";; parameter types (ref or params) that are not~%")
            (format stream ";; yet supported:~%")
            (dolist (dm dirty-methods)
              (format stream ";;   ~A~%" (method-signature-str dm)))
            (format stream "~%")))))))
+
+(defun emit-out-methods (stream fq-name out-method-groups method-groups)
+  "Writes wrapper(s) for out-only method groups (cmc-out-method-groups --
+   doc/plan-fable-detail-05.md): a C# method whose only special parameter
+   modifier is :out gets a real wrapper here, forwarding to dotnet:call-out/
+   dotnet:call-out-generic, with the out parameter(s) returned as additional
+   cl:values results instead of appearing in the wrapper's own lambda list.
+   Naming mirrors emit-methods' own static/instance split under one C#
+   name (static gets a trailing '*', but only when BOTH static and instance
+   out-only overloads share this name -- mixed-mode-p, exactly like clean
+   methods), and each wrapper's base name additionally gets a '/out' suffix
+   whenever a CLEAN overload of the same name/mode already exists in
+   METHOD-GROUPS (cmc-method-groups), so e.g. Parse (clean) and Parse/out
+   (out-only) can coexist without colliding -- see out-method-wrapper-name."
+  (dolist (group out-method-groups)
+    (let* ((name (car group))
+           (out-methods (cdr group))
+           (static-out (remove-if-not (lambda (m) (getf m :is-static)) out-methods))
+           (instance-out (remove-if-not (lambda (m) (not (getf m :is-static))) out-methods))
+           (mixed-mode-p (and static-out instance-out)))
+      (when instance-out
+        (generate-out-method-name-wrappers stream instance-out name
+                                            (out-method-wrapper-name name nil mixed-mode-p method-groups)
+                                            fq-name nil))
+      (when static-out
+        (generate-out-method-name-wrappers stream static-out name
+                                            (out-method-wrapper-name name t mixed-mode-p method-groups)
+                                            fq-name t)))))
 
 (defun emit-extension-methods (stream fq-name matched-extensions skipped-extensions)
   "Writes injected extension-method wrappers/skip-comments (Version 38 --
@@ -494,4 +523,5 @@
         (emit-public-instance-fields stream fq-name (cmc-instance-fields classification) is-value-type-p)
         (emit-mutable-static-fields stream (cmc-mutable-static-fields classification))
         (emit-methods stream fq-name (cmc-method-groups classification))
+        (emit-out-methods stream fq-name (cmc-out-method-groups classification) (cmc-method-groups classification))
         (emit-extension-methods stream fq-name matched-extensions skipped-extensions)))))

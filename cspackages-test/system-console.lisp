@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Console
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-console)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Console"))
 (cl:defconstant <type-str> "System.Console")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:define-symbol-macro caps-lock (dotnet:static <type-str> "CapsLock"))
 (cl:setf (cl:documentation (cl:quote caps-lock) (cl:quote cl:variable)) "Gets a value indicating whether the CAPS LOCK keyboard toggle is turned on or turned off.")
@@ -553,7 +553,7 @@ Write(String, Object, Object, Object) -> Void
                     :supplied-args (cl:append (cl:list :value value) (cl:when supplied-arg0 (cl:list :arg0 arg0)) (cl:when supplied-arg1 (cl:list :arg1 arg1)) (cl:when supplied-arg2 (cl:list :arg2 arg2)))))))
 
 ;; Note: System.Console.Write also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   Write(String, params Object[]) -> Void
 
@@ -707,7 +707,7 @@ WriteLine(String, Object, Object, Object) -> Void
                     :supplied-args (cl:append (cl:when supplied-value (cl:list :value value)) (cl:when supplied-arg0 (cl:list :arg0 arg0)) (cl:when supplied-count (cl:list :count count)) (cl:when supplied-arg2 (cl:list :arg2 arg2)))))))
 
 ;; Note: System.Console.WriteLine also has the following overloads with special
-;; parameter types (ref, out, or params) that are not
+;; parameter types (ref or params) that are not
 ;; yet supported:
 ;;   WriteLine(String, params Object[]) -> Void
 

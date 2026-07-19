@@ -133,6 +133,16 @@ Use `dotnet:call-out` to invoke a method that modifies parameters by reference.
     (format t "Parsed: ~A~%" result)))
 ```
 
+**Package generator usage (doc/plan-fable-detail-05.md, Phase 0):** `dotcl-packagegen` itself
+generates real wrappers around `dotnet:call-out`/`dotnet:call-out-generic` for any C# method
+whose only special parameter modifier is `out` (`out-only-method-p`,
+`apg-member-predicates.lisp`) — Phase 0's feasibility check found both primitives already
+present (added in dotcl 0.1.17, and this project's `DotCL.Runtime` pin was already at 0.1.18),
+so no upstream proposal was needed; `ref`/`ref readonly`/`params` overloads remain
+unsupported (documented in a comment), since `dotnet:call-out` fills a `ref` parameter with a
+null placeholder rather than accepting an input value for it (see `FindOutMethod` in dotcl's
+`Runtime.DotNet.cs`), which only matches `out`'s actual semantics.
+
 ### Events and Delegates
 
 You can attach Lisp functions to .NET events using `dotnet:add-event`. The runtime automatically wraps the Lisp function into a .NET delegate.

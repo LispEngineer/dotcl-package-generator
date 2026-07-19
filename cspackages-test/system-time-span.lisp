@@ -1,14 +1,14 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.TimeSpan
-;;; Generator Version: 50
-;;; Creation Date: 2026-07-15T12:15:32Z
+;;; Generator Version: 51
+;;; Creation Date: 2026-07-19T15:11:53Z
 
 (cl:in-package :system-time-span)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.TimeSpan"))
 (cl:defconstant <type-str> "System.TimeSpan")
-(cl:defconstant <creation> "2026-07-15T12:15:32Z")
-(cl:defconstant <version> 50)
+(cl:defconstant <creation> "2026-07-19T15:11:53Z")
+(cl:defconstant <version> 51)
 
 (cl:defun new (cl:&optional (ticks cl:nil supplied-ticks) (minutes cl:nil supplied-minutes) (seconds cl:nil supplied-seconds) (seconds2 cl:nil supplied-seconds2) (milliseconds cl:nil supplied-milliseconds) (microseconds cl:nil supplied-microseconds))
   "Master wrapper for System.TimeSpan constructor overloads. Dispatches at runtime.
@@ -1008,26 +1008,185 @@ ToString(String, IFormatProvider) -> String
                     :method-name "ToString"
                     :supplied-args (cl:append (cl:when supplied-format (cl:list :format format)) (cl:when supplied-format-provider (cl:list :format-provider format-provider)))))))
 
-;; The following C# System.TimeSpan.TryFormat overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryFormat(Char], out Int32&, Char] = default(System.ReadOnlySpan`1[System.Char]) [C# default of type System.ReadOnlySpan`1[System.Char] -- not representable in Lisp, must be supplied], IFormatProvider = null) -> Boolean
-;;   TryFormat(Byte], out Int32&, Char] = default(System.ReadOnlySpan`1[System.Char]) [C# default of type System.ReadOnlySpan`1[System.Char] -- not representable in Lisp, must be supplied], IFormatProvider = null) -> Boolean
+(cl:defun try-format (obj! destination format cl:&key (format-provider cl:nil supplied-format-provider))
+  "Master wrapper for System.TimeSpan.TryFormat out-only overloads. Dispatches at runtime. Each out parameter is returned as an additional cl:values result (after the primary return value), in C# declaration order.
 
-;; The following C# System.TimeSpan.TryParse overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryParse(String, out TimeSpan&) -> Boolean
-;;   TryParse(Char], out TimeSpan&) -> Boolean
-;;   TryParse(String, IFormatProvider, out TimeSpan&) -> Boolean
-;;   TryParse(Char], IFormatProvider, out TimeSpan&) -> Boolean
+TryFormat(Char], out Int32&, Char] = default(System.ReadOnlySpan`1[System.Char]) [C# default of type System.ReadOnlySpan`1[System.Char] -- not representable in Lisp, must be supplied], IFormatProvider = null) -> Boolean
+  Summary: Tries to format the value of the current timespan number instance into the provided span of characters.
+  Returns: if the formatting was successful; otherwise, .
+  Parameters:
+    - destination (System.Span`1[System.Char]): The span in which to write this instance's value formatted as a span of characters.
+    - chars-written (System.Int32&): When this method returns, contains the number of characters that were written in destination.
+    - format (System.ReadOnlySpan`1[System.Char]): A span containing the charactes that represent a standard or custom format string that defines the acceptable format for destination.
+    - format-provider (System.IFormatProvider): An optional object that supplies culture-specific formatting information for destination.
 
-;; The following C# System.TimeSpan.TryParseExact overloads have special parameter types
-;; (ref, out, or params) and are not yet supported:
-;;   TryParseExact(String, String, IFormatProvider, out TimeSpan&) -> Boolean
-;;   TryParseExact(Char], Char], IFormatProvider, out TimeSpan&) -> Boolean
-;;   TryParseExact(String, String[], IFormatProvider, out TimeSpan&) -> Boolean
-;;   TryParseExact(Char], String[], IFormatProvider, out TimeSpan&) -> Boolean
-;;   TryParseExact(String, String, IFormatProvider, TimeSpanStyles, out TimeSpan&) -> Boolean
-;;   TryParseExact(Char], Char], IFormatProvider, TimeSpanStyles, out TimeSpan&) -> Boolean
-;;   TryParseExact(String, String[], IFormatProvider, TimeSpanStyles, out TimeSpan&) -> Boolean
-;;   TryParseExact(Char], String[], IFormatProvider, TimeSpanStyles, out TimeSpan&) -> Boolean
+TryFormat(Byte], out Int32&, Char] = default(System.ReadOnlySpan`1[System.Char]) [C# default of type System.ReadOnlySpan`1[System.Char] -- not representable in Lisp, must be supplied], IFormatProvider = null) -> Boolean
+  Summary: Tries to format the value of the current instance as UTF-8 into the provided span of bytes.
+  Returns: if the formatting was successful; otherwise, .
+  Parameters:
+    - utf8-destination (System.Span`1[System.Byte]): The span in which to write this instance's value formatted as a span of bytes.
+    - bytes-written (System.Int32&): When this method returns, contains the number of bytes that were written in utf8Destination.
+    - format (System.ReadOnlySpan`1[System.Char]): A span containing the characters that represent a standard or custom format string that defines the acceptable format for utf8Destination.
+    - format-provider (System.IFormatProvider): 
+"
+  (cl:cond
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:not supplied-format-provider) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider"))))
+     (dotnet:call-out obj! "TryFormat" destination format (cl:if supplied-format-provider format-provider cl:nil)))
+    ((cl:and (cl:or (cl:null destination) (dotnet:is-instance-of destination "System.Span`1[[System.Byte, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:not supplied-format-provider) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider"))))
+     (dotnet:call-out obj! "TryFormat" destination format (cl:if supplied-format-provider format-provider cl:nil)))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-TIME-SPAN"
+                    :class-name <type-str>
+                    :method-name "TryFormat"
+                    :supplied-args (cl:append (cl:list :destination destination) (cl:list :format format) (cl:when supplied-format-provider (cl:list :format-provider format-provider)))))))
+
+(cl:defun try-parse (s cl:&optional (format-provider cl:nil supplied-format-provider))
+  "Master wrapper for System.TimeSpan.TryParse out-only overloads. Dispatches at runtime. Each out parameter is returned as an additional cl:values result (after the primary return value), in C# declaration order.
+
+TryParse(String, out TimeSpan&) -> Boolean
+  Summary: Converts the string representation of a time interval to its System.TimeSpan equivalent and returns a value that indicates whether the conversion succeeded.
+  Returns: if s was converted successfully; otherwise, . This operation returns if the s parameter is or System.String.Empty, has an invalid format, represents a time interval that is less than System.TimeSpan.MinValue or greater than System.TimeSpan.MaxValue, or has at least one days, hours, minutes, or seconds component outside its valid range.
+  Parameters:
+    - s (System.String): A string that specifies the time interval to convert.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by s, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParse(Char], out TimeSpan&) -> Boolean
+  Summary: Converts the span representation of a time interval to its System.TimeSpan equivalent and returns a value that indicates whether the conversion succeeded.
+  Returns: if s was converted successfully; otherwise, . This operation returns if the s parameter is or System.String.Empty, has an invalid format, represents a time interval that is less than System.TimeSpan.MinValue or greater than System.TimeSpan.MaxValue, or has at least one days, hours, minutes, or seconds component outside its valid range.
+  Parameters:
+    - s (System.ReadOnlySpan`1[System.Char]): A span containing the characters representing the time interval to convert.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by s, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParse(String, IFormatProvider, out TimeSpan&) -> Boolean
+  Summary: Converts the string representation of a time interval to its System.TimeSpan equivalent by using the specified culture-specific formatting information, and returns a value that indicates whether the conversion succeeded.
+  Returns: if input was converted successfully; otherwise, . This operation returns if the input parameter is or System.String.Empty, has an invalid format, represents a time interval that is less than System.TimeSpan.MinValue or greater than System.TimeSpan.MaxValue, or has at least one days, hours, minutes, or seconds component outside its valid range.
+  Parameters:
+    - input (System.String): A string that specifies the time interval to convert.
+    - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParse(Char], IFormatProvider, out TimeSpan&) -> Boolean
+  Summary: Converts the span representation of a time interval to its System.TimeSpan equivalent by using the specified culture-specific formatting information, and returns a value that indicates whether the conversion succeeded.
+  Returns: if input was converted successfully; otherwise, . This operation returns if the input parameter is or System.String.Empty, has an invalid format, represents a time interval that is less than System.TimeSpan.MinValue or greater than System.TimeSpan.MaxValue, or has at least one days, hours, minutes, or seconds component outside its valid range.
+  Parameters:
+    - input (System.ReadOnlySpan`1[System.Char]): A span containing the characters representing the time interval to convert.
+    - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+"
+  (cl:cond
+    ((cl:and (cl:stringp s) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")))
+     (dotnet:call-out <type-str> "TryParse" s format-provider))
+    ((cl:and (cl:or (cl:null s) (dotnet:is-instance-of s "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) supplied-format-provider (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")))
+     (dotnet:call-out <type-str> "TryParse" s format-provider))
+    ((cl:and (cl:stringp s) (cl:not supplied-format-provider))
+     (dotnet:call-out <type-str> "TryParse" s))
+    ((cl:and (cl:or (cl:null s) (dotnet:is-instance-of s "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:not supplied-format-provider))
+     (dotnet:call-out <type-str> "TryParse" s))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-TIME-SPAN"
+                    :class-name <type-str>
+                    :method-name "TryParse"
+                    :supplied-args (cl:append (cl:list :s s) (cl:when supplied-format-provider (cl:list :format-provider format-provider)))))))
+
+(cl:defun try-parse-exact (input format format-provider cl:&optional (styles cl:nil supplied-styles))
+  "Master wrapper for System.TimeSpan.TryParseExact out-only overloads. Dispatches at runtime. Each out parameter is returned as an additional cl:values result (after the primary return value), in C# declaration order.
+
+TryParseExact(String, String, IFormatProvider, out TimeSpan&) -> Boolean
+  Summary: Converts the string representation of a time interval to its System.TimeSpan equivalent by using the specified format and culture-specific format information. The format of the string representation must match the specified format exactly.
+  Returns: if input was converted successfully; otherwise, .
+  Parameters:
+    - input (System.String): A string that specifies the time interval to convert.
+    - format (System.String): A standard or custom format string that defines the required format of input.
+    - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParseExact(Char], Char], IFormatProvider, out TimeSpan&) -> Boolean
+  Summary: Converts the specified span representation of a time interval to its System.TimeSpan equivalent by using the specified format and culture-specific format information. The format of the string representation must match the specified format exactly.
+  Returns: if input was converted successfully; otherwise, .
+  Parameters:
+    - input (System.ReadOnlySpan`1[System.Char]): A span containing the characters that represent a time interval to convert.
+    - format (System.ReadOnlySpan`1[System.Char]): A span containing the characters that represent a standard or custom format string that defines the acceptable format of input.
+    - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParseExact(String, String[], IFormatProvider, out TimeSpan&) -> Boolean
+  Summary: Converts the specified string representation of a time interval to its System.TimeSpan equivalent by using the specified formats and culture-specific format information. The format of the string representation must match one of the specified formats exactly.
+  Returns: if input was converted successfully; otherwise, .
+  Parameters:
+    - input (System.String): A string that specifies the time interval to convert.
+    - formats (System.String[]): An array of standard or custom format strings that define the acceptable formats of input.
+    - format-provider (System.IFormatProvider): An object that provides culture-specific formatting information.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParseExact(Char], String[], IFormatProvider, out TimeSpan&) -> Boolean
+  Summary: Converts the specified span representation of a time interval to its System.TimeSpan equivalent by using the specified formats and culture-specific format information. The format of the string representation must match one of the specified formats exactly.
+  Returns: if input was converted successfully; otherwise, .
+  Parameters:
+    - input (System.ReadOnlySpan`1[System.Char]): A span containing the characters that represent a time interval to convert.
+    - formats (System.String[]): An array of standard or custom format strings that define the acceptable formats of input.
+    - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParseExact(String, String, IFormatProvider, TimeSpanStyles, out TimeSpan&) -> Boolean
+  Summary: Converts the string representation of a time interval to its System.TimeSpan equivalent by using the specified format, culture-specific format information and styles. The format of the string representation must match the specified format exactly.
+  Returns: if input was converted successfully; otherwise, .
+  Parameters:
+    - input (System.String): A string that specifies the time interval to convert.
+    - format (System.String): A standard or custom format string that defines the required format of input.
+    - format-provider (System.IFormatProvider): An object that provides culture-specific formatting information.
+    - styles (System.Globalization.TimeSpanStyles): One or more enumeration values that indicate the style of input.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParseExact(Char], Char], IFormatProvider, TimeSpanStyles, out TimeSpan&) -> Boolean
+  Summary: Converts the specified span representation of a time interval to its System.TimeSpan equivalent by using the specified format, culture-specific format information, and styles, and returns a value that indicates whether the conversion succeeded. The format of the string representation must match the specified format exactly.
+  Returns: if input was converted successfully; otherwise, .
+  Parameters:
+    - input (System.ReadOnlySpan`1[System.Char]): A span containing the characters that represent a time interval to convert.
+    - format (System.ReadOnlySpan`1[System.Char]): A span containing the charactes that represent a standard or custom format string that defines the acceptable format of input.
+    - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+    - styles (System.Globalization.TimeSpanStyles): One or more enumeration values that indicate the style of input.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParseExact(String, String[], IFormatProvider, TimeSpanStyles, out TimeSpan&) -> Boolean
+  Summary: Converts the specified string representation of a time interval to its System.TimeSpan equivalent by using the specified formats, culture-specific format information and styles. The format of the string representation must match one of the specified formats exactly.
+  Returns: if input was converted successfully; otherwise, .
+  Parameters:
+    - input (System.String): A string that specifies the time interval to convert.
+    - formats (System.String[]): An array of standard or custom format strings that define the acceptable formats of input.
+    - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+    - styles (System.Globalization.TimeSpanStyles): One or more enumeration values that indicate the style of input.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+
+TryParseExact(Char], String[], IFormatProvider, TimeSpanStyles, out TimeSpan&) -> Boolean
+  Summary: Converts the specified span representation of a time interval to its System.TimeSpan equivalent by using the specified formats, culture-specific format information and styles. The format of the string representation must match one of the specified formats exactly.
+  Returns: if input was converted successfully; otherwise, .
+  Parameters:
+    - input (System.ReadOnlySpan`1[System.Char]): A span containing the characters that represent a time interval to convert.
+    - formats (System.String[]): An array of standard or custom format strings that define the acceptable formats of input.
+    - format-provider (System.IFormatProvider): An object that supplies culture-specific formatting information.
+    - styles (System.Globalization.TimeSpanStyles): One or more enumeration values that indicate the style of input.
+    - result (System.TimeSpan&): When this method returns, contains an object that represents the time interval specified by input, or System.TimeSpan.Zero if the conversion failed. This parameter is passed uninitialized.
+"
+  (cl:cond
+    ((cl:and (cl:stringp input) (cl:stringp format) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) supplied-styles (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles")))
+     (dotnet:call-out <type-str> "TryParseExact" input format format-provider styles))
+    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) supplied-styles (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles")))
+     (dotnet:call-out <type-str> "TryParseExact" input format format-provider styles))
+    ((cl:and (cl:stringp input) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) supplied-styles (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles")))
+     (dotnet:call-out <type-str> "TryParseExact" input format format-provider styles))
+    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) supplied-styles (cl:or (cl:null styles) (dotnet:is-instance-of styles "System.Globalization.TimeSpanStyles")))
+     (dotnet:call-out <type-str> "TryParseExact" input format format-provider styles))
+    ((cl:and (cl:stringp input) (cl:stringp format) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:not supplied-styles))
+     (dotnet:call-out <type-str> "TryParseExact" input format format-provider))
+    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:not supplied-styles))
+     (dotnet:call-out <type-str> "TryParseExact" input format format-provider))
+    ((cl:and (cl:stringp input) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:not supplied-styles))
+     (dotnet:call-out <type-str> "TryParseExact" input format format-provider))
+    ((cl:and (cl:or (cl:null input) (dotnet:is-instance-of input "System.ReadOnlySpan`1[[System.Char, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")) (cl:or (cl:null format) (dotnet:is-instance-of format "System.String[]")) (cl:or (cl:null format-provider) (dotnet:is-instance-of format-provider "System.IFormatProvider")) (cl:not supplied-styles))
+     (dotnet:call-out <type-str> "TryParseExact" input format format-provider))
+    (cl:t (cl:error 'csharp-assembly-utils:csharp-overload-not-found
+                    :package-name "SYSTEM-TIME-SPAN"
+                    :class-name <type-str>
+                    :method-name "TryParseExact"
+                    :supplied-args (cl:append (cl:list :input input) (cl:list :format format) (cl:list :format-provider format-provider) (cl:when supplied-styles (cl:list :styles styles)))))))
 
