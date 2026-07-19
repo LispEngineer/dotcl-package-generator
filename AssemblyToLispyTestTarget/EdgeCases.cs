@@ -789,4 +789,28 @@ namespace AssemblyToLispyTestTarget
         /// <summary>Returns a value identifying this class, for dispatch assertions.</summary>
         public string Kind() => "B";
     }
+
+    // A small, deliberately-isolated sub-namespace (doc/plan-fable-detail-12.md) for a
+    // precise --all-classes/--all-classes-recursive smoke-test demonstration --
+    // AssemblyToLispyTestTarget.SubSpace has exactly the two classes below, so
+    // `--all-classes 'AssemblyToLispyTestTarget.SubSpace'` in the Makefile's smoke
+    // invocation expands to a known, stable set (unlike the enclosing
+    // AssemblyToLispyTestTarget namespace itself, which has many classes already
+    // individually exercised elsewhere in the smoke test).
+    namespace SubSpace
+    {
+        /// <summary>The first of SubSpace's two classes.</summary>
+        public class SubSpaceClassOne
+        {
+            /// <summary>Returns a value identifying this class.</summary>
+            public string Kind() => "One";
+        }
+
+        /// <summary>The second of SubSpace's two classes.</summary>
+        public class SubSpaceClassTwo
+        {
+            /// <summary>Returns a value identifying this class.</summary>
+            public string Kind() => "Two";
+        }
+    }
 }

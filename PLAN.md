@@ -190,6 +190,22 @@ not ten. See `FILES.md` for the current per-file breakdown.
   `--all-classes-recursive System.IO`. The latter includes any
   sub-namespaces (e.g., `System.IO.Socket`, not that that exists).
 
+  **DONE (see `doc/plan-fable-detail-12.md`):** `--all-classes`/`--all-classes-recursive`
+  implemented — expansion happens Lisp-side in `resolve-batch-entry`
+  (`apg-batch-discovery.lisp`) against the assembly's own already-reflected metadata (no
+  new reflection needed), matching each type's `:namespace` key exactly (`--all-classes`)
+  or as that namespace or a genuine sub-namespace (`--all-classes-recursive`, never a
+  bare string prefix — `Gum.Form` does not match `Gum.Forms.X`). Nested public types are
+  included (a nested type's own `:namespace` already equals its declaring type's). A
+  zero-match namespace is a hard error unless `--skip-missing` (then a dropped warning).
+  An explicit `--class` always wins over an overlapping namespace expansion regardless of
+  command-line order (two-pass resolution: explicit classes first, then namespace
+  expansion, deduplicated by fully-qualified-name); namespace-expanded classes are
+  appended after every explicit one, mirroring how a discovered (Phase B) class is
+  already appended after explicit ones. No `*generator-version*` bump — the per-class
+  generation machinery and the Plan 07 invocation-echo comment shape are both unaffected
+  by a class's origin (explicit vs. namespace-expanded).
+
 * Handle overloaded indexers, per:
   * C# indexer (`this[...]`) threads its index parameter(s) through
     positionally, unless the indexer itself is overloaded, in which case it is unsupported.

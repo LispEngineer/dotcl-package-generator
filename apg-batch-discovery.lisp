@@ -109,40 +109,110 @@
     (setf flags (sort flags #'string<))
     (if flags (format nil "~{~A~^ ~}" flags) "(none)")))
 
-(defun resolve-batch-entry (entry)
+(defun namespace-matches-p (type-namespace target-namespace recursive-p)
+  "Returns t if TYPE-NAMESPACE (a reflected type's own :namespace, or nil
+   for the global namespace) matches TARGET-NAMESPACE per
+   --all-classes/--all-classes-recursive semantics (doc/plan-fable-detail-
+   12.md): exact string= always matches (--all-classes); when RECURSIVE-P
+   (--all-classes-recursive), a type whose namespace is TARGET-NAMESPACE
+   followed by a literal '.' and more (a genuine sub-namespace, e.g.
+   Gum.Forms.Controls under Gum.Forms) also matches -- never a bare string
+   prefix, so target Gum.Form never matches an actual Gum.Forms.X type."
+  (and type-namespace
+       (or (string= type-namespace target-namespace)
+           (and recursive-p
+                (> (length type-namespace) (length target-namespace))
+                (string= type-namespace target-namespace :end1 (length target-namespace))
+                (char= (char type-namespace (length target-namespace)) #\.)))))
+
+(defun resolve-batch-entry (entry &optional skip-missing)
   "Loads ENTRY's :metadata-file and resolves each of its :classes by
    :fully-qualified-name against the loaded metadata. Returns two values:
    a list of resolved-class plists (see make-resolved-class) ready for
    generate-class-file, and a list of class names from :classes that could
    not be found in the metadata (empty if all resolved, or if :classes was
-   empty, which is a valid metadata-only request)."
+   empty, which is a valid metadata-only request).
+
+   A :classes entry with :namespace t (--all-classes/--all-classes-recursive,
+   doc/plan-fable-detail-12.md; :recursive t selects the latter) is a
+   namespace-level import rather than an ordinary class name: it expands,
+   Lisp-side, into one resolved class per public type in ENTRY's own
+   metadata whose :namespace matches (NAMESPACE-MATCHES-P), each carrying
+   this entry's own per-class flags/:constant-properties (nested types are
+   included -- a nested type's own :namespace already equals its declaring
+   type's). Resolved in two passes so an explicit (non-namespace) --class
+   always wins over an overlapping namespace expansion regardless of
+   command-line order, and namespace-expanded classes are appended after
+   every explicit one within this same entry -- mirroring how a Phase-B-
+   discovered class is already appended after its assembly's explicitly-
+   requested ones (GENERATE-ASSEMBLY-PACKAGES-BATCH): Pass 1 resolves every
+   explicit class-entry; Pass 2 expands every namespace entry, in original
+   order, skipping any type fully-qualified-name already resolved in pass 1
+   or by an earlier namespace entry in this same call. A namespace entry
+   matching zero types is a hard error (consistent with the resolve-
+   before-generate validation philosophy) unless SKIP-MISSING (nil by
+   default; Program.cs's --skip-missing/--no-skip-missing), in which case
+   it is dropped with a warning instead -- SKIP-MISSING has no effect on an
+   ordinary --class name, which is always a hard error when unresolvable,
+   unchanged from before this feature."
   (let* ((metadata-file (getf entry :metadata-file))
          (classes (getf entry :classes)))
     (unless (probe-file metadata-file)
       (error "Metadata file not found: ~A" metadata-file))
-    (let ((metadata (utils:safe-read-form-from-file metadata-file))
-          (resolved nil)
-          (not-found nil))
-      (dolist (class-entry classes)
-        (let* ((cname (getf class-entry :name))
-               (cprops-str (getf class-entry :constant-properties))
-               (cprops (and cprops-str (> (length cprops-str) 0) (split-string cprops-str #\,)))
-               (cls (find cname metadata :key (lambda (c) (getf c :fully-qualified-name)) :test #'string=)))
-          (if cls
-              (push (make-resolved-class cls cprops
-                                          (getf class-entry :export-parents)
-                                          (getf class-entry :export-interfaces)
-                                          (getf class-entry :export-object)
-                                          (getf class-entry :defgeneric)
-                                          (getf class-entry :extension-methods)
-                                          (getf class-entry :output-nested)
-                                          (getf class-entry :output-children)
-                                          (getf class-entry :output-implementations)
-                                          (getf class-entry :ensure-type)
-                                          (getf class-entry :ensure-type-in-generic))
-                    resolved)
-              (push cname not-found))))
-      (values (nreverse resolved) (nreverse not-found)))))
+    (let* ((metadata (utils:safe-read-form-from-file metadata-file))
+           (resolved nil)
+           (not-found nil)
+           (seen (make-hash-table :test #'equal)))
+      (flet ((resolve-one (cname cprops class-entry)
+               (let ((cls (find cname metadata :key (lambda (c) (getf c :fully-qualified-name)) :test #'string=)))
+                 (if cls
+                     (progn
+                       (push (make-resolved-class cls cprops
+                                                   (getf class-entry :export-parents)
+                                                   (getf class-entry :export-interfaces)
+                                                   (getf class-entry :export-object)
+                                                   (getf class-entry :defgeneric)
+                                                   (getf class-entry :extension-methods)
+                                                   (getf class-entry :output-nested)
+                                                   (getf class-entry :output-children)
+                                                   (getf class-entry :output-implementations)
+                                                   (getf class-entry :ensure-type)
+                                                   (getf class-entry :ensure-type-in-generic))
+                             resolved)
+                       (setf (gethash cname seen) t))
+                     (push cname not-found)))))
+        ;; Pass 1: explicit classes only.
+        (dolist (class-entry classes)
+          (unless (getf class-entry :namespace)
+            (let* ((cname (getf class-entry :name))
+                   (cprops-str (getf class-entry :constant-properties))
+                   (cprops (and cprops-str (> (length cprops-str) 0) (split-string cprops-str #\,))))
+              (resolve-one cname cprops class-entry))))
+        ;; Pass 2: namespace entries.
+        (dolist (class-entry classes)
+          (when (getf class-entry :namespace)
+            (let* ((namespace (getf class-entry :name))
+                   (recursive-p (getf class-entry :recursive))
+                   (cprops-str (getf class-entry :constant-properties))
+                   (cprops (and cprops-str (> (length cprops-str) 0) (split-string cprops-str #\,)))
+                   (matched (sort (remove-if-not (lambda (c) (namespace-matches-p (getf c :namespace) namespace recursive-p)) metadata)
+                                  #'string< :key (lambda (c) (getf c :fully-qualified-name))))
+                   (new-matched (remove-if (lambda (c) (gethash (getf c :fully-qualified-name) seen)) matched)))
+              (cond
+                (new-matched
+                 (format *error-output* "Expanded ~:[~;recursive ~]~A -> ~D class(es)~%" recursive-p namespace (length new-matched))
+                 (dolist (c new-matched)
+                   (resolve-one (getf c :fully-qualified-name) cprops class-entry)))
+                (matched
+                 ;; Every match already belongs to an explicit class or an
+                 ;; earlier namespace entry in this same call -- nothing new,
+                 ;; not an error.
+                 nil)
+                (skip-missing
+                 (format *error-output* "Warning: --all-classes~:[~;-recursive~] ~A matched no public types (skipped)~%" recursive-p namespace))
+                (t
+                 (push namespace not-found))))))
+        (values (nreverse resolved) (nreverse not-found))))))
 
 (defun build-metadata-index (assembly-entries)
   "Loads every entry's :metadata-file once (even when shared by more than

@@ -67,6 +67,29 @@ dotcl-packagegen --out-dir ./cspackages \
 the most recently given `--class`. `--assembly` may be repeated to process several assemblies
 in one invocation, and a `--assembly` with no `--class` options is valid (metadata-only).
 
+`--all-classes <namespace>`/`--all-classes-recursive <namespace>` behave like `--class` but
+name a whole C# namespace instead of one class: they expand, against the assembly's own
+already-reflected metadata, into every public type whose namespace is exactly `<namespace>`
+(`--all-classes`) or `<namespace>` or any sub-namespace (`--all-classes-recursive`, never a bare
+string prefix — `Gum.Form` does not match `Gum.Forms.X`), each carrying that group's own
+per-class flags/`--constant-properties`, exactly like an explicit `--class`:
+
+```sh
+dotcl-packagegen --out-dir ./cspackages \
+    --assembly Some.Assembly.dll \
+      --all-classes 'Some.Namespace' --defgeneric \
+      --all-classes-recursive 'Some.Other.Namespace'
+```
+
+A namespace matching zero types is an error (like an unresolvable `--class` name), unless
+`--skip-missing`, in which case it's dropped with a warning instead. An explicit `--class`
+always wins over an overlapping namespace expansion, regardless of which comes first on the
+command line. Namespace expansion is scoped to its own `--assembly` group, like every other
+per-class option.
+
+`--all-classes`/`--all-classes-recursive` do not support wildcards/globs (`System.*o*`) — only
+an exact namespace or its recursive sub-namespaces.
+
 A real invocation for a project with more than a handful of classes gets long fast; put it in
 a response file instead and pass `--options-file <path>`:
 

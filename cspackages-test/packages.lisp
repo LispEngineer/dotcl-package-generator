@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
 ;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Creation Date: 2026-07-19T15:45:00Z
 
 (cl:in-package :cl-user)
 
@@ -155,6 +155,7 @@
    #:stop
    #:add-elapsed
    #:remove-elapsed
+   #:kind
   ))
 
 ;;; Source File: system-console.lisp
@@ -2920,6 +2921,36 @@
    #:<creation>
    #:<version>
    #:new
+  ))
+
+;;; Source File: assembly-to-lispy-test-target-sub-space-sub-space-class-one.lisp
+;;; C# Class: AssemblyToLispyTestTarget.SubSpace.SubSpaceClassOne
+;;; Constant Properties: (none)
+;;; Options: --defgeneric
+(cl:defpackage :assembly-to-lispy-test-target-sub-space-sub-space-class-one
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:kind
+  ))
+
+;;; Source File: assembly-to-lispy-test-target-sub-space-sub-space-class-two.lisp
+;;; C# Class: AssemblyToLispyTestTarget.SubSpace.SubSpaceClassTwo
+;;; Constant Properties: (none)
+;;; Options: --defgeneric
+(cl:defpackage :assembly-to-lispy-test-target-sub-space-sub-space-class-two
+  (:use :cl)
+  (:export
+   #:<type>
+   #:<type-str>
+   #:<creation>
+   #:<version>
+   #:new
+   #:kind
   ))
 
 ;;; Source File: assembly-to-lispy-test-target-nesting-container-nested-level2.lisp

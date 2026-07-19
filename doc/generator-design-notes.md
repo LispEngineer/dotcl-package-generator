@@ -3374,3 +3374,77 @@ set: e.g. `System.ArgumentOutOfRangeException`'s ancestors
 System.ArgumentOutOfRangeException`, and `NestingContainer`'s nested levels get
 `Discovered via: --output-nested from
 AssemblyToLispyTestTarget.NestingContainer`.
+
+## `--all-classes`/`--all-classes-recursive` Namespace-Level Import (no version bump)
+
+`doc/plan-fable-detail-12.md` implements `PLAN.md`'s "Enable import of all classes in a
+certain namespace" Miscellaneous item: `--all-classes <namespace>`/
+`--all-classes-recursive <namespace>` behave like `--class` but name a whole namespace.
+No `*generator-version*` bump — nothing about `generate-class-file`'s own output shape
+changes; a namespace entry just becomes N ordinary resolved classes before any
+generation happens.
+
+**Where expansion happens:** the assembly's `.lispy.metadata` file already contains
+every public type in the assembly (`AssemblyToLispy.cs`'s existing reflection), so no
+new reflection is needed — expansion is purely a `resolve-batch-entry`
+(`apg-batch-discovery.lisp`) change, matching each type's own `:namespace` key
+(`namespace-matches-p`): exact `string=` for `--all-classes`; that string, or the same
+string followed by a literal `.` and more, for `--all-classes-recursive` (deliberately
+never a bare prefix check — `Gum.Form` must not match `Gum.Forms.X`, since
+`namespace-matches-p` requires the literal `.` boundary). A nested type's own
+`:namespace` already equals its declaring type's, so nested types are naturally included
+in a namespace expansion with no special-casing.
+
+**Two-pass resolution for correct precedence and dedup:** `resolve-batch-entry` now
+processes a manifest entry's `:classes` in two passes instead of one linear walk — pass
+1 resolves every explicit (non-namespace) `:class` entry first; pass 2 expands every
+namespace entry (`:namespace t`), skipping any fully-qualified-name already resolved in
+pass 1 or by an earlier namespace entry in the same call (a `seen` hash table threaded
+through both passes via a shared `resolve-one` closure). This guarantees an explicit
+`--class` always wins over an overlapping namespace expansion regardless of which comes
+first on the command line, and places namespace-expanded classes after every explicit
+one within the entry — deliberately mirroring how a Phase-B-discovered class
+(`generate-assembly-packages-batch`'s work queue) is already appended after its
+assembly's explicitly-requested ones, so the two "extra classes beyond what was
+literally typed" mechanisms in this codebase order their output the same way.
+
+**Zero-match handling:** `resolve-batch-entry` gained an optional `skip-missing`
+parameter (previously it took none at all — only ancestor resolution in
+`generate-assembly-packages-batch`'s Phase B consulted `--skip-missing`). A zero-match
+namespace is a hard error by default (pushed onto the same `not-found` list an
+unresolvable explicit `--class` name uses, so it fails the same way at the same point),
+or a dropped warning when `--skip-missing`. This does NOT change behavior for an
+ordinary `--class` name, which remains an unconditional hard error when unresolvable,
+exactly as before this feature — `skip-missing` only ever gates the *namespace*
+zero-match case.
+
+**CLI (`Program.cs`):** `ClassSpec` gained `IsNamespace`/`IsRecursive` bools; the
+previously-inline `--class` spec-construction code was factored into a shared
+`MakeClassSpec(name, isNamespace, isRecursive)` local function, used by all three CLI
+spellings (`--class`/`--all-classes`/`--all-classes-recursive`) so they can never
+disagree on which sticky `--*-all-*`/`--enable-*`/`--ensure-type*` defaults apply. The
+manifest gained `:namespace`/`:recursive` keys, emitted only for a namespace entry (an
+ordinary `--class` entry's manifest form is byte-for-byte unchanged, so `getf`'s nil
+default keeps the schema backward compatible without a version marker).
+
+**Non-goals** (documented, not implemented): cross-assembly namespace expansion (a
+namespace entry expands only within its own `--assembly` group, matching every other
+per-class option's scoping) and wildcard/glob namespace patterns (`System.*o*`) — only
+an exact namespace or its recursive sub-namespaces.
+
+### Verification
+
+New assertions in `package-generator-tests-batch-resolution.lisp` (a five-type fixture
+across `A.B`/`A.B.C`/`A.BX`/a nested type under `A.B`) cover: exact match (three direct
+members, not `A.B.C` or the `A.BX` prefix trap), recursive match (adds `A.B.C`, still
+not `A.BX`), zero-match hard error, zero-match + `--skip-missing` dropped warning, flag
+inheritance onto expanded classes, and dedup against an explicit `--class` (including
+that the explicit entry's own flags win, not the namespace group's). Smoke: a new, small
+`AssemblyToLispyTestTarget.SubSpace` sub-namespace (exactly two classes,
+`SubSpaceClassOne`/`SubSpaceClassTwo`) added to `EdgeCases.cs` specifically for a
+precise, stable `--all-classes` demonstration in the `Makefile`'s smoke invocation
+(deliberately not the enclosing `AssemblyToLispyTestTarget` namespace itself, which has
+many classes already individually exercised elsewhere in the smoke test and would
+produce a much larger, harder-to-review diff). `make clean build test test-runtime` all
+green; `cspackages-test/` diff shows exactly the two new `SubSpaceClass*` files plus the
+expected `.asd`/`packages.lisp`/metadata updates.

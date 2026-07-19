@@ -71,3 +71,4 @@
   --class AssemblyToLispyTestTarget.AbstractBase --output-children
   --class AssemblyToLispyTestTarget.IDummyInterface --output-implementations
   --class AssemblyToLispyTestTarget.ConcreteDerivedFromGeneric --export-parents
+  --all-classes AssemblyToLispyTestTarget.SubSpace --defgeneric

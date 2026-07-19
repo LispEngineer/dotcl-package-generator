@@ -182,4 +182,89 @@
         (when (probe-file fixture-file)
           (delete-file fixture-file))
         (when (probe-file out-dir)
-          (uiop:delete-directory-tree out-dir :validate t)))))
+          (uiop:delete-directory-tree out-dir :validate t))))
+
+    ;; 7. Namespace-level import (doc/plan-fable-detail-12.md):
+    ;;    --all-classes/--all-classes-recursive expansion in
+    ;;    resolve-batch-entry, via its :namespace/:recursive manifest keys.
+  (let* ((fixture-metadata
+             '((:fully-qualified-name "A.B.One" :namespace "A.B" :kind :class
+                :fields nil :properties nil :methods nil :constructors nil)
+               (:fully-qualified-name "A.B.Two" :namespace "A.B" :kind :class
+                :fields nil :properties nil :methods nil :constructors nil)
+               (:fully-qualified-name "A.B.C.Three" :namespace "A.B.C" :kind :class
+                :fields nil :properties nil :methods nil :constructors nil)
+               (:fully-qualified-name "A.BX.Four" :namespace "A.BX" :kind :class
+                :fields nil :properties nil :methods nil :constructors nil)
+               (:fully-qualified-name "A.B.One+Nested" :namespace "A.B" :kind :class
+                :fields nil :properties nil :methods nil :constructors nil)))
+           (fixture-file (merge-pathnames "package-generator-tests-namespace-fixture.lispy-metadata"
+                                          (uiop:temporary-directory))))
+      (unwind-protect
+          (progn
+            (with-open-file (s fixture-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+              (prin1 fixture-metadata s))
+
+            ;; 7.1 Exact match: "A.B" matches One/Two/One+Nested (nested
+            ;;     types share their declaring type's namespace) but NOT
+            ;;     A.B.C.Three (a genuine sub-namespace) or A.BX.Four (the
+            ;;     prefix trap -- "A.B" must not match "A.BX").
+            (multiple-value-bind (resolved not-found)
+                (assembly-package-generator:resolve-batch-entry
+                 (list :metadata-file (namestring fixture-file)
+                       :classes (list (list :name "A.B" :namespace t :constant-properties "" :defgeneric t))))
+              (assert-test not-found nil "--all-classes A.B finds matches, reports nothing missing")
+              (assert-test (sort (mapcar (lambda (rc) (getf (getf rc :class-plist) :fully-qualified-name)) resolved) #'string<)
+                          '("A.B.One" "A.B.One+Nested" "A.B.Two")
+                          "--all-classes A.B expands to exactly its own direct members (nested types included), not A.B.C or A.BX")
+              (assert-test (every (lambda (rc) (getf rc :defgeneric)) resolved) t
+                          "--all-classes A.B's own flags (--defgeneric) are inherited by every expanded class"))
+
+            ;; 7.2 Recursive match: "A.B" recursive also picks up A.B.C.Three,
+            ;;     but still not the A.BX prefix trap.
+            (multiple-value-bind (resolved not-found)
+                (assembly-package-generator:resolve-batch-entry
+                 (list :metadata-file (namestring fixture-file)
+                       :classes (list (list :name "A.B" :namespace t :recursive t :constant-properties ""))))
+              (declare (ignore not-found))
+              (assert-test (sort (mapcar (lambda (rc) (getf (getf rc :class-plist) :fully-qualified-name)) resolved) #'string<)
+                          '("A.B.C.Three" "A.B.One" "A.B.One+Nested" "A.B.Two")
+                          "--all-classes-recursive A.B also expands to A.B.C's members, but still not A.BX's"))
+
+            ;; 7.3 Zero-match namespace is a hard error (reported via not-found).
+            (multiple-value-bind (resolved not-found)
+                (assembly-package-generator:resolve-batch-entry
+                 (list :metadata-file (namestring fixture-file)
+                       :classes (list (list :name "Does.Not.Exist" :namespace t :constant-properties ""))))
+              (assert-test resolved nil "a zero-match namespace resolves no classes")
+              (assert-test not-found '("Does.Not.Exist") "a zero-match namespace is reported as not-found (hard error upstream)"))
+
+            ;; 7.4 Zero-match namespace + skip-missing is a dropped warning,
+            ;;     not an error.
+            (multiple-value-bind (resolved not-found)
+                (assembly-package-generator:resolve-batch-entry
+                 (list :metadata-file (namestring fixture-file)
+                       :classes (list (list :name "Does.Not.Exist" :namespace t :constant-properties "")))
+                 t)
+              (assert-test resolved nil "a zero-match namespace with skip-missing still resolves no classes")
+              (assert-test not-found nil "a zero-match namespace with skip-missing is dropped, not reported as missing"))
+
+            ;; 7.5 Dedup: an explicit --class always wins over an overlapping
+            ;;     namespace expansion, regardless of command-line order --
+            ;;     here the namespace entry comes FIRST but the explicit
+            ;;     entry's own (different) flags must still be the ones used.
+            (multiple-value-bind (resolved not-found)
+                (assembly-package-generator:resolve-batch-entry
+                 (list :metadata-file (namestring fixture-file)
+                       :classes (list (list :name "A.B" :namespace t :constant-properties "" :defgeneric t)
+                                      (list :name "A.B.One" :constant-properties "" :defgeneric nil :export-parents t))))
+              (declare (ignore not-found))
+              (assert-test (length resolved) 3
+                          "explicit A.B.One dedups against --all-classes A.B's own expansion (no duplicate entry)")
+              (let ((one (find "A.B.One" resolved :key (lambda (rc) (getf (getf rc :class-plist) :fully-qualified-name)) :test #'string=)))
+                (assert-test (getf one :defgeneric) nil
+                            "the explicit --class A.B.One entry's own flags win over the namespace group's (defgeneric nil, not inherited t)")
+                (assert-test (getf one :export-parents) t
+                            "the explicit --class A.B.One entry's own flags win over the namespace group's (export-parents t, its own)"))))
+        (when (probe-file fixture-file)
+          (delete-file fixture-file)))))

@@ -76,19 +76,16 @@ for (int i = 0; i < args.Length; i++) {
         if (currentGroup == null) {
             argErrors.Add("--class specified before any --assembly.");
         } else {
-            currentClass = new ClassSpec {
-                Name = args[i + 1],
-                ExportParents = exportAllParents,
-                ExportInterfaces = exportAllInterfaces,
-                ExportObject = exportAllObject,
-                OutputNested = outputAllNested,
-                OutputChildren = outputAllChildren,
-                OutputImplementations = outputAllImplementations,
-                DefGenericStatic = enableDefgenericStatic,
-                ExtensionMethods = enableExtensionMethods,
-                EnsureType = ensureType,
-                EnsureTypeInGeneric = ensureTypeInGeneric,
-            };
+            currentClass = MakeClassSpec(args[i + 1]);
+            currentGroup.Classes.Add(currentClass);
+        }
+        i++;
+    } else if ((args[i] == "--all-classes" || args[i] == "--all-classes-recursive") && i + 1 < args.Length) {
+        bool isRecursive = args[i] == "--all-classes-recursive";
+        if (currentGroup == null) {
+            argErrors.Add($"{args[i]} specified before any --assembly.");
+        } else {
+            currentClass = MakeClassSpec(args[i + 1], isNamespace: true, isRecursive: isRecursive);
             currentGroup.Classes.Add(currentClass);
         }
         i++;
@@ -324,6 +321,10 @@ if (!isTestMode && !printVersion && (outDir != null || groups.Count > 0 || argEr
                 manifest.Append(" :extension-methods ").Append(cls.ExtensionMethods ? "t" : "nil");
                 manifest.Append(" :ensure-type ").Append(cls.EnsureType ? "t" : "nil");
                 manifest.Append(" :ensure-type-in-generic ").Append(cls.EnsureTypeInGeneric ? "t" : "nil");
+                if (cls.IsNamespace) {
+                    manifest.Append(" :namespace t");
+                    manifest.Append(" :recursive ").Append(cls.IsRecursive ? "t" : "nil");
+                }
                 manifest.Append(')');
             }
             manifest.Append("))\n");
@@ -416,6 +417,28 @@ Environment.Exit(1);
 //////////////////////////////////////////////////////////////////////////////
 // Helpers
 
+// Builds a ClassSpec for --class/--all-classes/--all-classes-recursive alike,
+// applying the current sticky --*-all-*/--enable-*/--ensure-type* defaults --
+// factored out so the three CLI spellings can never drift on which defaults
+// they apply (see doc/plan-fable-detail-12.md).
+ClassSpec MakeClassSpec(string name, bool isNamespace = false, bool isRecursive = false) {
+    return new ClassSpec {
+        Name = name,
+        ExportParents = exportAllParents,
+        ExportInterfaces = exportAllInterfaces,
+        ExportObject = exportAllObject,
+        OutputNested = outputAllNested,
+        OutputChildren = outputAllChildren,
+        OutputImplementations = outputAllImplementations,
+        DefGenericStatic = enableDefgenericStatic,
+        ExtensionMethods = enableExtensionMethods,
+        EnsureType = ensureType,
+        EnsureTypeInGeneric = ensureTypeInGeneric,
+        IsNamespace = isNamespace,
+        IsRecursive = isRecursive,
+    };
+}
+
 void LoadDotclManifest() {
     // FIXME: This seems awfully fragile. Is there some way we can make these come in
     // from the build process?
@@ -490,6 +513,17 @@ void PrintHelp() {
     Opt("--class <name>", "Fully-qualified C# class name to generate a Lisp",
         "package for, in the most recently given --assembly.",
         "Repeatable.");
+    Opt("--all-classes <namespace>", "Every public type whose namespace is exactly",
+        "<namespace> (in the most recently given --assembly),",
+        "expanded into one --class-equivalent entry per type,",
+        "each carrying this entry's own flags/",
+        "--constant-properties. Zero matches is an error unless",
+        "--skip-missing. Repeatable; behaves like --class",
+        "otherwise (attaches --export-*/--output-*/--defgeneric/",
+        "--constant-properties, etc.).");
+    Opt("--all-classes-recursive <namespace>", "Like --all-classes, but also matches every",
+        "sub-namespace of <namespace> (never a bare string",
+        "prefix -- \"Gum.Form\" does not match \"Gum.Forms.X\").");
     Opt("--constant-properties <spec>", "Comma/semicolon-separated static property names",
         "(or \"*\" for all) to emit as Lisp constants instead",
         "of re-evaluated accessors, for the most recently given",
@@ -682,6 +716,15 @@ class ClassSpec {
     public bool ExtensionMethods;
     public bool EnsureType;
     public bool EnsureTypeInGeneric;
+    // Namespace-level import (doc/plan-fable-detail-12.md): when IsNamespace is
+    // true, Name is a C# namespace (not a fully-qualified class name), expanded
+    // Lisp-side (resolve-batch-entry, apg-batch-discovery.lisp) into one
+    // resolved class per matching public type in the assembly's already-
+    // reflected metadata -- IsRecursive selects --all-classes (exact namespace
+    // match only) vs. --all-classes-recursive (that namespace or any
+    // sub-namespace). False/false for an ordinary --class.
+    public bool IsNamespace;
+    public bool IsRecursive;
 }
 
 /// <summary>

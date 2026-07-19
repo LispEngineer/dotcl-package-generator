@@ -197,9 +197,13 @@
 
     ;; Phase A: resolve every explicitly requested class, per entry, exactly
     ;; as before (unchanged not-found contract: abort before touching
-    ;; ancestors or generating anything if any requested class is missing).
+    ;; ancestors or generating anything if any requested class is missing) --
+    ;; also expands any --all-classes/--all-classes-recursive namespace entry
+    ;; (doc/plan-fable-detail-12.md), where SKIP-MISSING additionally governs
+    ;; a zero-match namespace (never an ordinary --class name, which is
+    ;; always a hard error when unresolvable).
     (dolist (entry assembly-entries)
-      (multiple-value-bind (resolved not-found) (resolve-batch-entry entry)
+      (multiple-value-bind (resolved not-found) (resolve-batch-entry entry skip-missing)
         (setf (gethash entry entry-resolved-table) resolved)
         (push entry entries-with-resolved)
         (dolist (rc resolved)
@@ -388,7 +392,19 @@
                   :extension-methods t/nil
                   :output-nested t/nil :output-children t/nil
                   :output-implementations t/nil :ensure-type t/nil
-                  :ensure-type-in-generic t/nil) ...)) ...)
+                  :ensure-type-in-generic t/nil
+                  :namespace t/nil :recursive t/nil) ...)) ...)
+   :namespace/:recursive (per-class-entry, doc/plan-fable-detail-12.md;
+   absent -- getf default nil -- for an ordinary --class entry, so this
+   remains backward compatible): Program.cs's --all-classes/
+   --all-classes-recursive namespace-level import. When :namespace is t,
+   :name holds a C# namespace rather than a fully-qualified class name, and
+   RESOLVE-BATCH-ENTRY expands it Lisp-side into one resolved class per
+   matching public type already present in that assembly's own reflected
+   metadata (:recursive t also matches every sub-namespace, never a bare
+   string prefix) -- each expanded class carries this entry's own flags/
+   :constant-properties, exactly like an ordinary --class. A zero-match
+   namespace is a hard error unless SKIP-MISSING.
    :output-nested/:output-children/:output-implementations (per-class,
    Version 39, doc/plan-v38.md's Part B) discover, respectively, every type
    nested inside a class, every direct-or-indirect subclass of a class, and

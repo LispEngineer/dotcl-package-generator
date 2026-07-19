@@ -137,7 +137,13 @@ dotcl-packagegen --out-dir ./cspackages \
 
 `--class` attaches to the most recently given `--assembly`; `--constant-properties` attaches to
 the most recently given `--class`. `--assembly` is repeatable and may have zero `--class`
-options (metadata-only).
+options (metadata-only). `--all-classes <namespace>`/`--all-classes-recursive <namespace>`
+(`doc/plan-fable-detail-12.md`) behave like `--class` but expand, Lisp-side
+(`resolve-batch-entry`, `apg-batch-discovery.lisp`), into every public type in the assembly's
+own metadata whose namespace exactly matches (or, recursive, is that namespace or any
+sub-namespace — never a bare string prefix) — each expanded class carries the group's own
+per-class flags. A zero-match namespace is an error unless `--skip-missing`; an explicit
+`--class` always wins over an overlapping namespace expansion regardless of order.
 
 `--constant-properties` (comma/semicolon-separated names, or `"*"` for all) forces static
 read-only properties to be memoized — computed once, on first use, then cached for the life

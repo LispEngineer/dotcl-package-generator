@@ -10,6 +10,33 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.52.1 — 2026-07-19
+
+**`--all-classes`/`--all-classes-recursive` namespace-level import (`doc/plan-fable-detail-12.md`); no `*generator-version*` bump.**
+
+* `--all-classes <namespace>`/`--all-classes-recursive <namespace>` behave like `--class`
+  but name a whole C# namespace instead: expanded Lisp-side (`resolve-batch-entry`,
+  `apg-batch-discovery.lisp`) against the assembly's own already-reflected metadata into
+  every public type whose `:namespace` matches exactly (`--all-classes`) or is that
+  namespace or a genuine sub-namespace (`--all-classes-recursive`, never a bare string
+  prefix), each carrying that group's own per-class flags/`--constant-properties`.
+  Nested public types are included. A zero-match namespace is a hard error unless
+  `--skip-missing` (then a dropped warning); an explicit `--class` always wins over an
+  overlapping namespace expansion regardless of command-line order.
+* New `ClassSpec.IsNamespace`/`IsRecursive` fields (`Program.cs`, factored through a new
+  shared `MakeClassSpec` helper so `--class`/`--all-classes`/`--all-classes-recursive`
+  can never disagree on which sticky defaults they apply); new `:namespace`/`:recursive`
+  manifest keys (absent -- `getf` default nil -- for an ordinary `--class`, so the
+  manifest schema stays backward compatible).
+* New tests in `package-generator-tests-batch-resolution.lisp` (exact match, recursive
+  match, the `A.B` vs. `A.BX` prefix trap, zero-match error, zero-match +
+  `--skip-missing`, flag inheritance, dedup against an explicit `--class`). New smoke
+  fixture: a small, isolated `AssemblyToLispyTestTarget.SubSpace` sub-namespace (exactly
+  two classes) exercised via `--all-classes` in the `Makefile`'s smoke invocation.
+* No `*generator-version*` bump: the per-class generation machinery, and the Plan 07
+  invocation-echo comment shape, are both unaffected by whether a class came from an
+  explicit `--class` or a namespace expansion.
+
 ## 2.52.0 — 2026-07-19
 
 **`--options-file` (response-file CLI front end) and invocation-echo comments in generated output (`doc/plan-fable-detail-07.md`).**

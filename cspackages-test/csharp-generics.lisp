@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
 ;;; Generator Version: 52
-;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Creation Date: 2026-07-19T15:45:00Z
 
 (cl:in-package :csharp-generics)
 
@@ -644,6 +644,12 @@ System.Timers.Timer: add-elapsed (system-timers-timer:add-elapsed)
 System.Timers.Timer: remove-elapsed (system-timers-timer:remove-elapsed)
 "))
 
+(cl:defgeneric kind (obj! cl:&rest args)
+  (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
+AssemblyToLispyTestTarget.SubSpace.SubSpaceClassOne: kind (assembly-to-lispy-test-target-sub-space-sub-space-class-one:kind)
+AssemblyToLispyTestTarget.SubSpace.SubSpaceClassTwo: kind (assembly-to-lispy-test-target-sub-space-sub-space-class-two:kind)
+"))
+
 (cl:defgeneric (cl:setf capacity) (new-value obj! cl:&rest args)
   (:documentation "Dispatches on the C# runtime type of OBJ!. Specialized by:
 System.Text.StringBuilder: (cl:setf capacity) (cl:setf (system-text-string-builder:capacity ...))
@@ -1068,4 +1074,12 @@ System.Timers.Timer: (cl:setf synchronizing-object) (cl:setf (system-timers-time
   (cl:apply (cl:function (cl:setf system-timers-timer:site)) new-value obj! args))
 (cl:defmethod (cl:setf synchronizing-object) (new-value (obj! #.(dotnet:class-for-type "System.Timers.Timer")) cl:&rest args)
   (cl:apply (cl:function (cl:setf system-timers-timer:synchronizing-object)) new-value obj! args))
+
+;; AssemblyToLispyTestTarget.SubSpace.SubSpaceClassOne (assembly-to-lispy-test-target-sub-space-sub-space-class-one)
+(cl:defmethod kind ((obj! #.(dotnet:class-for-type "AssemblyToLispyTestTarget.SubSpace.SubSpaceClassOne")) cl:&rest args)
+  (cl:apply (cl:function assembly-to-lispy-test-target-sub-space-sub-space-class-one:kind) obj! args))
+
+;; AssemblyToLispyTestTarget.SubSpace.SubSpaceClassTwo (assembly-to-lispy-test-target-sub-space-sub-space-class-two)
+(cl:defmethod kind ((obj! #.(dotnet:class-for-type "AssemblyToLispyTestTarget.SubSpace.SubSpaceClassTwo")) cl:&rest args)
+  (cl:apply (cl:function assembly-to-lispy-test-target-sub-space-sub-space-class-two:kind) obj! args))
 
