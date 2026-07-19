@@ -1,14 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Environment
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: (none)
 
 (cl:in-package :system-environment)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Environment"))
 (cl:defconstant <type-str> "System.Environment")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:define-symbol-macro command-line (dotnet:static <type-str> "CommandLine"))
 

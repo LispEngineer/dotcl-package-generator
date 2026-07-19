@@ -1,0 +1,73 @@
+# Response file (doc/plan-fable-detail-07.md) for `make test`'s end-to-end
+# smoke-generation invocation -- see the `test:` target in Makefile, which
+# generates this file (via sed, substituting @REF_DIR@/@BIN_DIR@) into
+# $(BIN_DIR)test-options.txt before passing it to --options-file. Keeping
+# this as a checked-in template (rather than the old ~100-line shell
+# invocation) makes future additions a plain-text diff instead of a shell
+# line edit, and makes the effective invocation reviewable/reproducible on
+# its own. Unlike the shell, no quoting is needed for a generic class name's
+# backtick (e.g. System.ValueTuple`2) -- only a token containing actual
+# whitespace needs double-quotes here.
+--assembly @REF_DIR@System.Console.dll
+  --class System.Console
+--assembly @REF_DIR@System.Runtime.dll
+  --class System.TimeSpan --constant-properties *
+  --class System.Object --defgeneric
+  --class System.Type
+  --class System.String --defgeneric
+  --class System.Array --constant-properties MaxLength --defgeneric
+  --class System.TimeZoneInfo
+  --class System.Convert
+  --class System.Text.StringBuilder --defgeneric
+  --class System.TimeZoneInfo+AdjustmentRule
+  --class System.ValueTuple`2 --export-interfaces --skip-missing
+  --class System.ValueTuple`3
+  --class System.ValueTuple`4
+  --class System.ValueTuple`5
+  --class System.ValueTuple`6
+  --class System.ValueTuple`7
+  --class System.ValueTuple`8
+  --class System.ArgumentOutOfRangeException --export-parents --export-interfaces --export-object
+  --class System.Collections.Hashtable --export-all-parents --export-all-interfaces
+  --class System.IO.MemoryStream --export-object
+  --class System.IO.StreamReader
+--assembly @REF_DIR@System.Linq.dll
+  --class System.Linq.Enumerable --no-export-all-parents --no-export-interfaces
+--assembly @REF_DIR@System.Xml.ReaderWriter.dll
+  --class System.Xml.XmlReader --no-export-all-interfaces
+--assembly @REF_DIR@System.Collections.dll
+  --class System.Collections.Generic.Dictionary`2 --defgeneric
+  --class System.Collections.Generic.Dictionary`2+KeyCollection
+  --class System.Collections.Generic.Dictionary`2+ValueCollection
+  --class System.Collections.Generic.List`1
+  --class System.Collections.Generic.SortedList`2 --defgeneric
+--assembly @REF_DIR@System.Numerics.Vectors.dll
+  --class System.Numerics.Vector2 --constant-properties * --enable-defgeneric
+  --class System.Numerics.Vector3 --constant-properties *
+  --class System.Numerics.Vector4 --constant-properties *
+  --no-enable-defgeneric
+--assembly @REF_DIR@System.Threading.Timer.dll
+  --ensure-type --ensure-type-in-generic
+  --class System.Threading.Timer --defgeneric
+  --no-ensure-type --no-ensure-type-in-generic
+--assembly @REF_DIR@System.ComponentModel.TypeConverter.dll
+  --class System.Timers.Timer --defgeneric
+--assembly @REF_DIR@System.Diagnostics.Debug.dll
+  --class System.Diagnostics.Debug
+--assembly @REF_DIR@System.Globalization.dll
+  --class System.Globalization.CultureInfo
+--assembly @REF_DIR@System.Net.ServicePoint.dll
+  --class System.Net.ServicePointManager
+--assembly @REF_DIR@System.Runtime.Extensions.dll
+  --class System.Environment
+  --class System.AppDomain
+--assembly @REF_DIR@System.Threading.Thread.dll
+  --class System.Threading.Thread
+--assembly @REF_DIR@System.Collections.Specialized.dll
+  --class System.Collections.Specialized.NameValueCollection --export-parents --export-interfaces --export-object
+--assembly @BIN_DIR@AssemblyToLispyTestTarget.dll
+  --class AssemblyToLispyTestTarget.EventTestClass
+  --class AssemblyToLispyTestTarget.NestingContainer --output-nested
+  --class AssemblyToLispyTestTarget.AbstractBase --output-children
+  --class AssemblyToLispyTestTarget.IDummyInterface --output-implementations
+  --class AssemblyToLispyTestTarget.ConcreteDerivedFromGeneric --export-parents

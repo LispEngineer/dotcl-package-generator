@@ -127,4 +127,59 @@
         (when (probe-file fixture-file)
           (delete-file fixture-file))
         (when (probe-file out-dir)
+          (uiop:delete-directory-tree out-dir :validate t))))
+
+    ;; 6. Invocation echo (doc/plan-fable-detail-07.md's Part B): every
+    ;;    class's non-default per-class flags and discovery provenance are
+    ;;    recorded in csharp-assembly-packages.asd, packages.lisp, and the
+    ;;    class file's own header, so a generated directory alone is
+    ;;    reconstructable back into the invocation that produced it.
+  (let* ((fixture-metadata
+             '((:fully-qualified-name "Fixture.Child" :kind :class :superclass "Fixture.Parent"
+                :fields nil :properties nil :methods nil :constructors nil :interfaces nil)
+               (:fully-qualified-name "Fixture.Parent" :kind :class :superclass nil
+                :fields nil :properties nil :methods nil :constructors nil :interfaces nil)))
+           (fixture-file (merge-pathnames "package-generator-tests-echo-fixture.lispy-metadata"
+                                          (uiop:temporary-directory)))
+           (out-dir (merge-pathnames "package-generator-tests-echo-out/"
+                                     (uiop:temporary-directory))))
+      (unwind-protect
+          (progn
+            (with-open-file (s fixture-file :direction :output :if-exists :supersede :if-does-not-exist :create)
+              (prin1 fixture-metadata s))
+            (ensure-directories-exist out-dir)
+
+            (assembly-package-generator:generate-assembly-packages-batch
+             (list (list :metadata-file (namestring fixture-file)
+                         :assembly-name "Fixture.dll"
+                         :classes (list (list :name "Fixture.Child" :constant-properties ""
+                                               :export-parents t :defgeneric t))))
+             (namestring out-dir)
+             "2026-07-19T00:00:00Z"
+             "9.9.9"
+             (utils:qualify-path "csharp-assembly-utils-package.template.lisp")
+             (utils:qualify-path "csharp-assembly-utils.template.lisp")
+             t)
+
+            (let ((asd-contents (uiop:read-file-string (merge-pathnames "csharp-assembly-packages.asd" out-dir)))
+                  (packages-contents (uiop:read-file-string (merge-pathnames "packages.lisp" out-dir)))
+                  (child-contents (uiop:read-file-string (merge-pathnames "fixture-child.lisp" out-dir)))
+                  (parent-contents (uiop:read-file-string (merge-pathnames "fixture-parent.lisp" out-dir))))
+              (assert-test (not (null (search "Global flags: --skip-missing --csharp-generic-in-asd" asd-contents))) t
+                          "csharp-assembly-packages.asd's long-description records the global (whole-invocation) flags")
+              (assert-test (not (null (search "Options: --defgeneric --export-parents" asd-contents))) t
+                          "csharp-assembly-packages.asd's per-class listing records Fixture.Child's own non-default flags")
+              (assert-test (not (null (search ";;; Options: --defgeneric --export-parents" packages-contents))) t
+                          "packages.lisp's per-package comment records Fixture.Child's own non-default flags")
+              (assert-test (not (null (search ";;; Options: --defgeneric --export-parents" child-contents))) t
+                          "fixture-child.lisp's own header records its non-default flags")
+              (assert-test (null (search "Discovered via" child-contents)) t
+                          "an explicitly-requested class's header has no Discovered via line")
+              (assert-test (not (null (search ";;; Options: --defgeneric --export-parents" parent-contents))) t
+                          "fixture-parent.lisp (discovered via --export-parents) inherits its discoverer Fixture.Child's entire flag set (Version 39 cascading-discovery rule)")
+              (assert-test (not (null (search ";;; Discovered via: --export-parents from Fixture.Child" parent-contents))) t
+                          "fixture-parent.lisp's header records it was discovered via --export-parents from Fixture.Child")))
+        (when (probe-file fixture-file)
+          (delete-file fixture-file))
+        (when (probe-file out-dir)
           (uiop:delete-directory-tree out-dir :validate t)))))

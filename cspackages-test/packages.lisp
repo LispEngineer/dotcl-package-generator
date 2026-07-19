@@ -1,6 +1,6 @@
 ;;; Generated automatically. Do not edit.
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
 
 (cl:in-package :cl-user)
 
@@ -160,6 +160,7 @@
 ;;; Source File: system-console.lisp
 ;;; C# Class: System.Console
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-console
   (:use :cl)
   (:shadow
@@ -226,6 +227,7 @@
 ;;; Source File: system-time-span.lisp
 ;;; C# Class: System.TimeSpan
 ;;; Constant Properties: *
+;;; Options: (none)
 (cl:defpackage :system-time-span
   (:use :cl)
   (:shadow
@@ -324,6 +326,7 @@
 ;;; Source File: system-object.lisp
 ;;; C# Class: System.Object
 ;;; Constant Properties: (none)
+;;; Options: --defgeneric
 (cl:defpackage :system-object
   (:use :cl)
   (:export
@@ -346,6 +349,7 @@
 ;;; Source File: system-type.lisp
 ;;; C# Class: System.Type
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-type
   (:use :cl)
   (:shadow
@@ -523,6 +527,7 @@
 ;;; Source File: system-string.lisp
 ;;; C# Class: System.String
 ;;; Constant Properties: (none)
+;;; Options: --defgeneric
 (cl:defpackage :system-string
   (:use :cl)
   (:shadow
@@ -602,6 +607,7 @@
 ;;; Source File: system-array.lisp
 ;;; C# Class: System.Array
 ;;; Constant Properties: MaxLength
+;;; Options: --defgeneric
 (cl:defpackage :system-array
   (:use :cl)
   (:shadow
@@ -666,6 +672,7 @@
 ;;; Source File: system-time-zone-info.lisp
 ;;; C# Class: System.TimeZoneInfo
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-time-zone-info
   (:use :cl)
   (:export
@@ -710,6 +717,7 @@
 ;;; Source File: system-convert.lisp
 ;;; C# Class: System.Convert
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-convert
   (:use :cl)
   (:export
@@ -754,6 +762,7 @@
 ;;; Source File: system-text-string-builder.lisp
 ;;; C# Class: System.Text.StringBuilder
 ;;; Constant Properties: (none)
+;;; Options: --defgeneric
 (cl:defpackage :system-text-string-builder
   (:use :cl)
   (:shadow
@@ -792,6 +801,7 @@
 ;;; Source File: system-time-zone-info-adjustment-rule.lisp
 ;;; C# Class: System.TimeZoneInfo+AdjustmentRule
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-time-zone-info-adjustment-rule
   (:use :cl)
   (:export
@@ -813,6 +823,7 @@
 ;;; Source File: system-value-tuple-2.lisp
 ;;; C# Class: System.ValueTuple`2
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces
 (cl:defpackage :system-value-tuple-2
   (:use :cl)
   (:export
@@ -832,6 +843,7 @@
 ;;; Source File: system-value-tuple-3.lisp
 ;;; C# Class: System.ValueTuple`3
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-value-tuple-3
   (:use :cl)
   (:export
@@ -852,6 +864,7 @@
 ;;; Source File: system-value-tuple-4.lisp
 ;;; C# Class: System.ValueTuple`4
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-value-tuple-4
   (:use :cl)
   (:export
@@ -873,6 +886,7 @@
 ;;; Source File: system-value-tuple-5.lisp
 ;;; C# Class: System.ValueTuple`5
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-value-tuple-5
   (:use :cl)
   (:export
@@ -895,6 +909,7 @@
 ;;; Source File: system-value-tuple-6.lisp
 ;;; C# Class: System.ValueTuple`6
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-value-tuple-6
   (:use :cl)
   (:export
@@ -918,6 +933,7 @@
 ;;; Source File: system-value-tuple-7.lisp
 ;;; C# Class: System.ValueTuple`7
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-value-tuple-7
   (:use :cl)
   (:export
@@ -942,6 +958,7 @@
 ;;; Source File: system-value-tuple-8.lisp
 ;;; C# Class: System.ValueTuple`8
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-value-tuple-8
   (:use :cl)
   (:shadow
@@ -970,6 +987,7 @@
 ;;; Source File: system-argument-out-of-range-exception.lisp
 ;;; C# Class: System.ArgumentOutOfRangeException
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
 (cl:defpackage :system-argument-out-of-range-exception
   (:use :cl)
   (:export
@@ -995,6 +1013,7 @@
 ;;; Source File: system-collections-hashtable.lisp
 ;;; C# Class: System.Collections.Hashtable
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-collections-hashtable
   (:use :cl)
   (:shadow
@@ -1038,6 +1057,7 @@
 ;;; Source File: system-io-memory-stream.lisp
 ;;; C# Class: System.IO.MemoryStream
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
 (cl:defpackage :system-io-memory-stream
   (:use :cl)
   (:shadow
@@ -1082,6 +1102,7 @@
 ;;; Source File: system-io-stream-reader.lisp
 ;;; C# Class: System.IO.StreamReader
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-parents
 (cl:defpackage :system-io-stream-reader
   (:use :cl)
   (:shadow
@@ -1117,6 +1138,8 @@
 ;;; Source File: system-collections-i-structural-comparable.lisp
 ;;; C# Class: System.Collections.IStructuralComparable
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces
+;;; Discovered via: --export-interfaces from System.ValueTuple`2
 (cl:defpackage :system-collections-i-structural-comparable
   (:use :cl)
   (:export
@@ -1130,6 +1153,8 @@
 ;;; Source File: system-collections-i-structural-equatable.lisp
 ;;; C# Class: System.Collections.IStructuralEquatable
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces
+;;; Discovered via: --export-interfaces from System.ValueTuple`2
 (cl:defpackage :system-collections-i-structural-equatable
   (:use :cl)
   (:export
@@ -1144,6 +1169,8 @@
 ;;; Source File: system-i-comparable.lisp
 ;;; C# Class: System.IComparable
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces
+;;; Discovered via: --export-interfaces from System.ValueTuple`2
 (cl:defpackage :system-i-comparable
   (:use :cl)
   (:export
@@ -1157,6 +1184,8 @@
 ;;; Source File: system-i-comparable-1.lisp
 ;;; C# Class: System.IComparable`1
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces
+;;; Discovered via: --export-interfaces from System.ValueTuple`2
 (cl:defpackage :system-i-comparable-1
   (:use :cl)
   (:export
@@ -1170,6 +1199,8 @@
 ;;; Source File: system-i-equatable-1.lisp
 ;;; C# Class: System.IEquatable`1
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces
+;;; Discovered via: --export-interfaces from System.ValueTuple`2
 (cl:defpackage :system-i-equatable-1
   (:use :cl)
   (:export
@@ -1183,6 +1214,8 @@
 ;;; Source File: system-runtime-compiler-services-i-tuple.lisp
 ;;; C# Class: System.Runtime.CompilerServices.ITuple
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces
+;;; Discovered via: --export-interfaces from System.ValueTuple`2
 (cl:defpackage :system-runtime-compiler-services-i-tuple
   (:use :cl)
   (:shadow
@@ -1200,6 +1233,8 @@
 ;;; Source File: system-argument-exception.lisp
 ;;; C# Class: System.ArgumentException
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.ArgumentOutOfRangeException
 (cl:defpackage :system-argument-exception
   (:use :cl)
   (:export
@@ -1218,6 +1253,8 @@
 ;;; Source File: system-runtime-serialization-i-serializable.lisp
 ;;; C# Class: System.Runtime.Serialization.ISerializable
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.ArgumentOutOfRangeException
 (cl:defpackage :system-runtime-serialization-i-serializable
   (:use :cl)
   (:export
@@ -1231,6 +1268,8 @@
 ;;; Source File: system-system-exception.lisp
 ;;; C# Class: System.SystemException
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.ArgumentOutOfRangeException
 (cl:defpackage :system-system-exception
   (:use :cl)
   (:export
@@ -1244,6 +1283,8 @@
 ;;; Source File: system-exception.lisp
 ;;; C# Class: System.Exception
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.ArgumentOutOfRangeException
 (cl:defpackage :system-exception
   (:use :cl)
   (:export
@@ -1271,6 +1312,8 @@
 ;;; Source File: system-io-stream.lisp
 ;;; C# Class: System.IO.Stream
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.IO.MemoryStream
 (cl:defpackage :system-io-stream
   (:use :cl)
   (:shadow
@@ -1331,6 +1374,8 @@
 ;;; Source File: system-i-async-disposable.lisp
 ;;; C# Class: System.IAsyncDisposable
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.IO.MemoryStream
 (cl:defpackage :system-i-async-disposable
   (:use :cl)
   (:export
@@ -1345,6 +1390,8 @@
 ;;; Source File: system-i-disposable.lisp
 ;;; C# Class: System.IDisposable
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.IO.MemoryStream
 (cl:defpackage :system-i-disposable
   (:use :cl)
   (:export
@@ -1358,6 +1405,8 @@
 ;;; Source File: system-marshal-by-ref-object.lisp
 ;;; C# Class: System.MarshalByRefObject
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.IO.MemoryStream
 (cl:defpackage :system-marshal-by-ref-object
   (:use :cl)
   (:export
@@ -1374,6 +1423,8 @@
 ;;; Source File: system-io-text-reader.lisp
 ;;; C# Class: System.IO.TextReader
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.IO.StreamReader
 (cl:defpackage :system-io-text-reader
   (:use :cl)
   (:shadow
@@ -1406,6 +1457,8 @@
 ;;; Source File: system-collections-i-collection.lisp
 ;;; C# Class: System.Collections.ICollection
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.Collections.Specialized.NameValueCollection
 (cl:defpackage :system-collections-i-collection
   (:use :cl)
   (:shadow
@@ -1425,6 +1478,8 @@
 ;;; Source File: system-collections-i-enumerable.lisp
 ;;; C# Class: System.Collections.IEnumerable
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.Collections.Specialized.NameValueCollection
 (cl:defpackage :system-collections-i-enumerable
   (:use :cl)
   (:export
@@ -1438,6 +1493,8 @@
 ;;; Source File: system-runtime-serialization-i-deserialization-callback.lisp
 ;;; C# Class: System.Runtime.Serialization.IDeserializationCallback
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.Collections.Specialized.NameValueCollection
 (cl:defpackage :system-runtime-serialization-i-deserialization-callback
   (:use :cl)
   (:export
@@ -1451,6 +1508,7 @@
 ;;; Source File: system-linq-enumerable.lisp
 ;;; C# Class: System.Linq.Enumerable
 ;;; Constant Properties: (none)
+;;; Options: --export-parents
 (cl:defpackage :system-linq-enumerable
   (:use :cl)
   (:shadow
@@ -1552,6 +1610,7 @@
 ;;; Source File: system-xml-xml-reader.lisp
 ;;; C# Class: System.Xml.XmlReader
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces
 (cl:defpackage :system-xml-xml-reader
   (:use :cl)
   (:shadow
@@ -1664,6 +1723,7 @@
 ;;; Source File: system-collections-generic-dictionary-2.lisp
 ;;; C# Class: System.Collections.Generic.Dictionary`2
 ;;; Constant Properties: (none)
+;;; Options: --defgeneric
 (cl:defpackage :system-collections-generic-dictionary-2
   (:use :cl)
   (:shadow
@@ -1703,6 +1763,7 @@
 ;;; Source File: system-collections-generic-dictionary-2-key-collection.lisp
 ;;; C# Class: System.Collections.Generic.Dictionary`2+KeyCollection
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-collections-generic-dictionary-2-key-collection
   (:use :cl)
   (:shadow
@@ -1723,6 +1784,7 @@
 ;;; Source File: system-collections-generic-dictionary-2-value-collection.lisp
 ;;; C# Class: System.Collections.Generic.Dictionary`2+ValueCollection
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-collections-generic-dictionary-2-value-collection
   (:use :cl)
   (:shadow
@@ -1742,6 +1804,7 @@
 ;;; Source File: system-collections-generic-list-1.lisp
 ;;; C# Class: System.Collections.Generic.List`1
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-collections-generic-list-1
   (:use :cl)
   (:shadow
@@ -1797,6 +1860,7 @@
 ;;; Source File: system-collections-generic-sorted-list-2.lisp
 ;;; C# Class: System.Collections.Generic.SortedList`2
 ;;; Constant Properties: (none)
+;;; Options: --defgeneric
 (cl:defpackage :system-collections-generic-sorted-list-2
   (:use :cl)
   (:shadow
@@ -1835,6 +1899,7 @@
 ;;; Source File: system-numerics-vector2.lisp
 ;;; C# Class: System.Numerics.Vector2
 ;;; Constant Properties: *
+;;; Options: (none)
 (cl:defpackage :system-numerics-vector2
   (:use :cl)
   (:shadow
@@ -2010,6 +2075,7 @@
 ;;; Source File: system-numerics-vector3.lisp
 ;;; C# Class: System.Numerics.Vector3
 ;;; Constant Properties: *
+;;; Options: --defgeneric
 (cl:defpackage :system-numerics-vector3
   (:use :cl)
   (:shadow
@@ -2186,6 +2252,7 @@
 ;;; Source File: system-numerics-vector4.lisp
 ;;; C# Class: System.Numerics.Vector4
 ;;; Constant Properties: *
+;;; Options: --defgeneric
 (cl:defpackage :system-numerics-vector4
   (:use :cl)
   (:shadow
@@ -2363,6 +2430,7 @@
 ;;; Source File: system-threading-timer.lisp
 ;;; C# Class: System.Threading.Timer
 ;;; Constant Properties: (none)
+;;; Options: --defgeneric --ensure-type --ensure-type-in-generic
 (cl:defpackage :system-threading-timer
   (:use :cl)
   (:export
@@ -2380,6 +2448,7 @@
 ;;; Source File: system-timers-timer.lisp
 ;;; C# Class: System.Timers.Timer
 ;;; Constant Properties: (none)
+;;; Options: --defgeneric
 (cl:defpackage :system-timers-timer
   (:use :cl)
   (:shadow
@@ -2409,6 +2478,7 @@
 ;;; Source File: system-diagnostics-debug.lisp
 ;;; C# Class: System.Diagnostics.Debug
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-diagnostics-debug
   (:use :cl)
   (:shadow
@@ -2443,6 +2513,7 @@
 ;;; Source File: system-globalization-culture-info.lisp
 ;;; C# Class: System.Globalization.CultureInfo
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-globalization-culture-info
   (:use :cl)
   (:export
@@ -2495,6 +2566,7 @@
 ;;; Source File: system-net-service-point-manager.lisp
 ;;; C# Class: System.Net.ServicePointManager
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-net-service-point-manager
   (:use :cl)
   (:export
@@ -2523,6 +2595,7 @@
 ;;; Source File: system-environment.lisp
 ;;; C# Class: System.Environment
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-environment
   (:use :cl)
   (:export
@@ -2569,6 +2642,7 @@
 ;;; Source File: system-app-domain.lisp
 ;;; C# Class: System.AppDomain
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-app-domain
   (:use :cl)
   (:shadow
@@ -2646,6 +2720,7 @@
 ;;; Source File: system-threading-thread.lisp
 ;;; C# Class: System.Threading.Thread
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :system-threading-thread
   (:use :cl)
   (:shadow
@@ -2709,6 +2784,7 @@
 ;;; Source File: system-collections-specialized-name-value-collection.lisp
 ;;; C# Class: System.Collections.Specialized.NameValueCollection
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
 (cl:defpackage :system-collections-specialized-name-value-collection
   (:use :cl)
   (:shadow
@@ -2738,6 +2814,8 @@
 ;;; Source File: system-collections-specialized-name-object-collection-base.lisp
 ;;; C# Class: System.Collections.Specialized.NameObjectCollectionBase
 ;;; Constant Properties: (none)
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.Collections.Specialized.NameValueCollection
 (cl:defpackage :system-collections-specialized-name-object-collection-base
   (:use :cl)
   (:shadow
@@ -2770,6 +2848,7 @@
 ;;; Source File: assembly-to-lispy-test-target-event-test-class.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.EventTestClass
 ;;; Constant Properties: (none)
+;;; Options: (none)
 (cl:defpackage :assembly-to-lispy-test-target-event-test-class
   (:use :cl)
   (:shadow
@@ -2790,6 +2869,7 @@
 ;;; Source File: assembly-to-lispy-test-target-nesting-container.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.NestingContainer
 ;;; Constant Properties: (none)
+;;; Options: --output-nested
 (cl:defpackage :assembly-to-lispy-test-target-nesting-container
   (:use :cl)
   (:export
@@ -2803,6 +2883,7 @@
 ;;; Source File: assembly-to-lispy-test-target-abstract-base.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.AbstractBase
 ;;; Constant Properties: (none)
+;;; Options: --output-children
 (cl:defpackage :assembly-to-lispy-test-target-abstract-base
   (:use :cl)
   (:export
@@ -2816,6 +2897,7 @@
 ;;; Source File: assembly-to-lispy-test-target-i-dummy-interface.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.IDummyInterface
 ;;; Constant Properties: (none)
+;;; Options: --output-implementations
 (cl:defpackage :assembly-to-lispy-test-target-i-dummy-interface
   (:use :cl)
   (:export
@@ -2829,6 +2911,7 @@
 ;;; Source File: assembly-to-lispy-test-target-concrete-derived-from-generic.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.ConcreteDerivedFromGeneric
 ;;; Constant Properties: (none)
+;;; Options: --export-parents
 (cl:defpackage :assembly-to-lispy-test-target-concrete-derived-from-generic
   (:use :cl)
   (:export
@@ -2842,6 +2925,8 @@
 ;;; Source File: assembly-to-lispy-test-target-nesting-container-nested-level2.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.NestingContainer+NestedLevel2
 ;;; Constant Properties: (none)
+;;; Options: --output-nested
+;;; Discovered via: --output-nested from AssemblyToLispyTestTarget.NestingContainer
 (cl:defpackage :assembly-to-lispy-test-target-nesting-container-nested-level2
   (:use :cl)
   (:export
@@ -2855,6 +2940,8 @@
 ;;; Source File: assembly-to-lispy-test-target-nesting-container-nested-level2-nested-level3.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.NestingContainer+NestedLevel2+NestedLevel3
 ;;; Constant Properties: (none)
+;;; Options: --output-nested
+;;; Discovered via: --output-nested from AssemblyToLispyTestTarget.NestingContainer
 (cl:defpackage :assembly-to-lispy-test-target-nesting-container-nested-level2-nested-level3
   (:use :cl)
   (:export
@@ -2868,6 +2955,8 @@
 ;;; Source File: assembly-to-lispy-test-target-generic-class-1.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.GenericClass`1
 ;;; Constant Properties: (none)
+;;; Options: --output-children
+;;; Discovered via: --output-children from AssemblyToLispyTestTarget.AbstractBase
 (cl:defpackage :assembly-to-lispy-test-target-generic-class-1
   (:use :cl)
   (:shadow
@@ -2886,6 +2975,8 @@
 ;;; Source File: assembly-to-lispy-test-target-generic-base-for-superclass-test-1.lisp
 ;;; C# Class: AssemblyToLispyTestTarget.GenericBaseForSuperclassTest`1
 ;;; Constant Properties: (none)
+;;; Options: --export-parents
+;;; Discovered via: --export-parents from AssemblyToLispyTestTarget.ConcreteDerivedFromGeneric
 (cl:defpackage :assembly-to-lispy-test-target-generic-base-for-superclass-test-1
   (:use :cl)
   (:export

@@ -1,14 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Linq.Enumerable
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: --export-parents
 
 (cl:in-package :system-linq-enumerable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Linq.Enumerable"))
 (cl:defconstant <type-str> "System.Linq.Enumerable")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defun aggregate-arity-1 (type source func)
   "Summary: Applies an accumulator function over a sequence.

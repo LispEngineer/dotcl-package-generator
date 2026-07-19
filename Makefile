@@ -89,70 +89,14 @@ test: build
 	# System.AppDomain System.Diagnostics.Debug System.Environment System.Globalization.CultureInfo
 	rm -rf $(GEN_TEST_DIR)
 	mkdir -p $(GEN_TEST_DIR)
+	# The smoke invocation itself lives in test-options.txt.in (doc/plan-
+	# fable-detail-07.md's --options-file response-file front end) --
+	# substitute REF_DIR/BIN_DIR (Make variables an options file can't
+	# expand itself) into a real file, then pass that via --options-file.
+	sed -e "s|@REF_DIR@|$(REF_DIR)|g" -e "s|@BIN_DIR@|$(BIN_DIR)|g" \
+	    test-options.txt.in > $(BIN_DIR)test-options.txt
 	$(EXECUTABLE) --out-dir $(GEN_TEST_DIR) --no-csharp-generic-in-asd \
-   	    --assembly $(REF_DIR)System.Console.dll \
-	      --class System.Console \
-	    --assembly $(REF_DIR)System.Runtime.dll \
-	      --class System.TimeSpan --constant-properties "*" \
-	      --class System.Object --defgeneric \
-	      --class System.Type \
-	      --class System.String --defgeneric \
-				--class System.Array --constant-properties "MaxLength" --defgeneric \
-	      --class System.TimeZoneInfo \
-				--class System.Convert \
-				--class System.Text.StringBuilder --defgeneric \
-	      --class 'System.TimeZoneInfo+AdjustmentRule' \
-				--class 'System.ValueTuple`2' --export-interfaces --skip-missing \
-				--class 'System.ValueTuple`3' \
-				--class 'System.ValueTuple`4' \
-				--class 'System.ValueTuple`5' \
-				--class 'System.ValueTuple`6' \
-				--class 'System.ValueTuple`7' \
-				--class 'System.ValueTuple`8' \
-				--class System.ArgumentOutOfRangeException --export-parents --export-interfaces --export-object \
-				--class System.Collections.Hashtable --export-all-parents --export-all-interfaces \
-				--class System.IO.MemoryStream --export-object \
-				--class System.IO.StreamReader \
-	    --assembly $(REF_DIR)System.Linq.dll \
-	      --class System.Linq.Enumerable --no-export-all-parents --no-export-interfaces \
-	    --assembly $(REF_DIR)System.Xml.ReaderWriter.dll \
-	      --class System.Xml.XmlReader --no-export-all-interfaces \
-	    --assembly $(REF_DIR)System.Collections.dll \
-	      --class 'System.Collections.Generic.Dictionary`2' --defgeneric \
-	      --class 'System.Collections.Generic.Dictionary`2+KeyCollection' \
-	      --class 'System.Collections.Generic.Dictionary`2+ValueCollection' \
-	      --class 'System.Collections.Generic.List`1' \
-	      --class 'System.Collections.Generic.SortedList`2' --defgeneric \
-	    --assembly $(REF_DIR)System.Numerics.Vectors.dll \
-	      --class 'System.Numerics.Vector2' --constant-properties "*" --enable-defgeneric \
-	      --class 'System.Numerics.Vector3' --constant-properties "*" \
-	      --class 'System.Numerics.Vector4' --constant-properties "*" \
-	      --no-enable-defgeneric \
-	    --assembly $(REF_DIR)System.Threading.Timer.dll \
-	      --ensure-type --ensure-type-in-generic \
-	      --class System.Threading.Timer --defgeneric \
-	      --no-ensure-type --no-ensure-type-in-generic \
-	    --assembly $(REF_DIR)System.ComponentModel.TypeConverter.dll \
-	      --class System.Timers.Timer --defgeneric \
-	    --assembly $(REF_DIR)System.Diagnostics.Debug.dll \
-	      --class System.Diagnostics.Debug \
-	    --assembly $(REF_DIR)System.Globalization.dll \
-	      --class System.Globalization.CultureInfo \
-	    --assembly $(REF_DIR)System.Net.ServicePoint.dll \
-	      --class System.Net.ServicePointManager \
-	    --assembly $(REF_DIR)System.Runtime.Extensions.dll \
-	      --class System.Environment \
-	      --class System.AppDomain \
-	    --assembly $(REF_DIR)System.Threading.Thread.dll \
-	      --class System.Threading.Thread \
-		  --assembly $(REF_DIR)System.Collections.Specialized.dll \
-			  --class System.Collections.Specialized.NameValueCollection --export-parents --export-interfaces --export-object \
-	    --assembly $(BIN_DIR)AssemblyToLispyTestTarget.dll \
-	      --class AssemblyToLispyTestTarget.EventTestClass \
-	      --class AssemblyToLispyTestTarget.NestingContainer --output-nested \
-	      --class AssemblyToLispyTestTarget.AbstractBase --output-children \
-	      --class AssemblyToLispyTestTarget.IDummyInterface --output-implementations \
-	      --class AssemblyToLispyTestTarget.ConcreteDerivedFromGeneric --export-parents
+	    --options-file $(BIN_DIR)test-options.txt
 	# EventTestClass demonstrates Version 38's extension-method injection
 	# (--extension-methods, ON by default) against a real, generated package:
 	# see EventTestClassExtensions in AssemblyToLispyTestTarget/EdgeCases.cs

@@ -10,15 +10,23 @@
 (in-package :assembly-package-generator)
 
 
-(defun emit-class-file-header (stream fq-name pkg-name creation-time)
+(defun emit-class-file-header (stream fq-name pkg-name creation-time &optional options-line discovered-via)
   "Writes the generated-file header comment block and the cl:in-package
    preamble (the defpackage itself lives in packages.lisp, emitted
-   separately by generate-batch-packages-file)."
+   separately by generate-batch-packages-file). OPTIONS-LINE
+   (format-class-options-line) and DISCOVERED-VIA (nil for an explicitly-
+   requested class) record this class's own effective per-class flags and
+   discovery provenance, so a generated file is self-describing even in
+   isolation (doc/plan-fable-detail-07.md)."
   (format stream ";;; Generated automatically. Do not edit.~%")
   (format stream ";;; Class: ~A~%" fq-name)
   (format stream ";;; Generator Version: ~D~%" *generator-version*)
-  (format stream ";;; Creation Date: ~A~%~%" creation-time)
-  (format stream "(cl:in-package :~A)~%~%" pkg-name))
+  (format stream ";;; Creation Date: ~A~%" creation-time)
+  (when options-line
+    (format stream ";;; Options: ~A~%" options-line))
+  (when discovered-via
+    (format stream ";;; Discovered via: ~A~%" discovered-via))
+  (format stream "~%(cl:in-package :~A)~%~%" pkg-name))
 
 (defun emit-type-constants-and-clos-registration (stream fq-name creation-time ensure-type)
   "Writes the <type>/<type-str>/<creation>/<version> constants, plus the
@@ -483,7 +491,7 @@
 
 (defun generate-class-file (class-plist output-dir &optional constant-properties-list creation-time
                                                        matched-extensions skipped-extensions
-                                                       ensure-type)
+                                                       ensure-type options-line discovered-via)
   "Generates the Lisp source file for a single class plist.
    CREATION-TIME, if supplied, is used verbatim as the file's creation-date
    stamp (so a batch of files generated in one run can share a single
@@ -496,7 +504,10 @@
    document with a skip comment. ENSURE-TYPE (nil unless this class opted
    into --ensure-type -- Version 44) controls whether
    emit-type-constants-and-clos-registration emits the \"Register C# Type
-   with CLOS\" eval-when at all.
+   with CLOS\" eval-when at all. OPTIONS-LINE (format-class-options-line)
+   and DISCOVERED-VIA (this resolved-class's own :discovered-via) are
+   passed straight through to emit-class-file-header's own \";;; Options:\"/
+   \";;; Discovered via:\" comment lines (doc/plan-fable-detail-07.md).
    Driver: classifies CLASS-PLIST's members once (classify-class-members)
    and calls the emit-* section helpers in file order."
   (let* ((fq-name (getf class-plist :fully-qualified-name))
@@ -511,7 +522,7 @@
 
     (let ((classification (classify-class-members class-plist constant-properties-list)))
       (with-open-file (stream output-file :direction :output :if-exists :supersede :if-does-not-exist :create)
-        (emit-class-file-header stream fq-name pkg-name creation-time)
+        (emit-class-file-header stream fq-name pkg-name creation-time options-line discovered-via)
         (emit-type-constants-and-clos-registration stream fq-name creation-time ensure-type)
         (emit-constructors stream fq-name (cmc-clean-ctors classification) (cmc-dirty-ctors classification))
         (emit-literal-field-constants stream (cmc-literal-fields classification))

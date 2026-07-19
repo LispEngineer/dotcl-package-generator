@@ -1,14 +1,16 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.ArgumentException
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.ArgumentOutOfRangeException
 
 (cl:in-package :system-argument-exception)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.ArgumentException"))
 (cl:defconstant <type-str> "System.ArgumentException")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defun new (cl:&optional (message cl:nil supplied-message) (inner-exception cl:nil supplied-inner-exception) (inner-exception2 cl:nil supplied-inner-exception2))
   "Master wrapper for System.ArgumentException constructor overloads. Dispatches at runtime.

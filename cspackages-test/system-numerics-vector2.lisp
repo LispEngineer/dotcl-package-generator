@@ -1,14 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Numerics.Vector2
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: (none)
 
 (cl:in-package :system-numerics-vector2)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Numerics.Vector2"))
 (cl:defconstant <type-str> "System.Numerics.Vector2")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defun new (cl:&optional (value cl:nil supplied-value) (y cl:nil supplied-y))
   "Master wrapper for System.Numerics.Vector2 constructor overloads. Dispatches at runtime.

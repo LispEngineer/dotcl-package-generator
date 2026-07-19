@@ -1,14 +1,16 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Runtime.Serialization.IDeserializationCallback
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.Collections.Specialized.NameValueCollection
 
 (cl:in-package :system-runtime-serialization-i-deserialization-callback)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Runtime.Serialization.IDeserializationCallback"))
 (cl:defconstant <type-str> "System.Runtime.Serialization.IDeserializationCallback")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defun on-deserialization (obj! sender)
   "Summary: Runs when the entire object graph has been deserialized.

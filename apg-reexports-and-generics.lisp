@@ -263,6 +263,9 @@
               (format stream ";;; Source File: ~A.lisp~%" pkg-name)
               (format stream ";;; C# Class: ~A~%" fq-name)
               (format stream ";;; Constant Properties: ~:[(none)~;~:*~{~A~^, ~}~]~%" cprops)
+              (format stream ";;; Options: ~A~%" (format-class-options-line rc))
+              (when (getf rc :discovered-via)
+                (format stream ";;; Discovered via: ~A~%" (getf rc :discovered-via)))
               (format stream "(cl:defpackage :~A~%" pkg-name)
               (format stream "  (:use :cl)~%")
               (when shadows

@@ -20,7 +20,12 @@ yet translate — including a few real silent gaps, not just documented TODOs.
 names are remapped to avoid colliding with Lisp syntax or reading better as Lisp idioms;
 every overloaded member collapses to at most one or two exported names regardless of how
 many C# overloads exist; every class gets a fixed 4-constant header and one CLOS
-registration form.
+registration form. The header comment block (and the class's own entry in
+`packages.lisp`'s per-package comments and `csharp-assembly-packages.asd`'s long
+description) also records that class's own effective non-default `--`-spelled CLI flags
+(`;;; Options: ...`, or `(none)`), and, for a class pulled in only via discovery rather
+than explicitly requested, which flag(s) and discoverer found it (`;;; Discovered via:
+... from ...`) — see `doc/plan-fable-detail-07.md`.
 
 ### Name casing: `camel-to-kebab`
 

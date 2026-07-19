@@ -1,14 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Threading.Thread
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: (none)
 
 (cl:in-package :system-threading-thread)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Threading.Thread"))
 (cl:defconstant <type-str> "System.Threading.Thread")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defun new (start cl:&optional (max-stack-size cl:nil supplied-max-stack-size))
   "Master wrapper for System.Threading.Thread constructor overloads. Dispatches at runtime.

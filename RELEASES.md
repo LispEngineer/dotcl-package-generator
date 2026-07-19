@@ -10,6 +10,61 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.52.0 — 2026-07-19
+
+**`--options-file` (response-file CLI front end) and invocation-echo comments in generated output (`doc/plan-fable-detail-07.md`).**
+
+* **Part A (CLI-only, no `*generator-version*` bump):** `--options-file <path>` reads
+  additional CLI arguments from a text file, spliced into the argument list at the exact
+  position `--options-file` appeared (position matters for sticky flags). Format: one or
+  more whitespace-separated arguments per line; `#` at the start of a token begins a
+  line comment; a double-quoted token may contain whitespace (`\"`/`\\` are the only
+  escapes) — unlike the shell, a generic class name's backtick needs no quoting at all.
+  Not recursive. New `OptionsFileParser`/`ProgramArgsTest` in `Program.cs`. The
+  `Makefile`'s ~60-line smoke-test invocation was converted to a checked-in template,
+  `test-options.txt.in`, substituting `@REF_DIR@`/`@BIN_DIR@` via `sed` — verified
+  byte-identical output to the old direct invocation.
+* **Part B (`*generator-version*` 51 → 52):** every class's non-default per-class flags
+  (`format-class-options-line`, canonical/sorted/`--`-spelled, or `(none)`) now appear as
+  a `;;; Options: ...` line in `csharp-assembly-packages.asd`'s per-class
+  long-description entry, `packages.lisp`'s per-package comment, and the class file's
+  own header. A class discovered only via `--export-parents`/`--export-interfaces`/
+  `--output-nested`/`--output-children`/`--output-implementations` (never explicitly
+  requested) also gets a `;;; Discovered via: <flag(s)> from <discoverer>` line (new
+  `:discovered-via` key on the resolved-class plist, set by
+  `generate-assembly-packages-batch`'s work queue). The `.asd`'s long description also
+  gained a `Global flags: --skip-missing --csharp-generic-in-asd`-style line for the two
+  whole-invocation flags. Also satisfies most of `PLAN.md`'s "Add More to Generated
+  `.lisp` Files" section (marked DONE there).
+* See `doc/generator-design-notes.md`'s "`--options-file` and Invocation-Echo Comments
+  (Version 52)" section for the full writeup.
+
+## 2.51.0 — 2026-07-19
+
+**Out-parameter support: C# `out` parameters map to extra `cl:values` via `dotnet:call-out` (`doc/plan-fable-detail-05.md`, `*generator-version*` 50 → 51).**
+
+* A method whose only special parameter modifier is `out` (the ubiquitous `Try*`
+  pattern — `TryParse`, `Dictionary.TryGetValue`) now generates a real wrapper instead of
+  a "not yet supported" comment: every `out` parameter is omitted from the Lisp lambda
+  list and returned as an additional `cl:values` result, in C# declaration order, after
+  the primary return value, forwarding to DotCL's `dotnet:call-out`/
+  `dotnet:call-out-generic` (already present in this project's pinned `DotCL.Runtime`
+  0.1.18 — no upstream proposal was needed).
+* New `out-only-method-p` (`apg-member-predicates.lisp`); `dirty-method-p` no longer
+  treats a lone `:out` as dirty. Naming: the plain mapped name in the common case
+  (`try-parse`), or `name/out` when a clean overload of the same C# name/mode already
+  exists. Multiple out-only overloads sharing a name reuse the entire existing Master
+  Wrapper dispatch toolkit unchanged, operating on a filtered (non-out) view of each
+  overload's parameters.
+* v1 scope: methods only (not constructors, not injected extension methods); a method
+  mixing `out` with `ref`/`ref readonly`/`params` stays dirty; deliberately excluded from
+  `--defgeneric`/`csharp-generics` unification pending separate verification.
+* New `package-generator-tests-out-parameters.lisp`; new `RuntimeExerciseFixtures`
+  fixtures plus `RuntimeExerciseTest/runtime-tests.lisp`'s `test-out-parameters` (13 new
+  runtime assertions against live DotCL execution, all passing).
+* See `doc/generator-design-notes.md`'s "Out-Parameter Support (Version 51)" section for
+  the full writeup.
+
 ## 2.50.5 — 2026-07-19
 
 **Corrected stale `FEATURES.md` claim about generic-type-parameter members (`doc/plan-fable-detail-04.md`); no code or generated-output change.**

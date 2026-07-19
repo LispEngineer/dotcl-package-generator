@@ -3284,3 +3284,93 @@ genuine ambiguity in `dotnet:call-out`'s own count-only overload resolution) plu
 `RuntimeExerciseTest/runtime-tests.lisp`'s `test-out-parameters`, actually calling each
 generated wrapper against the live DotCL host and asserting on both the primary return
 value and every `out` value.
+
+## `--options-file` and Invocation-Echo Comments (Version 52)
+
+`doc/plan-fable-detail-07.md` had two separable halves: a CLI-only response-file front
+end (Part A, no generated-output change) and invocation-echo comments in generated
+output (Part B, the version bump this section documents).
+
+### Part A: `--options-file` (CLI-only)
+
+A real invocation (the `~60`-line `Makefile` smoke invocation, or a Dungeon Slime
+generation line) is an unwieldy shell command. `OptionsFileParser`/`ProgramArgsTest`
+(`Program.cs`) add `--options-file <path>`: a response file of CLI arguments (the `@file`
+convention familiar from dotnet/msvc/gcc), NOT a Lisp s-expression config — `Program.cs`
+has no Lisp reader (the manifest flows C#→Lisp, never the reverse), so reusing the
+existing, well-tested tokenized-argument parsing loop verbatim keeps exact CLI parity by
+construction and needs no new schema doc. `ExpandOptionsFiles` is a pre-pass, before any
+other argument scanning: it splices `TokenizeOptionsFile`'s tokens in at the exact
+position `--options-file` appeared (position matters — sticky flags are order-sensitive
+by design), so it can be freely mixed with ordinary arguments or split across several
+files. Format: one or more whitespace-separated arguments per line; `#` at the start of
+a token begins a line comment; a double-quoted token may contain whitespace (only `\"`
+and `\\` are recognized escapes) — unlike the shell, a generic class name's backtick
+(`System.ValueTuple\`2`) needs no quoting or escaping at all. Not recursive: a response
+file containing its own `--options-file` is an error, to keep the splicing model simple.
+The `Makefile`'s giant smoke-test invocation was converted to a checked-in template,
+`test-options.txt.in` (`@REF_DIR@`/`@BIN_DIR@` placeholders, substituted via `sed` since
+an options file can't expand Make variables itself) — this makes the smoke test itself
+the end-to-end proof of Part A, and future smoke additions a plain-text diff instead of
+a shell-line edit. No `*generator-version*` bump for this half — nothing about generated
+output changed.
+
+### Part B: invocation echo in generated output
+
+A generated directory's `.asd`/`packages.lisp`/per-class files should be
+self-describing enough to reconstruct the invocation that produced them by hand. Three
+additions, all sourced from the resolved-class plist (`make-resolved-class`,
+`apg-batch-discovery.lisp`) so there is exactly one source of truth per class:
+
+* **`format-class-options-line`** (`apg-batch-discovery.lisp`) returns a canonical
+  (sorted, `--`-spelled) space-separated string of a resolved-class's non-default
+  per-class flags, or `"(none)"` -- excluding `:constant-properties` (already shown on
+  its own line) and `:extension-methods` (only shown as `--no-extension-methods` when
+  explicitly OFF, since it defaults to ON unlike every other sticky flag). This single
+  function feeds all three emission sites below, so they can never drift from each
+  other.
+* **`:discovered-via`** is a new key on the resolved-class plist (nil for an
+  explicitly-requested class), set by `generate-assembly-packages-batch`'s work queue
+  (`apg-batch-orchestration.lisp`) when a class is pulled in only via
+  `--export-parents`/`--export-interfaces`/`--output-nested`/`--output-children`/
+  `--output-implementations`. `ancestor-discovered` and `downward-discovered` (returned
+  separately by `expand-related`) are processed in two separate loops (previously one
+  combined `(dolist (pair (append ancestor-discovered downward-discovered)) ...)`) so
+  each can be tagged with its own label: `"<flag(s)> from <discoverer-fq-name>"`, where
+  `<flag(s)>` lists whichever of the discoverer's own relevant direction flags were
+  actually set (e.g. `--export-parents/--export-interfaces` if both were true on the
+  discoverer) -- `expand-related`'s internal multi-hop walk does not separately tag
+  which single flag produced which discovered class, so when more than one is set, all
+  are listed rather than guessing.
+* Both are threaded into three emission sites: `csharp-assembly-packages.asd`'s
+  per-class long-description entry (`generate-batch-asd-file`,
+  `apg-batch-orchestration.lisp`, which also gained a `skip-missing` parameter for a new
+  whole-invocation `"Global flags: --skip-missing --csharp-generic-in-asd"`-style line),
+  `packages.lisp`'s per-package comment (`generate-batch-packages-file`,
+  `apg-reexports-and-generics.lisp`), and the per-class file's own header
+  (`emit-class-file-header`, `apg-class-file-generator.lisp`, now taking optional
+  `options-line`/`discovered-via` parameters threaded through `generate-class-file`).
+
+This also satisfies most of `PLAN.md`'s "Add More to Generated `.lisp` Files" section
+(marked DONE there, append-only) -- not done: `<constant-properties>` as a structured
+constant, and a dedicated `<assembly>` constant/per-assembly `packages.lisp` comment
+(the assembly name is already visible in the `.asd`'s existing per-assembly grouping,
+just not as its own constant).
+
+### Verification
+
+`make check-parens`, then `make build test test-runtime`. New assertions in
+`package-generator-tests-batch-resolution.lisp` (a two-class ancestor fixture,
+`--export-parents`/`--defgeneric` on the child) confirm: the child's own `Options:` line
+lists both flags it was given; the parent -- discovered only via `--export-parents`,
+never explicitly requested -- inherits the child's *entire* flag set per the existing
+Version 39 cascading-discovery rule (so its own `Options:` line matches the child's, not
+`"(none)"`) and gets a `Discovered via: --export-parents from Fixture.Child` line the
+child itself does not have; the `.asd`'s long description gets the new global-flags
+line. The `cspackages-test/` smoke diff shows real examples across the existing fixture
+set: e.g. `System.ArgumentOutOfRangeException`'s ancestors
+(`System.ArgumentException`/`System.SystemException`/`System.Exception`) each get
+`Discovered via: --export-parents/--export-interfaces from
+System.ArgumentOutOfRangeException`, and `NestingContainer`'s nested levels get
+`Discovered via: --output-nested from
+AssemblyToLispyTestTarget.NestingContainer`.

@@ -1,14 +1,16 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.Stream
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: --export-interfaces --export-object --export-parents
+;;; Discovered via: --export-parents/--export-interfaces from System.IO.MemoryStream
 
 (cl:in-package :system-io-stream)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.Stream"))
 (cl:defconstant <type-str> "System.IO.Stream")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defun new ()
   "Summary: Initializes a new instance of the System.IO.Stream class.

@@ -1,14 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IO.MemoryStream
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: --export-interfaces --export-object --export-parents
 
 (cl:in-package :system-io-memory-stream)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IO.MemoryStream"))
 (cl:defconstant <type-str> "System.IO.MemoryStream")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defun new (cl:&optional (capacity cl:nil supplied-capacity) (writable cl:nil supplied-writable) (count cl:nil supplied-count) (writable2 cl:nil supplied-writable2) (publicly-visible cl:nil supplied-publicly-visible))
   "Master wrapper for System.IO.MemoryStream constructor overloads. Dispatches at runtime.

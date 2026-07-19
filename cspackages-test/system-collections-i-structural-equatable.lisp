@@ -1,14 +1,16 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Collections.IStructuralEquatable
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: --export-interfaces
+;;; Discovered via: --export-interfaces from System.ValueTuple`2
 
 (cl:in-package :system-collections-i-structural-equatable)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Collections.IStructuralEquatable"))
 (cl:defconstant <type-str> "System.Collections.IStructuralEquatable")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defun equals (obj! other comparer)
   "Summary: Determines whether an object is structurally equal to the current instance.

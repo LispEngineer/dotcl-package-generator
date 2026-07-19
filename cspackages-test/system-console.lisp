@@ -1,14 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Console
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: (none)
 
 (cl:in-package :system-console)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Console"))
 (cl:defconstant <type-str> "System.Console")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:define-symbol-macro caps-lock (dotnet:static <type-str> "CapsLock"))
 (cl:setf (cl:documentation (cl:quote caps-lock) (cl:quote cl:variable)) "Gets a value indicating whether the CAPS LOCK keyboard toggle is turned on or turned off.")

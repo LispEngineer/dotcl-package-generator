@@ -1,14 +1,16 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.IComparable`1
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: --export-interfaces
+;;; Discovered via: --export-interfaces from System.ValueTuple`2
 
 (cl:in-package :system-i-comparable-1)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.IComparable`1"))
 (cl:defconstant <type-str> "System.IComparable`1")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defun compare-to (obj! other)
   "Summary: Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.

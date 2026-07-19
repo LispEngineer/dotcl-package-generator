@@ -1,14 +1,15 @@
 ;;; Generated automatically. Do not edit.
 ;;; Class: System.Net.ServicePointManager
-;;; Generator Version: 51
-;;; Creation Date: 2026-07-19T15:11:53Z
+;;; Generator Version: 52
+;;; Creation Date: 2026-07-19T15:32:24Z
+;;; Options: (none)
 
 (cl:in-package :system-net-service-point-manager)
 
 (cl:define-symbol-macro <type> (dotnet:resolve-type "System.Net.ServicePointManager"))
 (cl:defconstant <type-str> "System.Net.ServicePointManager")
-(cl:defconstant <creation> "2026-07-19T15:11:53Z")
-(cl:defconstant <version> 51)
+(cl:defconstant <creation> "2026-07-19T15:32:24Z")
+(cl:defconstant <version> 52)
 
 (cl:defvar %default-non-persistent-connection-limit-cache% csharp-assembly-utils:+unbound-marker+)
 (cl:define-symbol-macro +default-non-persistent-connection-limit+

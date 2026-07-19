@@ -14,7 +14,8 @@
                              &optional export-parents export-interfaces export-object
                                defgeneric extension-methods
                                output-nested output-children output-implementations
-                               ensure-type ensure-type-in-generic)
+                               ensure-type ensure-type-in-generic
+                               discovered-via)
   "Builds a resolved-class plist: the unit of work generate-class-file,
    generate-batch-packages-file, generate-batch-asd-file, and the
    parents/interfaces re-export machinery all operate on. CLASS-PLIST is
@@ -58,7 +59,12 @@
    :matched-extensions/:skipped-extensions slots (initially nil) are
    filled in separately by GENERATE-ASSEMBLY-PACKAGES-BATCH once the whole
    working set and the extension-method index are available -- see
-   COMPUTE-MATCHED-EXTENSIONS-FOR-CLASS."
+   COMPUTE-MATCHED-EXTENSIONS-FOR-CLASS. DISCOVERED-VIA (nil for an
+   explicitly-requested class; a \"<flag(s)> from <discoverer-fq-name>\"
+   string for a class pulled in only via discovery -- see
+   GENERATE-ASSEMBLY-PACKAGES-BATCH's work queue) records provenance for
+   the generated packages.lisp/per-class file header's own \";;; Discovered
+   via:\" comment line (doc/plan-fable-detail-07.md)."
   (list :class-plist class-plist
         :constant-properties constant-properties
         :export-parents export-parents
@@ -72,7 +78,36 @@
         :ensure-type ensure-type
         :ensure-type-in-generic ensure-type-in-generic
         :matched-extensions nil
-        :skipped-extensions nil))
+        :skipped-extensions nil
+        :discovered-via discovered-via))
+
+(defun format-class-options-line (rc)
+  "Returns a canonical (sorted, --flag-spelled) space-separated string of
+   RC's (a resolved-class plist) non-default per-class flags, or \"(none)\"
+   if every flag is at its CLI default -- suitable for a generated
+   \";;; Options:\" comment line so a class's effective invocation is
+   reconstructable from generated output alone (doc/plan-fable-detail-07.md
+   ; also satisfies most of PLAN.md's \"Add More to Generated .lisp Files\"
+   section). Excludes :constant-properties (already shown on its own
+   line), :discovered-via (its own separate line), and
+   :matched-extensions/:skipped-extensions (not CLI flags). Sorted so
+   regenerating with identical inputs produces identical bytes."
+  (let ((flags nil))
+    (when (getf rc :export-parents) (push "--export-parents" flags))
+    (when (getf rc :export-interfaces) (push "--export-interfaces" flags))
+    (when (getf rc :export-object) (push "--export-object" flags))
+    (when (getf rc :output-nested) (push "--output-nested" flags))
+    (when (getf rc :output-children) (push "--output-children" flags))
+    (when (getf rc :output-implementations) (push "--output-implementations" flags))
+    (when (getf rc :defgeneric) (push "--defgeneric" flags))
+    ;; :extension-methods defaults to T (Program.cs's enableExtensionMethods,
+    ;; ON by default unlike every other sticky flag) -- so it is only
+    ;; "non-default" when explicitly turned off.
+    (unless (getf rc :extension-methods) (push "--no-extension-methods" flags))
+    (when (getf rc :ensure-type) (push "--ensure-type" flags))
+    (when (getf rc :ensure-type-in-generic) (push "--ensure-type-in-generic" flags))
+    (setf flags (sort flags #'string<))
+    (if flags (format nil "~{~A~^ ~}" flags) "(none)")))
 
 (defun resolve-batch-entry (entry)
   "Loads ENTRY's :metadata-file and resolves each of its :classes by

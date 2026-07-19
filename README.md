@@ -67,6 +67,24 @@ dotcl-packagegen --out-dir ./cspackages \
 the most recently given `--class`. `--assembly` may be repeated to process several assemblies
 in one invocation, and a `--assembly` with no `--class` options is valid (metadata-only).
 
+A real invocation for a project with more than a handful of classes gets long fast; put it in
+a response file instead and pass `--options-file <path>`:
+
+```sh
+dotcl-packagegen --out-dir ./cspackages --options-file dotcl-packagegen-options.txt
+```
+
+`--options-file`'s tokens are spliced into the argument list at the exact position
+`--options-file` appears (order matters — several flags above are position-sensitive by
+design), so it can be freely mixed with regular command-line arguments, or split across
+several files each covering one `--assembly` group. Format: one or more whitespace-separated
+arguments per line; `#` at the start of a token begins a line comment; a double-quoted token
+may contain whitespace (only `\"` and `\\` are recognized escapes) — unlike the shell, a
+generic class name's backtick (e.g. `System.ValueTuple\`2`) needs no quoting or escaping at
+all in a response file. Not recursive: a response file containing its own `--options-file` is
+an error. See `test-options.txt.in` (the template `make test`'s own smoke-test invocation is
+generated from) for a real example.
+
 `--constant-properties` (comma/semicolon-separated names, or `"*"` for all) forces static
 read-only properties to be memoized — computed once, on first use, then cached for the life
 of the program — instead of re-evaluated on every reference; safe only when the property

@@ -38,6 +38,21 @@ bool ensureType = false;
 bool ensureTypeInGeneric = false;
 
 ////////////////////////////////////////////////////////////////////////////
+// --options-file: response-file expansion (see doc/plan-fable-detail-07.md).
+// Splices each file's whitespace-tokenized CLI arguments in at the exact
+// position --options-file appeared -- sticky flags are position-sensitive
+// by design, so where the tokens land matters as much as what they are.
+// Runs before any other argument scanning so --help/--version/etc. also see
+// an options file's contents.
+
+try {
+    args = OptionsFileParser.ExpandOptionsFiles(args);
+} catch (Exception ex) {
+    WriteRed($"Error: {ex.Message}");
+    Environment.Exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////////
 // Parse arguments
 
 if (args.Contains("--help")) {
@@ -365,6 +380,9 @@ if (printVersion) {
 // Tests
 
 if (isTestMode) {
+    Console.WriteLine($"[Program.cs] Running --options-file argument-parsing tests...");
+    ProgramArgsTest.RunTests();
+
     Console.WriteLine($"[Program.cs] Running Lisp generator tests...");
     DotclHost.Call("RUN-GENERATOR-TESTS");
 
@@ -456,6 +474,13 @@ void PrintHelp() {
     Console.WriteLine("Single-pass generator: reflects one or more .NET assemblies and generates");
     Console.WriteLine("Lisp package(s) for the requested classes, all in one invocation.");
     Console.WriteLine();
+    Opt("--options-file <path>", "Read additional CLI arguments from a response file,",
+        "spliced in at this exact position (order matters --",
+        "sticky flags are position-sensitive). One or more",
+        "whitespace-separated arguments per line; \"#\" at the",
+        "start of a token begins a line comment; a double-quoted",
+        "token may contain whitespace (\\\" and \\\\ are the only",
+        "escapes). Not recursive -- nesting is an error.");
     Opt("--out-dir <dir>", "Destination directory for generated metadata and .lisp",
         "package file(s).");
     Opt("--assembly <path>", "A .NET assembly to reflect. Repeatable; starts a new",
@@ -657,4 +682,190 @@ class ClassSpec {
     public bool ExtensionMethods;
     public bool EnsureType;
     public bool EnsureTypeInGeneric;
+}
+
+/// <summary>
+///   Implements <c>--options-file</c> (see doc/plan-fable-detail-07.md): a
+///   response file of CLI arguments, freely mixed with regular arguments on
+///   the command line, so a consuming project can keep its generation
+///   configuration as a versioned file instead of one unwieldy shell line.
+/// </summary>
+static class OptionsFileParser {
+    /// <summary>
+    ///   Splices tokens from every "--options-file &lt;path&gt;" pair in ARGS
+    ///   in at that exact position, leaving every other argument untouched.
+    ///   Not recursive -- an options file containing its own
+    ///   "--options-file" is an error, to keep the splicing model simple
+    ///   (position-sensitive splicing plus recursion would be needlessly
+    ///   hard to reason about; revisit only if an actual need arises).
+    /// </summary>
+    public static string[] ExpandOptionsFiles(string[] args) {
+        var result = new List<string>();
+        for (int i = 0; i < args.Length; i++) {
+            if (args[i] != "--options-file") {
+                result.Add(args[i]);
+                continue;
+            }
+            if (i + 1 >= args.Length) {
+                throw new FormatException("--options-file requires a path argument");
+            }
+            string path = args[i + 1];
+            i++;
+            if (!File.Exists(path)) {
+                throw new FileNotFoundException($"--options-file: file not found: {path}");
+            }
+            var tokens = TokenizeOptionsFile(File.ReadAllText(path));
+            if (tokens.Contains("--options-file")) {
+                throw new FormatException($"--options-file: nested --options-file is not supported (in {path})");
+            }
+            result.AddRange(tokens);
+        }
+        return result.ToArray();
+    }
+
+    /// <summary>
+    ///   Tokenizes an options-file's text into CLI-argument-equivalent
+    ///   tokens: whitespace-separated, with "#"-at-start-of-token line
+    ///   comments and double-quoted tokens (backslash-escaping only " and \
+    ///   itself) so a value containing whitespace or a literal backtick
+    ///   (e.g. a generic class name like `System.ValueTuple\`2`) survives
+    ///   without shell-style escaping. A pure function of its input text,
+    ///   kept separate from ExpandOptionsFiles so it is independently
+    ///   unit-testable.
+    /// </summary>
+    public static List<string> TokenizeOptionsFile(string text) {
+        var tokens = new List<string>();
+        int i = 0;
+        int n = text.Length;
+        while (i < n) {
+            while (i < n && char.IsWhiteSpace(text[i])) {
+                i++;
+            }
+            if (i >= n) {
+                break;
+            }
+            if (text[i] == '#') {
+                while (i < n && text[i] != '\n') {
+                    i++;
+                }
+                continue;
+            }
+            if (text[i] == '"') {
+                i++;
+                var sb = new StringBuilder();
+                bool closed = false;
+                while (i < n) {
+                    if (text[i] == '"') {
+                        closed = true;
+                        i++;
+                        break;
+                    }
+                    if (text[i] == '\\' && i + 1 < n && (text[i + 1] == '"' || text[i + 1] == '\\')) {
+                        sb.Append(text[i + 1]);
+                        i += 2;
+                        continue;
+                    }
+                    sb.Append(text[i]);
+                    i++;
+                }
+                if (!closed) {
+                    throw new FormatException("Unterminated quoted token in options file");
+                }
+                tokens.Add(sb.ToString());
+            } else {
+                var sb = new StringBuilder();
+                while (i < n && !char.IsWhiteSpace(text[i])) {
+                    sb.Append(text[i]);
+                    i++;
+                }
+                tokens.Add(sb.ToString());
+            }
+        }
+        return tokens;
+    }
+}
+
+/// <summary>
+///   C# unit tests for OptionsFileParser, run from --test alongside
+///   AssemblyToLispyTest.
+/// </summary>
+static class ProgramArgsTest {
+    public static void RunTests() {
+        // Comments, blank lines, plain tokens.
+        AssertTokens(
+            OptionsFileParser.TokenizeOptionsFile("--out-dir gen\n# a comment\n--assembly Foo.dll\n\n--class Foo.Bar\n"),
+            new[] { "--out-dir", "gen", "--assembly", "Foo.dll", "--class", "Foo.Bar" },
+            "comments/blank lines are skipped, plain tokens split on whitespace");
+
+        // A "#" not at the start of a token is not treated as a comment.
+        AssertTokens(
+            OptionsFileParser.TokenizeOptionsFile("--class Foo#Bar\n"),
+            new[] { "--class", "Foo#Bar" },
+            "a '#' embedded inside a token (not at its start) does not begin a comment");
+
+        // Quoted token with an embedded space and a literal backtick.
+        AssertTokens(
+            OptionsFileParser.TokenizeOptionsFile("--class \"System.ValueTuple`2\"\n--class \"has space\"\n"),
+            new[] { "--class", "System.ValueTuple`2", "--class", "has space" },
+            "a double-quoted token may contain whitespace and a literal backtick unescaped");
+
+        // Escaped quote and backslash inside a quoted token.
+        AssertTokens(
+            OptionsFileParser.TokenizeOptionsFile("--class \"a\\\"b\\\\c\"\n"),
+            new[] { "--class", "a\"b\\c" },
+            "a quoted token's only escapes are \\\" and \\\\");
+
+        // Unterminated quote is an error.
+        AssertThrows(
+            () => OptionsFileParser.TokenizeOptionsFile("--class \"unterminated"),
+            "an unterminated quoted token signals an error");
+
+        // ExpandOptionsFiles splices at the exact position (order matters
+        // for sticky flags), leaving surrounding arguments untouched.
+        string tmpFile = Path.GetTempFileName();
+        try {
+            File.WriteAllText(tmpFile, "--class Foo.Bar\n--class Foo.Baz\n");
+            var expanded = OptionsFileParser.ExpandOptionsFiles(
+                new[] { "--out-dir", "gen", "--options-file", tmpFile, "--assembly", "Extra.dll" });
+            AssertTokens(expanded,
+                new[] { "--out-dir", "gen", "--class", "Foo.Bar", "--class", "Foo.Baz", "--assembly", "Extra.dll" },
+                "ExpandOptionsFiles splices the file's tokens in at the --options-file position");
+        } finally {
+            File.Delete(tmpFile);
+        }
+
+        // Nested --options-file is an error.
+        string nestedFile = Path.GetTempFileName();
+        try {
+            File.WriteAllText(nestedFile, "--options-file somewhere-else.txt\n");
+            AssertThrows(
+                () => OptionsFileParser.ExpandOptionsFiles(new[] { "--options-file", nestedFile }),
+                "a nested --options-file is rejected");
+        } finally {
+            File.Delete(nestedFile);
+        }
+
+        // A missing options file is an error.
+        AssertThrows(
+            () => OptionsFileParser.ExpandOptionsFiles(new[] { "--options-file", "/no/such/file.txt" }),
+            "a missing options file is rejected");
+
+        Console.WriteLine("[ProgramArgsTest] All tests passed.");
+    }
+
+    private static void AssertTokens(IEnumerable<string> actual, string[] expected, string description) {
+        if (!actual.SequenceEqual(expected)) {
+            throw new Exception(
+                $"ProgramArgsTest failed ({description}): expected [{string.Join(", ", expected)}], got [{string.Join(", ", actual)}]");
+        }
+    }
+
+    private static void AssertThrows(Action action, string description) {
+        try {
+            action();
+        } catch (Exception) {
+            return;
+        }
+        throw new Exception($"ProgramArgsTest failed ({description}): expected an exception, none was thrown");
+    }
 }

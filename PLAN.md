@@ -32,6 +32,22 @@ TODO
 * Add the Assembly to the per-package comment in `packages.lisp`
 * Add the generator options for each package in `packages.lisp`
 
+**DONE (see `doc/plan-fable-detail-07.md`, Version 52):** "All package generator options
+in effect when the class was generated" and "Add the generator options for each package
+in `packages.lisp`" — every per-class non-default flag (`format-class-options-line`,
+canonical/sorted/`--`-spelled) now appears as a `;;; Options: ...` line in
+`csharp-assembly-packages.asd`'s per-class long-description entry, `packages.lisp`'s
+per-package comment, and the class file's own header; a class pulled in only via
+`--export-parents`/`--export-interfaces`/`--output-nested`/`--output-children`/
+`--output-implementations` also gets a `;;; Discovered via: <flag(s)> from
+<discoverer>` line. A `Global flags: --skip-missing --csharp-generic-in-asd`-style line
+covers the two whole-invocation flags in the `.asd`. Still not done: `<constant-properties>`
+as a structured constant, and `<assembly>`/per-assembly comment in `packages.lisp` (the
+assembly name is already visible on the `.asd`'s per-assembly grouping line in the
+long-description, but not as its own dedicated constant/comment) — left for a future
+pass. A separate response-file CLI front end (`--options-file`) also landed in the same
+plan (Part A) — see `README.md`'s CLI Usage section.
+
 
 # Clone a Boxed Struct
 

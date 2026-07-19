@@ -12,7 +12,9 @@ design docs.
 
 * **`Program.cs`** — CLI entry point: arg parsing/dispatch, `--out-dir`/`--assembly`/
   `--class`/`--constant-properties`/flag parsing, runs metadata reflection before booting
-  DotCL, builds the batch manifest, and invokes the Lisp generator.
+  DotCL, builds the batch manifest, and invokes the Lisp generator. Also hosts
+  `OptionsFileParser` (`--options-file`, a response-file CLI front end —
+  `doc/plan-fable-detail-07.md`) and its `ProgramArgsTest` C# unit tests (`--test` mode).
 * **`AssemblyToLispy.cs`** — reflects a .NET assembly (plus its XML doc file) into a
   Lisp-reader-compatible `.lispy.metadata` plist file: type/member enumeration, XML-doc
   parsing, generic/operator name mangling, default-value literal formatting. Includes the
@@ -118,6 +120,10 @@ semantically cross-checks reflected metadata against the live CLR — not itemiz
 
 * **`Makefile`** — all build/test/package/deploy/clean targets; the canonical entry point
   for building, testing, and packaging this tool (see `CLAUDE.md`/`BUILD.md`).
+* **`test-options.txt.in`** — the `--options-file` response-file template (`@REF_DIR@`/
+  `@BIN_DIR@` placeholders, substituted via `sed` in the `test:` target) `make test`'s
+  end-to-end smoke-generation invocation is generated from — see
+  `doc/plan-fable-detail-07.md`.
 * **`dotcl-packagegen.asd`** — ASDF system definition for the generator's own Lisp sources
   (load order, version).
 * **`check_parens.py`** — validates parenthesis balance across `.lisp`/`.asd` files; run
