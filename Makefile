@@ -36,6 +36,22 @@ REF_DIR = /usr/share/dotnet/packs/Microsoft.NETCore.App.Ref/10.0.10/ref/net10.0/
 # so we can see how the output changes over time.
 GEN_TEST_DIR = cspackages-test
 
+# Third-party assemblies for the runtime exercise suite (`test-runtime`):
+# MonoGame + Gum, the same real-world libraries dotcl-dungeonslime consumes
+# (where the v48-v50 escapes were originally found downstream). Reflection
+# needs each assembly's dependencies loadable from the SAME directory, so
+# they are staged together into $(RT_REFS) before generation (the NuGet
+# cache keeps every package in its own directory). Versions are pinned and
+# must match RuntimeExerciseTest.csproj's PackageReference versions, which
+# put these same assemblies in the test project's output directory for
+# DotCL compile time and runtime.
+NUGET_DIR = $(HOME)/.nuget/packages
+MONOGAME_VER = 3.8.5
+GUM_VER = 2026.5.8.1
+INTERP_VER = 2025.4.22.1
+TEXTCOPY_VER = 6.2.1
+RT_REFS = RuntimeExerciseTest/refs
+
 .PHONY: all clean build test test-runtime check-parens package deploy
 
 all: build test
@@ -176,9 +192,36 @@ test-runtime: build
 	# Nullable<T> guards), all of which were runtime-dispatch bugs invisible
 	# to `test`'s string-level (paren-balance/read-back) assertions above.
 	rm -rf RuntimeExerciseTest/gen
+	# Stage the MonoGame/Gum assemblies (plus their own dependencies) into one
+	# directory so reflection can resolve cross-assembly references -- see the
+	# RT_REFS comment near the top of this file.
+	mkdir -p $(RT_REFS)
+	cp $(NUGET_DIR)/monogame.framework.desktopgl/$(MONOGAME_VER)/lib/net8.0/MonoGame.Framework.dll \
+	   $(NUGET_DIR)/monogame.framework.desktopgl/$(MONOGAME_VER)/lib/net8.0/MonoGame.Framework.xml \
+	   $(NUGET_DIR)/flatredball.gumcommon/$(GUM_VER)/lib/net8.0/GumCommon.dll \
+	   $(NUGET_DIR)/flatredball.gumcommon/$(GUM_VER)/lib/net8.0/GumCommon.xml \
+	   $(NUGET_DIR)/flatredball.interpolationcore/$(INTERP_VER)/lib/netstandard2.0/FlatRedBall.InterpolationCore.dll \
+	   $(NUGET_DIR)/gum.monogame/$(GUM_VER)/lib/net8.0/MonoGameGum.dll \
+	   $(NUGET_DIR)/textcopy/$(TEXTCOPY_VER)/lib/net6.0/TextCopy.dll \
+	   $(RT_REFS)/
 	$(EXECUTABLE) --out-dir RuntimeExerciseTest/gen \
 	    --assembly $(REF_DIR)System.Runtime.dll \
 	      --class System.TimeSpan --constant-properties "*" \
+	      --class System.DateTime \
+	      --class System.Text.StringBuilder --defgeneric \
+	    --assembly $(RT_REFS)/MonoGame.Framework.dll \
+	      --class Microsoft.Xna.Framework.Vector2 --constant-properties "*" --defgeneric \
+	      --class Microsoft.Xna.Framework.Color --constant-properties "*" \
+	      --class Microsoft.Xna.Framework.Point --constant-properties "*" \
+	      --class Microsoft.Xna.Framework.Rectangle --constant-properties "*" \
+	      --class Microsoft.Xna.Framework.MathHelper \
+	      --class Microsoft.Xna.Framework.GameTime \
+	      --class Microsoft.Xna.Framework.Input.Keys \
+	    --assembly $(RT_REFS)/GumCommon.dll \
+	      --class Gum.DataTypes.DimensionUnitType \
+	    --assembly $(RT_REFS)/MonoGameGum.dll \
+	      --class MonoGameGum.GueDeriving.TextRuntime \
+	      --class Gum.Forms.Controls.KeyCombo \
 	    --assembly $(BIN_DIR)AssemblyToLispyTestTarget.dll \
 	      --class AssemblyToLispyTestTarget.RuntimeExerciseFixtures --constant-properties "SharedSingleton" \
 	      --class AssemblyToLispyTestTarget.EdgeCaseStruct \
@@ -191,6 +234,11 @@ test-runtime: build
 	# exactly as a real downstream consumer (dotcl-dungeonslime) would --
 	# this also permanently regression-tests ASDF-loadability (the
 	# dotcl/dotcl#49 class fixed across Versions 42-46).
+	# The dotcl-fasl bundle must be cleared first: MSBuild's incremental
+	# inputs for the DotCL dependency-resolution target track only the .asd/
+	# build-init/search-path items, not gen/'s regenerated contents, so a
+	# stale csharp-assembly-packages fasl would otherwise be reused.
+	rm -rf RuntimeExerciseTest/obj/Debug/net10.0/dotcl-fasl
 	dotnet build RuntimeExerciseTest/RuntimeExerciseTest.csproj -c Debug
 	dotnet run --no-build --project RuntimeExerciseTest/RuntimeExerciseTest.csproj -c Debug
 
@@ -216,7 +264,7 @@ deploy: package
 clean:
 	dotnet clean dotcl-packagegen.csproj
 	rm -rf bin obj AssemblyToLispyTestTarget/bin AssemblyToLispyTestTarget/obj $(NUPKG_DIR)
-	rm -rf RuntimeExerciseTest/bin RuntimeExerciseTest/obj RuntimeExerciseTest/gen
+	rm -rf RuntimeExerciseTest/bin RuntimeExerciseTest/obj RuntimeExerciseTest/gen RuntimeExerciseTest/refs
 
 version:
 	echo $(VERSION)

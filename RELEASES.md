@@ -10,6 +10,43 @@ history (the integer `*generator-version*` embedded in every emitted `.lisp` fil
 Version History" section instead — those two numbers are independent and do not always move
 together.
 
+## 2.50.3 — 2026-07-18
+
+**`make test-runtime` expanded to real-world MonoGame, Gum, and additional BCL classes
+(82 assertions, up from 36).**
+
+* The generation step now also covers `System.DateTime` (many-arity constructor Master
+  Wrapper, `-`/`=` struct operators returning a different struct type),
+  `System.Text.StringBuilder` (`--defgeneric`; the many-overload `Append` Master
+  Wrapper, `Chars` indexer, cross-class `csharp-generics:length` dispatch against
+  `Vector2.Length()`), and — from the same real-world libraries `dotcl-dungeonslime`
+  consumes, where the v48-v50 escapes were originally found downstream —
+  `Microsoft.Xna.Framework.Vector2` (`--constant-properties "*" --defgeneric`; the
+  documented `Normalize()` in-place boxing-mutation transcript case, `Zero` memoization
+  identity, operators), `Color`/`Point`/`Rectangle` (constants, int-ctor dispatch,
+  struct-taking methods like `Contains`/`Intersects`), `MathHelper`, `GameTime`,
+  `Input.Keys`, Gum's `DimensionUnitType` (enum constants **plus GumCommon's own
+  extension methods injected as real-world v38 coverage** — `get-is-pixel-based` on a
+  memoized enum constant), `KeyCombo` (nullable-enum struct fields, `Is*`→`?` renaming,
+  MonoGameGum extension-method injection), and `TextRuntime` (the exact
+  all-parameters-defaulted constructor shape that motivated v48; constructed with
+  `:full-instantiation nil` since full instantiation needs a live Gum/graphics
+  environment).
+* The MonoGame/Gum assemblies are staged from the NuGet cache into
+  `RuntimeExerciseTest/refs/` (gitignored) before generation, since reflection needs an
+  assembly's dependencies loadable from the same directory; versions are pinned in the
+  `Makefile` and must match `RuntimeExerciseTest.csproj`'s new
+  `MonoGame.Framework.DesktopGL`/`Gum.MonoGame` `PackageReference`s, which put the same
+  assemblies in the test project's output for DotCL compile time and runtime.
+  `build-setup.lisp`/`Program.cs` gained the corresponding assembly loads and
+  `class-for-type` pre-registrations for the two new `--defgeneric` classes.
+* `make test-runtime` also now clears `RuntimeExerciseTest`'s cached `dotcl-fasl`
+  bundle before `dotnet build` — MSBuild's incremental inputs for the DotCL
+  dependency-resolution target don't track `gen/`'s regenerated contents, so a stale
+  `csharp-assembly-packages` fasl was silently reused when the generated class set
+  changed.
+* No `*generator-version*` bump — no generated-output shape changed.
+
 ## 2.50.2 — 2026-07-18
 
 **New `make test-runtime` target: a runtime exercise suite that actually calls generated

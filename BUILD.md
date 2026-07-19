@@ -63,7 +63,16 @@ repo's own Stage-1 test suite instead) covering one test per historical
 runtime-dispatch escape (v48 omitted-optional-arguments, v49 overload dispatch
 ordering, v50 `Nullable<T>` guards) plus breadth (Master Wrapper branches,
 operators, properties/fields/indexers, events, `--defgeneric` dispatch,
-generic methods, struct boxing mutation). Run it before any release, or after
-touching overload dispatch/codegen — `make test` alone cannot catch this bug
-class, since it only ever validates the *shape* of generated code, never that
-calling it produces correct results.
+generic methods, struct boxing mutation), and real-world coverage against BCL
+(`TimeSpan`/`DateTime`/`StringBuilder`), MonoGame (`Vector2` — including the
+documented `Normalize()` in-place mutation transcript case — `Color`, `Point`,
+`Rectangle`, `MathHelper`, `GameTime`, `Input.Keys`), and Gum
+(`DimensionUnitType` with GumCommon's own injected extension methods,
+`KeyCombo`, `TextRuntime`'s all-defaulted v48-motivator constructor). The
+MonoGame/Gum assemblies are staged from the local NuGet cache into
+`RuntimeExerciseTest/refs/` (gitignored); their versions are pinned in the
+`Makefile` (`MONOGAME_VER`/`GUM_VER` etc.) and must be kept in lockstep with
+`RuntimeExerciseTest.csproj`'s `PackageReference` versions. Run it before any
+release, or after touching overload dispatch/codegen — `make test` alone
+cannot catch this bug class, since it only ever validates the *shape* of
+generated code, never that calling it produces correct results.

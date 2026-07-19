@@ -20,6 +20,8 @@ DotclHost.Initialize();
 // before loading the manifest below.
 DotclHost.Call("CLASS-FOR-TYPE", "AssemblyToLispyTestTarget.GenericDispatchFixtureA");
 DotclHost.Call("CLASS-FOR-TYPE", "AssemblyToLispyTestTarget.GenericDispatchFixtureB");
+DotclHost.Call("CLASS-FOR-TYPE", "Microsoft.Xna.Framework.Vector2");
+DotclHost.Call("CLASS-FOR-TYPE", "System.Text.StringBuilder");
 
 var manifestPath = Path.Combine(AppContext.BaseDirectory, "dotcl-fasl", "dotcl-deps.txt");
 Console.WriteLine($"[RuntimeExerciseTest] manifest: {manifestPath}");

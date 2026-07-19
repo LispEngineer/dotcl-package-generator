@@ -437,6 +437,39 @@ To prevent other shadowed symbols in generated packages (such as `length`, `nth`
   - `(error ...)` -> `(cl:error ...)`
 This prevents type-cast exceptions like `Unable to cast object of type 'DotCL.Cons' to type 'DotCL.LispDotNetObject'` when calling generated operator functions.
 
+### 3. The Same Convention in Hand-Written Consumer Code (added with `make test-runtime`, 2026-07)
+
+Inside *generated* files the `cl:` qualification is mandatory — generated class packages
+never `:use :cl` at all, precisely because their export lists shadow so many standard
+symbols. This repo also applies the same full qualification, deliberately, to one class of
+*hand-written* Lisp: files that heavily call into generated packages.
+`RuntimeExerciseTest/runtime-tests.lisp` is the canonical example — it constantly mixes
+shadowed C# wrappers (`sb:append`, `sb:length`, `xv2:+`, `xv2:-`, `xv2:=`, `dt:-`, `dt:=`,
+`mh:min`, `mh:max`, `ecs:item`, `ros:+`, …) with the real CL originals, often in the same
+expression, e.g. `(cl:= 7 (ts:days (dt:- d1 d2)))`. Uniform qualification there buys:
+
+* **Two-namespace clarity at every call site** — the reader never has to consult the
+  package definition to know whether a `length` or `append` is the C# wrapper or the CL
+  function, and an accidental unqualified use of a collision-prone name is impossible to
+  write without noticing.
+* **Immunity to package evolution** — the file's own package `(:use :cl)`s with no shadows
+  today, so unqualified `defun`/`let` would technically resolve fine; but if the package
+  ever grows direct imports from the generated packages, every unqualified standard symbol
+  becomes a latent collision. Qualification removes that failure mode entirely.
+
+This is defense and clarity, **not** a current necessity, and it is intentionally *not*
+repo-wide: a hand-written file with no generated-package interaction (`read-check.lisp`;
+also dotcl-dungeonslime's own `build-setup.lisp`, the model for this repo's
+`RuntimeExerciseTest/build-setup.lisp`) uses plain unqualified CL. One fragment of the
+convention is load-order-critical rather than stylistic, though: qualifying a file's
+*first* form as `(cl:in-package ...)` — as every generated file and both `build-setup.lisp`
+files do — makes that form read correctly whatever `*package*` the loading environment
+happens to have when the file is read (relevant for `build-setup.lisp` in particular,
+which is `load`ed by the DotCL MSBuild task rather than through ASDF). See the style notes
+at the top of `RuntimeExerciseTest/runtime-tests.lisp` and
+`RuntimeExerciseTest/build-setup.lisp`, and CLAUDE.md's "Key conventions when touching the
+generator".
+
 ## Struct Mutation, Boxing, and Overload Resolution (Version 16)
 
 *(from implementation-notes.md — excerpt; the source file's "Workaround" subsection is

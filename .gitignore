@@ -5,3 +5,4 @@ obj/
 scratch/
 nupkg/
 RuntimeExerciseTest/gen/
+RuntimeExerciseTest/refs/

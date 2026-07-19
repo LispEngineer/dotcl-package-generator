@@ -85,7 +85,12 @@ post-build verification steps that matter (see below).
   subsequent top-level forms) rather than a clear syntax error.
 * `make test-runtime` — the runtime exercise suite (`RuntimeExerciseTest/`, see
   `doc/plan-fable-detail-02.md`): generates real packages against
-  `AssemblyToLispyTestTarget` fixture classes (plus `System.TimeSpan` as a BCL smoke test)
+  `AssemblyToLispyTestTarget` fixture classes, BCL classes
+  (`System.TimeSpan`/`DateTime`/`Text.StringBuilder`), and real-world MonoGame/Gum
+  classes (`Vector2`/`Color`/`Point`/`Rectangle`/`MathHelper`/`GameTime`/`Input.Keys`,
+  Gum's `DimensionUnitType`/`KeyCombo`/`TextRuntime` — staged from the NuGet cache into
+  `RuntimeExerciseTest/refs/`, versions pinned in the `Makefile` in lockstep with
+  `RuntimeExerciseTest.csproj`'s `PackageReference`s)
   into `RuntimeExerciseTest/gen/`, then a sibling C# project — modeled on
   `dotcl-packagegen.csproj` itself, i.e. DotCL cross-compiles the generated `.lisp` during
   `dotnet build`, exactly as `dotcl-dungeonslime` consumes real generated output — actually
@@ -292,8 +297,21 @@ reflection and runs before DotCL boots.
 * Generated Lisp templates qualify standard CL operators with `cl:` (e.g. `cl:defun`,
   `cl:cond`, `cl:length`) because generated packages routinely `:shadow` symbols like `=`,
   `and`, or `t` to match C# operator/member names — an unqualified call would resolve to the
-  shadowed local version instead of the real CL function. Follow this pattern in any new
+  shadowed local version instead of the real CL function (generated class packages never
+  `:use :cl` at all, for exactly this reason). Follow this pattern in any new
   code-emitting `format` calls.
+  * The same full qualification is also used, deliberately, in *hand-written* Lisp that
+    heavily calls into generated packages — `RuntimeExerciseTest/runtime-tests.lisp`
+    constantly mixes shadowed C# wrappers (`sb:append`, `xv2:+`, `dt:-`, `mh:min`, …) with
+    the real CL originals in the same expressions, and uniform `cl:` qualification makes the
+    two namespaces visually unambiguous at every call site (and future-proofs the file
+    against later direct imports from generated packages). This is defense and clarity, not
+    a current necessity: its own package `(:use :cl)`s with no shadows. A hand-written file
+    with no generated-package interaction (e.g. `read-check.lisp`) uses plain unqualified
+    CL instead. One fragment is load-order-critical rather than stylistic: qualifying a
+    file's *first* form as `(cl:in-package ...)` (as `RuntimeExerciseTest/build-setup.lisp`
+    and every generated file do) makes it read correctly whatever `*package*` the loader
+    has when the file is read.
 * C# names that collide with CL reader syntax (`quote`, `function`, `t`, `nil`) get mapped to
   safe suffixed forms (`quote!`, `function!`, `t!`, `nil!`) rather than being shadowed.
   `Is*`-prefixed predicates become `*?` (`IsEmpty` → `empty?`); this is deliberately distinct

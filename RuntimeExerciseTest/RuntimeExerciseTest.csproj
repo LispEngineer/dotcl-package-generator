@@ -85,6 +85,23 @@
   </ItemGroup>
 
   <!-- ========================================================================= -->
+  <!-- Real-World Third-Party Assemblies Under Test                              -->
+  <!-- ========================================================================= -->
+  <!-- MonoGame + Gum, the same libraries dotcl-dungeonslime consumes (where the  -->
+  <!-- v48 to v50 escapes were originally found downstream). These references     -->
+  <!-- put MonoGame.Framework.dll / GumCommon.dll / MonoGameGum.dll (and their    -->
+  <!-- own dependencies) in this project's output directory, needed both at      -->
+  <!-- DotCL compile time (defgeneric class-for-type resolution) and at test     -->
+  <!-- runtime. Versions are pinned and must match the Makefile's               -->
+  <!-- MONOGAME_VER/GUM_VER variables, which stage the same assemblies for the   -->
+  <!-- generation step.                                                          -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.5" />
+    <PackageReference Include="Gum.MonoGame" Version="2026.5.8.1" />
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
   <!-- Contrib Lisp Library Copy Task                                            -->
   <!-- ========================================================================= -->
   <!-- Copies the Lisp standard library ('contrib' directory) from the restored  -->

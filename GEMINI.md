@@ -128,7 +128,9 @@ parentheses.
   an unescaped `#:|` export) which balanced-parens checking alone cannot see.
 * `make test-runtime` (`RuntimeExerciseTest/`) goes one step further than either of the
   above: it actually compiles, loads, and calls the generated wrapper functions against
-  live .NET objects, catching runtime-dispatch bugs (omitted-optional-passed-as-`nil`,
+  live .NET objects — including real-world MonoGame and Gum classes (the same libraries
+  `dotcl-dungeonslime` consumes), staged from the local NuGet cache — catching
+  runtime-dispatch bugs (omitted-optional-passed-as-`nil`,
   Master Wrapper dispatch ordering, `Nullable<T>` guards) that neither paren-balance
   checking nor read-back checking can see, since both only validate the *shape* of
   generated code, never that calling it produces correct results. See

@@ -137,15 +137,20 @@ A `Makefile` is provided with the following targets:
 
 * `make test-runtime` — The runtime exercise suite
   (`RuntimeExerciseTest/`, see [`doc/plan-fable-detail-02.md`](doc/plan-fable-detail-02.md)):
-  generates real packages against a handful of `AssemblyToLispyTestTarget`
-  fixture classes (plus `System.TimeSpan` as a BCL smoke test) into
+  generates real packages against `AssemblyToLispyTestTarget` fixture classes,
+  BCL classes (`System.TimeSpan`/`DateTime`/`Text.StringBuilder`), and — from
+  the same real-world libraries `dotcl-dungeonslime` consumes — MonoGame
+  (`Vector2`, `Color`, `Point`, `Rectangle`, `MathHelper`, `GameTime`,
+  `Input.Keys`) and Gum (`DimensionUnitType`, `KeyCombo`, `TextRuntime`) into
   `RuntimeExerciseTest/gen/`, then a sibling C# project cross-compiles and
   **actually calls** the generated wrapper functions against live .NET
   objects — the structural fix for the v48-v50 escape class
   (omitted-optional-passed-as-`nil`, Master Wrapper dispatch ordering,
   `Nullable<T>` guards), all runtime-dispatch bugs invisible to `make test`'s
-  string-level (paren-balance/read-back) checks above. Run it before any
-  release, or after touching overload dispatch/codegen.
+  string-level (paren-balance/read-back) checks above. The MonoGame/Gum
+  assemblies are staged from the local NuGet cache (versions pinned in the
+  `Makefile`, matching `RuntimeExerciseTest.csproj`'s `PackageReference`s).
+  Run it before any release, or after touching overload dispatch/codegen.
 
 * `make package` — Builds Release binaries for every configured
   `RuntimeIdentifier` (`linux-x64`, `linux-arm64`, `win-x64`, `osx-x64`,

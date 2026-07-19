@@ -10,6 +10,24 @@
 ;;; belongs to the generator's own system and does metadata schema
 ;;; validation); this project depends only on the generated
 ;;; csharp-assembly-packages system plus DotCL.
+;;;
+;;; STYLE NOTE -- why every standard CL symbol here is cl:-qualified:
+;;; This file constantly mixes generated C# wrappers whose exported names
+;;; shadow standard CL symbols (sb:append, sb:length, xv2:+, xv2:-, xv2:=,
+;;; dt:-, dt:=, mh:min, mh:max, ecs:item, ros:+, ...) with the real CL
+;;; originals, often in the same expression -- e.g.
+;;; (cl:= 7 (ts:days (dt:- d1 d2))). Qualifying EVERYTHING makes it visually
+;;; unambiguous at every call site which of the two worlds a symbol comes
+;;; from, makes an accidental unqualified length/append/= impossible to
+;;; write without noticing, and keeps this file immune if the defpackage
+;;; below ever grows direct imports from the generated packages (whose
+;;; class files never :use :cl at all, for exactly this shadowing reason --
+;;; see CLAUDE.md's "Key conventions when touching the generator").
+;;; Strictly, (:use :cl) with no shadows would let defun/let/etc. resolve
+;;; unqualified today -- the qualification is deliberate defense and
+;;; two-namespace clarity, not a current necessity. Contrast
+;;; read-check.lisp, which has no generated-package interaction and so uses
+;;; plain unqualified CL.
 
 (cl:defpackage :runtime-exercise
   (:use :cl)
@@ -37,7 +55,23 @@
                       :assembly-to-lispy-test-target-event-test-class '("ETC"))
   (cl:rename-package :assembly-to-lispy-test-target-generic-method-test-class
                       :assembly-to-lispy-test-target-generic-method-test-class '("GMTC"))
-  (cl:rename-package :system-time-span :system-time-span '("TS")))
+  (cl:rename-package :system-time-span :system-time-span '("TS"))
+  ;; BCL additions
+  (cl:rename-package :system-date-time :system-date-time '("DT"))
+  (cl:rename-package :system-text-string-builder :system-text-string-builder '("SB"))
+  ;; MonoGame (the same real-world library dotcl-dungeonslime consumes)
+  (cl:rename-package :microsoft-xna-framework-vector2 :microsoft-xna-framework-vector2 '("XV2"))
+  (cl:rename-package :microsoft-xna-framework-color :microsoft-xna-framework-color '("XCOLOR"))
+  (cl:rename-package :microsoft-xna-framework-point :microsoft-xna-framework-point '("XPOINT"))
+  (cl:rename-package :microsoft-xna-framework-rectangle :microsoft-xna-framework-rectangle '("XRECT"))
+  (cl:rename-package :microsoft-xna-framework-math-helper :microsoft-xna-framework-math-helper '("MH"))
+  (cl:rename-package :microsoft-xna-framework-game-time :microsoft-xna-framework-game-time '("XGT"))
+  (cl:rename-package :microsoft-xna-framework-input-keys :microsoft-xna-framework-input-keys '("XKEYS"))
+  ;; Gum
+  (cl:rename-package :gum-data-types-dimension-unit-type :gum-data-types-dimension-unit-type '("DUT"))
+  (cl:rename-package :gum-forms-controls-key-combo :gum-forms-controls-key-combo '("KC"))
+  (cl:rename-package :mono-game-gum-gue-deriving-text-runtime
+                      :mono-game-gum-gue-deriving-text-runtime '("TR")))
 
 ;;; ---------------------------------------------------------------------
 ;;; Minimal assertion framework
@@ -65,6 +99,17 @@
            (record-pass)
            (record-failure ,description cl:t cl:nil))
      (cl:error (e) (record-failure ,description cl:t (cl:format cl:nil "signaled: ~A" e)))))
+
+(cl:defmacro check-near (description expected-form actual-form)
+  "Floating-point comparison with a small absolute tolerance, for
+single-float results (e.g. Vector2 normalization) where cl:equal's exact
+comparison would be brittle."
+  `(cl:handler-case
+       (cl:let ((expected ,expected-form) (actual ,actual-form))
+         (cl:if (cl:< (cl:abs (cl:- expected actual)) 0.001)
+             (record-pass)
+             (record-failure ,description expected actual)))
+     (cl:error (e) (record-failure ,description "(no error)" (cl:format cl:nil "signaled: ~A" e)))))
 
 ;;; ---------------------------------------------------------------------
 ;;; 1. v48 guard: omitted optional arguments
@@ -193,6 +238,137 @@
     (check-true "BCL smoke: TimeSpan.FromHours(2).TotalSeconds == 7200" (cl:= 7200 (ts:total-seconds ts)))))
 
 ;;; ---------------------------------------------------------------------
+;;; BCL breadth: System.DateTime (ctor Master Wrapper across many arities,
+;;; struct operators returning a different struct type)
+
+(cl:defun test-datetime ()
+  (cl:let ((d1 (dt:new 2026 7 18))
+           (d2 (dt:new 2026 7 11)))
+    (check-true "DateTime ctor: year" (cl:= 2026 (dt:year d1)))
+    (check-true "DateTime ctor: month" (cl:= 7 (dt:month d1)))
+    (check-true "DateTime ctor: day" (cl:= 18 (dt:day d1)))
+    (check-true "DateTime operator - returns TimeSpan" (cl:= 7 (ts:days (dt:- d1 d2))))
+    (check-true "DateTime operator =, equal" (dt:= d1 (dt:new 2026 7 18)))
+    (check-true "DateTime operator =, not equal" (cl:not (dt:= d1 d2)))))
+
+;;; ---------------------------------------------------------------------
+;;; BCL breadth: System.Text.StringBuilder (many-overload Append Master
+;;; Wrapper, indexer, --defgeneric participation)
+
+(cl:defun test-string-builder ()
+  (cl:let ((sb (sb:new)))
+    (sb:append sb "Hello")
+    (sb:append sb 42)
+    (check-equal "StringBuilder append string+int" "Hello42" (sb:to-string sb))
+    (check-equal "StringBuilder chars indexer" #\H (sb:chars sb 0))
+    (check-true "StringBuilder length" (cl:= 7 (sb:length sb)))))
+
+;;; ---------------------------------------------------------------------
+;;; MonoGame: Vector2 -- the actual library where the historical struct
+;;; boxing mutation / constant-memoization / dispatch bugs were found
+;;; downstream (see doc/generator-design-notes.md's Version 16/29 sections)
+
+(cl:defun test-monogame-vector2 ()
+  ;; --constant-properties memoization on a real MonoGame constant
+  (cl:let ((a xv2:+zero+) (b xv2:+zero+))
+    (check-true "Vector2.Zero memoization (cl:eq)" (cl:eq a b))
+    (check-near "Vector2.Zero.X" 0.0 (xv2:x a)))
+  (cl:let ((v (xv2:new 3.0 4.0)))
+    (check-near "Vector2 ctor + X accessor" 3.0 (xv2:x v))
+    (check-near "Vector2.Length()" 5.0 (xv2:length v))
+    ;; The exact documented Dungeon Slime transcript case: Normalize()
+    ;; mutates the boxed instance in place (and returns nil, since the C#
+    ;; method returns void)
+    (xv2:normalize v)
+    (check-near "Vector2.Normalize() mutates in place: X" 0.6 (xv2:x v))
+    (check-near "Vector2.Normalize() mutates in place: Y" 0.8 (xv2:y v))
+    (cl:setf (xv2:x v) 9.0)
+    (check-near "Vector2 setf X" 9.0 (xv2:x v)))
+  (cl:let ((v1 (xv2:new 1.0 2.0)) (v2 (xv2:new 10.0 20.0)))
+    (check-near "Vector2 operator +" 11.0 (xv2:x (xv2:+ v1 v2)))
+    (check-true "Vector2 operator =, equal" (xv2:= v1 (xv2:new 1.0 2.0)))
+    (check-true "Vector2 operator =, not equal" (cl:not (xv2:= v1 v2)))
+    ;; --defgeneric: the unified generic dispatches on the MonoGame type too
+    (check-near "csharp-generics x dispatch on Vector2" 1.0 (csharp-generics:x v1))))
+
+;;; ---------------------------------------------------------------------
+;;; MonoGame: Color (constants + int-ctor Master Wrapper + byte accessors)
+
+(cl:defun test-monogame-color ()
+  (check-true "Color.White.R" (cl:= 255 (xcolor:r xcolor:+white+)))
+  (cl:let ((c (xcolor:new 10 20 30)))
+    (check-true "Color ctor RGB: R" (cl:= 10 (xcolor:r c)))
+    (check-true "Color ctor RGB: G" (cl:= 20 (xcolor:g c)))
+    (check-true "Color ctor RGB: B" (cl:= 30 (xcolor:b c)))
+    (check-true "Color ctor RGB: A defaults opaque" (cl:= 255 (xcolor:a c)))
+    (check-true "Color operator =" (xcolor:= c (xcolor:new 10 20 30)))))
+
+;;; ---------------------------------------------------------------------
+;;; MonoGame: Point / Rectangle (int structs, methods taking other structs)
+
+(cl:defun test-monogame-point-rectangle ()
+  (cl:let ((p (xpoint:new 3 4)))
+    (check-true "Point ctor: X" (cl:= 3 (xpoint:x p)))
+    (check-true "Point ctor: Y" (cl:= 4 (xpoint:y p)))
+    (check-true "Point.Zero.X" (cl:= 0 (xpoint:x xpoint:+zero+))))
+  (cl:let ((r (xrect:new 1 2 30 40)))
+    (check-true "Rectangle ctor: X" (cl:= 1 (xrect:x r)))
+    (check-true "Rectangle ctor: Width" (cl:= 30 (xrect:width r)))
+    (check-true "Rectangle.Contains(x, y) inside" (xrect:contains r 5 5))
+    (check-true "Rectangle.Contains(x, y) outside" (cl:not (xrect:contains r 100 100)))
+    (check-true "Rectangle.Intersects(Rectangle)" (xrect:intersects r (xrect:new 20 30 10 10)))))
+
+;;; ---------------------------------------------------------------------
+;;; MonoGame: MathHelper (pure static methods) and GameTime (class ctor
+;;; taking struct arguments)
+
+(cl:defun test-monogame-mathhelper-gametime ()
+  (check-near "MathHelper.Clamp above range" 1.0 (mh:clamp 5.0 0.0 1.0))
+  (check-near "MathHelper.Lerp midpoint" 5.0 (mh:lerp 0.0 10.0 0.5))
+  (check-near "MathHelper.ToDegrees(Pi)" 180.0 (mh:to-degrees mh:+pi+))
+  (cl:let ((gt (xgt:new (ts:from-hours 1) (ts:from-seconds 30))))
+    (check-true "GameTime ctor + TotalGameTime"
+                (cl:= 3600 (ts:total-seconds (xgt:total-game-time gt))))
+    (check-true "GameTime ElapsedGameTime"
+                (cl:= 30 (ts:total-seconds (xgt:elapsed-game-time gt))))))
+
+;;; ---------------------------------------------------------------------
+;;; Gum: enum constants, REAL-WORLD extension-method injection (the v38
+;;; feature against actual Gum code, not just the synthetic fixture), the
+;;; Is*->? predicate renaming, and nullable-enum struct fields
+
+(cl:defun test-gum ()
+  ;; DimensionUnitType: enum constants + GumCommon's own
+  ;; DimensionUnitTypeExtensions injected as obj!-first wrappers
+  (check-true "Gum enum constant non-nil" (cl:not (cl:null dut:+absolute+)))
+  (check-true "Gum extension method: Absolute is pixel-based"
+              (dut:get-is-pixel-based dut:+absolute+))
+  (check-true "Gum extension method: PercentageOfParent is not pixel-based"
+              (cl:not (dut:get-is-pixel-based dut:+percentage-of-parent+)))
+  ;; KeyCombo: struct with nullable-enum (Keys?) fields; MonoGameGum's own
+  ;; KeyComboExtensions also inject here (combo-down? etc.), though calling
+  ;; those needs live keyboard state, so only field access is exercised
+  (cl:let ((kc (kc:new)))
+    (check-true "KeyCombo Keys field initially None (0)"
+                (cl:= 0 (xkeys:value__ (kc:pushed-key kc))))
+    (cl:setf (kc:pushed-key kc) xkeys:+space+)
+    (check-true "KeyCombo nullable Keys field set + read back (Space = 32)"
+                (cl:= 32 (xkeys:value__ (kc:pushed-key kc))))
+    (cl:setf (kc:triggered-on-repeat? kc) cl:t)
+    (check-true "KeyCombo Is*->? renamed bool field" (kc:triggered-on-repeat? kc))))
+
+;;; ---------------------------------------------------------------------
+;;; Gum: TextRuntime -- the exact all-parameters-defaulted constructor shape
+;;; that motivated the v48 fix (DefaultParameterTestClass mirrors it
+;;; synthetically; this is the real one). Constructed with
+;;; :full-instantiation nil since full instantiation requires an initialized
+;;; Gum/graphics environment this headless test process does not have.
+
+(cl:defun test-gum-text-runtime ()
+  (check-true "TextRuntime construction (fullInstantiation: false)"
+              (cl:not (cl:null (tr:new :full-instantiation cl:nil)))))
+
+;;; ---------------------------------------------------------------------
 ;;; Entry point
 
 (cl:defun run-runtime-exercise-tests ()
@@ -209,6 +385,14 @@
   (test-generic-methods)
   (test-struct-boxing-mutation)
   (test-bcl-smoke)
+  (test-datetime)
+  (test-string-builder)
+  (test-monogame-vector2)
+  (test-monogame-color)
+  (test-monogame-point-rectangle)
+  (test-monogame-mathhelper-gametime)
+  (test-gum)
+  (test-gum-text-runtime)
   (cl:format cl:t "~&[runtime-tests] ~D passed, ~D failed.~%" *pass-count* (cl:length *failures*))
   (cl:dolist (f (cl:reverse *failures*))
     (cl:format cl:t "[runtime-tests] FAIL: ~A~%" f))

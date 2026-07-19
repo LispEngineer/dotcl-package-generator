@@ -175,10 +175,11 @@ runtime-dispatch escape class invisible to `make test`'s string-level checks.
   `#.(dotnet:class-for-type ...)` forms can resolve those fixture types at DotCL
   compile time) and declares `gen/` as a `DotclAsdSearchPath`.
 * **`build-setup.lisp`** — a `DotclBuildInit` script, loaded before both dependency
-  resolution and root compilation: explicitly loads `AssemblyToLispyTestTarget.dll` and
-  pre-registers the CLOS classes for its `--defgeneric` fixture classes, since the usual
-  `dotnet:resolve-type` base-directory probe looks in the wrong place when running inside
-  an in-process MSBuild task.
+  resolution and root compilation: explicitly loads `AssemblyToLispyTestTarget.dll` plus
+  the MonoGame/Gum assemblies, and pre-registers the CLOS classes for every
+  `--defgeneric` class in the batch, since the usual `dotnet:resolve-type`
+  base-directory probe looks in the wrong place when running inside an in-process
+  MSBuild task.
 * **`runtime-exercise.asd`** — `:depends-on ("csharp-assembly-packages")` (the system
   `gen/` defines, regardless of which classes were requested).
 * **`runtime-tests.lisp`** — the assertion suite itself: a small, self-contained
@@ -187,13 +188,21 @@ runtime-dispatch escape class invisible to `make test`'s string-level checks.
   test per historical escape (v48 omitted defaults, v49 dispatch ordering, v50
   `Nullable<T>`) plus breadth (Master Wrapper branches, operators, properties/fields/
   indexers, static-property memoization, events, `--defgeneric` dispatch, generic
-  methods, struct boxing mutation, a `System.TimeSpan` BCL smoke test).
+  methods, struct boxing mutation), and real-world coverage against BCL
+  (`TimeSpan`/`DateTime`/`StringBuilder`), MonoGame (`Vector2` incl. the documented
+  `Normalize()` in-place mutation transcript case, `Color`, `Point`, `Rectangle`,
+  `MathHelper`, `GameTime`, `Input.Keys`), and Gum (`DimensionUnitType` with GumCommon's
+  own injected extension methods, `KeyCombo`, `TextRuntime`'s all-defaulted v48-motivator
+  constructor).
 * **`Program.cs`** — boots DotCL, pre-registers the same `--defgeneric` CLOS classes
   (this time for the real runtime process, not the build-time MSBuild task), loads the
   manifest, calls `RUN-RUNTIME-EXERCISE-TESTS`, and exits nonzero on any failure.
 * **`gen/`** — output of `make test-runtime`'s generation step; gitignored, not checked in
   (unlike `cspackages-test/`, which exists specifically to make generation-output drift
   visible in diffs — `gen/`'s only job is to be compiled and called, not diffed).
+* **`refs/`** — staging directory (gitignored) the `Makefile` fills from the NuGet cache
+  with the pinned MonoGame/Gum assemblies plus their own dependencies, so metadata
+  reflection can resolve cross-assembly references from one directory.
 
 Fixture classes supporting this suite live in `AssemblyToLispyTestTarget/EdgeCases.cs`:
 `RuntimeExerciseFixtures`, `EdgeCaseStruct` (extended with a constructor, a mutable
