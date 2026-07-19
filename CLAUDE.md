@@ -65,7 +65,7 @@ post-build verification steps that matter (see below).
 
 * `make build` — `dotnet build dotcl-packagegen.csproj -c Debug`. Compiles the C# host *and*
   cross-compiles the DotCL Lisp sources (`packages.lisp`, `utils.lisp`, `monoutils.lisp`, the
-  ten `apg-*.lisp` modules the generator proper is split into, the eleven
+  eleven `apg-*.lisp` modules the generator proper is split into, the eleven
   `package-generator-tests-*.lisp` files, and `generator-tests.lisp` — see
   `dotcl-packagegen.asd` for the load order, or `FILES.md` for the per-file breakdown) into
   `bin/Debug/net10.0/`.
@@ -247,7 +247,7 @@ reflection and runs before DotCL boots.
   package code — see `doc/package-generator-dependencies.md` for the full dependency list
   in both directions.
 * **The code generator proper** — as of the July 2026 refactor (commit `6a47c35`), no longer
-  one monolithic `assembly-package-generator.lisp`; split into ten `apg-*.lisp` modules (see
+  one monolithic `assembly-package-generator.lisp`; split into eleven `apg-*.lisp` modules (see
   `FILES.md` for the authoritative per-file breakdown and `dotcl-packagegen.asd` for load
   order). Entry points `run-assembly-package-generator-batch` → `generate-assembly-packages-batch`
   (`apg-batch-orchestration.lisp`; resolves and validates every requested class against its
@@ -261,8 +261,11 @@ reflection and runs before DotCL boots.
   `generate-class-file` (`apg-class-file-generator.lisp`; the driver plus per-section `emit-*`
   helpers). Member classification (`classify-class-members` → the `class-member-classification`
   struct) lives in `apg-member-predicates.lisp`; overload signature/docstring formatting in
-  `apg-overload-signatures.lisp`; the Master Wrapper dispatch machinery (`format-param-type-check`,
-  `generate-method-name-wrappers`, generic-arity dispatch) — largest and highest-risk module — in
+  `apg-overload-signatures.lisp`; per-parameter runtime type-check/guard-string generation
+  (`resolvable-type-name-for-check`, `format-param-type-check`) in `apg-type-checks.lisp`
+  (split out of `apg-overload-dispatch.lisp` per `doc/plan-fable-detail-09.md`, pure internal
+  reorganization); the Master Wrapper dispatch machinery (`generate-method-name-wrappers`,
+  generic-arity dispatch) — largest and highest-risk module — in
   `apg-overload-dispatch.lisp`; struct-boxing/shared-constant warning comments in
   `apg-immutability.lisp`; export/shadow-list computation and generic-method collection in
   `apg-export-mirrors.lisp`; re-exports/`packages.lisp`/`csharp-generics.lisp` generation in

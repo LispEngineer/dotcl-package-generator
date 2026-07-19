@@ -159,6 +159,13 @@ constructor synthesis for structs (old `:1266-1271`) is in `apg-member-predicate
 Master Wrapper (old `:905`) is `generate-constructor-master-wrapper` in
 `apg-overload-dispatch.lisp`.
 
+**2026-07-19 follow-up note (append-only):** `doc/plan-fable-detail-09.md` further split
+`apg-overload-dispatch.lisp`'s per-parameter runtime type-check/guard-string generation
+(`resolvable-type-name-for-check`, `*numeric-primitive-check-types*`,
+`format-param-type-check`) out into its own `apg-type-checks.lisp` module (pure internal
+reorganization, byte-identical generated output) — the module count above is now eleven,
+not ten. See `FILES.md` for the current per-file breakdown.
+
 
 # Miscellaneous
 

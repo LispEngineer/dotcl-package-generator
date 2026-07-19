@@ -48,6 +48,11 @@ All emit one Lisp package, `assembly-package-generator`; split out of a former s
   method? a constant property? a mutable field?) and `classify-class-members`.
 * **`apg-overload-signatures.lisp`** — signature-string and docstring-formatting helpers
   used when documenting a method/constructor's overloads.
+* **`apg-type-checks.lisp`** — runtime type-check/guard-string generation for a single
+  parameter or return value (`resolvable-type-name-for-check`,
+  `*numeric-primitive-check-types*`, `format-param-type-check`). Split out of
+  `apg-overload-dispatch.lisp` (`doc/plan-fable-detail-09.md`, pure internal
+  reorganization; see `doc/generator-design-notes.md`).
 * **`apg-overload-dispatch.lisp`** — the overload/generic-arity dispatch engine: Master
   Wrapper generation, single-overload wrappers, generic-arity dispatchers.
 * **`apg-immutability.lisp`** — tracks which C# types are known-safe immutable primitives,
