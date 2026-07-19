@@ -1,5 +1,8 @@
 # Detail Plan 16: Surface `[Obsolete]` and Tuple Element Names
 
+**Status: DONE** — see commit 44f4d0c (Version 53). Tuple-element-name half scoped to
+metadata only; docstring-rendering codegen deferred as documented future work.
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 5.4 items 4–5);
   addresses `doc/claude-suggested-improvements-20260703.md`'s items 9 and 11 (the
   `[Obsolete]` slice of 11 only — general attribute reflection stays out of scope).

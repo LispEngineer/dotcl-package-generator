@@ -1,5 +1,7 @@
 # Detail Plan 05: `out`-Parameter Support (`out` → `cl:values`)
 
+**Status: DONE** — see commit 7360efd (Version 51).
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 3.3).
 * Standalone, but do Plan 02 (runtime suite) first if at all possible — this feature
   is exactly the kind of runtime-dispatch behavior that has historically shipped

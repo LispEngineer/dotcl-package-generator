@@ -1,5 +1,7 @@
 # Detail Plan 07: `--options-file` (Response-File CLI Front End) + Invocation Echo
 
+**Status: DONE** — see commit f5b2eaa (Version 52).
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 3.5); also
   satisfies most of `PLAN.md`'s "Add More to Generated `.lisp` Files" section.
 * Standalone. Two halves, separable if desired: (A) response file — CLI-only, no

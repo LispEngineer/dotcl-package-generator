@@ -1,5 +1,7 @@
 # Detail Plan 08: De-Fragilize Tests Against .NET Version/Path Changes
 
+**Status: DONE** — see commit 97f2c27.
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 3.6); addresses
   `PLAN.md`'s "Make the `AssemblyToLispy` tests less fragile" item (10.0.8 → 10.0.9
   upgrade broke tests).

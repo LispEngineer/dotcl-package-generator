@@ -1,5 +1,7 @@
 # Detail Plan 09: Extract `apg-type-checks.lisp` from `apg-overload-dispatch.lisp`
 
+**Status: DONE** — see commit ad8fa76 (no `*generator-version*` bump, byte-identical output).
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 4.2).
 * Standalone; **pure internal reorganization** — byte-identical generated output is
   the hard requirement. No `*generator-version*` bump (matching the precedent of the

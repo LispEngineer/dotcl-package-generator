@@ -1,5 +1,7 @@
 # Detail Plan 02: Runtime Exercise Suite (`make test-runtime`)
 
+**Status: DONE** — implemented (`RuntimeExerciseTest/`, `make test-runtime`); see commits 7562b2e/9d73496.
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 3.1(b)).
 * Standalone, but pairs naturally with Plan 01 (read-back check). Do 01 first if
   possible — it's the cheap half of the same verification gap.

@@ -1,5 +1,7 @@
 # Detail Plan 12: Namespace-Level Import (`--all-classes` / `--all-classes-recursive`)
 
+**Status: DONE** — see commit f94ab4b.
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 5.3); implements
   `PLAN.md`'s Miscellaneous item of the same name.
 * Standalone. CLI + manifest + resolution change; per-class generation machinery is

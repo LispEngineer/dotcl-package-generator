@@ -1,5 +1,7 @@
 # Detail Plan 03: Documentation Sync After the Modularization Refactor
 
+**Status: DONE** — see commit 46ff16c ("Sonnet implemented Fable Plan 03").
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 3.7).
 * Standalone; zero code change, zero version bump. Do early — every other plan's
   implementer benefits.

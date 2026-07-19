@@ -1,5 +1,7 @@
 # Detail Plan 01: Read-Back Verification of Generated Output (`--read-check`)
 
+**Status: DONE** — implemented (`--read-check`, `read-check.lisp`); see commit 9171d54.
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 3.1(a)).
 * Standalone: no dependency on any other plan in this series.
 * Estimated scope: small-medium. New Lisp file (~150 lines), small `Program.cs` mode,

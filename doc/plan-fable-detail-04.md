@@ -1,5 +1,10 @@
 # Detail Plan 04: Document Silently-Dropped Generic-Type-Parameter Members
 
+**Status: DONE** — implemented as a documentation correction rather than code, since the
+plan's core premise was found empirically false (see `doc/generator-design-notes.md`'s
+"Audit: the 'Silently-Dropped Generic-Type-Parameter Members' Premise Does Not Hold" section);
+see commit 97f2c27.
+
 * Part of the plan series from `doc/plan-fable-20260718.md` (section 3.2).
 * Standalone. Changes generated-output shape → **bump `*generator-version*`**
   (`apg-naming.lisp`) with a changelog docstring line, plus a
